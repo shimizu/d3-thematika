@@ -1,4 +1,4 @@
-# D3 Cartography
+# d3-Cartgraphy
 
 D3.jsを使用した地図作成（cartography）ライブラリです。
 
@@ -15,7 +15,7 @@ npm install d3-cartography
 ```html
 <!-- D3.js CDN -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<!-- D3 Cartography -->
+<!-- d3-Cartgraphy -->
 <script src="./dist/cartography.umd.js"></script>
 
 <script>

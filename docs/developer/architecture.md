@@ -1,11 +1,11 @@
 # アーキテクチャ
 
-D3 Cartographyライブラリの全体構造と設計思想について説明します。
+d3-Cartgraphyライブラリの全体構造と設計思想について説明します。
 
 ## 全体構造
 
 ```
-D3 Cartography
+d3-Cartgraphy
 ├── Core Layer (コア機能)
 │   ├── Cartography (メインクラス)
 │   ├── LayerManager (レイヤー管理)

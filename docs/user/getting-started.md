@@ -1,6 +1,6 @@
 # はじめに
 
-D3 Cartographyライブラリの基本的な使い方を学びましょう。
+d3-Cartgraphyライブラリの基本的な使い方を学びましょう。
 
 ## インストール
 
@@ -82,7 +82,7 @@ map.addLayer('countries', {
 
 ## 投影法の選択
 
-D3 Cartographyは複数の投影法をサポートしています：
+d3-Cartgraphyは複数の投影法をサポートしています：
 
 ```javascript
 // Natural Earth I (推奨)
