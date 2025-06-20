@@ -9,15 +9,15 @@ d3-Cartgraphy
 ├── Core Layer (コア機能)
 │   ├── Cartography (メインクラス)
 │   ├── LayerManager (レイヤー管理)
-│   ├── Renderer (描画エンジン)
-│   └── Projection (投影法)
+│   └── Renderer (描画エンジン)
 ├── Layer System (レイヤーシステム)
 │   ├── BaseLayer (基底クラス)
 │   ├── VectorLayer (ベクターレイヤー)
 │   └── [Future: RasterLayer, etc.]
 ├── Utilities (ユーティリティ)
 │   ├── GeoUtils (地理計算)
-│   └── StyleUtils (スタイル処理)
+│   ├── StyleUtils (スタイル処理)
+│   └── Tests (デバッグ・テストユーティリティ)
 └── Types (型定義)
 ```
 
@@ -71,6 +71,18 @@ d3-Cartgraphy
 - GeoJSONデータの描画
 - フィーチャー単位のスタイリング
 - イベントハンドリング
+- 動的スタイル関数のサポート
+
+### 5. Tests (デバッグ・テストユーティリティ)
+
+- 座標変換テスト機能
+- 投影法境界テスト
+- パフォーマンス測定
+
+**責任範囲:**
+- testProjectionTransform: 座標変換の異常値検出
+- testProjectionBounds: 投影法境界設定の検証
+- logTestResult: テスト結果の可視化
 
 ## データフロー
 
@@ -127,9 +139,9 @@ class CustomRenderer extends Renderer {
 - レイヤーの状態変化を監視
 - 自動的な再描画のトリガー
 
-### 3. Factory Pattern (投影法作成)
-- 投影法名から投影法オブジェクトを生成
-- 拡張可能な投影法サポート
+### 3. Direct Injection Pattern (投影法設定)
+- D3投影法オブジェクトを直接受け取る設計
+- より柔軟で拡張可能な投影法サポート
 
 ## パフォーマンス考慮事項
 
@@ -155,6 +167,8 @@ class CustomRenderer extends Renderer {
 ### Phase 1: 基本機能
 - ✅ コア機能の実装
 - ✅ ベクターレイヤー
+- ✅ 投影法設定（D3プロジェクション直接指定）
+- ✅ デバッグ・テストユーティリティ
 - ⏳ 基本的な主題図表現
 
 ### Phase 2: 高度な主題図
