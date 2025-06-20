@@ -43,6 +43,61 @@
     <script src="./cartography.umd.js"></script>
     
     <script>
+
+        async function main() {
+
+           const geojson =  await d3.json("./geojson/world.geojson");
+
+           console.log("GeoJSONデータ:", geojson);
+
+
+
+
+            const width = 800;
+            const height = 600;
+
+            // D3.jsの投影法を使用して地図の投影を設定
+            const projection = d3.geoEqualEarth()
+                .fitExtent([[0, 0], [800, 600]], geojson);
+
+            console.log("投影法:", projection);
+
+
+            // ライブラリのテスト機能を使用してprojectionによる座標変換をテストする
+            const testResult = Cartography.testProjectionTransform(width, height, projection, geojson);
+            
+            // テスト結果をコンソールに詳細出力
+            Cartography.logTestResult(testResult, true);
+            
+            // 投影法の境界設定もテスト
+            const boundsTest = Cartography.testProjectionBounds(projection, geojson);
+            console.log(boundsTest.message);
+
+
+            // UMD版のライブラリを使用（D3投影法を直接指定）
+            const map = new Cartography.Cartography({
+                container: '#map',
+                width: 800,
+                height: 600,
+                projection: projection
+            });
+            
+            map.addLayer('base', {
+                data: geojson,
+                style: {
+                    fill: '#ccc',
+                    stroke: '#000',
+                    strokeWidth: 1
+                }
+            });
+
+            console.log('地図ライブラリの初期化完了');
+
+            
+        }
+
+        main()
+
         // サンプルのGeoJSONデータ（簡単な世界地図）
         const worldGeometry = {
             "type": "FeatureCollection",
@@ -70,24 +125,7 @@
             ]
         };
 
-        // UMD版のライブラリを使用
-        const map = new Cartography.Cartography({
-            container: '#map',
-            width: 800,
-            height: 600,
-            projection: 'naturalEarth1'
-        });
-        
-        map.addLayer('base', {
-            data: worldGeometry,
-            style: {
-                fill: '#f8f9fa',
-                stroke: '#dee2e6',
-                strokeWidth: 1
-            }
-        });
 
-        console.log('地図ライブラリの初期化完了');
     </script>
 </body>
 </html>

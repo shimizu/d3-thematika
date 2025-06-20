@@ -11,8 +11,8 @@ export interface CartographyOptions {
   width: number;
   /** 地図の高さ（ピクセル） */
   height: number;
-  /** 投影法（文字列または投影法オブジェクト） */
-  projection: string | GeoProjection;
+  /** 投影法（D3投影法オブジェクト） */
+  projection: GeoProjection;
 }
 
 /**
@@ -80,10 +80,6 @@ export interface CartographyLayer {
   zIndex?: number;
 }
 
-/**
- * サポートされている投影法の種類
- */
-export type ProjectionName = 'naturalEarth1' | 'mercator' | 'orthographic' | 'equirectangular';
 
 /**
  * レンダラーのオプション

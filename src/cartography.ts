@@ -1,7 +1,6 @@
 import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { CartographyOptions, LayerOptions, LayerStyle } from './types';
-import { createProjection } from './core/projection';
 import { Renderer } from './core/renderer';
 import { LayerManager } from './core/layer-manager';
 import { VectorLayer } from './layers/vector-layer';
@@ -48,7 +47,7 @@ export class Cartography {
       .attr('class', 'cartography-map');
 
     // 投影法を設定
-    this.projection = createProjection(options.projection, this.width, this.height);
+    this.projection = options.projection;
 
     // レンダラーを初期化
     this.renderer = new Renderer({
@@ -124,10 +123,10 @@ export class Cartography {
 
   /**
    * 地図の投影法を変更します
-   * @param projection - 新しい投影法（文字列または投影法オブジェクト）
+   * @param projection - 新しい投影法オブジェクト
    */
-  setProjection(projection: string | GeoProjection): void {
-    this.projection = createProjection(projection, this.width, this.height);
+  setProjection(projection: GeoProjection): void {
+    this.projection = projection;
     
     // レンダラーの投影法を更新
     this.renderer.updateProjection({
@@ -153,8 +152,8 @@ export class Cartography {
       .attr('width', width)
       .attr('height', height);
 
-    // 投影法を再設定
-    this.projection = createProjection(this.projection, width, height);
+    // 投影法のサイズを更新（必要に応じて）
+    // 注意: 多くのD3投影法はsize/scaleの再設定が必要な場合があります
     this.renderer.updateProjection({
       svg: this.svg,
       projection: this.projection

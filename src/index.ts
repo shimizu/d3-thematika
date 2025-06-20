@@ -13,7 +13,7 @@
  *   container: '#map',
  *   width: 800,
  *   height: 600,
- *   projection: 'naturalEarth1'
+ *   projection: d3.geoMercator()
  * });
  * 
  * map.addLayer('countries', {
@@ -22,6 +22,7 @@
  * });
  * ```
  */
+
 
 // メインクラス
 export { Cartography } from './cartography';
@@ -32,13 +33,11 @@ export type {
   LayerOptions, 
   LayerStyle, 
   CartographyLayer,
-  ProjectionName,
   ILayer,
   RendererOptions
 } from './types';
 
 // コア機能
-export { createProjection } from './core/projection';
 export { Renderer } from './core/renderer';
 export { LayerManager } from './core/layer-manager';
 
@@ -49,3 +48,4 @@ export { VectorLayer } from './layers/vector-layer';
 // ユーティリティ
 export * from './utils/geo-utils';
 export * from './utils/style-utils';
+export * from './utils/tests';
