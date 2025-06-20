@@ -3,15 +3,30 @@ import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { CartographyOptions, LayerOptions, CartographyLayer, LayerStyle } from './cartography_types';
 import { createProjection } from './projection_utils';
 
+/**
+ * 地図描画を行うメインクラス
+ * D3.jsを使用してSVGベースの地図を作成し、複数のレイヤーを管理します
+ */
 export class Cartography {
+  /** DOM要素を選択するためのD3セレクション */
   private container: Selection<HTMLElement, unknown, HTMLElement, any>;
+  /** SVG要素のD3セレクション */
   private svg: Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  /** 地図投影法 */
   private projection: GeoProjection;
+  /** 地理データをSVGパスに変換するためのパス生成器 */
   private path: GeoPath;
+  /** レイヤーを管理するマップ */
   private layers: Map<string, CartographyLayer> = new Map();
+  /** 地図の幅 */
   private width: number;
+  /** 地図の高さ */
   private height: number;
 
+  /**
+   * Cartographyインスタンスを作成します
+   * @param options - 地図の設定オプション
+   */
   constructor(options: CartographyOptions) {
     this.width = options.width;
     this.height = options.height;
@@ -35,7 +50,9 @@ export class Cartography {
   }
 
   /**
-   * レイヤーを追加
+   * 地図にレイヤーを追加します
+   * @param id - レイヤーの一意識別子
+   * @param options - レイヤーの設定オプション（データとスタイル）
    */
   addLayer(id: string, options: LayerOptions): void {
     // データの正規化
@@ -65,7 +82,9 @@ export class Cartography {
   }
 
   /**
-   * レイヤーを描画
+   * レイヤーをSVGに描画します
+   * @param layer - 描画するレイヤーオブジェクト
+   * @private
    */
   private renderLayer(layer: CartographyLayer): void {
     // レイヤーグループを作成
@@ -90,7 +109,8 @@ export class Cartography {
   }
 
   /**
-   * レイヤーを削除
+   * 指定されたIDのレイヤーを削除します
+   * @param id - 削除するレイヤーのID
    */
   removeLayer(id: string): void {
     const layer = this.layers.get(id);
@@ -101,7 +121,8 @@ export class Cartography {
   }
 
   /**
-   * 投影法を変更
+   * 地図の投影法を変更します
+   * @param projection - 新しい投影法（文字列または投影法オブジェクト）
    */
   setProjection(projection: string | GeoProjection): void {
     this.projection = createProjection(projection, this.width, this.height);
@@ -110,7 +131,9 @@ export class Cartography {
   }
 
   /**
-   * 全レイヤーを再描画
+   * 全レイヤーを再描画します
+   * 投影法の変更時などに呼び出されます
+   * @private
    */
   private rerender(): void {
     this.svg.selectAll('.cartography-layer').remove();
@@ -121,14 +144,16 @@ export class Cartography {
   }
 
   /**
-   * SVG要素を取得
+   * 地図のSVG要素を取得します
+   * @returns 地図が描画されているSVG要素
    */
   getSVG(): SVGSVGElement {
     return this.svg.node()!;
   }
 
   /**
-   * 投影法を取得
+   * 現在の投影法を取得します
+   * @returns 現在使用されている投影法オブジェクト
    */
   getProjection(): GeoProjection {
     return this.projection;

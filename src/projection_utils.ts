@@ -7,6 +7,9 @@ import {
 } from 'd3-geo';
 import { ProjectionName } from './cartography_types';
 
+/**
+ * サポートされている投影法名と対応するD3投影法関数のマッピング
+ */
 const projectionMap: Record<ProjectionName, () => GeoProjection> = {
   naturalEarth1: geoNaturalEarth1,
   mercator: geoMercator,
@@ -14,6 +17,14 @@ const projectionMap: Record<ProjectionName, () => GeoProjection> = {
   equirectangular: geoEquirectangular
 };
 
+/**
+ * 投影法を作成し、地図のサイズに合わせて設定します
+ * @param projection - 投影法の名前または投影法オブジェクト
+ * @param width - 地図の幅
+ * @param height - 地図の高さ
+ * @returns 設定済みの投影法オブジェクト
+ * @throws {Error} 未知の投影法名が指定された場合
+ */
 export function createProjection(
   projection: string | GeoProjection,
   width: number,

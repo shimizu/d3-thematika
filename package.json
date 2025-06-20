@@ -9,7 +9,6 @@
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "dev": "rollup -c -w",
-    "serve": "rollup -c -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
