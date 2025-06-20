@@ -16,10 +16,11 @@
  *   projection: d3.geoMercator()
  * });
  * 
- * map.addLayer('countries', {
+ * const layer = new VectorLayer({
  *   data: geoJsonData,
  *   style: { fill: '#f0f0f0', stroke: '#333' }
  * });
+ * map.addLayer('countries', layer);
  * ```
  */
 
@@ -31,15 +32,11 @@ export { Cartography } from './cartography';
 // 型定義
 export type { 
   CartographyOptions, 
-  LayerOptions, 
   LayerStyle, 
-  CartographyLayer,
-  ILayer,
-  RendererOptions
+  ILayer
 } from './types';
 
 // コア機能
-export { Renderer } from './core/renderer';
 export { LayerManager } from './core/layer-manager';
 
 // レイヤークラス

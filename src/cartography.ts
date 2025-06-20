@@ -1,7 +1,6 @@
 import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
-import { CartographyOptions, LayerOptions, LayerStyle, ILayer } from './types';
-import { Renderer } from './core/renderer';
+import { CartographyOptions, LayerStyle, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
 import { VectorLayer } from './layers/vector-layer';
 
@@ -18,8 +17,6 @@ export class Cartography {
   private svgGroup: Selection<SVGGElement, unknown, HTMLElement, any>;
   /** 地図投影法 */
   private projection: GeoProjection;
-  /** レンダラーインスタンス */
-  private renderer: Renderer;
   /** レイヤーマネージャーインスタンス */
   private layerManager: LayerManager;
   /** 地図の幅 */
@@ -55,48 +52,20 @@ export class Cartography {
     // 投影法を設定
     this.projection = options.projection;
 
-    // レンダラーを初期化
-    this.renderer = new Renderer({
-      svg: this.svg,
-      projection: this.projection
-    });
-
     // レイヤーマネージャーを初期化
-    this.layerManager = new LayerManager(this.renderer);
+    this.layerManager = new LayerManager();
     this.layerManager.setContext(this.svgGroup, this.projection);
   }
 
   /**
    * 地図にレイヤーを追加します
    * @param id - レイヤーの一意識別子
-   * @param optionsOrLayer - レイヤーの設定オプション（データとスタイル）またはレイヤーインスタンス
+   * @param layer - レイヤーインスタンス
    */
-  addLayer(id: string, optionsOrLayer: LayerOptions | ILayer): void {
-    if ('render' in optionsOrLayer && 'update' in optionsOrLayer) {
-      // ILayerインスタンスの場合
-      this.layerManager.addLayerInstance(id, optionsOrLayer);
-    } else {
-      // 従来のLayerOptionsの場合
-      this.layerManager.addLayer(id, optionsOrLayer as LayerOptions);
-    }
+  addLayer(id: string, layer: ILayer): void {
+    this.layerManager.addLayer(id, layer);
   }
 
-  /**
-   * ベクターレイヤーを追加します（新しいAPI）
-   * @param id - レイヤーの一意識別子
-   * @param data - GeoJSONデータ
-   * @param style - レイヤーのスタイル設定
-   * @returns 作成されたベクターレイヤー
-   */
-  addVectorLayer(
-    id: string, 
-    data: GeoJSON.FeatureCollection | GeoJSON.Feature[], 
-    style: LayerStyle = {}
-  ): VectorLayer {
-    const vectorLayer = new VectorLayer({ data, style });
-    this.addLayer(id, vectorLayer);
-    return vectorLayer;
-  }
 
   /**
    * 指定されたIDのレイヤーを削除します
@@ -140,12 +109,6 @@ export class Cartography {
   setProjection(projection: GeoProjection): void {
     this.projection = projection;
     
-    // レンダラーの投影法を更新
-    this.renderer.updateProjection({
-      svg: this.svg,
-      projection: this.projection
-    });
-    
     // レイヤーマネージャーの投影法を更新
     this.layerManager.updateProjection(this.projection);
     
@@ -169,11 +132,7 @@ export class Cartography {
 
     // 投影法のサイズを更新（必要に応じて）
     // 注意: 多くのD3投影法はsize/scaleの再設定が必要な場合があります
-    this.renderer.updateProjection({
-      svg: this.svg,
-      projection: this.projection
-    });
-
+    
     // レイヤーマネージャーの投影法を更新
     this.layerManager.updateProjection(this.projection);
 
@@ -203,10 +162,6 @@ export class Cartography {
     ];
 
     this.projection.scale(scale).translate(translate);
-    this.renderer.updateProjection({
-      svg: this.svg,
-      projection: this.projection
-    });
     this.layerManager.updateProjection(this.projection);
     this.layerManager.rerenderAllLayers();
   }

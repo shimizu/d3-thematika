@@ -31,15 +31,6 @@ export interface LayerStyle {
   className?: string;
 }
 
-/**
- * レイヤー追加時のオプション
- */
-export interface LayerOptions {
-  /** 地理データ（GeoJSONフィーチャーコレクションまたはフィーチャー配列） */
-  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  /** レイヤーのスタイル設定（オプション） */
-  style?: LayerStyle;
-}
 
 /**
  * 基底レイヤーインターフェース
@@ -68,31 +59,4 @@ export interface ILayer {
   isRendered(): boolean;
 }
 
-/**
- * 内部で管理されるレイヤーオブジェクト
- */
-export interface CartographyLayer {
-  /** レイヤーの一意識別子 */
-  id: string;
-  /** 正規化されたGeoJSONデータ */
-  data: GeoJSON.FeatureCollection;
-  /** レイヤーのスタイル設定 */
-  style: LayerStyle;
-  /** レイヤーに対応するSVGグループ要素 */
-  element?: SVGGElement;
-  /** レイヤーの表示状態 */
-  visible?: boolean;
-  /** レイヤーの描画順序 */
-  zIndex?: number;
-}
 
-
-/**
- * レンダラーのオプション
- */
-export interface RendererOptions {
-  /** SVGコンテナ */
-  svg: Selection<SVGSVGElement, unknown, HTMLElement, any>;
-  /** 地図投影法 */
-  projection: GeoProjection;
-}
