@@ -20,13 +20,13 @@ export interface CartographyOptions {
  */
 export interface LayerStyle {
   /** 塗りつぶし色 */
-  fill?: string;
+  fill?: string | ((feature: GeoJSON.Feature) => string);
   /** 境界線の色 */
-  stroke?: string;
+  stroke?: string | ((feature: GeoJSON.Feature) => string);
   /** 境界線の幅 */
-  strokeWidth?: number;
+  strokeWidth?: number | ((feature: GeoJSON.Feature) => number);
   /** 透明度（0-1） */
-  opacity?: number;
+  opacity?: number | ((feature: GeoJSON.Feature) => number);
   /** 追加のCSSクラス名 */
   className?: string;
 }

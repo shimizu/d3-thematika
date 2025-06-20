@@ -97,10 +97,22 @@ export abstract class BaseLayer implements ILayer {
 
     const container = this.element as any as Selection<SVGGElement, unknown, HTMLElement, any>;
     container.selectAll('path')
-      .style('fill', this.style.fill!)
-      .style('stroke', this.style.stroke!)
-      .style('stroke-width', this.style.strokeWidth!)
-      .style('opacity', this.style.opacity!);
+      .style('fill', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.fill === 'function' ? this.style.fill(feature) : (this.style.fill || null);
+      })
+      .style('stroke', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.stroke === 'function' ? this.style.stroke(feature) : (this.style.stroke || null);
+      })
+      .style('stroke-width', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(feature) : (this.style.strokeWidth || null);
+      })
+      .style('opacity', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.opacity === 'function' ? this.style.opacity(feature) : (this.style.opacity || null);
+      });
   }
 
   /**

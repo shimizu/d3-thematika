@@ -109,10 +109,18 @@ export class VectorLayer extends BaseLayer {
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .style('fill', this.style.fill!)
-      .style('stroke', this.style.stroke!)
-      .style('stroke-width', this.style.strokeWidth!)
-      .style('opacity', this.style.opacity!)
+      .style('fill', (d: GeoJSON.Feature) => {
+        return typeof this.style.fill === 'function' ? this.style.fill(d) : (this.style.fill || null);
+      })
+      .style('stroke', (d: GeoJSON.Feature) => {
+        return typeof this.style.stroke === 'function' ? this.style.stroke(d) : (this.style.stroke || null);
+      })
+      .style('stroke-width', (d: GeoJSON.Feature) => {
+        return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(d) : (this.style.strokeWidth || null);
+      })
+      .style('opacity', (d: GeoJSON.Feature) => {
+        return typeof this.style.opacity === 'function' ? this.style.opacity(d) : (this.style.opacity || null);
+      })
       .style('cursor', 'pointer');
   }
 
@@ -129,10 +137,26 @@ export class VectorLayer extends BaseLayer {
 
     this.layerGroup.selectAll('path')
       .filter((d: any) => filter(d as GeoJSON.Feature))
-      .style('fill', style.fill || this.style.fill!)
-      .style('stroke', style.stroke || this.style.stroke!)
-      .style('stroke-width', style.strokeWidth || this.style.strokeWidth!)
-      .style('opacity', style.opacity || this.style.opacity!);
+      .style('fill', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        const fillValue = style.fill || this.style.fill;
+        return typeof fillValue === 'function' ? fillValue(feature) : (fillValue || null);
+      })
+      .style('stroke', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        const strokeValue = style.stroke || this.style.stroke;
+        return typeof strokeValue === 'function' ? strokeValue(feature) : (strokeValue || null);
+      })
+      .style('stroke-width', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        const strokeWidthValue = style.strokeWidth || this.style.strokeWidth;
+        return typeof strokeWidthValue === 'function' ? strokeWidthValue(feature) : (strokeWidthValue || null);
+      })
+      .style('opacity', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        const opacityValue = style.opacity || this.style.opacity;
+        return typeof opacityValue === 'function' ? opacityValue(feature) : (opacityValue || null);
+      });
   }
 
   /**

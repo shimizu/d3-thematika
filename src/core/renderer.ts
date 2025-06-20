@@ -48,10 +48,18 @@ export class Renderer {
       .append('path')
       .attr('d', this.path)
       .attr('class', d => `cartography-feature ${layer.style.className || ''}`)
-      .style('fill', layer.style.fill!)
-      .style('stroke', layer.style.stroke!)
-      .style('stroke-width', layer.style.strokeWidth!)
-      .style('opacity', layer.style.opacity!);
+      .style('fill', (d: GeoJSON.Feature) => {
+        return typeof layer.style.fill === 'function' ? layer.style.fill(d) : (layer.style.fill || null);
+      })
+      .style('stroke', (d: GeoJSON.Feature) => {
+        return typeof layer.style.stroke === 'function' ? layer.style.stroke(d) : (layer.style.stroke || null);
+      })
+      .style('stroke-width', (d: GeoJSON.Feature) => {
+        return typeof layer.style.strokeWidth === 'function' ? layer.style.strokeWidth(d) : (layer.style.strokeWidth || null);
+      })
+      .style('opacity', (d: GeoJSON.Feature) => {
+        return typeof layer.style.opacity === 'function' ? layer.style.opacity(d) : (layer.style.opacity || null);
+      });
 
     layer.element = layerGroup.node()!;
   }
@@ -67,10 +75,22 @@ export class Renderer {
     
     layerGroup
       .selectAll('path')
-      .style('fill', layer.style.fill!)
-      .style('stroke', layer.style.stroke!)
-      .style('stroke-width', layer.style.strokeWidth!)
-      .style('opacity', layer.style.opacity!);
+      .style('fill', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof layer.style.fill === 'function' ? layer.style.fill(feature) : (layer.style.fill || null);
+      })
+      .style('stroke', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof layer.style.stroke === 'function' ? layer.style.stroke(feature) : (layer.style.stroke || null);
+      })
+      .style('stroke-width', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof layer.style.strokeWidth === 'function' ? layer.style.strokeWidth(feature) : (layer.style.strokeWidth || null);
+      })
+      .style('opacity', (d: any) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof layer.style.opacity === 'function' ? layer.style.opacity(feature) : (layer.style.opacity || null);
+      });
   }
 
   /**
