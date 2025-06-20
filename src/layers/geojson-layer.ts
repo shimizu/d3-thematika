@@ -1,7 +1,7 @@
-import { Selection } from 'd3-selection';
+import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle } from '../types';
+import { LayerStyle, DropShadowConfig } from '../types';
 
 /**
  * GeojsonLayerの初期化オプション
@@ -132,6 +132,14 @@ export class GeojsonLayer extends BaseLayer {
       })
       .style('opacity', (d: GeoJSON.Feature) => {
         return typeof this.style.opacity === 'function' ? this.style.opacity(d) : (this.style.opacity || null);
+      })
+      .style('filter', (d: GeoJSON.Feature) => {
+        // dropShadowが関数の場合は個別のfeatureに適用
+        if (typeof this.style.dropShadow === 'function') {
+          const shadow = this.style.dropShadow(d);
+          return `drop-shadow(${shadow.offsetX}px ${shadow.offsetY}px ${shadow.blur}px ${shadow.color})`;
+        }
+        return null; // レイヤー全体のfilterを使用
       })
       .style('cursor', 'pointer');
   }

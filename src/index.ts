@@ -33,7 +33,8 @@ export { Cartography } from './cartography';
 export type { 
   CartographyOptions, 
   LayerStyle, 
-  ILayer
+  ILayer,
+  DropShadowConfig
 } from './types';
 
 // コア機能

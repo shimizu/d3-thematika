@@ -7,7 +7,7 @@ import { LayerStyle } from '../types';
 /**
  * デフォルトのレイヤースタイル
  */
-export const DEFAULT_LAYER_STYLE: Required<LayerStyle> = {
+export const DEFAULT_LAYER_STYLE: LayerStyle = {
   fill: '#cccccc',
   stroke: '#333333',
   strokeWidth: 0.5,
@@ -30,8 +30,8 @@ export function mergeStyles(baseStyle: LayerStyle, overrideStyle: LayerStyle = {
  * @param style - 元のスタイル
  * @returns 完全なスタイル
  */
-export function normalizeStyle(style: LayerStyle = {}): Required<LayerStyle> {
-  return mergeStyles(DEFAULT_LAYER_STYLE, style) as Required<LayerStyle>;
+export function normalizeStyle(style: LayerStyle = {}): LayerStyle {
+  return mergeStyles(DEFAULT_LAYER_STYLE, style);
 }
 
 /**

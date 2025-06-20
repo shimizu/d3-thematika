@@ -12,7 +12,7 @@
             background: #f8f9fa;
         }
         
-        #map, #map2 {
+        #map {
             margin: 20px auto;
             display: block;
             background: white;
@@ -43,7 +43,6 @@
     </div>
     
     <div id="map"></div>
-    <div id="map2"></div>
     
     <!-- D3.js CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -84,8 +83,8 @@
 
 
             // === 新しいAPI（レイヤークラスベース） ===
-            const map2 = new Cartography.Cartography({
-                container: '#map2',
+            const map = new Cartography.Cartography({
+                container: '#map',
                 width: 800,
                 height: 600,
                 projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
@@ -95,15 +94,27 @@
             const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,
                 style: {
-                    fill: '#e8f4f8',
-                    stroke: '#2c5530',
+                    fill: (d,i) => { i%2 == 0 ? '#e8f4f8' : '#cfe2f3' }, // 偶数インデックスのフィーチャーは薄い青、奇数は薄い灰色
+                    stroke: (d,i)=>{'#2c5530'},
                     strokeWidth: 0.8,
-                    opacity: 0.9
+                    opacity: (d,i) =>{ 0.9 },
+                    // ドロップシャドウを追加
+                    dropShadow: (d,i) => {
+                        console.log('geojson feature', d);
+                        console.log('feature index:', i);
+                        
+                        return {
+                            offsetX: 3,
+                            offsetY: 3,
+                            blur: 6,
+                            color: 'rgba(0,0,0,0.3)'
+                        }
+                    }
                 }
             });
 
             // レイヤーインスタンスを地図に追加
-            map2.addLayer('world_new', worldLayer);
+            map.addLayer('world_new', worldLayer);
 
             // チェックボックスのイベントリスナーを追加
             const checkbox = document.getElementById('hideLayerCheckbox');

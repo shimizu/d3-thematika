@@ -16,6 +16,20 @@ export interface CartographyOptions {
 }
 
 /**
+ * ドロップシャドウの設定
+ */
+export interface DropShadowConfig {
+  /** X方向のオフセット（ピクセル） */
+  offsetX: number;
+  /** Y方向のオフセット（ピクセル） */
+  offsetY: number;
+  /** ぼかし半径（ピクセル） */
+  blur: number;
+  /** 影の色 */
+  color: string;
+}
+
+/**
  * レイヤーのスタイル設定
  */
 export interface LayerStyle {
@@ -29,6 +43,8 @@ export interface LayerStyle {
   opacity?: number | ((feature: GeoJSON.Feature) => number);
   /** 追加のCSSクラス名 */
   className?: string;
+  /** ドロップシャドウ設定 */
+  dropShadow?: DropShadowConfig | ((feature: GeoJSON.Feature) => DropShadowConfig) | string;
 }
 
 
