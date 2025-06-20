@@ -99,21 +99,25 @@ export abstract class BaseLayer implements ILayer {
     // d3-selectionでelementをラップして適切なD3セレクションを作成
     const container = select(this.element);
     container.selectAll('path')
-      .style('fill', (d: any) => {
+      .style('fill', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
-        return typeof this.style.fill === 'function' ? this.style.fill(feature) : (this.style.fill || null);
+        return typeof this.style.fill === 'function' ? this.style.fill(feature, i) : (this.style.fill || null);
       })
-      .style('stroke', (d: any) => {
+      .style('stroke', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
-        return typeof this.style.stroke === 'function' ? this.style.stroke(feature) : (this.style.stroke || null);
+        return typeof this.style.stroke === 'function' ? this.style.stroke(feature, i) : (this.style.stroke || null);
       })
-      .style('stroke-width', (d: any) => {
+      .style('stroke-width', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
-        return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(feature) : (this.style.strokeWidth || null);
+        return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(feature, i) : (this.style.strokeWidth || null);
       })
-      .style('opacity', (d: any) => {
+      .style('stroke-dasharray', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
-        return typeof this.style.opacity === 'function' ? this.style.opacity(feature) : (this.style.opacity || null);
+        return typeof this.style.strokeDasharray === 'function' ? this.style.strokeDasharray(feature, i) : (this.style.strokeDasharray || null);
+      })
+      .style('opacity', (d: any, i: number) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.opacity === 'function' ? this.style.opacity(feature, i) : (this.style.opacity || null);
       });
   }
 

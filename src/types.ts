@@ -34,17 +34,19 @@ export interface DropShadowConfig {
  */
 export interface LayerStyle {
   /** 塗りつぶし色 */
-  fill?: string | ((feature: GeoJSON.Feature) => string);
+  fill?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 境界線の色 */
-  stroke?: string | ((feature: GeoJSON.Feature) => string);
+  stroke?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 境界線の幅 */
-  strokeWidth?: number | ((feature: GeoJSON.Feature) => number);
+  strokeWidth?: number | ((feature: GeoJSON.Feature, index?: number) => number);
+  /** 境界線の破線パターン */
+  strokeDasharray?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 透明度（0-1） */
-  opacity?: number | ((feature: GeoJSON.Feature) => number);
+  opacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
   /** 追加のCSSクラス名 */
   className?: string;
   /** ドロップシャドウ設定 */
-  dropShadow?: DropShadowConfig | ((feature: GeoJSON.Feature) => DropShadowConfig) | string;
+  dropShadow?: DropShadowConfig | ((feature: GeoJSON.Feature, index?: number) => DropShadowConfig) | string;
 }
 
 

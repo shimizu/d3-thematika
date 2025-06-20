@@ -94,10 +94,11 @@
             const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,
                 style: {
-                    fill: (d,i) => { i%2 == 0 ? '#e8f4f8' : '#cfe2f3' }, // 偶数インデックスのフィーチャーは薄い青、奇数は薄い灰色
-                    stroke: (d,i)=>{'#2c5530'},
+                    fill: (d,i) => i%2 == 0 ? '#e8f4f8' : '#ffe200', // 偶数インデックスのフィーチャーは薄い青、奇数は薄い灰色
+                    stroke: (d,i) => '#2c5530',
                     strokeWidth: 0.8,
-                    opacity: (d,i) =>{ 0.9 },
+                    strokeDasharray: (d,i) => i%3 === 0 ? '5,5' : i%3 === 1 ? '10,2' : null, // インデックスによって破線パターンを変更
+                    opacity: (d,i) => 0.9,
                     // ドロップシャドウを追加
                     dropShadow: (d,i) => {
                         console.log('geojson feature', d);
