@@ -1,6 +1,6 @@
 import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
-import { CartographyOptions, LayerOptions, LayerStyle } from './types';
+import { CartographyOptions, LayerOptions, LayerStyle, ILayer } from './types';
 import { Renderer } from './core/renderer';
 import { LayerManager } from './core/layer-manager';
 import { VectorLayer } from './layers/vector-layer';
@@ -14,6 +14,8 @@ export class Cartography {
   private container: Selection<HTMLElement, unknown, HTMLElement, any>;
   /** SVG要素のD3セレクション */
   private svg: Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  /** メインのSVGグループ要素 */
+  private svgGroup: Selection<SVGGElement, unknown, HTMLElement, any>;
   /** 地図投影法 */
   private projection: GeoProjection;
   /** レンダラーインスタンス */
@@ -46,6 +48,10 @@ export class Cartography {
       .attr('height', this.height)
       .attr('class', 'cartography-map');
 
+    // メインのSVGグループを作成
+    this.svgGroup = this.svg.append('g')
+      .attr('class', 'cartography-main-group');
+
     // 投影法を設定
     this.projection = options.projection;
 
@@ -57,15 +63,22 @@ export class Cartography {
 
     // レイヤーマネージャーを初期化
     this.layerManager = new LayerManager(this.renderer);
+    this.layerManager.setContext(this.svgGroup, this.projection);
   }
 
   /**
-   * 地図にレイヤーを追加します（後方互換性のため）
+   * 地図にレイヤーを追加します
    * @param id - レイヤーの一意識別子
-   * @param options - レイヤーの設定オプション（データとスタイル）
+   * @param optionsOrLayer - レイヤーの設定オプション（データとスタイル）またはレイヤーインスタンス
    */
-  addLayer(id: string, options: LayerOptions): void {
-    this.layerManager.addLayer(id, options);
+  addLayer(id: string, optionsOrLayer: LayerOptions | ILayer): void {
+    if ('render' in optionsOrLayer && 'update' in optionsOrLayer) {
+      // ILayerインスタンスの場合
+      this.layerManager.addLayerInstance(id, optionsOrLayer);
+    } else {
+      // 従来のLayerOptionsの場合
+      this.layerManager.addLayer(id, optionsOrLayer as LayerOptions);
+    }
   }
 
   /**
@@ -80,9 +93,8 @@ export class Cartography {
     data: GeoJSON.FeatureCollection | GeoJSON.Feature[], 
     style: LayerStyle = {}
   ): VectorLayer {
-    const vectorLayer = new VectorLayer(id, data, this.projection, style);
-    const layerGroup = this.svg.append('g');
-    vectorLayer.render(layerGroup);
+    const vectorLayer = new VectorLayer({ data, style });
+    this.addLayer(id, vectorLayer);
     return vectorLayer;
   }
 
@@ -134,6 +146,9 @@ export class Cartography {
       projection: this.projection
     });
     
+    // レイヤーマネージャーの投影法を更新
+    this.layerManager.updateProjection(this.projection);
+    
     // 全レイヤーを再描画
     this.layerManager.rerenderAllLayers();
   }
@@ -158,6 +173,9 @@ export class Cartography {
       svg: this.svg,
       projection: this.projection
     });
+
+    // レイヤーマネージャーの投影法を更新
+    this.layerManager.updateProjection(this.projection);
 
     // 全レイヤーを再描画
     this.layerManager.rerenderAllLayers();
@@ -189,6 +207,7 @@ export class Cartography {
       svg: this.svg,
       projection: this.projection
     });
+    this.layerManager.updateProjection(this.projection);
     this.layerManager.rerenderAllLayers();
   }
 

@@ -12,7 +12,7 @@
             background: #f8f9fa;
         }
         
-        #map {
+        #map, #map2 {
             margin: 20px auto;
             display: block;
             background: white;
@@ -31,10 +31,12 @@
 <body>
     <div class="info">
         <h1>Cartography ライブラリ テスト</h1>
-        <p>基本的な地図描画機能をテストします</p>
+        <p>基本的な地図描画機能と新しいレイヤーシステムをテストします</p>
+        <p>上の地図：従来のAPI、下の地図：新しいレイヤークラスベースAPI</p>
     </div>
     
     <div id="map"></div>
+    <div id="map2"></div>
     
     <!-- D3.js CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -74,24 +76,29 @@
             console.log(boundsTest.message);
 
 
-            // UMD版のライブラリを使用（D3投影法を直接指定）
-            const map = new Cartography.Cartography({
-                container: '#map',
+            // === 新しいAPI（レイヤークラスベース） ===
+            const map2 = new Cartography.Cartography({
+                container: '#map2',
                 width: 800,
                 height: 600,
-                projection: projection
+                projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
             });
-            
-            map.addLayer('base', {
+
+            // VectorLayerインスタンスを作成
+            const worldLayer = new Cartography.VectorLayer({
                 data: geojson,
                 style: {
-                    fill: '#ccc',
-                    stroke: '#000',
-                    strokeWidth: 1
+                    fill: '#e8f4f8',
+                    stroke: '#2c5530',
+                    strokeWidth: 0.8,
+                    opacity: 0.9
                 }
             });
 
-            console.log('地図ライブラリの初期化完了');
+            // レイヤーインスタンスを地図に追加
+            map2.addLayer('world_new', worldLayer);
+
+            console.log('地図ライブラリの初期化完了（新しいAPI）');
 
             
         }

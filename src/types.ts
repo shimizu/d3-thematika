@@ -60,6 +60,12 @@ export interface ILayer {
   destroy(): void;
   /** スタイルを設定する */
   setStyle(style: LayerStyle): void;
+  /** 表示状態を設定する */
+  setVisible(visible: boolean): void;
+  /** 描画順序を設定する */
+  setZIndex(zIndex: number): void;
+  /** レイヤーが描画されているかを確認する */
+  isRendered(): boolean;
 }
 
 /**

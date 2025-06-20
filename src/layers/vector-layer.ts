@@ -4,37 +4,49 @@ import { BaseLayer } from './base-layer';
 import { LayerStyle } from '../types';
 
 /**
+ * VectorLayerの初期化オプション
+ */
+export interface VectorLayerOptions {
+  /** GeoJSONデータ */
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
+  /** レイヤーのスタイル設定 */
+  style?: LayerStyle;
+}
+
+/**
  * ベクターデータ（GeoJSON）を描画するレイヤークラス
  */
 export class VectorLayer extends BaseLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */
-  private path: GeoPath;
+  private path?: GeoPath;
   /** レイヤーグループ */
   private layerGroup?: Selection<SVGGElement, unknown, HTMLElement, any>;
 
   /**
    * ベクターレイヤーを初期化します
-   * @param id - レイヤーの一意識別子
-   * @param data - GeoJSONデータ
-   * @param projection - 地図投影法
-   * @param style - レイヤーのスタイル設定
+   * @param options - レイヤーの設定オプション
    */
-  constructor(
-    id: string,
-    data: GeoJSON.FeatureCollection | GeoJSON.Feature[],
-    projection: GeoProjection,
-    style: LayerStyle = {}
-  ) {
-    super(id, style);
+  constructor(options: VectorLayerOptions) {
+    // 一意のIDを自動生成
+    super(`vector-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.style);
     
     // データの正規化
-    this.data = Array.isArray(data)
-      ? { type: 'FeatureCollection', features: data }
-      : data as GeoJSON.FeatureCollection;
-      
+    this.data = Array.isArray(options.data)
+      ? { type: 'FeatureCollection', features: options.data }
+      : options.data as GeoJSON.FeatureCollection;
+  }
+
+  /**
+   * 投影法を設定します
+   * @param projection - 地図投影法
+   */
+  setProjection(projection: GeoProjection): void {
     this.path = geoPath(projection);
+    if (this.layerGroup) {
+      this.update();
+    }
   }
 
   /**
@@ -95,7 +107,7 @@ export class VectorLayer extends BaseLayer {
    * @private
    */
   private renderFeatures(): void {
-    if (!this.layerGroup) return;
+    if (!this.layerGroup || !this.path) return;
 
     this.layerGroup
       .selectAll('path')
