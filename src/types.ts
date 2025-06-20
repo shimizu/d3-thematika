@@ -66,4 +66,12 @@ export interface ILayer {
   isRendered(): boolean;
 }
 
+/**
+ * GeoJSONレイヤーインターフェース
+ */
+export interface IGeojsonLayer extends ILayer {
+  /** 投影法を設定する */
+  setProjection(projection: GeoProjection): void;
+}
+
 

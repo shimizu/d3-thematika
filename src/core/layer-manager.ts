@@ -1,4 +1,4 @@
-import { LayerStyle, ILayer } from '../types';
+import { LayerStyle, ILayer, IGeojsonLayer } from '../types';
 import { GeoProjection } from 'd3-geo';
 import { Selection } from 'd3-selection';
 
@@ -42,9 +42,9 @@ export class LayerManager {
       throw new Error('SVG container not set. Call setContext() first.');
     }
 
-    // 投影法をレイヤーに設定（VectorLayerの場合）
-    if (this.projection && 'setProjection' in layerInstance) {
-      (layerInstance as any).setProjection(this.projection);
+    // 投影法をレイヤーに設定（GeojsonLayerの場合）
+    if (this.projection && this.isGeojsonLayer(layerInstance)) {
+      layerInstance.setProjection(this.projection);
     }
 
     // zIndexを設定
@@ -146,8 +146,8 @@ export class LayerManager {
       
       sortedInstances.forEach(layer => {
         layer.destroy();
-        if (this.projection && 'setProjection' in layer) {
-          (layer as any).setProjection(this.projection);
+        if (this.projection && this.isGeojsonLayer(layer)) {
+          layer.setProjection(this.projection);
         }
         layer.render(this.svgContainer!);
       });
@@ -167,7 +167,7 @@ export class LayerManager {
     Array.from(this.layerInstances.values())
       .filter(layer => layer.isRendered())
       .forEach(layer => {
-        const element = (layer as any).element;
+        const element = this.getLayerElement(layer);
         if (element) {
           allElements.push({ element, zIndex: layer.zIndex });
         }
@@ -197,8 +197,8 @@ export class LayerManager {
     
     // レイヤーインスタンスの投影法を更新
     this.layerInstances.forEach(layer => {
-      if ('setProjection' in layer) {
-        (layer as any).setProjection(projection);
+      if (this.isGeojsonLayer(layer)) {
+        layer.setProjection(projection);
       }
     });
   }
@@ -216,6 +216,30 @@ export class LayerManager {
     );
     
     return maxZIndex + 1;
+  }
+
+  /**
+   * レイヤーがIGeojsonLayerインターフェースを実装しているか確認します
+   * @private
+   * @param layer - 確認するレイヤー
+   * @returns IGeojsonLayerの場合true
+   */
+  private isGeojsonLayer(layer: ILayer): layer is IGeojsonLayer {
+    return 'setProjection' in layer;
+  }
+
+  /**
+   * レイヤーのSVG要素を取得します
+   * @private
+   * @param layer - 対象のレイヤー
+   * @returns SVG要素またはundefined
+   */
+  private getLayerElement(layer: ILayer): SVGElement | undefined {
+    // BaseLayerを使用している場合、elementプロパティにアクセス
+    if ('element' in layer) {
+      return (layer as any).element;
+    }
+    return undefined;
   }
 
 }

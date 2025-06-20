@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle } from '../types';
+import { LayerStyle, IGeojsonLayer } from '../types';
 
 /**
  * GeojsonLayerの初期化オプション
@@ -18,7 +18,7 @@ export interface GeojsonLayerOptions {
 /**
  * GeoJSONデータを描画するレイヤークラス
  */
-export class GeojsonLayer extends BaseLayer {
+export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */
