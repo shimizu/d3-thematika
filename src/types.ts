@@ -1,4 +1,5 @@
 import { GeoProjection } from 'd3-geo';
+import { Selection } from 'd3-selection';
 
 /**
  * Cartographyインスタンスの初期化オプション
@@ -41,6 +42,27 @@ export interface LayerOptions {
 }
 
 /**
+ * 基底レイヤーインターフェース
+ */
+export interface ILayer {
+  /** レイヤーの一意識別子 */
+  readonly id: string;
+  /** レイヤーの表示状態 */
+  visible: boolean;
+  /** レイヤーの描画順序 */
+  zIndex: number;
+  
+  /** レイヤーを描画する */
+  render(container: Selection<SVGGElement, unknown, HTMLElement, any>): void;
+  /** レイヤーを更新する */
+  update(): void;
+  /** レイヤーを削除する */
+  destroy(): void;
+  /** スタイルを設定する */
+  setStyle(style: LayerStyle): void;
+}
+
+/**
  * 内部で管理されるレイヤーオブジェクト
  */
 export interface CartographyLayer {
@@ -52,9 +74,23 @@ export interface CartographyLayer {
   style: LayerStyle;
   /** レイヤーに対応するSVGグループ要素 */
   element?: SVGGElement;
+  /** レイヤーの表示状態 */
+  visible?: boolean;
+  /** レイヤーの描画順序 */
+  zIndex?: number;
 }
 
 /**
  * サポートされている投影法の種類
  */
 export type ProjectionName = 'naturalEarth1' | 'mercator' | 'orthographic' | 'equirectangular';
+
+/**
+ * レンダラーのオプション
+ */
+export interface RendererOptions {
+  /** SVGコンテナ */
+  svg: Selection<SVGSVGElement, unknown, HTMLElement, any>;
+  /** 地図投影法 */
+  projection: GeoProjection;
+}

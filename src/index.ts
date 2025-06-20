@@ -3,6 +3,7 @@
  * 
  * このライブラリはD3.jsを使用してSVGベースの地図を作成するためのツールを提供します。
  * 複数のレイヤーを管理し、様々な投影法をサポートしています。
+ * リファクタリングによりモジュール化され、拡張性と保守性が向上しました。
  * 
  * @example
  * ```typescript
@@ -22,17 +23,29 @@
  * ```
  */
 
-/** メインのCartographyクラス */
-export { Cartography } from './cartography_main';
+// メインクラス
+export { Cartography } from './cartography';
 
-/** 型定義のエクスポート */
+// 型定義
 export type { 
   CartographyOptions, 
   LayerOptions, 
   LayerStyle, 
   CartographyLayer,
-  ProjectionName 
-} from './cartography_types';
+  ProjectionName,
+  ILayer,
+  RendererOptions
+} from './types';
 
-/** ユーティリティ関数 */
-export { createProjection } from './projection_utils';
+// コア機能
+export { createProjection } from './core/projection';
+export { Renderer } from './core/renderer';
+export { LayerManager } from './core/layer-manager';
+
+// レイヤークラス
+export { BaseLayer } from './layers/base-layer';
+export { VectorLayer } from './layers/vector-layer';
+
+// ユーティリティ
+export * from './utils/geo-utils';
+export * from './utils/style-utils';

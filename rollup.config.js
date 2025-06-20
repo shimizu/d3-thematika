@@ -7,7 +7,7 @@ import livereload from 'rollup-plugin-livereload';
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-  input: 'src/index_export.ts',
+  input: 'src/index.ts',
   output: [
     {
       file: 'dist/cartography.cjs.js',

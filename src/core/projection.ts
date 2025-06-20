@@ -5,7 +5,7 @@ import {
   geoEquirectangular,
   GeoProjection 
 } from 'd3-geo';
-import { ProjectionName } from './cartography_types';
+import { ProjectionName } from '../types';
 
 /**
  * サポートされている投影法名と対応するD3投影法関数のマッピング
