@@ -87,16 +87,16 @@
                 container: '#map',
                 width: 800,
                 height: 600,
-                defs: [texture, shadowFilter], // 複数のフィルターとテクスチャを登録
+                defs: [texture, shadowFilter], 
                 projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
             });
 
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Cartography.GeojsonLayer({
-                data: geojson,
-                style: {
-                    fill:"#ff0000",
-                    //filter: shadowFilter.url(), // ドロップシャドウフィルターを適用 textureと同じように指定できるように
+                data: geojson,                
+                attr: { //要望：styleではなくattrを使用するように変更したい。
+                    fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    filter: shadowFilter.url(), 
                     stroke: '#1a3d1f',
                     strokeWidth: 0.8,
                     opacity: (d,i) => 0.9,

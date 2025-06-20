@@ -11,6 +11,8 @@ export interface GeojsonLayerOptions {
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   /** レイヤーのスタイル設定 */
   style?: LayerStyle;
+  /** レイヤーの属性設定（styleのエイリアス） */
+  attr?: LayerStyle;
 }
 
 /**
@@ -30,7 +32,8 @@ export class GeojsonLayer extends BaseLayer {
    */
   constructor(options: GeojsonLayerOptions) {
     // 一意のIDを自動生成
-    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.style);
+    // style または attr のどちらかを使用（attr が優先）
+    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || options.style);
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -109,7 +112,18 @@ export class GeojsonLayer extends BaseLayer {
   private renderFeatures(): void {
     if (!this.layerGroup || !this.path) return;
 
-    this.layerGroup
+    // スタイル属性を効率的に適用
+    const styleProperties = [
+      { key: 'fill' as const, method: 'attr' as const, attr: undefined },
+      { key: 'stroke' as const, method: 'attr' as const, attr: undefined },
+      { key: 'strokeWidth' as const, method: 'attr' as const, attr: 'stroke-width' },
+      { key: 'strokeDasharray' as const, method: 'attr' as const, attr: 'stroke-dasharray' },
+      { key: 'opacity' as const, method: 'attr' as const, attr: undefined },
+      { key: 'filter' as const, method: 'attr' as const, attr: undefined }
+    ];
+
+    // パス要素を作成
+    const paths = this.layerGroup
       .selectAll('path')
       .data(this.data.features)
       .enter()
@@ -121,71 +135,23 @@ export class GeojsonLayer extends BaseLayer {
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .attr('fill', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.fill === 'function' ? this.style.fill(d, i) : (this.style.fill || null);
-      })
-      .attr('stroke', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.stroke === 'function' ? this.style.stroke(d, i) : (this.style.stroke || null);
-      })
-      .attr('stroke-width', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(d, i) : (this.style.strokeWidth || null);
-      })
-      .attr('stroke-dasharray', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.strokeDasharray === 'function' ? this.style.strokeDasharray(d, i) : (this.style.strokeDasharray || null);
-      })
-      .attr('opacity', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.opacity === 'function' ? this.style.opacity(d, i) : (this.style.opacity || null);
-      })
-      .attr('filter', (d: GeoJSON.Feature, i: number) => {
-        return typeof this.style.filter === 'function' ? this.style.filter(d, i) : (this.style.filter || null);
-      })
       .style('cursor', 'pointer');
+
+    // スタイル属性を適用（関数型は個別パスに、非関数型はlayerGroupに）
+    styleProperties.forEach(({ key, method, attr }) => {
+      const value = this.style[key];
+      const attrName = attr || key;
+      
+      if (typeof value === 'function') {
+        // 関数型の場合は個別のpathに適用
+        paths[method as 'style' | 'attr'](attrName, (d: GeoJSON.Feature, i: number) => value(d, i));
+      } else if (value) {
+        // 非関数型の場合はlayerGroupに適用
+        this.layerGroup![method as 'style' | 'attr'](attrName, value);
+      }
+    });
   }
 
-  /**
-   * 特定のフィーチャーのスタイルを更新します
-   * @param filter - フィーチャーを特定するフィルター関数
-   * @param style - 適用するスタイル
-   */
-  updateFeatureStyle(
-    filter: (feature: GeoJSON.Feature) => boolean, 
-    style: Partial<LayerStyle>
-  ): void {
-    if (!this.layerGroup) return;
-
-    this.layerGroup.selectAll('path')
-      .filter((d: any) => filter(d as GeoJSON.Feature))
-      .attr('fill', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const fillValue = style.fill || this.style.fill;
-        return typeof fillValue === 'function' ? fillValue(feature, i) : (fillValue || null);
-      })
-      .attr('stroke', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const strokeValue = style.stroke || this.style.stroke;
-        return typeof strokeValue === 'function' ? strokeValue(feature, i) : (strokeValue || null);
-      })
-      .attr('stroke-width', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const strokeWidthValue = style.strokeWidth || this.style.strokeWidth;
-        return typeof strokeWidthValue === 'function' ? strokeWidthValue(feature, i) : (strokeWidthValue || null);
-      })
-      .attr('stroke-dasharray', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const strokeDasharrayValue = style.strokeDasharray || this.style.strokeDasharray;
-        return typeof strokeDasharrayValue === 'function' ? strokeDasharrayValue(feature, i) : (strokeDasharrayValue || null);
-      })
-      .attr('opacity', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const opacityValue = style.opacity || this.style.opacity;
-        return typeof opacityValue === 'function' ? opacityValue(feature, i) : (opacityValue || null);
-      })
-      .attr('filter', (d: any, i: number) => {
-        const feature = d as GeoJSON.Feature;
-        const filterValue = style.filter || this.style.filter;
-        return typeof filterValue === 'function' ? filterValue(feature, i) : (filterValue || null);
-      });
-  }
 
   /**
    * GeoJSONデータを取得します
