@@ -16,7 +16,7 @@
  *   projection: d3.geoMercator()
  * });
  * 
- * const layer = new VectorLayer({
+ * const layer = new GeojsonLayer({
  *   data: geoJsonData,
  *   style: { fill: '#f0f0f0', stroke: '#333' }
  * });
@@ -41,7 +41,7 @@ export { LayerManager } from './core/layer-manager';
 
 // レイヤークラス
 export { BaseLayer } from './layers/base-layer';
-export { VectorLayer } from './layers/vector-layer';
+export { GeojsonLayer } from './layers/geojson-layer';
 
 // ユーティリティ
 export * from './utils/geo-utils';

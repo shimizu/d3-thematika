@@ -2,7 +2,7 @@ import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { CartographyOptions, LayerStyle, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
-import { VectorLayer } from './layers/vector-layer';
+import { GeojsonLayer } from './layers/geojson-layer';
 
 /**
  * 地図描画を行うメインクラス（リファクタリング版）

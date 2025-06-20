@@ -84,8 +84,8 @@
                 projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
             });
 
-            // VectorLayerインスタンスを作成
-            const worldLayer = new Cartography.VectorLayer({
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,
                 style: {
                     fill: '#e8f4f8',

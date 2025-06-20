@@ -4,9 +4,9 @@ import { BaseLayer } from './base-layer';
 import { LayerStyle } from '../types';
 
 /**
- * VectorLayerの初期化オプション
+ * GeojsonLayerの初期化オプション
  */
-export interface VectorLayerOptions {
+export interface GeojsonLayerOptions {
   /** GeoJSONデータ */
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   /** レイヤーのスタイル設定 */
@@ -14,9 +14,9 @@ export interface VectorLayerOptions {
 }
 
 /**
- * ベクターデータ（GeoJSON）を描画するレイヤークラス
+ * GeoJSONデータを描画するレイヤークラス
  */
-export class VectorLayer extends BaseLayer {
+export class GeojsonLayer extends BaseLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */
@@ -25,12 +25,12 @@ export class VectorLayer extends BaseLayer {
   private layerGroup?: Selection<SVGGElement, unknown, HTMLElement, any>;
 
   /**
-   * ベクターレイヤーを初期化します
+   * GeoJSONレイヤーを初期化します
    * @param options - レイヤーの設定オプション
    */
-  constructor(options: VectorLayerOptions) {
+  constructor(options: GeojsonLayerOptions) {
     // 一意のIDを自動生成
-    super(`vector-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.style);
+    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.style);
     
     // データの正規化
     this.data = Array.isArray(options.data)
