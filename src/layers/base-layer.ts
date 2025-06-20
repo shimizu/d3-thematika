@@ -1,4 +1,4 @@
-import { Selection } from 'd3-selection';
+import { Selection, select } from 'd3-selection';
 import { ILayer, LayerStyle } from '../types';
 
 /**
@@ -95,7 +95,8 @@ export abstract class BaseLayer implements ILayer {
   protected updateStyle(): void {
     if (!this.element) return;
 
-    const container = this.element as any as Selection<SVGGElement, unknown, HTMLElement, any>;
+    // d3-selectionでelementをラップして適切なD3セレクションを作成
+    const container = select(this.element);
     container.selectAll('path')
       .style('fill', (d: any) => {
         const feature = d as GeoJSON.Feature;
@@ -122,7 +123,8 @@ export abstract class BaseLayer implements ILayer {
   protected updateVisibility(): void {
     if (!this.element) return;
 
-    const container = this.element as any as Selection<SVGGElement, unknown, HTMLElement, any>;
+    // d3-selectionでelementをラップして適切なD3セレクションを作成
+    const container = select(this.element);
     container.style('display', this.visible ? '' : 'none');
   }
 

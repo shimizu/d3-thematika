@@ -33,6 +33,13 @@
         <h1>Cartography ライブラリ テスト</h1>
         <p>基本的な地図描画機能と新しいレイヤーシステムをテストします</p>
         <p>上の地図：従来のAPI、下の地図：新しいレイヤークラスベースAPI</p>
+        
+        <div style="margin: 20px 0;">
+            <label>
+                <input type="checkbox" id="hideLayerCheckbox"> 
+                レイヤーを非表示にする
+            </label>
+        </div>
     </div>
     
     <div id="map"></div>
@@ -97,6 +104,14 @@
 
             // レイヤーインスタンスを地図に追加
             map2.addLayer('world_new', worldLayer);
+
+            // チェックボックスのイベントリスナーを追加
+            const checkbox = document.getElementById('hideLayerCheckbox');
+            checkbox.addEventListener('change', function() {
+                // BaseLayerのupdateVisibility機能をテスト
+                worldLayer.setVisible(!this.checked);
+                console.log('レイヤー表示状態:', !this.checked);
+            });
 
             console.log('地図ライブラリの初期化完了（新しいAPI）');
 
