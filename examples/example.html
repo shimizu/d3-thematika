@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartography ライブラリ テスト</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, sans-serif;
+            background: #f8f9fa;
+        }
+        
+        #map {
+            margin: 20px auto;
+            display: block;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        .info {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>Cartography ライブラリ テスト</h1>
+        <p>基本的な地図描画機能をテストします</p>
+    </div>
+    
+    <div id="map"></div>
+    
+    <script type="module">
+        // サンプルのGeoJSONデータ（簡単な世界地図）
+        const worldGeometry = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": { "name": "Sample Country 1" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [-180, -60], [180, -60], [180, 60], [-180, 60], [-180, -60]
+                        ]]
+                    }
+                },
+                {
+                    "type": "Feature", 
+                    "properties": { "name": "Sample Country 2" },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [-100, -30], [-50, -30], [-50, 30], [-100, 30], [-100, -30]
+                        ]]
+                    }
+                }
+            ]
+        };
+
+        // ライブラリを使用（実際の使用時はimportまたはUMDで読み込み）
+        // import { Cartography } from '../dist/cartography.esm.js';
+        
+        // UMD版を想定したサンプル
+        // const map = new Cartography({
+        //     container: '#map',
+        //     width: 800,
+        //     height: 600,
+        //     projection: 'naturalEarth1'
+        // });
+        
+        // map.addLayer('base', {
+        //     data: worldGeometry,
+        //     style: {
+        //         fill: '#f8f9fa',
+        //         stroke: '#dee2e6',
+        //         strokeWidth: 1
+        //     }
+        // });
+
+        console.log('地図ライブラリの初期化準備完了');
+        console.log('ライブラリをビルド後、上記のコメントアウトを解除してテストしてください');
+    </script>
+</body>
+</html>
