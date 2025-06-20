@@ -27,6 +27,8 @@
             color: #666;
         }
     </style>
+
+    <script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
 </head>
 <body>
     <div class="info">
@@ -52,14 +54,25 @@
     
     <script>
 
+        // テクスチャとフィルターを定義
+        const texture = textures
+            .lines()
+            .thicker();
+        
+        // SVGフィルターを作成
+
+        const shadowFilter = Cartography.createDropShadow({
+            id: 'mapShadow',
+            dx: 8,
+            dy: 8,
+            stdDeviation: 3,
+            floodColor: '#000000',
+            floodOpacity: 1
+        });
+        
         async function main() {
 
            const geojson =  await d3.json("./geojson/world.geojson");
-
-           console.log("GeoJSONデータ:", geojson);
-
-
-
 
             const width = 800;
             const height = 600;
@@ -68,25 +81,13 @@
             const projection = d3.geoEqualEarth()
                 .fitExtent([[0, 0], [800, 600]], geojson);
 
-            console.log("投影法:", projection);
-
-
-            // ライブラリのテスト機能を使用してprojectionによる座標変換をテストする
-            const testResult = Cartography.testProjectionTransform(width, height, projection, geojson);
-            
-            // テスト結果をコンソールに詳細出力
-            Cartography.logTestResult(testResult, true);
-            
-            // 投影法の境界設定もテスト
-            const boundsTest = Cartography.testProjectionBounds(projection, geojson);
-            console.log(boundsTest.message);
-
 
             // === 新しいAPI（レイヤークラスベース） ===
             const map = new Cartography.Cartography({
                 container: '#map',
                 width: 800,
                 height: 600,
+                defs: [texture, shadowFilter], // 複数のフィルターとテクスチャを登録
                 projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
             });
 
@@ -94,71 +95,21 @@
             const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,
                 style: {
-                    fill: (d,i) => i%2 == 0 ? '#e8f4f8' : '#ffe200', // 偶数インデックスのフィーチャーは薄い青、奇数は薄い灰色
-                    stroke: (d,i) => '#2c5530',
+                    fill:"#ff0000",
+                    //filter: shadowFilter.url(), // ドロップシャドウフィルターを適用 textureと同じように指定できるように
+                    stroke: '#1a3d1f',
                     strokeWidth: 0.8,
-                    strokeDasharray: (d,i) => i%3 === 0 ? '5,5' : i%3 === 1 ? '10,2' : null, // インデックスによって破線パターンを変更
                     opacity: (d,i) => 0.9,
-                    // ドロップシャドウを追加
-                    dropShadow: (d,i) => {
-                        console.log('geojson feature', d);
-                        console.log('feature index:', i);
-                        
-                        return {
-                            offsetX: 3,
-                            offsetY: 3,
-                            blur: 6,
-                            color: 'rgba(0,0,0,0.3)'
-                        }
-                    }
                 }
             });
 
             // レイヤーインスタンスを地図に追加
             map.addLayer('world_new', worldLayer);
 
-            // チェックボックスのイベントリスナーを追加
-            const checkbox = document.getElementById('hideLayerCheckbox');
-            checkbox.addEventListener('change', function() {
-                // BaseLayerのupdateVisibility機能をテスト
-                worldLayer.setVisible(!this.checked);
-                console.log('レイヤー表示状態:', !this.checked);
-            });
-
-            console.log('地図ライブラリの初期化完了（新しいAPI）');
-
             
         }
 
         main()
-
-        // サンプルのGeoJSONデータ（簡単な世界地図）
-        const worldGeometry = {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": { "name": "Sample Country 1" },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [-180, -60], [180, -60], [180, 60], [-180, 60], [-180, -60]
-                        ]]
-                    }
-                },
-                {
-                    "type": "Feature", 
-                    "properties": { "name": "Sample Country 2" },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                            [-100, -30], [-50, -30], [-50, 30], [-100, 30], [-100, -30]
-                        ]]
-                    }
-                }
-            ]
-        };
-
 
     </script>
 </body>

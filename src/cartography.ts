@@ -45,6 +45,9 @@ export class Cartography {
       .attr('height', this.height)
       .attr('class', 'cartography-map');
 
+    // defsオプションが指定されている場合、テクスチャを初期化
+    this.initializeDefs(options.defs);
+
     // メインのSVGグループを作成
     this.svgGroup = this.svg.append('g')
       .attr('class', 'cartography-main-group');
@@ -211,5 +214,19 @@ export class Cartography {
    */
   getLayerIds(): string[] {
     return this.layerManager.getLayerIds();
+  }
+
+
+  /**
+   * defs要素を初期化します（初期化時の内部メソッド）
+   * @private
+   */
+  private initializeDefs(defs?: any[]): void {
+    if (!defs) return;
+
+    // 配列の各要素を順番に適用
+    defs.forEach(def => {
+      this.svg.call(def);
+    });
   }
 }

@@ -13,21 +13,10 @@ export interface CartographyOptions {
   height: number;
   /** 投影法（D3投影法オブジェクト） */
   projection: GeoProjection;
+  /** SVG定義（テクスチャやパターン、フィルターなど）- コールバック関数の配列 */
+  defs?: any[];
 }
 
-/**
- * ドロップシャドウの設定
- */
-export interface DropShadowConfig {
-  /** X方向のオフセット（ピクセル） */
-  offsetX: number;
-  /** Y方向のオフセット（ピクセル） */
-  offsetY: number;
-  /** ぼかし半径（ピクセル） */
-  blur: number;
-  /** 影の色 */
-  color: string;
-}
 
 /**
  * レイヤーのスタイル設定
@@ -43,10 +32,10 @@ export interface LayerStyle {
   strokeDasharray?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 透明度（0-1） */
   opacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
+  /** SVGフィルター */
+  filter?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 追加のCSSクラス名 */
   className?: string;
-  /** ドロップシャドウ設定 */
-  dropShadow?: DropShadowConfig | ((feature: GeoJSON.Feature, index?: number) => DropShadowConfig) | string;
 }
 
 

@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, DropShadowConfig } from '../types';
+import { LayerStyle } from '../types';
 
 /**
  * GeojsonLayerの初期化オプション
@@ -121,28 +121,23 @@ export class GeojsonLayer extends BaseLayer {
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .style('fill', (d: GeoJSON.Feature, i: number) => {
+      .attr('fill', (d: GeoJSON.Feature, i: number) => {
         return typeof this.style.fill === 'function' ? this.style.fill(d, i) : (this.style.fill || null);
       })
-      .style('stroke', (d: GeoJSON.Feature, i: number) => {
+      .attr('stroke', (d: GeoJSON.Feature, i: number) => {
         return typeof this.style.stroke === 'function' ? this.style.stroke(d, i) : (this.style.stroke || null);
       })
-      .style('stroke-width', (d: GeoJSON.Feature, i: number) => {
+      .attr('stroke-width', (d: GeoJSON.Feature, i: number) => {
         return typeof this.style.strokeWidth === 'function' ? this.style.strokeWidth(d, i) : (this.style.strokeWidth || null);
       })
-      .style('stroke-dasharray', (d: GeoJSON.Feature, i: number) => {
+      .attr('stroke-dasharray', (d: GeoJSON.Feature, i: number) => {
         return typeof this.style.strokeDasharray === 'function' ? this.style.strokeDasharray(d, i) : (this.style.strokeDasharray || null);
       })
-      .style('opacity', (d: GeoJSON.Feature, i: number) => {
+      .attr('opacity', (d: GeoJSON.Feature, i: number) => {
         return typeof this.style.opacity === 'function' ? this.style.opacity(d, i) : (this.style.opacity || null);
       })
-      .style('filter', (d: GeoJSON.Feature, i: number) => {
-        // dropShadowが関数の場合は個別のfeatureに適用
-        if (typeof this.style.dropShadow === 'function') {
-          const shadow = this.style.dropShadow(d, i);
-          return `drop-shadow(${shadow.offsetX}px ${shadow.offsetY}px ${shadow.blur}px ${shadow.color})`;
-        }
-        return null; // レイヤー全体のfilterを使用
+      .attr('filter', (d: GeoJSON.Feature, i: number) => {
+        return typeof this.style.filter === 'function' ? this.style.filter(d, i) : (this.style.filter || null);
       })
       .style('cursor', 'pointer');
   }
@@ -160,30 +155,35 @@ export class GeojsonLayer extends BaseLayer {
 
     this.layerGroup.selectAll('path')
       .filter((d: any) => filter(d as GeoJSON.Feature))
-      .style('fill', (d: any, i: number) => {
+      .attr('fill', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         const fillValue = style.fill || this.style.fill;
         return typeof fillValue === 'function' ? fillValue(feature, i) : (fillValue || null);
       })
-      .style('stroke', (d: any, i: number) => {
+      .attr('stroke', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         const strokeValue = style.stroke || this.style.stroke;
         return typeof strokeValue === 'function' ? strokeValue(feature, i) : (strokeValue || null);
       })
-      .style('stroke-width', (d: any, i: number) => {
+      .attr('stroke-width', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         const strokeWidthValue = style.strokeWidth || this.style.strokeWidth;
         return typeof strokeWidthValue === 'function' ? strokeWidthValue(feature, i) : (strokeWidthValue || null);
       })
-      .style('stroke-dasharray', (d: any, i: number) => {
+      .attr('stroke-dasharray', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         const strokeDasharrayValue = style.strokeDasharray || this.style.strokeDasharray;
         return typeof strokeDasharrayValue === 'function' ? strokeDasharrayValue(feature, i) : (strokeDasharrayValue || null);
       })
-      .style('opacity', (d: any, i: number) => {
+      .attr('opacity', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         const opacityValue = style.opacity || this.style.opacity;
         return typeof opacityValue === 'function' ? opacityValue(feature, i) : (opacityValue || null);
+      })
+      .attr('filter', (d: any, i: number) => {
+        const feature = d as GeoJSON.Feature;
+        const filterValue = style.filter || this.style.filter;
+        return typeof filterValue === 'function' ? filterValue(feature, i) : (filterValue || null);
       });
   }
 

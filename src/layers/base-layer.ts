@@ -1,5 +1,5 @@
 import { Selection, select } from 'd3-selection';
-import { ILayer, LayerStyle, DropShadowConfig } from '../types';
+import { ILayer, LayerStyle } from '../types';
 
 /**
  * 全レイヤーの基底となる抽象クラス
@@ -61,7 +61,6 @@ export abstract class BaseLayer implements ILayer {
   setStyle(style: LayerStyle): void {
     this.style = { ...this.style, ...style };
     this.updateStyle();
-    this.updateDropShadow();
   }
 
   /**
@@ -118,6 +117,10 @@ export abstract class BaseLayer implements ILayer {
       .style('opacity', (d: any, i: number) => {
         const feature = d as GeoJSON.Feature;
         return typeof this.style.opacity === 'function' ? this.style.opacity(feature, i) : (this.style.opacity || null);
+      })
+      .attr('filter', (d: any, i: number) => {
+        const feature = d as GeoJSON.Feature;
+        return typeof this.style.filter === 'function' ? this.style.filter(feature, i) : (this.style.filter || null);
       });
   }
 
@@ -149,37 +152,7 @@ export abstract class BaseLayer implements ILayer {
 
     this.element = group.node()!;
     
-    // 初期のdrop-shadowを適用
-    this.updateDropShadow();
-    
     return group;
   }
 
-  /**
-   * ドロップシャドウを更新します
-   * @protected
-   */
-  protected updateDropShadow(): void {
-    if (!this.element) return;
-
-    const container = select(this.element);
-    
-    if (this.style.dropShadow) {
-      if (typeof this.style.dropShadow === 'string') {
-        // 文字列の場合はそのまま適用
-        container.style('filter', this.style.dropShadow);
-      } else if (typeof this.style.dropShadow === 'function') {
-        // 関数の場合は、レイヤー全体に対して最初のfeatureの値を使用
-        // TODO: より適切な処理が必要な場合は、サブクラスでオーバーライド
-        container.style('filter', 'none'); // 関数型の場合は個別に処理
-      } else {
-        // DropShadowConfigオブジェクトの場合
-        const shadow = this.style.dropShadow as DropShadowConfig;
-        const filterValue = `drop-shadow(${shadow.offsetX}px ${shadow.offsetY}px ${shadow.blur}px ${shadow.color})`;
-        container.style('filter', filterValue);
-      }
-    } else {
-      container.style('filter', 'none');
-    }
-  }
 }

@@ -33,8 +33,7 @@ export { Cartography } from './cartography';
 export type { 
   CartographyOptions, 
   LayerStyle, 
-  ILayer,
-  DropShadowConfig
+  ILayer
 } from './types';
 
 // コア機能
@@ -47,4 +46,5 @@ export { GeojsonLayer } from './layers/geojson-layer';
 // ユーティリティ
 export * from './utils/geo-utils';
 export * from './utils/style-utils';
+export * from './utils/effect-utils';
 export * from './utils/tests';
