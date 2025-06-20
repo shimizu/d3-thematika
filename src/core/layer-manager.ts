@@ -41,12 +41,13 @@ export class LayerManager {
     const style = { ...defaultStyle, ...options.style };
 
     // レイヤーオブジェクトを作成
+    // zIndexは追加順で自動設定（後から追加されたレイヤーが上に描画される）
     const layer: CartographyLayer = {
       id,
       data,
       style,
       visible: true,
-      zIndex: this.layers.size
+      zIndex: this.getNextZIndex()
     };
 
     this.layers.set(id, layer);
@@ -99,8 +100,13 @@ export class LayerManager {
   setLayerZIndex(id: string, zIndex: number): void {
     const layer = this.layers.get(id);
     if (layer) {
+      const oldZIndex = layer.zIndex || 0;
       layer.zIndex = zIndex;
-      this.reorderLayers();
+      
+      // zIndexが変更された場合のみ再配置
+      if (oldZIndex !== zIndex) {
+        this.reorderLayersOptimized();
+      }
     }
   }
 
@@ -146,10 +152,52 @@ export class LayerManager {
   }
 
   /**
-   * レイヤーの描画順序を再整理します
+   * レイヤーの描画順序を最適化された方法で再整理します
+   * 再描画せずにDOM要素の順序のみを変更します
    * @private
    */
+  private reorderLayersOptimized(): void {
+    // 描画済みのレイヤーを取得してzIndexでソート
+    const renderedLayers = Array.from(this.layers.values())
+      .filter(layer => layer.element)
+      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
+
+    if (renderedLayers.length === 0) return;
+
+    // 最初のレイヤーの親コンテナを取得
+    const container = renderedLayers[0].element!.parentNode as SVGElement;
+    if (!container) return;
+
+    // zIndex順に要素を再配置
+    renderedLayers.forEach(layer => {
+      if (layer.element) {
+        // 要素を最後に移動（appendChild は要素を末尾に移動）
+        container.appendChild(layer.element);
+      }
+    });
+  }
+
+  /**
+   * 次に使用するzIndex値を取得します
+   * @private
+   * @returns 次のzIndex値
+   */
+  private getNextZIndex(): number {
+    if (this.layers.size === 0) return 0;
+    
+    const maxZIndex = Math.max(
+      ...Array.from(this.layers.values()).map(layer => layer.zIndex || 0)
+    );
+    
+    return maxZIndex + 1;
+  }
+
+  /**
+   * レイヤーの描画順序を再整理します（後方互換性のため）
+   * @private
+   * @deprecated reorderLayersOptimized() を使用してください
+   */
   private reorderLayers(): void {
-    this.rerenderAllLayers();
+    this.reorderLayersOptimized();
   }
 }
