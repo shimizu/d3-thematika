@@ -40,9 +40,46 @@ export function normalizeStyle(style: LayerStyle = {}): Required<LayerStyle> {
  * @returns 有効かどうか
  */
 export function isValidColor(color: string): boolean {
-  const style = new Option().style;
-  style.color = color;
-  return style.color !== '';
+  if (!color || typeof color !== 'string') {
+    return false;
+  }
+  
+  // 基本的な色名の検証
+  const namedColors = [
+    'red', 'green', 'blue', 'yellow', 'orange', 'purple', 'pink', 'brown',
+    'black', 'white', 'gray', 'grey', 'cyan', 'magenta', 'lime', 'maroon',
+    'navy', 'olive', 'silver', 'teal', 'aqua', 'fuchsia'
+  ];
+  
+  if (namedColors.includes(color.toLowerCase())) {
+    return true;
+  }
+  
+  // HEX色の検証
+  if (/^#?([a-f\d]{3}|[a-f\d]{6})$/i.test(color)) {
+    return true;
+  }
+  
+  // RGB/RGBA色の検証
+  const rgbMatch = color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(,\s*([\d.]+)\s*)?\)$/i);
+  if (rgbMatch) {
+    const r = parseInt(rgbMatch[1]);
+    const g = parseInt(rgbMatch[2]);
+    const b = parseInt(rgbMatch[3]);
+    const a = rgbMatch[5] ? parseFloat(rgbMatch[5]) : 1;
+    
+    // RGB値は0-255、透明度は0-1の範囲内であることを確認
+    if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255 && a >= 0 && a <= 1) {
+      return true;
+    }
+  }
+  
+  // HSL/HSLA色の検証
+  if (/^hsla?\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*(,\s*[\d.]+\s*)?\)$/i.test(color)) {
+    return true;
+  }
+  
+  return false;
 }
 
 /**
@@ -52,14 +89,29 @@ export function isValidColor(color: string): boolean {
  * @returns RGBA色文字列
  */
 export function hexToRgba(hex: string, alpha: number = 1): string {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) {
+  // #を除去
+  const cleanHex = hex.replace('#', '');
+  
+  let r: number, g: number, b: number;
+  
+  if (cleanHex.length === 3) {
+    // 3桁HEX (#fff -> #ffffff)
+    r = parseInt(cleanHex[0] + cleanHex[0], 16);
+    g = parseInt(cleanHex[1] + cleanHex[1], 16);
+    b = parseInt(cleanHex[2] + cleanHex[2], 16);
+  } else if (cleanHex.length === 6) {
+    // 6桁HEX
+    r = parseInt(cleanHex.substr(0, 2), 16);
+    g = parseInt(cleanHex.substr(2, 2), 16);
+    b = parseInt(cleanHex.substr(4, 2), 16);
+  } else {
     throw new Error(`Invalid hex color: ${hex}`);
   }
   
-  const r = parseInt(result[1], 16);
-  const g = parseInt(result[2], 16);
-  const b = parseInt(result[3], 16);
+  // NaNチェック
+  if (isNaN(r) || isNaN(g) || isNaN(b)) {
+    throw new Error(`Invalid hex color: ${hex}`);
+  }
   
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
