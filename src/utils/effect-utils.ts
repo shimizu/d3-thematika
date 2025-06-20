@@ -55,15 +55,6 @@ export interface BloomOptions {
   color?: string;
 }
 
-/**
- * 複合フィルターの定義
- */
-export interface FilterDefinition {
-  /** フィルター生成関数 */
-  generator: (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => void;
-  /** フィルターID */
-  id: string;
-}
 
 /**
  * ガウシアンブラーフィルターを生成します
@@ -184,36 +175,6 @@ export function createBloom(options: BloomOptions) {
   (filterFunction as any).url = () => getFilterUrl(options.id);
   
   return filterFunction;
-}
-
-/**
- * 複数のエフェクトを組み合わせた複合フィルターを生成します
- * @param id - 複合フィルターのID
- * @param effects - 適用するエフェクトの配列
- * @returns D3セレクションで使用可能なコールバック関数
- */
-export function createComplexFilter(id: string, effects: FilterDefinition[]) {
-  return (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
-    const filter = defs.append("defs").append('filter')
-      .attr('id', id)
-      .attr('x', '-100%')
-      .attr('y', '-100%')
-      .attr('width', '300%')
-      .attr('height', '300%');
-    
-    let currentResult = 'SourceGraphic';
-    
-    effects.forEach((effect, index) => {
-      const effectId = `${id}_effect_${index}`;
-      
-      // 個別のエフェクト要素を追加
-      // 注意: 実際の実装ではeffect.generatorの内容を
-      // filterコンテキスト内に適用する必要があります
-      
-      // 結果の名前を更新
-      currentResult = `effect_${index}`;
-    });
-  };
 }
 
 /**
