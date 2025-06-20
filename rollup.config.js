@@ -1,6 +1,8 @@
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
+import serve from 'rollup-plugin-serve';
+import livereload from 'rollup-plugin-livereload';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -39,6 +41,13 @@ export default {
       sourceMap: !production,
       inlineSources: !production
     }),
-    production && terser()
+    production && terser(),
+    !production && serve({
+      open: true,
+      contentBase: ['examples', 'dist'],
+      host: 'localhost',
+      port: 3000
+    }),
+    !production && livereload('examples')
   ].filter(Boolean)
 };
