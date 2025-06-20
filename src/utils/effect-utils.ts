@@ -76,7 +76,7 @@ export function createGaussianBlur(options: GaussianBlurOptions) {
       .attr('stdDeviation', options.stdDeviation);
   };
   
-  // textureと同じように.url()メソッドを追加
+  // id名を返す.url()メソッドを追加
   (filterFunction as any).url = () => getFilterUrl(options.id);
   
   return filterFunction;
@@ -109,7 +109,7 @@ export function createDropShadow(options: DropShadowOptions) {
     }
   };
   
-  // textureと同じように.url()メソッドを追加
+  // id名を返す.url()メソッドを追加
   (filterFunction as any).url = () => getFilterUrl(options.id);
   
   return filterFunction;
@@ -171,7 +171,7 @@ export function createBloom(options: BloomOptions) {
       .attr('in', d => d);
   };
   
-  // textureと同じように.url()メソッドを追加
+  // id名を返す.url()メソッドを追加
   (filterFunction as any).url = () => getFilterUrl(options.id);
   
   return filterFunction;
