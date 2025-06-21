@@ -1,4 +1,4 @@
-import { Selection } from 'd3-selection';
+import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
 import { LayerStyle, IGeojsonLayer } from '../types';
@@ -11,6 +11,10 @@ export interface OutlineLayerOptions {
   style?: LayerStyle;
   /** レイヤーの属性設定（styleのエイリアス） */
   attr?: LayerStyle;
+  /** クリップパスを作成するかどうか */
+  createClipPath?: boolean;
+  /** クリップパスのID（指定しない場合は自動生成） */
+  clipPathId?: string;
 }
 
 /**
@@ -22,6 +26,10 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
   private path?: GeoPath;
   /** レイヤーグループ */
   private layerGroup?: Selection<SVGGElement, unknown, HTMLElement, any>;
+  /** クリップパスを作成するかどうか */
+  private createClipPath: boolean;
+  /** クリップパスのID */
+  private clipPathId: string;
 
   /**
    * OutlineLayerを初期化します
@@ -39,6 +47,9 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     
     super(`outline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
           { ...defaultStyle, ...(options.attr || options.style) });
+    
+    this.createClipPath = options.createClipPath ?? false;
+    this.clipPathId = options.clipPathId || `outline-clip-${this.id}`;
   }
 
   /**
@@ -80,6 +91,40 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
 
     // Sphereジオメトリを使用してアウトラインパスを生成
     const sphereGeometry = { type: "Sphere" as const };
+    const outlinePathData = this.path(sphereGeometry);
+    
+    // クリップパスを作成（オプションが有効な場合）
+    if (this.createClipPath && outlinePathData) {
+      // SVG要素を取得
+      const svg = this.layerGroup.node()?.closest('svg');
+      if (svg) {
+        const svgSelection = select(svg);
+        
+        // 既存のクリップパスを削除
+        svgSelection.select(`#${this.clipPathId}`).remove();
+        
+        // defs要素を取得または作成
+        let defs = svgSelection.select<SVGDefsElement>('defs');
+        if (defs.empty()) {
+          defs = svgSelection.insert<SVGDefsElement>('defs', ':first-child');
+        }
+        
+        // 新しいクリップパスを作成
+        const clipPath = defs
+          .append('clipPath')
+          .attr('id', this.clipPathId);
+        
+        clipPath
+          .append('path')
+          .attr('d', outlinePathData);
+        
+        // cartography-main-groupにクリップパスを適用
+        const mainGroup = svgSelection.select('.cartography-main-group');
+        if (!mainGroup.empty()) {
+          mainGroup.attr('clip-path', this.getClipPathUrl());
+        }
+      }
+    }
     
     // スタイル属性を効率的に適用
     const styleProperties = [
@@ -113,5 +158,21 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
         outlinePath[method as 'style' | 'attr'](attrName, finalValue);
       }
     });
+  }
+
+  /**
+   * クリップパスIDを取得します
+   * @returns クリップパスのID
+   */
+  getClipPathId(): string {
+    return this.clipPathId;
+  }
+  
+  /**
+   * クリップパスURLを取得します
+   * @returns クリップパスのURL文字列
+   */
+  getClipPathUrl(): string {
+    return `url(#${this.clipPathId})`;
   }
 }

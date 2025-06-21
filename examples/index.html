@@ -96,7 +96,7 @@
                 projection: projection
             });
 
-            // GeojsonLayerインスタンスを作成
+            // GeojsonLayerインスタンスを作成（クリップパス適用）
             const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,                
                 attr: { 
@@ -108,8 +108,10 @@
                 }
             });
 
-            // OutlineLayerインスタンスを作成
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
             const outlineLayer = new Cartography.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
                 attr: {
                     fill: 'none',
                     stroke: '#2c3e50',
@@ -121,6 +123,7 @@
             // レイヤーインスタンスを地図に追加
             map.addLayer('outline', outlineLayer);
             map.addLayer('world_new', worldLayer);
+
 
             
         }
