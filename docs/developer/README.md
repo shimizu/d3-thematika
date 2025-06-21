@@ -5,10 +5,6 @@ d3-cartographyライブラリの開発に関するドキュメントです。
 ## 目次
 
 - [アーキテクチャ](./architecture.md) - ライブラリの全体構造
-- [コーディング規約](./coding-standards.md) - コード品質の基準
-- [開発ワークフロー](./development-workflow.md) - 開発・テスト・リリース手順
-- [コントリビューション](./contributing.md) - 貢献方法
-- [API設計](./api-design.md) - API設計指針
 
 ## クイックスタート
 

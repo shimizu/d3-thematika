@@ -52,6 +52,7 @@
     
     <!-- D3.js CDN -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     
     <!-- UMD版のライブラリを使用 -->
     <script src="./cartography.umd.js"></script>
@@ -83,7 +84,7 @@
             const height = document.querySelector(id).clientHeight || 600;
 
             // D3.jsの投影法を使用して地図の投影を設定（マージン付き）
-            const projection = d3.geoEqualEarth()
+            const projection = d3.geoEquirectangular()
                 .fitExtent([[10, 10], [width-10, height-10]], geojson);
 
 
