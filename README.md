@@ -19,7 +19,7 @@ npm install d3-thematika
 <script src="./dist/thematika.umd.js"></script>
 
 <script>
-  const map = new Thematika.Thematika({
+  const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 600,
@@ -40,9 +40,9 @@ npm install d3-thematika
 ### ES Modules
 
 ```javascript
-import { Thematika } from 'd3-thematika';
+import { Map } from 'd3-thematika';
 
-const map = new Thematika({
+const map = new Map({
   container: '#map',
   width: 800,
   height: 600,
@@ -90,7 +90,7 @@ npm run build
 
 ## API
 
-### Thematika(options)
+### Map(options)
 
 地図インスタンスを作成します。
 

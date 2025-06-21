@@ -9,7 +9,7 @@
  * ```typescript
  * import { Thematika } from 'd3-thematika';
  * 
- * const map = new Thematika({
+ * const map = new Map({
  *   container: '#map',
  *   width: 800,
  *   height: 600,
@@ -27,7 +27,7 @@
 
 
 // メインクラス
-export { Thematika } from './thematika';
+export { Map } from './thematika';
 
 // 型定義
 export type { 

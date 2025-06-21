@@ -130,7 +130,7 @@ const height = 600;
 const projection = d3.geoEquirectangular()
     .fitExtent([[10, 0], [width-10, height]], geojson);
 
-const map = new Thematika.Thematika({
+const map = new Thematika.Map({
     container: '#map',
     width: width,
     height: height,
@@ -202,7 +202,7 @@ map.addLayer('world_new', worldLayer);
             currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
 
             // 地図を作成
-            const map = new Thematika.Thematika({
+            const map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,

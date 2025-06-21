@@ -8,7 +8,7 @@ import { GeojsonLayer } from './layers/geojson-layer';
  * 主題図描画を行うメインクラス（リファクタリング版）
  * モジュール化された構造で、拡張性と保守性を向上させています
  */
-export class Thematika {
+export class Map {
   /** DOM要素を選択するためのD3セレクション */
   private container: Selection<HTMLElement, unknown, HTMLElement, any>;
   /** SVG要素のD3セレクション */
@@ -25,7 +25,7 @@ export class Thematika {
   private height: number;
 
   /**
-   * Thematikaインスタンスを作成します
+   * Mapインスタンスを作成します
    * @param options - 主題図の設定オプション
    */
   constructor(options: ThematikaOptions) {
