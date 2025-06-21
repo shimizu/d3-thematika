@@ -54,6 +54,13 @@
         .control-group input[type="range"] {
             width: 200px;
         }
+        .control-group label span {
+            font-weight: bold;
+            color: #007acc;
+            min-width: 40px;
+            display: inline-block;
+            text-align: right;
+        }
         .control-group input[type="checkbox"] {
             margin-right: 5px;
         }
@@ -87,7 +94,8 @@
         <h1>LegendLayer デモ</h1>
         <p class="description">
             LegendLayerを使用してD3スケールに基づく凡例を地図上に表示します。
-            序数、連続、閾値スケールに対応した自動凡例生成機能を確認できます。
+            序数、連続、閾値スケールに対応した自動凡例生成機能、スライダーによる位置調整、
+            凡例のドラッグ移動機能を確認できます。
         </p>
 
         <div class="note">
@@ -95,7 +103,8 @@
             <ul>
                 <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
                 <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）</li>
-                <li>機能: スケール型切り替え、凡例位置切り替え</li>
+                <li>機能: スケール型切り替え、X/Y座標による位置調整、シンボルタイプ選択</li>
+                <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
             </ul>
         </div>
 
@@ -108,17 +117,29 @@
                     <option value="linear">連続スケール (Linear)</option>
                     <option value="threshold">閾値スケール (Threshold)</option>
                     <option value="sequential">連続色スケール (Sequential)</option>
+                    <option value="size">サイズスケール (Size)</option>
                 </select>
             </div>
 
             <div class="control-group">
-                <label for="legend-position-select">凡例位置:</label>
-                <select id="legend-position-select">
-                    <option value="top-right" selected>右上</option>
-                    <option value="top-left">左上</option>
-                    <option value="bottom-right">右下</option>
-                    <option value="bottom-left">左下</option>
+                <label for="symbol-type-select">シンボルタイプ:</label>
+                <select id="symbol-type-select">
+                    <option value="auto" selected>自動選択</option>
+                    <option value="cell">セル (Cell)</option>
+                    <option value="circle">円 (Circle)</option>
+                    <option value="line">線 (Line)</option>
+                    <option value="gradient">グラデーション (Gradient)</option>
                 </select>
+            </div>
+
+            <div class="control-group">
+                <label for="legend-x-slider">X座標: <span id="legend-x-value">20</span></label>
+                <input type="range" id="legend-x-slider" min="0" max="800" value="20" style="width: 300px;">
+            </div>
+            
+            <div class="control-group">
+                <label for="legend-y-slider">Y座標: <span id="legend-y-value">20</span></label>
+                <input type="range" id="legend-y-slider" min="0" max="600" value="20" style="width: 300px;">
             </div>
 
             <div class="control-group">
@@ -144,7 +165,7 @@ const colorScale = d3.scaleOrdinal()
 
 const legendLayer = new Thematika.LegendLayer({
     scale: colorScale,
-    position: { top: '10%', left: '80%' },
+    position: { top: 20, left: 20 },  // SVG座標系でのピクセル値
     title: '土地利用',
     orientation: 'vertical'
 });
@@ -155,7 +176,7 @@ const populationScale = d3.scaleSequential(d3.interpolateYlOrRd)
 
 const popLegend = new Thematika.LegendLayer({
     scale: populationScale,
-    position: { top: '70%', left: '5%' },
+    position: { top: 300, left: 200 },  // SVG座標系でのピクセル値
     title: '人口密度',
     orientation: 'horizontal'
 });
@@ -173,8 +194,9 @@ map.addLayer('population-legend', popLegend);
         
         // 現在のスケール設定
         let currentScaleType = 'ordinal';
-        let currentPosition = { top: '10%', left: '80%' };
+        let currentPosition = { top: 20, left: 20 };
         let currentOrientation = 'vertical';
+        let currentSymbolType = 'auto';
         
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
@@ -219,6 +241,16 @@ map.addLayer('population-legend', popLegend);
                     const value = Math.random();
                     return scaleData.sequential.scale(value);
                 }
+            },
+            size: {
+                scale: d3.scaleLinear()
+                    .domain([0, 100])
+                    .range(['#0066cc', '#0066cc']), // 同じ色
+                sizeScale: d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([5, 30]),
+                title: '人口 (万人)',
+                colorFunction: (d, i) => '#0066cc' // 同じ色
             }
         };
         
@@ -258,12 +290,25 @@ map.addLayer('population-legend', popLegend);
             });
             
             // LegendLayerインスタンスを作成
-            const legendLayer = new Thematika.LegendLayer({
+            const legendOptions = {
                 scale: currentScale.scale,
                 position: currentPosition,
                 title: currentScale.title,
                 orientation: currentOrientation
-            });
+            };
+            
+            // シンボルタイプが指定されている場合
+            if (currentSymbolType !== 'auto') {
+                legendOptions.symbolType = currentSymbolType;
+            }
+            
+            // サイズスケールの場合
+            if (currentScaleType === 'size') {
+                legendOptions.symbolType = 'circle';
+                legendOptions.sizeScale = currentScale.sizeScale;
+            }
+            
+            const legendLayer = new Thematika.LegendLayer(legendOptions);
 
             // OutlineLayerインスタンスを作成
             const outlineLayer = new Thematika.OutlineLayer({
@@ -279,7 +324,7 @@ map.addLayer('population-legend', popLegend);
             map.addLayer('outline', outlineLayer);
             map.addLayer('world', worldLayer);
             map.addLayer('legend', legendLayer);
-
+            
         }
 
         draw()
@@ -290,9 +335,13 @@ map.addLayer('population-legend', popLegend);
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
+                updateSliderMaxValues();
                 draw();
             }, 250);
         });
+        
+        // 初回ロード時にスライダーの最大値を設定
+        setTimeout(updateSliderMaxValues, 100);
 
         // コントロールのイベントハンドラ
         document.getElementById('scale-type-select').addEventListener('change', (e) => {
@@ -300,27 +349,38 @@ map.addLayer('population-legend', popLegend);
             draw();
         });
         
-        document.getElementById('legend-position-select').addEventListener('change', (e) => {
-            const position = e.target.value;
-            switch (position) {
-                case 'top-right':
-                    currentPosition = { top: '10%', left: '80%' };
-                    break;
-                case 'top-left':
-                    currentPosition = { top: '10%', left: '5%' };
-                    break;
-                case 'bottom-right':
-                    currentPosition = { top: '70%', left: '80%' };
-                    break;
-                case 'bottom-left':
-                    currentPosition = { top: '70%', left: '5%' };
-                    break;
-            }
+        // X座標スライダー
+        document.getElementById('legend-x-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('legend-x-value').textContent = value;
+            currentPosition.left = value;
             draw();
         });
         
+        // Y座標スライダー
+        document.getElementById('legend-y-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('legend-y-value').textContent = value;
+            currentPosition.top = value;
+            draw();
+        });
+        
+        // リサイズ時にスライダーの最大値を更新
+        function updateSliderMaxValues() {
+            const width = document.querySelector('#map').clientWidth;
+            const height = document.querySelector('#map').clientHeight;
+            
+            document.getElementById('legend-x-slider').max = width;
+            document.getElementById('legend-y-slider').max = height;
+        }
+        
         document.getElementById('legend-orientation-select').addEventListener('change', (e) => {
             currentOrientation = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('symbol-type-select').addEventListener('change', (e) => {
+            currentSymbolType = e.target.value;
             draw();
         });
 

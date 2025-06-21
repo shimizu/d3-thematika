@@ -36,7 +36,7 @@ export type {
   ILayer
 } from './types';
 export type { RasterLayerOptions } from './layers/raster-layer';
-export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale } from './layers/legend-layer';
+export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize } from './layers/legend-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
