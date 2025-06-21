@@ -54,7 +54,7 @@
     <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     
     <!-- UMD版のライブラリを使用 -->
-    <script src="./cartography.umd.js"></script>
+    <script src="./thematika.umd.js"></script>
     
     <script>
 
@@ -65,7 +65,7 @@
         
         // SVGフィルターを作成
 
-        const shadowFilter = Cartography.createDropShadow({
+        const shadowFilter = Thematika.createDropShadow({
             id: 'mapShadow',
             dx: 8,
             dy: 8,
@@ -88,7 +88,7 @@
 
 
             // === 新しいAPI（レイヤークラスベース） ===
-            const map = new Cartography.Cartography({
+            const map = new Thematika.Thematika({
                 container: '#map',
                 width: width,
                 height: height,
@@ -97,7 +97,7 @@
             });
 
             // GeojsonLayerインスタンスを作成
-            const worldLayer = new Cartography.GeojsonLayer({
+            const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
                     fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
@@ -109,7 +109,7 @@
             });
 
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
-            const outlineLayer = new Cartography.OutlineLayer({
+            const outlineLayer = new Thematika.OutlineLayer({
                 createClipPath: true,
                 clipPathId: 'earth-outline-clip',
                 attr: {
@@ -121,7 +121,7 @@
             });
 
             // GraticuleLayerインスタンスを作成
-            const graticuleLayer = new Cartography.GraticuleLayer({
+            const graticuleLayer = new Thematika.GraticuleLayer({
                 step: [10, 10], // 10度間隔
                 attr: {
                     fill: 'none',

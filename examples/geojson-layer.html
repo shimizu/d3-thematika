@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[LAYER_NAME] - d3-cartography</title>
+    <title>[LAYER_NAME] - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <style>
@@ -130,7 +130,7 @@ const height = 600;
 const projection = d3.geoEquirectangular()
     .fitExtent([[10, 0], [width-10, height]], geojson);
 
-const map = new Cartography.Cartography({
+const map = new Thematika.Thematika({
     container: '#map',
     width: width,
     height: height,
@@ -138,7 +138,7 @@ const map = new Cartography.Cartography({
 });
 
 // GeojsonLayerインスタンスを作成
-const worldLayer = new Cartography.GeojsonLayer({
+const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
         fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
@@ -151,7 +151,7 @@ const worldLayer = new Cartography.GeojsonLayer({
 
 
 // OutlineLayerインスタンスを作成（クリップパス機能ON）
-const outlineLayer = new Cartography.OutlineLayer({
+const outlineLayer = new Thematika.OutlineLayer({
     createClipPath: true,
     clipPathId: 'earth-outline-clip',
     attr: {
@@ -163,7 +163,7 @@ const outlineLayer = new Cartography.OutlineLayer({
 });
 
 // GraticuleLayerインスタンスを作成
-const graticuleLayer = new Cartography.GraticuleLayer({
+const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10], // 10度間隔
     attr: {
         fill: 'none',
@@ -181,7 +181,7 @@ map.addLayer('world_new', worldLayer);
     </div>
 
     <!-- UMD版のライブラリを使用 -->
-    <script src="./cartography.umd.js"></script>
+    <script src="./thematika.umd.js"></script>
 
     <script >
         
@@ -202,7 +202,7 @@ map.addLayer('world_new', worldLayer);
             currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
 
             // 地図を作成
-            const map = new Cartography.Cartography({
+            const map = new Thematika.Thematika({
                 container: '#map',
                 width: width,
                 height: height,
@@ -210,7 +210,7 @@ map.addLayer('world_new', worldLayer);
             });
 
             // GeojsonLayerインスタンスを作成
-            const worldLayer = new Cartography.GeojsonLayer({
+            const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
                     fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
@@ -222,7 +222,7 @@ map.addLayer('world_new', worldLayer);
             });
 
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
-            const outlineLayer = new Cartography.OutlineLayer({
+            const outlineLayer = new Thematika.OutlineLayer({
                 createClipPath: true,
                 clipPathId: 'earth-outline-clip',
                 attr: {
@@ -234,7 +234,7 @@ map.addLayer('world_new', worldLayer);
             });
 
             // GraticuleLayerインスタンスを作成
-            const graticuleLayer = new Cartography.GraticuleLayer({
+            const graticuleLayer = new Thematika.GraticuleLayer({
                 step: [10, 10], // 10度間隔
                 attr: {
                     fill: 'none',

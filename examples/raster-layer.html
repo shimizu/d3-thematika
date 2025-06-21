@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RasterLayer - d3-cartography</title>
+    <title>RasterLayer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <style>
@@ -123,7 +123,7 @@
 
         <div class="code-example">
             <pre>// RasterLayerの使用例（アフリカ画像）
-const map = new Cartography.Cartography({
+const map = new Thematika.Thematika({
     container: '#map',
     width: 800,
     height: 400,
@@ -131,7 +131,7 @@ const map = new Cartography.Cartography({
 });
 
 // ラスター画像レイヤーの追加
-const rasterLayer = new Cartography.RasterLayer('raster', {
+const rasterLayer = new Thematika.RasterLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
     style: { opacity: 0.7 }
@@ -144,7 +144,7 @@ map.addLayer('raster', rasterLayer);</pre>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
-    <script src="./cartography.umd.js"></script>
+    <script src="./thematika.umd.js"></script>
 
     <script type="module">
 
@@ -161,7 +161,7 @@ map.addLayer('raster', rasterLayer);</pre>
             currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
 
             // 地図を作成
-            map = new Cartography.Cartography({
+            map = new Thematika.Thematika({
                 container: '#map',
                 width: 800,
                 height: 400,
@@ -169,7 +169,7 @@ map.addLayer('raster', rasterLayer);</pre>
             });
 
             // 背景レイヤー（国境）
-            backgroundLayer = new Cartography.GeojsonLayer({
+            backgroundLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
                     fill: '#ffffff',
@@ -181,7 +181,7 @@ map.addLayer('raster', rasterLayer);</pre>
 
             // ラスターレイヤー（アフリカの画像を使用）
             // GeoJSONと同じ座標を使用（西端は負の値）
-            rasterLayer = new Cartography.RasterLayer('raster', {
+            rasterLayer = new Thematika.RasterLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { opacity: 0.7 }
@@ -194,7 +194,7 @@ map.addLayer('raster', rasterLayer);</pre>
             map.addLayer('raster', rasterLayer);
 
             // 経緯線レイヤー
-            graticuleLayer = new Cartography.GraticuleLayer({
+            graticuleLayer = new Thematika.GraticuleLayer({
                 step: [15, 15],
                 attr: {
                     stroke: '#999999',
