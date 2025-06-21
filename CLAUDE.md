@@ -4,11 +4,11 @@
 
 ## プロジェクト概要
 
-このプロジェクトは D3.js の地図作成（cartography）ライブラリです。
+このプロジェクトは D3.js の主題図作成（thematika）ライブラリです。
 
 ### ライブラリの目的
 
-- 更新の止まっているbertin.jsに変わって主にスタティックな主題図を作るカルトグラフィーライブラリを作成
+- 更新の止まっているbertin.jsに変わって主にスタティックな主題図を作る主題図ライブラリを作成
 - D3.jsの機能をフルに活用し、CSSやSVGのエフェクトを適用しやすい作りにする
 - 一般的な地図ライブラリとは違い、パンやズームといった機能は持たない
 - 目標とする地図スタイル: img/reference_map_style.png を参照
@@ -16,11 +16,11 @@
 ## 開発環境
 
 - プラットフォーム: Linux (WSL2)
-- 作業ディレクトリ: /home/shimizu/_playground/d3/d3-cartography
+- 作業ディレクトリ: /home/shimizu/_make_libs/d3-thematika
 
 ## Git/GitHub設定
 
-- リポジトリ: https://github.com/shimizu/d3-cartography.git
+- リポジトリ: https://github.com/shimizu/d3-thematika.git
 - メインブランチ: main
 - GPG署名: 無効（--no-gpg-sign使用）
 - コミット時はGPG署名なしで実行する必要があります
@@ -71,7 +71,8 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 
 ## メモリーログ
 
-- ライブラリの正式名称は「d3-Cartgraphy」です。
+- ライブラリの正式名称は「d3-thematika」です。
 - ライブラリは開発中のため後方互換を保つ必要はありません。
-- 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-cartographyは可視化に特化し、地理計算はturf.jsに委譲する。
+- 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
+- **重要**: examples/フォルダにthematika.umd.jsをコピーする必要はない。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため

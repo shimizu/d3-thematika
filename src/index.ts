@@ -1,15 +1,15 @@
 /**
- * D3 Cartography ライブラリ
+ * D3 Thematika ライブラリ
  * 
- * このライブラリはD3.jsを使用してSVGベースの地図を作成するためのツールを提供します。
+ * このライブラリはD3.jsを使用してSVGベースの主題図を作成するためのツールを提供します。
  * 複数のレイヤーを管理し、様々な投影法をサポートしています。
  * リファクタリングによりモジュール化され、拡張性と保守性が向上しました。
  * 
  * @example
  * ```typescript
- * import { Cartography } from 'd3-cartography';
+ * import { Thematika } from 'd3-thematika';
  * 
- * const map = new Cartography({
+ * const map = new Thematika({
  *   container: '#map',
  *   width: 800,
  *   height: 600,
@@ -27,11 +27,11 @@
 
 
 // メインクラス
-export { Cartography } from './cartography';
+export { Thematika } from './thematika';
 
 // 型定義
 export type { 
-  CartographyOptions, 
+  ThematikaOptions, 
   LayerStyle, 
   ILayer
 } from './types';

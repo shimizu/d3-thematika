@@ -1,14 +1,14 @@
 import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
-import { CartographyOptions, LayerStyle, ILayer } from './types';
+import { ThematikaOptions, LayerStyle, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
 import { GeojsonLayer } from './layers/geojson-layer';
 
 /**
- * 地図描画を行うメインクラス（リファクタリング版）
+ * 主題図描画を行うメインクラス（リファクタリング版）
  * モジュール化された構造で、拡張性と保守性を向上させています
  */
-export class Cartography {
+export class Thematika {
   /** DOM要素を選択するためのD3セレクション */
   private container: Selection<HTMLElement, unknown, HTMLElement, any>;
   /** SVG要素のD3セレクション */
@@ -25,10 +25,10 @@ export class Cartography {
   private height: number;
 
   /**
-   * Cartographyインスタンスを作成します
-   * @param options - 地図の設定オプション
+   * Thematikaインスタンスを作成します
+   * @param options - 主題図の設定オプション
    */
-  constructor(options: CartographyOptions) {
+  constructor(options: ThematikaOptions) {
     this.width = options.width;
     this.height = options.height;
 
@@ -40,14 +40,14 @@ export class Cartography {
 
 
     // すでにSVGが存在する場合は削除
-    this.container.selectAll('svg.cartography-map').remove();
+    this.container.selectAll('svg.thematika-map').remove();
 
     // SVG要素を作成
     this.svg = this.container
       .append('svg')
       .attr('width', "100%")
       .attr('height', "100%")
-      .attr('class', 'cartography-map')
+      .attr('class', 'thematika-map')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
@@ -56,7 +56,7 @@ export class Cartography {
 
     // メインのSVGグループを作成
     this.svgGroup = this.svg.append('g')
-      .attr('class', 'cartography-main-group');
+      .attr('class', 'thematika-main-group');
 
     // 投影法を設定
     this.projection = options.projection;
@@ -67,7 +67,7 @@ export class Cartography {
   }
 
   /**
-   * 地図にレイヤーを追加します
+   * 主題図にレイヤーを追加します
    * @param id - レイヤーの一意識別子
    * @param layer - レイヤーインスタンス
    */

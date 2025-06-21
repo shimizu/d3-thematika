@@ -1,11 +1,11 @@
-# d3-Cartgraphy
+# d3-thematika
 
-D3.jsを使用した地図作成（cartography）ライブラリです。
+D3.jsを使用した主題図作成（thematika）ライブラリです。
 
 ## インストール
 
 ```bash
-npm install d3-cartography
+npm install d3-thematika
 ```
 
 ## 使用方法
@@ -15,11 +15,11 @@ npm install d3-cartography
 ```html
 <!-- D3.js CDN -->
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<!-- d3-Cartgraphy -->
-<script src="./dist/cartography.umd.js"></script>
+<!-- d3-thematika -->
+<script src="./dist/thematika.umd.js"></script>
 
 <script>
-  const map = new Cartography.Cartography({
+  const map = new Thematika.Thematika({
     container: '#map',
     width: 800,
     height: 600,
@@ -40,9 +40,9 @@ npm install d3-cartography
 ### ES Modules
 
 ```javascript
-import { Cartography } from 'd3-cartography';
+import { Thematika } from 'd3-thematika';
 
-const map = new Cartography({
+const map = new Thematika({
   container: '#map',
   width: 800,
   height: 600,
@@ -64,8 +64,8 @@ map.addLayer('base', {
 ### セットアップ
 
 ```bash
-git clone https://github.com/shimizu/d3-cartography.git
-cd d3-cartography
+git clone https://github.com/shimizu/d3-thematika.git
+cd d3-thematika
 npm install
 ```
 
@@ -84,13 +84,13 @@ npm run build
 ```
 
 ビルドファイルは `dist/` フォルダに出力されます：
-- `cartography.umd.js` - UMD版
-- `cartography.esm.js` - ES Modules版  
-- `cartography.cjs.js` - CommonJS版
+- `thematika.umd.js` - UMD版
+- `thematika.esm.js` - ES Modules版  
+- `thematika.cjs.js` - CommonJS版
 
 ## API
 
-### Cartography(options)
+### Thematika(options)
 
 地図インスタンスを作成します。
 

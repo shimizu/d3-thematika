@@ -10,20 +10,20 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/cartography.cjs.js',
+      file: 'dist/thematika.cjs.js',
       format: 'cjs',
       sourcemap: true,
       exports: 'named'
     },
     {
-      file: 'dist/cartography.esm.js',
+      file: 'dist/thematika.esm.js',
       format: 'esm',
       sourcemap: true
     },
     {
-      file: 'dist/cartography.umd.js',
+      file: 'dist/thematika.umd.js',
       format: 'umd',
-      name: 'Cartography',
+      name: 'Thematika',
       sourcemap: true,
       globals: {
         'd3-geo': 'd3',

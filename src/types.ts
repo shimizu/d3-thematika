@@ -2,14 +2,14 @@ import { GeoProjection } from 'd3-geo';
 import { Selection } from 'd3-selection';
 
 /**
- * Cartographyインスタンスの初期化オプション
+ * Thematikaインスタンスの初期化オプション
  */
-export interface CartographyOptions {
-  /** 地図を描画するDOM要素のCSSセレクタ */
+export interface ThematikaOptions {
+  /** 主題図を描画するDOM要素のCSSセレクタ */
   container: string;
-  /** 地図の幅（ピクセル） */
+  /** 主題図の幅（ピクセル） */
   width: number;
-  /** 地図の高さ（ピクセル） */
+  /** 主題図の高さ（ピクセル） */
   height: number;
   /** 投影法（D3投影法オブジェクト） */
   projection: GeoProjection;
