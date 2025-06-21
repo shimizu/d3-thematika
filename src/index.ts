@@ -35,6 +35,7 @@ export type {
   LayerStyle, 
   ILayer
 } from './types';
+export type { RasterLayerOptions } from './layers/raster-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
@@ -44,6 +45,7 @@ export { BaseLayer } from './layers/base-layer';
 export { GeojsonLayer } from './layers/geojson-layer';
 export { OutlineLayer } from './layers/outline-layer';
 export { GraticuleLayer } from './layers/graticule-layer';
+export { RasterLayer } from './layers/raster-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';

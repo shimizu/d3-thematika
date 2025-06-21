@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RasterLayer - d3-cartography</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RasterLayer デモ</h1>
+        <p class="description">
+            RasterLayerを使用して地図上にラスター画像を表示します。
+            Equirectangular投影法の場合は高速に描画し、その他の投影法では画像を変換して表示します。
+        </p>
+
+        <div class="note">
+            <strong>テスト画像:</strong> 
+            <ul>
+                <li>画像: examples/img/africa_img.png</li>
+                <li>範囲: 西経25.86°〜東経66.43°、南緯38.48°〜北緯41.48°（アフリカ地域）</li>
+                <li>Equirectangular以外の投影法では、画像サイズは1000×1000ピクセル以下に制限されます。</li>
+                <li>投影法を変更して変換処理の動作を確認できます。</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="equirectangular" selected>Equirectangular (高速)</option>
+                    <option value="mercator">Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="orthographic">Orthographic</option>
+                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="opacity-slider">透明度: <span id="opacity-value">0.7</span></label>
+                <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.7">
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="visible-checkbox" checked>
+                    レイヤーを表示
+                </label>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="graticule-checkbox" checked>
+                    経緯線を表示
+                </label>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="bbox-markers-checkbox">
+                    Bboxマーカー表示
+                </label>
+            </div>
+        </div>
+
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+
+        <div class="code-example">
+            <pre>// RasterLayerの使用例（アフリカ画像）
+const map = new Cartography.Cartography({
+    container: '#map',
+    width: 800,
+    height: 400,
+    projection: d3.geoEquirectangular()
+});
+
+// ラスター画像レイヤーの追加
+const rasterLayer = new Cartography.RasterLayer('raster', {
+    src: './img/africa_img.png',
+    bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
+    style: { opacity: 0.7 }
+});
+
+// 投影法を設定
+rasterLayer.setProjection(map.getProjection());
+map.addLayer('raster', rasterLayer);</pre>
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./cartography.umd.js"></script>
+
+    <script type="module">
+
+        // 地図の初期化
+        let currentProjection = d3.geoEquirectangular();
+        let map, rasterLayer, graticuleLayer, backgroundLayer;
+
+        async function initMap() {
+            // 既存の地図をクリア
+            d3.select('#map').selectAll('*').remove();
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+
+            // 地図を作成
+            map = new Cartography.Cartography({
+                container: '#map',
+                width: 800,
+                height: 400,
+                projection: currentProjection
+            });
+
+            // 背景レイヤー（国境）
+            backgroundLayer = new Cartography.GeojsonLayer({
+                data: geojson,
+                attr: {
+                    fill: '#ffffff',
+                    stroke: '#333333',
+                    strokeWidth: 0.5
+                }
+            });
+            map.addLayer('countries', backgroundLayer);
+
+            // ラスターレイヤー（アフリカの画像を使用）
+            // GeoJSONと同じ座標を使用（西端は負の値）
+            rasterLayer = new Cartography.RasterLayer('raster', {
+                src: './img/africa_img.png',
+                bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
+                style: { opacity: 0.7 }
+            });
+            rasterLayer.setProjection(currentProjection);
+            map.addLayer('raster', rasterLayer);
+
+            // 経緯線レイヤー
+            graticuleLayer = new Cartography.GraticuleLayer({
+                step: [15, 15],
+                attr: {
+                    stroke: '#999999',
+                    strokeWidth: 0.5,
+                    strokeDasharray: '2,2'
+                }
+            });
+            map.addLayer('graticule', graticuleLayer);
+        }
+
+        // 初期表示
+        initMap().catch(error => {
+            console.error('地図の初期化に失敗しました:', error);
+        });
+
+        // コントロールのイベントハンドラ
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch (projectionName) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            initMap();
+        });
+
+        document.getElementById('opacity-slider').addEventListener('input', (e) => {
+            const opacity = parseFloat(e.target.value);
+            document.getElementById('opacity-value').textContent = opacity;
+            if (rasterLayer) {
+                rasterLayer.setStyle({ opacity: opacity });
+            }
+        });
+
+        document.getElementById('visible-checkbox').addEventListener('change', (e) => {
+            if (rasterLayer) {
+                rasterLayer.setVisible(e.target.checked);
+            }
+        });
+
+        document.getElementById('graticule-checkbox').addEventListener('change', (e) => {
+            if (graticuleLayer) {
+                graticuleLayer.setVisible(e.target.checked);
+            }
+        });
+
+        document.getElementById('bbox-markers-checkbox').addEventListener('change', (e) => {
+            if (rasterLayer) {
+                rasterLayer.setShowBboxMarkers(e.target.checked);
+            }
+        });
+    </script>
+</body>
+</html>
