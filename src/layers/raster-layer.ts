@@ -1,5 +1,5 @@
 import { Selection, select } from 'd3-selection';
-import { GeoProjection } from 'd3-geo';
+import { GeoProjection, geoPath, geoEquirectangular } from 'd3-geo';
 import { BaseLayer } from './base-layer';
 import { LayerStyle } from '../types';
 
@@ -28,6 +28,8 @@ export class RasterLayer extends BaseLayer {
   private projection?: GeoProjection;
   private imageElement?: Selection<SVGImageElement, unknown, any, any>;
   private showBboxMarkers: boolean;
+  private useAdvancedReprojection: boolean = true;
+  private useMask: boolean = true;
 
   /**
    * RasterLayerを初期化します
@@ -75,8 +77,16 @@ export class RasterLayer extends BaseLayer {
     try {
       const img = await this.loadImage(this.src);
       
-      // 全ての投影法で画像をそのまま表示（座標変換なし）
-      await this.renderSimpleImage(img);
+      // Equirectangular投影法の場合は高速描画
+      if (this.projection && this.isEquirectangularProjection(this.projection)) {
+        await this.renderSimpleImage(img);
+      } else if (this.useAdvancedReprojection) {
+        // その他の投影法では高度な再投影を実行
+        await this.renderAdvancedReprojection(img);
+      } else {
+        // フォールバック: 単純な画像配置
+        await this.renderSimpleImage(img);
+      }
     } catch (error) {
       console.error('RasterLayer: 画像の描画に失敗しました', error);
     }
@@ -95,8 +105,16 @@ export class RasterLayer extends BaseLayer {
     selection.selectAll('.bbox-marker-label').remove();
     
     this.loadImage(this.src).then(img => {
-      // 全ての投影法で画像をそのまま表示（座標変換なし）
-      this.renderSimpleImage(img);
+      // Equirectangular投影法の場合は高速描画
+      if (this.projection && this.isEquirectangularProjection(this.projection)) {
+        this.renderSimpleImage(img);
+      } else if (this.useAdvancedReprojection) {
+        // その他の投影法では高度な再投影を実行
+        this.renderAdvancedReprojection(img);
+      } else {
+        // フォールバック: 単純な画像配置
+        this.renderSimpleImage(img);
+      }
     }).catch(error => {
       console.error('RasterLayer: 更新に失敗しました', error);
     });
@@ -467,6 +485,343 @@ export class RasterLayer extends BaseLayer {
    */
   public getShowBboxMarkers(): boolean {
     return this.showBboxMarkers;
+  }
+
+  /**
+   * 高度な再投影を使用して画像を描画します
+   * @param img - 画像要素
+   */
+  private async renderAdvancedReprojection(img: HTMLImageElement): Promise<void> {
+    if (!this.element || !this.projection) return;
+
+    try {
+      const result = await this.advancedTransformRasterImage(img);
+      const transformedImg = await this.loadImage(result.dataUrl);
+      
+      const selection = select(this.element as any) as Selection<SVGGElement, unknown, any, any>;
+      this.imageElement = selection
+        .append('image')
+        .attr('x', result.x)
+        .attr('y', result.y)
+        .attr('width', result.width)
+        .attr('height', result.height)
+        .attr('href', result.dataUrl)
+        .attr('preserveAspectRatio', 'none');
+
+      if (this.imageElement) {
+        this.applyStyle(this.imageElement);
+      }
+
+      // bbox マーカーを表示（オプション）
+      if (this.showBboxMarkers) {
+        const [west, south, east, north] = this.bounds;
+        const topLeft = this.projection([west, north]);
+        const topRight = this.projection([east, north]);
+        const bottomLeft = this.projection([west, south]);
+        const bottomRight = this.projection([east, south]);
+        this.addBboxMarkers(selection, [topLeft, topRight, bottomLeft, bottomRight]);
+      }
+    } catch (error) {
+      console.warn('高度な再投影に失敗しました。単純な描画にフォールバックします。', error);
+      this.renderSimpleImage(img);
+    }
+  }
+
+  /**
+   * 高度なアルゴリズムを使用してラスター画像を投影変換します
+   * @param img - 元画像
+   * @returns 変換後の画像のData URL
+   */
+  private async advancedTransformRasterImage(img: HTMLImageElement): Promise<{ dataUrl: string; x: number; y: number; width: number; height: number }> {
+    if (!this.projection) throw new Error('投影法が設定されていません');
+
+    const [west, south, east, north] = this.bounds;
+    
+    // ソース画像をCanvasに描画
+    const srcCanvas = document.createElement('canvas');
+    const srcCtx = srcCanvas.getContext('2d');
+    if (!srcCtx) throw new Error('Canvas contextの取得に失敗しました');
+
+    srcCanvas.width = img.width;
+    srcCanvas.height = img.height;
+    srcCtx.drawImage(img, 0, 0);
+    const srcImageData = srcCtx.getImageData(0, 0, img.width, img.height);
+
+    // Equirectangular投影を作成（ソース画像の座標系）
+    const srcProj = geoEquirectangular()
+      .scale(1)
+      .translate([0, 0]);
+
+    // 出力範囲を計算
+    const bounds = this.calculateOutputBounds();
+    if (!bounds) throw new Error('出力範囲の計算に失敗しました');
+
+    const { minX, minY, width, height } = bounds;
+
+    // 出力Canvas作成
+    const dstCanvas = document.createElement('canvas');
+    const dstCtx = dstCanvas.getContext('2d');
+    if (!dstCtx) throw new Error('Canvas contextの取得に失敗しました');
+
+    dstCanvas.width = width;
+    dstCanvas.height = height;
+
+    // マスクを作成
+    const maskCanvas = document.createElement('canvas');
+    const maskCtx = maskCanvas.getContext('2d');
+    if (!maskCtx) throw new Error('Mask contextの取得に失敗しました');
+
+    maskCanvas.width = width;
+    maskCanvas.height = height;
+    maskCtx.fillStyle = '#fff';
+    
+    // 投影をオフセットして出力範囲に合わせる
+    const offsetProjection = (coords: [number, number]): [number, number] | null => {
+      const projected = this.projection!(coords);
+      if (!projected) return null;
+      return [projected[0] - minX, projected[1] - minY];
+    };
+
+    // 球体マスクを描画（手動で境界を計算）
+    maskCtx.beginPath();
+    
+    // 投影範囲の境界を計算
+    const boundaryPoints: [number, number][] = [];
+    const steps = 100;
+    
+    // 上辺（北端）
+    for (let i = 0; i <= steps; i++) {
+      const lng = -180 + (360 * i / steps);
+      const point = offsetProjection([lng, 90]);
+      if (point) boundaryPoints.push(point);
+    }
+    
+    // 右辺（東端）
+    for (let i = 0; i <= steps; i++) {
+      const lat = 90 - (180 * i / steps);
+      const point = offsetProjection([180, lat]);
+      if (point) boundaryPoints.push(point);
+    }
+    
+    // 下辺（南端）
+    for (let i = 0; i <= steps; i++) {
+      const lng = 180 - (360 * i / steps);
+      const point = offsetProjection([lng, -90]);
+      if (point) boundaryPoints.push(point);
+    }
+    
+    // 左辺（西端）
+    for (let i = 0; i <= steps; i++) {
+      const lat = -90 + (180 * i / steps);
+      const point = offsetProjection([-180, lat]);
+      if (point) boundaryPoints.push(point);
+    }
+    
+    // パスを描画
+    if (boundaryPoints.length > 0) {
+      maskCtx.moveTo(boundaryPoints[0][0], boundaryPoints[0][1]);
+      for (let i = 1; i < boundaryPoints.length; i++) {
+        maskCtx.lineTo(boundaryPoints[i][0], boundaryPoints[i][1]);
+      }
+      maskCtx.closePath();
+      maskCtx.fill();
+    }
+    
+    const maskData = maskCtx.getImageData(0, 0, width, height);
+    const dstImageData = dstCtx.createImageData(width, height);
+
+    // 各ピクセルを変換
+    for (let row = 0; row < height; row++) {
+      for (let col = 0; col < width; col++) {
+        // マスクチェック（マスクが有効な場合のみ）
+        if (this.useMask) {
+          const maskIndex = (row * width + col) * 4;
+          // マスクがアルファゼロの場合はスキップ
+          if (maskData.data[maskIndex + 3] === 0) continue;
+        }
+
+        // スクリーン座標から地理座標へ逆変換
+        const screenX = col + minX + 0.5;
+        const screenY = row + minY + 0.5;
+        
+        // 投影の逆変換を試みる
+        const geoCoord = this.inverseProjectWithFallback(screenX, screenY, west, south, east, north);
+        
+        if (geoCoord) {
+          // ソース画像の座標を計算（補間付き）
+          const srcX = (geoCoord[0] - west) / (east - west) * (img.width - 1);
+          const srcY = (north - geoCoord[1]) / (north - south) * (img.height - 1);
+          
+          // 双線形補間
+          const pixel = this.bilinearInterpolate(srcImageData, srcX, srcY);
+          const dstIndex = (row * width + col) * 4;
+          
+          dstImageData.data[dstIndex] = pixel[0];
+          dstImageData.data[dstIndex + 1] = pixel[1];
+          dstImageData.data[dstIndex + 2] = pixel[2];
+          dstImageData.data[dstIndex + 3] = pixel[3];
+        }
+      }
+    }
+
+    dstCtx.putImageData(dstImageData, 0, 0);
+    
+    // 位置情報と共にデータURLを返す
+    return {
+      dataUrl: dstCanvas.toDataURL(),
+      x: minX,
+      y: minY,
+      width,
+      height
+    };
+  }
+
+  /**
+   * 出力画像の境界を計算します
+   * @returns 境界情報またはnull
+   */
+  private calculateOutputBounds(): { minX: number; minY: number; width: number; height: number } | null {
+    if (!this.projection) return null;
+
+    const [west, south, east, north] = this.bounds;
+    
+    // より多くのテストポイントで正確な境界を計算
+    const testPoints: [number, number][] = [];
+    const steps = 20;
+    
+    // 境界線上の点を追加
+    for (let i = 0; i <= steps; i++) {
+      const t = i / steps;
+      testPoints.push(
+        [west + (east - west) * t, north],
+        [west + (east - west) * t, south],
+        [west, south + (north - south) * t],
+        [east, south + (north - south) * t]
+      );
+    }
+
+    const projectedPoints = testPoints
+      .map(p => this.projection!(p))
+      .filter(p => p !== null) as [number, number][];
+    
+    if (projectedPoints.length === 0) return null;
+
+    const xs = projectedPoints.map(p => p[0]);
+    const ys = projectedPoints.map(p => p[1]);
+    
+    const minX = Math.floor(Math.min(...xs));
+    const maxX = Math.ceil(Math.max(...xs));
+    const minY = Math.floor(Math.min(...ys));
+    const maxY = Math.ceil(Math.max(...ys));
+
+    return {
+      minX,
+      minY,
+      width: maxX - minX,
+      height: maxY - minY
+    };
+  }
+
+  /**
+   * 投影の逆変換を行います（フォールバック付き）
+   * @param screenX - 画面X座標
+   * @param screenY - 画面Y座標
+   * @param west - 西端の経度
+   * @param south - 南端の緯度
+   * @param east - 東端の経度
+   * @param north - 北端の緯度
+   * @returns 地理座標 [経度, 緯度] またはnull
+   */
+  private inverseProjectWithFallback(
+    screenX: number,
+    screenY: number,
+    west: number,
+    south: number,
+    east: number,
+    north: number
+  ): [number, number] | null {
+    if (!this.projection) return null;
+
+    // まず投影法のinvertメソッドを試す
+    if (typeof this.projection.invert === 'function') {
+      try {
+        const inverted = this.projection.invert([screenX, screenY]);
+        if (inverted && 
+            inverted[0] >= west && inverted[0] <= east &&
+            inverted[1] >= south && inverted[1] <= north) {
+          return inverted;
+        }
+      } catch (e) {
+        // invertが失敗した場合は近似メソッドにフォールバック
+      }
+    }
+
+    // フォールバック: 近似的な逆投影
+    return this.approximateInverseProjection(screenX, screenY, west, south, east, north);
+  }
+
+  /**
+   * 双線形補間を行います
+   * @param imageData - 画像データ
+   * @param x - X座標（小数）
+   * @param y - Y座標（小数）
+   * @returns RGBA値の配列
+   */
+  private bilinearInterpolate(imageData: ImageData, x: number, y: number): [number, number, number, number] {
+    const x0 = Math.floor(x);
+    const x1 = Math.min(x0 + 1, imageData.width - 1);
+    const y0 = Math.floor(y);
+    const y1 = Math.min(y0 + 1, imageData.height - 1);
+    
+    const fx = x - x0;
+    const fy = y - y0;
+    
+    const getPixel = (px: number, py: number): [number, number, number, number] => {
+      const idx = (py * imageData.width + px) * 4;
+      return [
+        imageData.data[idx],
+        imageData.data[idx + 1],
+        imageData.data[idx + 2],
+        imageData.data[idx + 3]
+      ];
+    };
+    
+    const p00 = getPixel(x0, y0);
+    const p10 = getPixel(x1, y0);
+    const p01 = getPixel(x0, y1);
+    const p11 = getPixel(x1, y1);
+    
+    const result: [number, number, number, number] = [0, 0, 0, 0];
+    
+    for (let i = 0; i < 4; i++) {
+      const v0 = p00[i] * (1 - fx) + p10[i] * fx;
+      const v1 = p01[i] * (1 - fx) + p11[i] * fx;
+      result[i] = Math.round(v0 * (1 - fy) + v1 * fy);
+    }
+    
+    return result;
+  }
+
+  /**
+   * 高度な再投影の使用を設定します
+   * @param use - 使用するかどうか
+   */
+  public setUseAdvancedReprojection(use: boolean): void {
+    this.useAdvancedReprojection = use;
+    if (this.isRendered()) {
+      this.update();
+    }
+  }
+
+  /**
+   * マスク処理の使用を設定します
+   * @param use - 使用するかどうか
+   */
+  public setUseMask(use: boolean): void {
+    this.useMask = use;
+    if (this.isRendered()) {
+      this.update();
+    }
   }
 
   /**
