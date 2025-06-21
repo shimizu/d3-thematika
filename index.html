@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartography ライブラリ テスト</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: system-ui, sans-serif;
+            background: #f8f9fa;
+        }
+        
+        #map {
+            max-width: 1000px;
+            max-width: 1200px;
+            margin: 20px auto;
+            display: block;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            position: relative;
+            overflow: auto;
+        }
+        
+        .info {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+
+    <script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
+</head>
+<body>
+    <div class="info">
+        <h1>Cartography ライブラリ テスト</h1>
+        <p>基本的な地図描画機能と新しいレイヤーシステムをテストします</p>
+        <p>上の地図：従来のAPI、下の地図：新しいレイヤークラスベースAPI</p>
+        
+        <div style="margin: 20px 0;">
+            <label>
+                <input type="checkbox" id="hideLayerCheckbox"> 
+                レイヤーを非表示にする
+            </label>
+        </div>
+    </div>
+    
+    <div id="map"></div>
+    
+    <!-- D3.js CDN -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./cartography.umd.js"></script>
+    
+    <script>
+
+        // テクスチャとフィルターを定義
+        const texture = textures
+            .lines()
+            .thicker();
+        
+        // SVGフィルターを作成
+
+        const shadowFilter = Cartography.createDropShadow({
+            id: 'mapShadow',
+            dx: 8,
+            dy: 8,
+            stdDeviation: 3,
+            floodColor: '#000000',
+            floodOpacity: 1
+        });
+        
+        async function draw() {
+            const id = "#map"
+
+           const geojson =  await d3.json("./geojson/world.geojson");
+
+            const width = document.querySelector(id).clientWidth || 800;
+            const height = document.querySelector(id).clientHeight || 600;
+
+            // D3.jsの投影法を使用して地図の投影を設定（マージン付き）
+            const projection = d3.geoEqualEarth()
+                .fitExtent([[10, 10], [width-10, height-10]], geojson);
+
+
+            // === 新しいAPI（レイヤークラスベース） ===
+            const map = new Cartography.Cartography({
+                container: '#map',
+                width: width,
+                height: height,
+                defs: [texture, shadowFilter], 
+                projection: projection
+            });
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Cartography.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    filter: shadowFilter.url(), 
+                    stroke: '#1a3d1f',
+                    strokeWidth: 0.8,
+                    opacity: (d,i) => 0.9,
+                }
+            });
+
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
+            const outlineLayer = new Cartography.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    fill: 'none',
+                    stroke: '#2c3e50',
+                    strokeWidth: 2,
+                    opacity: 0.8
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Cartography.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    fill: 'none',
+                    stroke: '#ddd',
+                    strokeWidth: 0.5,
+                    opacity: 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('world_new', worldLayer);
+
+
+            
+        }
+
+        draw()
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+
+
+    </script>
+</body>
+</html>
