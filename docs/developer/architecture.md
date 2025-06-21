@@ -64,6 +64,18 @@ d3-Cartgraphy
 - 投影法の設定と更新
 - styleとattrプロパティのサポート（attrはstyleのエイリアス）
 
+#### OutlineLayer (アウトラインレイヤー)
+- D3のSphereジオメトリを使用した投影法境界の描画
+- 自動クリッピング機能（createClipPath: true）
+- 他のレイヤーを投影法境界内にクリップ
+- カスタマイズ可能なクリップパスID
+
+#### GraticuleLayer (経緯線レイヤー)
+- D3のgeoGraticuleを使用した経緯線網の描画
+- カスタマイズ可能な間隔設定（step: [経度, 緯度]）
+- 描画範囲の指定（extent）
+- 動的な間隔・範囲の変更機能
+
 ### 4. Utilities (ユーティリティ)
 
 #### FilterUtils (SVGフィルター)
@@ -162,6 +174,7 @@ export interface ICustomLayer extends ILayer {
 ### 2. 最適化されたzIndex制御
 - **DOM要素順序の直接変更**: zIndex変更時に再描画せず、DOM要素の順序のみ変更
 - **差分検出**: zIndex値が実際に変更された場合のみ再配置処理を実行
+- **共通スタイル適用システム**: BaseLayerで統一されたスタイル属性マッピング
 - **スマートな初期値設定**: 新しいレイヤーは既存の最大zIndex+1で自動設定
 
 ### 3. メモリ管理
@@ -195,5 +208,5 @@ export interface ICustomLayer extends ILayer {
 
 ### Phase 4: エフェクト・アニメーション
 - 📋 CSS effects integration
-- ✅ SVG filters (基本実装完了)
+- ✅ SVG filters (実装完了)
 - 📋 Smooth transitions

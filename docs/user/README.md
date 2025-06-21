@@ -1,6 +1,6 @@
-# d3-Cartgraphy ユーザーガイド
+# d3-cartography ユーザーガイド
 
-d3-Cartgraphyは、美しいスタティックな主題図を作成するためのJavaScriptライブラリです。
+d3-cartographyは、美しいスタティックな主題図を作成するためのJavaScriptライブラリです。
 
 ## 目次
 
@@ -9,12 +9,12 @@ d3-Cartgraphyは、美しいスタティックな主題図を作成するため�
 - [主題図の作成](./thematic-maps.md) - 様々な主題図の作成方法
 - [スタイリング](./styling.md) - CSS/SVGエフェクトの活用
 - [チュートリアル](./tutorials/) - ステップバイステップガイド
-- [デバッグ](./debug.md) - d3-Cartgraphyを使用時のデバッグ方法
+- [デバッグ](./debug.md) - d3-cartographyを使用時のデバッグ方法
 - [FAQ](./faq.md) - よくある質問
 
 ## 概要
 
-d3-Cartgraphyは以下のような特徴を持ちます：
+d3-cartographyは以下のような特徴を持ちます：
 
 - 📊 **主題図に特化**: スタティックな主題図作成に最適化
 - 🎨 **美しいデザイン**: CSS/SVGエフェクトを活用した美しい地図

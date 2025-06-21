@@ -1,6 +1,6 @@
 # 開発者ドキュメント
 
-d3-Cartgraphyライブラリの開発に関するドキュメントです。
+d3-cartographyライブラリの開発に関するドキュメントです。
 
 ## 目次
 
@@ -34,15 +34,15 @@ src/
 ├── cartography.ts             # メインクラス
 ├── types.ts                   # 型定義
 ├── core/                      # コア機能
-│   ├── layer-manager.ts       # レイヤー管理
-│   ├── renderer.ts            # 描画処理
-│   └── projection.ts          # 投影法ユーティリティ
+│   └── layer-manager.ts       # レイヤー管理
 ├── layers/                    # レイヤー種別
 │   ├── base-layer.ts          # 基底レイヤークラス
-│   └── vector-layer.ts        # ベクターレイヤー
+│   ├── geojson-layer.ts       # GeoJSONレイヤー
+│   ├── outline-layer.ts       # アウトラインレイヤー
+│   └── graticule-layer.ts     # 経緯線レイヤー
 └── utils/                     # ユーティリティ
-    ├── geo-utils.ts           # 地理データ処理
-    └── style-utils.ts         # スタイル処理
+    ├── effect-utils.ts        # SVGエフェクトユーティリティ
+    └── tests.ts               # デバッグ・テスト機能
 ```
 
 ## ライブラリの目的

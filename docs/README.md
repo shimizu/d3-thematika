@@ -51,7 +51,10 @@ D3 Cartographyは、[bertin.js](https://github.com/neocarto/bertin)に代わる�
 - ✅ ベクターレイヤー描画
 - ✅ 複数投影法サポート
 - ✅ レイヤー管理システム
-- ⏳ 基本的なスタイリング
+- ✅ 基本的なスタイリング
+- ✅ アウトラインレイヤー（クリップ機能付き）
+- ✅ 経緯線レイヤー
+- ✅ SVGフィルター・エフェクト
 
 ### 主題図表現
 - 📋 段階区分図 (Choropleth)
@@ -71,6 +74,25 @@ D3 Cartographyは、[bertin.js](https://github.com/neocarto/bertin)に代わる�
 - 📋 ハッチング (Hatching patterns)
 - 📋 グラデーション (Gradients)
 - 📋 アニメーション (Transitions)
+
+## 🌐 デモページ
+
+実際の動作を確認できるデモページをGitHub Pagesで公開しています：
+
+🔗 **[Live Demo](https://shimizu.github.io/d3-cartography/)**
+
+### デプロイ手順
+
+開発者向け：デモページの更新は以下のコマンドで実行できます：
+
+```bash
+npm run deploy
+```
+
+このコマンドで以下が自動実行されます：
+1. ライブラリのビルド（`npm run build`）
+2. デモページの構築（`npm run build:demo`）
+3. GitHub Pagesへのデプロイ（`gh-pages`）
 
 ## 🤝 貢献
 

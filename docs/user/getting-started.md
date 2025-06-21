@@ -1,6 +1,6 @@
 # はじめに
 
-d3-Cartgraphyライブラリの基本的な使い方を学びましょう。
+d3-cartographyライブラリの基本的な使い方を学びましょう。
 
 ## インストール
 
@@ -48,12 +48,16 @@ import { Cartography } from 'd3-cartography';
 // UMDを使用する場合
 // const { Cartography } = window.Cartography;
 
+// D3投影法を設定
+const projection = d3.geoNaturalEarth1()
+    .fitExtent([[0, 0], [800, 600]], worldData);
+
 // 地図インスタンスを作成
 const map = new Cartography({
     container: '#map',    // 描画先のDOM要素
     width: 800,          // 地図の幅
     height: 600,         // 地図の高さ
-    projection: 'naturalEarth1'  // 投影法
+    projection: projection  // D3投影法オブジェクト
 });
 ```
 
@@ -68,8 +72,8 @@ const worldData = {
     ]
 };
 
-// レイヤーを追加
-map.addLayer('countries', {
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Cartography.GeojsonLayer({
     data: worldData,
     style: {
         fill: '#e8f4f8',
@@ -78,43 +82,54 @@ map.addLayer('countries', {
         opacity: 1
     }
 });
+
+// レイヤーを地図に追加
+map.addLayer('countries', worldLayer);
 ```
 
 ## 投影法の選択
 
-d3-Cartgraphyは複数の投影法をサポートしています：
+d3-cartographyは複数の投影法をサポートしています：
 
 ```javascript
 // Natural Earth I (推奨)
+const projection1 = d3.geoNaturalEarth1()
+    .fitExtent([[0, 0], [800, 600]], worldData);
 const map1 = new Cartography({
     container: '#map1',
     width: 800,
     height: 600,
-    projection: 'naturalEarth1'
+    projection: projection1
 });
 
 // メルカトル図法
+const projection2 = d3.geoMercator()
+    .fitExtent([[0, 0], [800, 600]], worldData);
 const map2 = new Cartography({
     container: '#map2',
     width: 800,
     height: 600,
-    projection: 'mercator'
+    projection: projection2
 });
 
 // 正射図法（地球儀風）
+const projection3 = d3.geoOrthographic()
+    .fitExtent([[0, 0], [800, 600]], worldData);
 const map3 = new Cartography({
     container: '#map3',
     width: 800,
     height: 600,
-    projection: 'orthographic'
+    projection: projection3
 });
 
-// 正距円筒図法
+// Equal Earth図法
+const projection4 = d3.geoEqualEarth()
+    .fitExtent([[0, 0], [800, 600]], worldData);
 const map4 = new Cartography({
     container: '#map4',
     width: 800,
     height: 600,
-    projection: 'equirectangular'
+    projection: projection4
 });
 ```
 
@@ -123,7 +138,7 @@ const map4 = new Cartography({
 ### 基本的なスタイル
 
 ```javascript
-map.addLayer('countries', {
+const countryLayer = new Cartography.GeojsonLayer({
     data: worldData,
     style: {
         fill: '#3498db',        // 塗りつぶし色
@@ -133,6 +148,7 @@ map.addLayer('countries', {
         className: 'country'    // CSSクラス名
     }
 });
+map.addLayer('countries', countryLayer);
 ```
 
 ### CSSでのスタイリング
@@ -151,16 +167,17 @@ map.addLayer('countries', {
 
 ```javascript
 // 背景レイヤー（海）
-map.addLayer('ocean', {
+const oceanLayer = new Cartography.GeojsonLayer({
     data: oceanData,
     style: {
         fill: '#3498db',
         stroke: 'none'
     }
 });
+map.addLayer('ocean', oceanLayer);
 
 // 国境レイヤー
-map.addLayer('countries', {
+const countryLayer = new Cartography.GeojsonLayer({
     data: countryData,
     style: {
         fill: '#e8f4f8',
@@ -168,9 +185,10 @@ map.addLayer('countries', {
         strokeWidth: 0.5
     }
 });
+map.addLayer('countries', countryLayer);
 
 // 都市レイヤー
-map.addLayer('cities', {
+const cityLayer = new Cartography.GeojsonLayer({
     data: cityData,
     style: {
         fill: '#e74c3c',
@@ -178,25 +196,26 @@ map.addLayer('cities', {
         strokeWidth: 1
     }
 });
+map.addLayer('cities', cityLayer);
 ```
 
 ## レイヤーの操作
 
 ```javascript
 // レイヤーの表示/非表示
-map.setLayerVisibility('cities', false);  // 非表示
-map.setLayerVisibility('cities', true);   // 表示
+map.getLayer('cities').setVisible(false);  // 非表示
+map.getLayer('cities').setVisible(true);   // 表示
 
 // レイヤーの削除
 map.removeLayer('cities');
 
 // レイヤーのスタイル更新
-map.updateLayerStyle('countries', {
+map.getLayer('countries').setStyle({
     fill: '#95a5a6'
 });
 
 // 描画順序の変更
-map.setLayerZIndex('countries', 10);
+map.getLayer('countries').setZIndex(10);
 ```
 
 ## 地図のサイズ変更
@@ -204,11 +223,13 @@ map.setLayerZIndex('countries', 10);
 ```javascript
 // レスポンシブ対応
 window.addEventListener('resize', () => {
+    // リサイズ時は地図を再作成する方法を推奨
     const container = document.getElementById('map');
     const width = container.offsetWidth;
     const height = container.offsetHeight;
     
-    map.resize(width, height);
+    // 地図を再作成
+    createMap(width, height);
 });
 ```
 
@@ -232,11 +253,45 @@ try {
 }
 ```
 
+## 特殊レイヤーの使用
+
+### OutlineLayer（アウトラインレイヤー）
+
+投影法の境界線を描画し、他のレイヤーをクリップする機能を提供します。
+
+```javascript
+// アウトラインレイヤー（クリップ機能付き）
+const outlineLayer = new Cartography.OutlineLayer({
+    createClipPath: true,  // クリップパスを作成
+    style: {
+        fill: 'none',
+        stroke: '#333',
+        strokeWidth: 2
+    }
+});
+map.addLayer('outline', outlineLayer);
+```
+
+### GraticuleLayer（経緯線レイヤー）
+
+経緯線網（グラティキュール）を描画します。
+
+```javascript
+// 経緯線レイヤー
+const graticuleLayer = new Cartography.GraticuleLayer({
+    step: [15, 15],  // 15度間隔
+    style: {
+        fill: 'none',
+        stroke: '#ddd',
+        strokeWidth: 0.5,
+        opacity: 0.7
+    }
+});
+map.addLayer('graticule', graticuleLayer);
+```
+
 ## 次のステップ
 
 基本的な地図が作成できたら、以下のドキュメントを参照してください：
 
-- [API リファレンス](./api-reference.md) - 詳細なAPI仕様
-- [主題図の作成](./thematic-maps.md) - データ可視化の手法
-- [スタイリング](./styling.md) - 高度なスタイリング技法
-- [チュートリアル](./tutorials/) - 実践的な例
+- [デバッグ](./debug.md) - 座標変換テストやデバッグ機能
