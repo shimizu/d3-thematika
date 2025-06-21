@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LegendLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LegendLayer デモ</h1>
+        <p class="description">
+            LegendLayerを使用してD3スケールに基づく凡例を地図上に表示します。
+            序数、連続、閾値スケールに対応した自動凡例生成機能を確認できます。
+        </p>
+
+        <div class="note">
+            <strong>機能:</strong> 
+            <ul>
+                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）</li>
+                <li>機能: スケール型切り替え、凡例位置切り替え</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="scale-type-select">スケール型:</label>
+                <select id="scale-type-select">
+                    <option value="ordinal" selected>序数スケール (Ordinal)</option>
+                    <option value="linear">連続スケール (Linear)</option>
+                    <option value="threshold">閾値スケール (Threshold)</option>
+                    <option value="sequential">連続色スケール (Sequential)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="legend-position-select">凡例位置:</label>
+                <select id="legend-position-select">
+                    <option value="top-right" selected>右上</option>
+                    <option value="top-left">左上</option>
+                    <option value="bottom-right">右下</option>
+                    <option value="bottom-left">左下</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="legend-orientation-select">配置方向:</label>
+                <select id="legend-orientation-select">
+                    <option value="vertical" selected>縦方向</option>
+                    <option value="horizontal">横方向</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// LegendLayerの使用例
+
+// 序数スケールの例
+const colorScale = d3.scaleOrdinal()
+    .domain(['都市', '農村', '工業地域'])
+    .range(['#ff0000', '#00ff00', '#0000ff']);
+
+const legendLayer = new Thematika.LegendLayer({
+    scale: colorScale,
+    position: { top: '10%', left: '80%' },
+    title: '土地利用',
+    orientation: 'vertical'
+});
+
+// 連続スケールの例
+const populationScale = d3.scaleSequential(d3.interpolateYlOrRd)
+    .domain([0, 1000000]);
+
+const popLegend = new Thematika.LegendLayer({
+    scale: populationScale,
+    position: { top: '70%', left: '5%' },
+    title: '人口密度',
+    orientation: 'horizontal'
+});
+
+// 地図に追加
+map.addLayer('legend', legendLayer);
+map.addLayer('population-legend', popLegend);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script >
+        
+        // 現在のスケール設定
+        let currentScaleType = 'ordinal';
+        let currentPosition = { top: '10%', left: '80%' };
+        let currentOrientation = 'vertical';
+        
+        // プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        
+        // 各スケール型のデータを定義
+        const scaleData = {
+            ordinal: {
+                scale: d3.scaleOrdinal()
+                    .domain(['先進国', '新興国', '発展途上国'])
+                    .range(['#2E86AB', '#A23B72', '#F18F01']),
+                title: '経済発展レベル',
+                colorFunction: (d, i) => {
+                    const types = ['先進国', '新興国', '発展途上国'];
+                    return scaleData.ordinal.scale(types[i % 3]);
+                }
+            },
+            linear: {
+                scale: d3.scaleLinear()
+                    .domain([0, 100])
+                    .range(['#ffffff', '#ff0000']),
+                title: 'GDP成長率 (%)',
+                colorFunction: (d, i) => {
+                    const value = Math.random() * 100;
+                    return scaleData.linear.scale(value);
+                }
+            },
+            threshold: {
+                scale: d3.scaleThreshold()
+                    .domain([10, 25, 50, 75])
+                    .range(['#ffffcc', '#c7e9b4', '#7fcdbb', '#41b6c4', '#2c7fb8']),
+                title: '人口密度 (人/km²)',
+                colorFunction: (d, i) => {
+                    const values = [5, 15, 30, 60, 80];
+                    return scaleData.threshold.scale(values[i % 5]);
+                }
+            },
+            sequential: {
+                scale: d3.scaleSequential(d3.interpolateYlGnBu)
+                    .domain([0, 1]),
+                title: '環境指数',
+                colorFunction: (d, i) => {
+                    const value = Math.random();
+                    return scaleData.sequential.scale(value);
+                }
+            }
+        };
+        
+        async function draw() {
+            const id = "#map"
+
+
+            const width = document.querySelector(id).clientWidth ;
+            const height = document.querySelector(id).clientHeight;
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+
+            // 現在のスケールデータを取得
+            const currentScale = scaleData[currentScaleType];
+            
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    fill: currentScale.colorFunction,
+                    stroke: '#333',
+                    strokeWidth: 0.5,
+                    opacity: 0.8
+                }
+            });
+            
+            // LegendLayerインスタンスを作成
+            const legendLayer = new Thematika.LegendLayer({
+                scale: currentScale.scale,
+                position: currentPosition,
+                title: currentScale.title,
+                orientation: currentOrientation
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    fill: 'none',
+                    stroke: '#2c3e50',
+                    strokeWidth: 2,
+                    opacity: 0.8
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('legend', legendLayer);
+
+        }
+
+        draw()
+
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+        // コントロールのイベントハンドラ
+        document.getElementById('scale-type-select').addEventListener('change', (e) => {
+            currentScaleType = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('legend-position-select').addEventListener('change', (e) => {
+            const position = e.target.value;
+            switch (position) {
+                case 'top-right':
+                    currentPosition = { top: '10%', left: '80%' };
+                    break;
+                case 'top-left':
+                    currentPosition = { top: '10%', left: '5%' };
+                    break;
+                case 'bottom-right':
+                    currentPosition = { top: '70%', left: '80%' };
+                    break;
+                case 'bottom-left':
+                    currentPosition = { top: '70%', left: '5%' };
+                    break;
+            }
+            draw();
+        });
+        
+        document.getElementById('legend-orientation-select').addEventListener('change', (e) => {
+            currentOrientation = e.target.value;
+            draw();
+        });
+
+
+    </script>
+</body>
+</html>
