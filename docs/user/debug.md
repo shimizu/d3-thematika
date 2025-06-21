@@ -13,7 +13,7 @@
 #### 基本的な使用法
 
 ```javascript
-import { testProjectionTransform, logTestResult } from 'd3-cartography';
+import { testProjectionTransform, logTestResult } from 'd3-thematika';
 
 // テスト実行
 const testResult = testProjectionTransform(width, height, projection, geoJsonData);

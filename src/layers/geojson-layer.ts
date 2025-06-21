@@ -114,6 +114,8 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
 
     // パス要素を作成
     const paths = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-geojson-layer')
       .selectAll('path')
       .data(this.data.features)
       .enter()

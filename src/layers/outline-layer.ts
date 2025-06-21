@@ -100,14 +100,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
       if (svg) {
         const svgSelection = select(svg);
         
-        // 既存のクリップパスを削除
-        svgSelection.select(`#${this.clipPathId}`).remove();
-        
-        // defs要素を取得または作成
-        let defs = svgSelection.select<SVGDefsElement>('defs');
-        if (defs.empty()) {
-          defs = svgSelection.insert<SVGDefsElement>('defs', ':first-child');
-        }
+        const defs = svgSelection.insert<SVGDefsElement>('defs', ':first-child');
         
         // 新しいクリップパスを作成
         const clipPath = defs
@@ -128,6 +121,8 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     
     // アウトラインパス要素を作成
     const outlinePath = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-outline-layer')
       .append('path')
       .datum(sphereGeometry)
       .attr('d', this.path)
