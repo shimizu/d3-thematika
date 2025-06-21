@@ -118,16 +118,6 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     // 経緯線のジオメトリを生成
     const graticuleGeometry = graticule();
     
-    // スタイル属性を効率的に適用
-    const styleProperties = [
-      { key: 'fill' as const, method: 'attr' as const, attr: undefined },
-      { key: 'stroke' as const, method: 'attr' as const, attr: undefined },
-      { key: 'strokeWidth' as const, method: 'attr' as const, attr: 'stroke-width' },
-      { key: 'strokeDasharray' as const, method: 'attr' as const, attr: 'stroke-dasharray' },
-      { key: 'opacity' as const, method: 'attr' as const, attr: undefined },
-      { key: 'filter' as const, method: 'attr' as const, attr: undefined }
-    ];
-
     // 経緯線パス要素を作成
     const graticulePath = this.layerGroup
       .append('path')
@@ -139,17 +129,8 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
         return [baseClass, customClass].filter(Boolean).join(' ');
       });
 
-    // スタイル属性を適用
-    styleProperties.forEach(({ key, method, attr }) => {
-      const value = this.style[key];
-      const attrName = attr || key;
-      
-      if (value !== undefined) {
-        // 関数型の場合は直接値を渡し、非関数型の場合はそのまま渡す
-        const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
-        graticulePath[method as 'style' | 'attr'](attrName, finalValue);
-      }
-    });
+    // スタイル属性を適用（共通メソッドを使用）
+    this.applyStylesToElement(graticulePath, graticuleGeometry, 0);
   }
 
   /**

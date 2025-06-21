@@ -112,16 +112,6 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
   private renderFeatures(): void {
     if (!this.layerGroup || !this.path) return;
 
-    // スタイル属性を効率的に適用
-    const styleProperties = [
-      { key: 'fill' as const, method: 'attr' as const, attr: undefined },
-      { key: 'stroke' as const, method: 'attr' as const, attr: undefined },
-      { key: 'strokeWidth' as const, method: 'attr' as const, attr: 'stroke-width' },
-      { key: 'strokeDasharray' as const, method: 'attr' as const, attr: 'stroke-dasharray' },
-      { key: 'opacity' as const, method: 'attr' as const, attr: undefined },
-      { key: 'filter' as const, method: 'attr' as const, attr: undefined }
-    ];
-
     // パス要素を作成
     const paths = this.layerGroup
       .selectAll('path')
@@ -137,19 +127,8 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
       })
       .style('cursor', 'pointer');
 
-    // スタイル属性を適用（関数型は個別パスに、非関数型はlayerGroupに）
-    styleProperties.forEach(({ key, method, attr }) => {
-      const value = this.style[key];
-      const attrName = attr || key;
-      
-      if (typeof value === 'function') {
-        // 関数型の場合は個別のpathに適用
-        paths[method as 'style' | 'attr'](attrName, (d: GeoJSON.Feature, i: number) => value(d, i));
-      } else if (value) {
-        // 非関数型の場合はlayerGroupに適用
-        this.layerGroup![method as 'style' | 'attr'](attrName, value);
-      }
-    });
+    // スタイル属性を適用（共通メソッドを使用）
+    this.applyStylesToElements(paths, this.layerGroup);
   }
 
 
