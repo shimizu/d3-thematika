@@ -42,6 +42,7 @@ export { LayerManager } from './core/layer-manager';
 // レイヤークラス
 export { BaseLayer } from './layers/base-layer';
 export { GeojsonLayer } from './layers/geojson-layer';
+export { OutlineLayer } from './layers/outline-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';

@@ -99,7 +99,7 @@
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Cartography.GeojsonLayer({
                 data: geojson,                
-                attr: { //要望：styleではなくattrを使用するように変更したい。
+                attr: { 
                     fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
                     filter: shadowFilter.url(), 
                     stroke: '#1a3d1f',
@@ -108,7 +108,18 @@
                 }
             });
 
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Cartography.OutlineLayer({
+                attr: {
+                    fill: 'none',
+                    stroke: '#2c3e50',
+                    strokeWidth: 2,
+                    opacity: 0.8
+                }
+            });
+
             // レイヤーインスタンスを地図に追加
+            map.addLayer('outline', outlineLayer);
             map.addLayer('world_new', worldLayer);
 
             
