@@ -186,7 +186,11 @@ map.addLayer('raster', rasterLayer);</pre>
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { opacity: 0.7 }
             });
+
             rasterLayer.setProjection(currentProjection);
+            
+            //rasterLayer.setUseMask(false)
+
             map.addLayer('raster', rasterLayer);
 
             // 経緯線レイヤー
