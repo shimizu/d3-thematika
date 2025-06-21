@@ -152,9 +152,7 @@ map.addLayer('raster', rasterLayer);</pre>
         let currentProjection = d3.geoEquirectangular();
         let map, rasterLayer, graticuleLayer, backgroundLayer;
 
-        async function initMap() {
-            // 既存の地図をクリア
-            d3.select('#map').selectAll('*').remove();
+        async function draw() {
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
             const geojson = await d3.json('./geojson/world.geojson');
@@ -203,10 +201,7 @@ map.addLayer('raster', rasterLayer);</pre>
             map.addLayer('graticule', graticuleLayer);
         }
 
-        // 初期表示
-        initMap().catch(error => {
-            console.error('地図の初期化に失敗しました:', error);
-        });
+        draw();
 
         // コントロールのイベントハンドラ
         document.getElementById('projection-select').addEventListener('change', (e) => {
@@ -228,7 +223,7 @@ map.addLayer('raster', rasterLayer);</pre>
                     currentProjection = d3.geoAzimuthalEqualArea();
                     break;
             }
-            initMap();
+            draw();
         });
 
         document.getElementById('bbox-markers-checkbox').addEventListener('change', (e) => {

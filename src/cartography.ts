@@ -45,9 +45,11 @@ export class Cartography {
     // SVG要素を作成
     this.svg = this.container
       .append('svg')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('class', 'cartography-map');
+      .attr('width', "100%")
+      .attr('height', "100%")
+      .attr('class', 'cartography-map')
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+      .attr("preserveAspectRatio", "xMidYMid meet");
 
     // defsオプションが指定されている場合、テクスチャを初期化
     this.initializeDefs(options.defs);

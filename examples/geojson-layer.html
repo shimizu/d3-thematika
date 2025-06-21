@@ -255,14 +255,6 @@ map.addLayer('world_new', worldLayer);
         draw()
 
 
-        // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
-        });
 
         // コントロールのイベントハンドラ
         document.getElementById('projection-select').addEventListener('change', (e) => {
