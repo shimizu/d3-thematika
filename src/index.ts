@@ -43,6 +43,7 @@ export { LayerManager } from './core/layer-manager';
 export { BaseLayer } from './layers/base-layer';
 export { GeojsonLayer } from './layers/geojson-layer';
 export { OutlineLayer } from './layers/outline-layer';
+export { GraticuleLayer } from './layers/graticule-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';

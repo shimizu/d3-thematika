@@ -120,7 +120,19 @@
                 }
             });
 
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Cartography.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    fill: 'none',
+                    stroke: '#ddd',
+                    strokeWidth: 0.5,
+                    opacity: 0.6
+                }
+            });
+
             // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
             map.addLayer('outline', outlineLayer);
             map.addLayer('world_new', worldLayer);
 
