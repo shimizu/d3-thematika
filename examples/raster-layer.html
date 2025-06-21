@@ -108,25 +108,6 @@
                     <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
                 </select>
             </div>
-            
-            <div class="control-group">
-                <label for="opacity-slider">透明度: <span id="opacity-value">0.7</span></label>
-                <input type="range" id="opacity-slider" min="0" max="1" step="0.1" value="0.7">
-            </div>
-            
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="visible-checkbox" checked>
-                    レイヤーを表示
-                </label>
-            </div>
-
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="graticule-checkbox" checked>
-                    経緯線を表示
-                </label>
-            </div>
 
             <div class="control-group">
                 <label>
@@ -248,26 +229,6 @@ map.addLayer('raster', rasterLayer);</pre>
                     break;
             }
             initMap();
-        });
-
-        document.getElementById('opacity-slider').addEventListener('input', (e) => {
-            const opacity = parseFloat(e.target.value);
-            document.getElementById('opacity-value').textContent = opacity;
-            if (rasterLayer) {
-                rasterLayer.setStyle({ opacity: opacity });
-            }
-        });
-
-        document.getElementById('visible-checkbox').addEventListener('change', (e) => {
-            if (rasterLayer) {
-                rasterLayer.setVisible(e.target.checked);
-            }
-        });
-
-        document.getElementById('graticule-checkbox').addEventListener('change', (e) => {
-            if (graticuleLayer) {
-                graticuleLayer.setVisible(e.target.checked);
-            }
         });
 
         document.getElementById('bbox-markers-checkbox').addEventListener('change', (e) => {
