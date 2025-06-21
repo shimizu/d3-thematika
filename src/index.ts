@@ -49,4 +49,5 @@ export { RasterLayer } from './layers/raster-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';
+export * from './utils/texture-utils';
 export * from './utils/tests';

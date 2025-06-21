@@ -31,21 +31,13 @@
         }
     </style>
 
-    <script src="https://unpkg.com/textures@1.2.0/dist/textures.js"></script>
 </head>
 <body>
     <div class="info">
         <h1>Cartography ライブラリ テスト</h1>
         <p>基本的な地図描画機能と新しいレイヤーシステムをテストします</p>
         <p>上の地図：従来のAPI、下の地図：新しいレイヤークラスベースAPI</p>
-        
-        <div style="margin: 20px 0;">
-            <label>
-                <input type="checkbox" id="hideLayerCheckbox"> 
-                レイヤーを非表示にする
-            </label>
-        </div>
-    </div>
+            </div>
     
     <div id="map"></div>
     
@@ -59,9 +51,12 @@
     <script>
 
         // テクスチャとフィルターを定義
-        const texture = textures
-            .lines()
-            .thicker();
+        const texture = Thematika.createDotsTexture({
+            id: 'circleTexture',
+            background: '#e0f7fa',
+            size: 4,
+            radius: 2
+        });
         
         // SVGフィルターを作成
 
@@ -77,30 +72,19 @@
         async function draw() {
             const id = "#map"
 
-           const geojson =  await d3.json("./geojson/world.geojson");
+           const geojson =  await d3.json("geojson/world.geojson");
 
 
-           const takasaki =  await d3.json("./geojson/takasaki/building.geojson");
 
 
             const width = document.querySelector(id).clientWidth ;
             const height = document.querySelector(id).clientHeight;
 
             // D3.jsの投影法を使用して地図の投影を設定（マージン付き）
-            const projection = d3.geoEquirectangular()
-                .scale(4050) // スケールを調整
-                .translate([width / 2, height / 2]) // 中心を画面中央に
-                .rotate([-40, 00]) // 回転を調整
-                .center([100, 35]) // 中心を調整（赤道付近に）
-                .precision(0.1) // 精度を設定
-                //.fitExtent([[10, 10], [width-10, height-10]], geojson);
+            const projection = d3.geoEqualEarth()
+                .fitExtent([[10, 10], [width-10, height-10]], geojson);
 
-
-            const testResult = Thematika.testProjectionTransform(width-10, height-10, projection, geojson);
-
-            // 結果をコンソールに出力
-            Thematika.logTestResult(testResult, true); // 第二引数がtrueで詳細表示
-
+                
 
             // === 新しいAPI（レイヤークラスベース） ===
             const map = new Thematika.Map({
@@ -111,11 +95,14 @@
                 projection: projection
             });
 
+
+            const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
+
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    fill:(d,i)=> fillStyles[i%3] , 
                     filter: shadowFilter.url(), 
                     stroke: '#1a3d1f',
                     strokeWidth: 0.8,
@@ -124,20 +111,8 @@
             });
 
 
-         // GeojsonLayerインスタンスを作成
-            const takasakiLayer = new Thematika.GeojsonLayer({
-                data: takasaki,                
-                attr: { 
-                    fill:'#ff0000', 
-                    stroke: '#000000',
-                    strokeWidth: 0.8,
-                    opacity: (d,i) => 0.9,
-                }
-            });
 
 
-
-            /*
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
             const outlineLayer = new Thematika.OutlineLayer({
                 createClipPath: true,
@@ -155,18 +130,17 @@
                 step: [10, 10], // 10度間隔
                 attr: {
                     fill: 'none',
-                    stroke: '#ddd',
+                    stroke: '#000',
                     strokeWidth: 0.5,
-                    opacity: 0.6
+                    strokeDasharray: '2, 2',
+                    opacity: 0.9
                 }
             });
 
             // レイヤーインスタンスを地図に追加
             map.addLayer('graticule', graticuleLayer);
             map.addLayer('outline', outlineLayer);
-            */
             map.addLayer('world_new', worldLayer);
-            map.addLayer('takasaki_new', takasakiLayer);
 
 
 
