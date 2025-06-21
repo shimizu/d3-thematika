@@ -12,7 +12,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false"
+    "test:ci": "jest --ci --coverage --watchAll=false",
+    "build:demo": "node scripts/build-demo.js",
+    "predeploy": "npm run build && npm run build:demo",
+    "deploy": "gh-pages -d demoPages -m 'Deploy demo pages'"
   },
   "author": "",
   "license": "ISC",
@@ -32,6 +35,7 @@
     "@types/d3-selection": "^3.0.11",
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
+    "gh-pages": "^6.3.0",
     "jest": "^30.0.2",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^3.0.0",

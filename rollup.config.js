@@ -38,7 +38,7 @@ export default {
     }),
     typescript({
       tsconfig: './tsconfig.json',
-      sourceMap: !production,
+      sourceMap: true,
       inlineSources: !production
     }),
     production && terser(),
