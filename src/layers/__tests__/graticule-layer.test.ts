@@ -1,6 +1,12 @@
 import { GraticuleLayer } from '../graticule-layer';
 import { LayerStyle } from '../../types';
 
+// d3-geoのモック
+jest.mock('d3-geo', () => ({
+  geoGraticule: jest.fn(),
+  geoPath: jest.fn(() => jest.fn())
+}));
+
 describe('GraticuleLayer', () => {
   let graticuleLayer: GraticuleLayer;
   let mockContainer: any;
@@ -9,10 +15,15 @@ describe('GraticuleLayer', () => {
 
   beforeEach(() => {
     // モックGraticule関数
-    mockGraticule = {
-      step: jest.fn().mockReturnThis(),
-      extent: jest.fn().mockReturnThis()
-    };
+    mockGraticule = jest.fn(() => ({
+      type: 'Feature',
+      geometry: {
+        type: 'MultiLineString',
+        coordinates: [[[0, 0], [1, 0]], [[0, 1], [1, 1]]]
+      }
+    }));
+    mockGraticule.step = jest.fn().mockReturnValue(mockGraticule);
+    mockGraticule.extent = jest.fn().mockReturnValue(mockGraticule);
 
     // d3.geoGraticuleのモック
     const mockD3Geo = require('d3-geo');

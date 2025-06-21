@@ -44,11 +44,31 @@ describe('GeojsonLayer', () => {
     mockProjection = jest.fn();
 
     // モックコンテナの設定
+    const mockPathElement = {
+      attr: jest.fn().mockReturnThis(),
+      style: jest.fn().mockReturnThis(),
+      on: jest.fn().mockReturnThis()
+    };
+
+    const mockEnterSelection = {
+      append: jest.fn(() => mockPathElement)
+    };
+
+    const mockDataSelection = {
+      enter: jest.fn(() => mockEnterSelection),
+      exit: jest.fn().mockReturnThis(),
+      remove: jest.fn().mockReturnThis(),
+      attr: jest.fn().mockReturnThis(),
+      style: jest.fn().mockReturnThis(),
+      on: jest.fn().mockReturnThis()
+    };
+
     const mockSubSelection = {
       remove: jest.fn().mockReturnThis(),
       on: jest.fn().mockReturnThis(),
       attr: jest.fn().mockReturnThis(),
-      style: jest.fn().mockReturnThis()
+      style: jest.fn().mockReturnThis(),
+      data: jest.fn(() => mockDataSelection)
     };
 
     mockContainer = {
