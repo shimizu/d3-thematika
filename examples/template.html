@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[LAYER_NAME] - d3-cartography</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GeojsonLayer デモ</h1>
+        <p class="description">
+            GeojsonLayerを使用してGeoJSONデータを地図上に表示します。
+            世界地図データを表示し、アウトライン、経緯線、スタイリング機能を確認できます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                <li>レイヤー: GeojsonLayer（国境線）、OutlineLayer（投影法境界）、GraticuleLayer（経緯線）</li>
+                <li>機能: 投影法切り替え</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="equirectangular" selected>Equirectangular</option>
+                    <option value="mercator">Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="orthographic">Orthographic</option>
+                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                </select>
+            </div>
+
+            <!-- レイヤー固有のコントロールをここに追加 -->
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// GeojsonLayerの使用例
+
+const geojson =  await d3.json("./geojson/world.geojson");
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoEquirectangular()
+    .fitExtent([[10, 0], [width-10, height]], geojson);
+
+const map = new Cartography.Cartography({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Cartography.GeojsonLayer({
+    data: geojson,                
+    attr: { 
+        fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+        filter: shadowFilter.url(), 
+        stroke: '#1a3d1f',
+        strokeWidth: 0.8,
+        opacity: (d,i) => 0.9,
+    }
+});
+
+
+// OutlineLayerインスタンスを作成（クリップパス機能ON）
+const outlineLayer = new Cartography.OutlineLayer({
+    createClipPath: true,
+    clipPathId: 'earth-outline-clip',
+    attr: {
+        fill: 'none',
+        stroke: '#2c3e50',
+        strokeWidth: 2,
+        opacity: 0.8
+    }
+});
+
+// GraticuleLayerインスタンスを作成
+const graticuleLayer = new Cartography.GraticuleLayer({
+    step: [10, 10], // 10度間隔
+    attr: {
+        fill: 'none',
+        stroke: '#ddd',
+        strokeWidth: 0.5,
+        opacity: 0.6
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('world_new', worldLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./cartography.umd.js"></script>
+
+    <script >
+        
+        //プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        
+        async function draw() {
+            const id = "#map"
+
+
+            const width = document.querySelector(id).clientWidth ;
+            const height = document.querySelector(id).clientHeight;
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
+
+            // 地図を作成
+            const map = new Cartography.Cartography({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Cartography.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    filter: "#2c3e50", 
+                    stroke: '#1a3d1f',
+                    strokeWidth: 0.8,
+                    opacity: (d,i) => 0.9,
+                }
+            });
+
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
+            const outlineLayer = new Cartography.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    fill: 'none',
+                    stroke: '#2c3e50',
+                    strokeWidth: 2,
+                    opacity: 0.8
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Cartography.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    fill: 'none',
+                    stroke: '#000',
+                    strokeWidth: 0.5,
+                    strokeDasharray: '1,2',
+                    opacity: 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('world_new', worldLayer);
+
+        }
+
+        draw()
+
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+        // コントロールのイベントハンドラ
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch (projectionName) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            draw();
+        });
+
+
+    </script>
+</body>
+</html>
