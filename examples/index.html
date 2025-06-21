@@ -51,15 +51,26 @@
     <script>
 
         // テクスチャとフィルターを定義
+        /*
         const texture = Thematika.createDotsTexture({
             id: 'circleTexture',
             background: '#e0f7fa',
             size: 4,
             radius: 2
         });
-        
-        // SVGフィルターを作成
+        */
 
+        // テクスチャをプリセットから取得
+        const texture = Thematika.TexturePresets.lightOcean()
+        
+
+
+
+        // SVGフィルターを作成
+        const effect = Thematika.FilterPresets.standardDropShadow()
+
+
+        /*
         const shadowFilter = Thematika.createDropShadow({
             id: 'mapShadow',
             dx: 8,
@@ -68,6 +79,7 @@
             floodColor: '#000000',
             floodOpacity: 1
         });
+        */
         
         async function draw() {
             const id = "#map"
@@ -91,7 +103,7 @@
                 container: '#map',
                 width: width,
                 height: height,
-                defs: [texture, shadowFilter], 
+                defs: [texture, effect], 
                 projection: projection
             });
 
@@ -103,7 +115,7 @@
                 data: geojson,                
                 attr: { 
                     fill:(d,i)=> fillStyles[i%3] , 
-                    filter: shadowFilter.url(), 
+                    filter: effect.url(), 
                     stroke: '#1a3d1f',
                     strokeWidth: 0.8,
                     opacity: (d,i) => 0.9,
