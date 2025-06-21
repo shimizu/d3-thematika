@@ -38,7 +38,9 @@ module.exports = {
   
   // モジュール解決
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '^d3-selection$': '<rootDir>/tests/mocks/d3-selection.js',
+    '^d3-geo$': '<rootDir>/tests/mocks/d3-geo.js'
   },
   
   // セットアップファイル

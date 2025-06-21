@@ -1,0 +1,135 @@
+import { BaseLayer } from '../base-layer';
+import { LayerStyle } from '../../types';
+import { Selection } from 'd3-selection';
+
+// テスト用のBaseLayerの具象クラス
+class TestLayer extends BaseLayer {
+  render(container: Selection<SVGGElement, unknown, HTMLElement, any>): void {
+    // テスト用の空実装
+    this.createLayerGroup(container);
+  }
+
+  update(): void {
+    // テスト用の空実装
+  }
+}
+
+describe('BaseLayer', () => {
+  let testLayer: TestLayer;
+  let mockContainer: any;
+
+  beforeEach(() => {
+    testLayer = new TestLayer('test-layer', {
+      fill: '#ff0000',
+      stroke: '#000000',
+      strokeWidth: 2
+    });
+
+    // モックコンテナの設定
+    mockContainer = {
+      append: jest.fn().mockReturnThis(),
+      attr: jest.fn().mockReturnThis(),
+      style: jest.fn().mockReturnThis(),
+      node: jest.fn(() => ({ 
+        tagName: 'g',
+        remove: jest.fn() 
+      }))
+    };
+  });
+
+  describe('constructor', () => {
+    test('IDとデフォルトスタイルが正しく設定される', () => {
+      expect(testLayer.id).toBe('test-layer');
+      expect(testLayer.visible).toBe(true);
+      expect(testLayer.zIndex).toBe(0);
+    });
+
+    test('カスタムスタイルがマージされる', () => {
+      const customLayer = new TestLayer('custom', { fill: 'blue' });
+      expect(customLayer['style'].fill).toBe('blue');
+      expect(customLayer['style'].stroke).toBe('#333333'); // デフォルト値
+    });
+  });
+
+  describe('visibility management', () => {
+    test('setVisible()で表示状態を変更できる', () => {
+      expect(testLayer.visible).toBe(true);
+      
+      testLayer.setVisible(false);
+      expect(testLayer.visible).toBe(false);
+      
+      testLayer.setVisible(true);
+      expect(testLayer.visible).toBe(true);
+    });
+  });
+
+  describe('zIndex management', () => {
+    test('setZIndex()でz-indexを変更できる', () => {
+      expect(testLayer.zIndex).toBe(0);
+      
+      testLayer.setZIndex(5);
+      expect(testLayer.zIndex).toBe(5);
+      
+      testLayer.setZIndex(-1);
+      expect(testLayer.zIndex).toBe(-1);
+    });
+  });
+
+  describe('style management', () => {
+    test('setStyle()でスタイルを更新できる', () => {
+      const newStyle: LayerStyle = {
+        fill: 'green',
+        opacity: 0.5
+      };
+      
+      testLayer.setStyle(newStyle);
+      
+      expect(testLayer['style'].fill).toBe('green');
+      expect(testLayer['style'].opacity).toBe(0.5);
+      expect(testLayer['style'].stroke).toBe('#000000'); // 既存の値は保持
+    });
+  });
+
+  describe('render management', () => {
+    test('render()でレイヤーグループが作成される', () => {
+      testLayer.render(mockContainer);
+      
+      expect(mockContainer.append).toHaveBeenCalledWith('g');
+      expect(mockContainer.attr).toHaveBeenCalledWith('class', 'cartography-layer cartography-layer--test-layer');
+      expect(testLayer.isRendered()).toBe(true);
+    });
+
+    test('isRendered()で描画状態を確認できる', () => {
+      expect(testLayer.isRendered()).toBe(false);
+      
+      testLayer.render(mockContainer);
+      expect(testLayer.isRendered()).toBe(true);
+    });
+  });
+
+  describe('destroy', () => {
+    test('destroy()でレイヤーが削除される', () => {
+      testLayer.render(mockContainer);
+      expect(testLayer.isRendered()).toBe(true);
+      
+      testLayer.destroy();
+      expect(testLayer.isRendered()).toBe(false);
+    });
+  });
+
+  describe('STYLE_PROPERTIES', () => {
+    test('スタイル属性マッピングが定義されている', () => {
+      const styleProperties = (BaseLayer as any).STYLE_PROPERTIES;
+      
+      expect(Array.isArray(styleProperties)).toBe(true);
+      expect(styleProperties.length).toBeGreaterThan(0);
+      
+      // 基本的なスタイル属性が含まれているかチェック
+      const keys = styleProperties.map((prop: any) => prop.key);
+      expect(keys).toContain('fill');
+      expect(keys).toContain('stroke');
+      expect(keys).toContain('strokeWidth');
+      expect(keys).toContain('opacity');
+    });
+  });
+});
