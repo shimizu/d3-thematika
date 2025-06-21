@@ -38,6 +38,10 @@ export class Cartography {
       throw new Error(`Container not found: ${options.container}`);
     }
 
+
+    // すでにSVGが存在する場合は削除
+    this.container.selectAll('svg.cartography-map').remove();
+
     // SVG要素を作成
     this.svg = this.container
       .append('svg')

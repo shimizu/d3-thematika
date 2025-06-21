@@ -13,11 +13,15 @@
         }
         
         #map {
+            max-width: 1000px;
+            max-width: 1200px;
             margin: 20px auto;
             display: block;
             background: white;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-radius: 8px;
+            position: relative;
+            overflow: auto;
         }
         
         .info {
@@ -70,25 +74,26 @@
             floodOpacity: 1
         });
         
-        async function main() {
+        async function draw() {
+            const id = "#map"
 
            const geojson =  await d3.json("./geojson/world.geojson");
 
-            const width = 800;
-            const height = 600;
+            const width = document.querySelector(id).clientWidth || 800;
+            const height = document.querySelector(id).clientHeight || 600;
 
             // D3.jsの投影法を使用して地図の投影を設定
             const projection = d3.geoEqualEarth()
-                .fitExtent([[0, 0], [800, 600]], geojson);
+                .fitExtent([[0, 0], [width, height]], geojson);
 
 
             // === 新しいAPI（レイヤークラスベース） ===
             const map = new Cartography.Cartography({
                 container: '#map',
-                width: 800,
-                height: 600,
+                width: width,
+                height: height,
                 defs: [texture, shadowFilter], 
-                projection: d3.geoEqualEarth().fitExtent([[0, 0], [800, 600]], geojson)
+                projection: d3.geoEqualEarth().fitExtent([[0, 0], [width, height]], geojson)
             });
 
             // GeojsonLayerインスタンスを作成
@@ -109,7 +114,18 @@
             
         }
 
-        main()
+        draw()
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+
 
     </script>
 </body>
