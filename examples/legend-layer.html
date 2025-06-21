@@ -105,6 +105,7 @@
                 <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）</li>
                 <li>機能: スケール型切り替え、X/Y座標による位置調整、シンボルタイプ選択</li>
                 <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
+                <li>外観: 背景ボックスの表示/非表示切り替え（opacityで制御、要素は常に存在）</li>
             </ul>
         </div>
 
@@ -150,6 +151,13 @@
                 </select>
             </div>
 
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="show-background-checkbox" checked>
+                    背景ボックスを表示
+                </label>
+            </div>
+
         </div>
 
         <div id="map"></div>
@@ -167,7 +175,14 @@ const legendLayer = new Thematika.LegendLayer({
     scale: colorScale,
     position: { top: 20, left: 20 },  // SVG座標系でのピクセル値
     title: '土地利用',
-    orientation: 'vertical'
+    orientation: 'vertical',
+    showBackground: true,  // 背景ボックスを表示
+    backgroundStyle: {
+        fill: '#ffffff',
+        stroke: '#cccccc', 
+        opacity: 0.9,
+        rx: 4
+    }
 });
 
 // 連続スケールの例
@@ -197,6 +212,7 @@ map.addLayer('population-legend', popLegend);
         let currentPosition = { top: 20, left: 20 };
         let currentOrientation = 'vertical';
         let currentSymbolType = 'auto';
+        let showBackground = true;
         
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
@@ -294,7 +310,8 @@ map.addLayer('population-legend', popLegend);
                 scale: currentScale.scale,
                 position: currentPosition,
                 title: currentScale.title,
-                orientation: currentOrientation
+                orientation: currentOrientation,
+                showBackground: showBackground
             };
             
             // シンボルタイプが指定されている場合
@@ -381,6 +398,11 @@ map.addLayer('population-legend', popLegend);
         
         document.getElementById('symbol-type-select').addEventListener('change', (e) => {
             currentSymbolType = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('show-background-checkbox').addEventListener('change', (e) => {
+            showBackground = e.target.checked;
             draw();
         });
 

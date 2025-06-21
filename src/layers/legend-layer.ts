@@ -56,6 +56,26 @@ export interface SymbolSize {
 }
 
 /**
+ * 背景ボックスのスタイル設定
+ */
+export interface LegendBackgroundStyle {
+  /** 背景色 */
+  fill?: string;
+  /** 境界線の色 */
+  stroke?: string;
+  /** 境界線の幅 */
+  strokeWidth?: number;
+  /** 透明度 */
+  opacity?: number;
+  /** 角丸の半径 */
+  rx?: number;
+  /** 角丸の半径（Y方向） */
+  ry?: number;
+  /** パディング */
+  padding?: number;
+}
+
+/**
  * LegendLayerの初期化オプション
  */
 export interface LegendLayerOptions {
@@ -87,6 +107,10 @@ export interface LegendLayerOptions {
   gradientSteps?: number;
   /** ドラッグ機能を有効にするか */
   enableDrag?: boolean;
+  /** 背景ボックスを表示するか */
+  showBackground?: boolean;
+  /** 背景ボックスのスタイル */
+  backgroundStyle?: LegendBackgroundStyle;
 }
 
 /**
@@ -128,6 +152,10 @@ export class LegendLayer extends BaseLayer {
   private gradientSteps: number;
   /** ドラッグ機能の有効/無効 */
   private enableDrag: boolean;
+  /** 背景ボックスの表示/非表示 */
+  private showBackground: boolean;
+  /** 背景ボックスのスタイル */
+  private backgroundStyle: LegendBackgroundStyle;
 
   /**
    * LegendLayerを初期化します
@@ -150,6 +178,17 @@ export class LegendLayer extends BaseLayer {
     this.sizeScale = options.sizeScale;
     this.gradientSteps = options.gradientSteps || 256;
     this.enableDrag = options.enableDrag !== false; // デフォルトで有効
+    this.showBackground = options.showBackground !== false; // デフォルトで有効
+    this.backgroundStyle = {
+      fill: '#ffffff',
+      stroke: '#cccccc',
+      strokeWidth: 1,
+      opacity: 0.9,
+      rx: 4,
+      ry: 4,
+      padding: 8,
+      ...options.backgroundStyle
+    };
   }
 
   /**
@@ -189,6 +228,24 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
+   * 背景ボックスの表示状態を更新します
+   * @param show - 表示するかどうか
+   */
+  updateBackgroundVisibility(show: boolean): void {
+    this.showBackground = show;
+    this.updateBackgroundOpacity();
+  }
+
+  /**
+   * 背景ボックスのスタイルを更新します
+   * @param style - 新しい背景スタイル
+   */
+  updateBackgroundStyle(style: Partial<LegendBackgroundStyle>): void {
+    this.backgroundStyle = { ...this.backgroundStyle, ...style };
+    this.updateBackgroundStyles();
+  }
+
+  /**
    * レイヤーを描画します
    * @param container - 描画先のSVGコンテナ
    */
@@ -197,6 +254,7 @@ export class LegendLayer extends BaseLayer {
     this.layerGroup = this.createLayerGroup(container);
     
     this.renderLegend();
+    this.renderBackground();
     this.updatePositionTransform();
 
     // ドラッグ機能を設定
@@ -219,6 +277,7 @@ export class LegendLayer extends BaseLayer {
     
     // 凡例を再描画
     this.renderLegend();
+    this.renderBackground();
   }
 
   /**
@@ -588,6 +647,86 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
+   * 背景ボックスを描画します
+   * @private
+   */
+  private renderBackground(): void {
+    if (!this.layerGroup) return;
+
+    // 凡例の境界ボックスを計算
+    const legendBBox = this.calculateLegendBounds();
+    const padding = this.backgroundStyle.padding || 8;
+
+    // 背景の透明度を設定（showBackgroundがfalseの場合は0）
+    const backgroundOpacity = this.showBackground 
+      ? (this.backgroundStyle.opacity || 0.9) 
+      : 0;
+
+    // 背景矩形を最初に挿入（z-orderを背面にするため）
+    const background = this.layerGroup
+      .insert('rect', ':first-child')
+      .attr('class', 'cartography-legend-background')
+      .attr('x', legendBBox.x - padding)
+      .attr('y', legendBBox.y - padding)
+      .attr('width', legendBBox.width + padding * 2)
+      .attr('height', legendBBox.height + padding * 2)
+      .attr('fill', this.backgroundStyle.fill || '#ffffff')
+      .attr('stroke', this.backgroundStyle.stroke || '#cccccc')
+      .attr('stroke-width', this.backgroundStyle.strokeWidth || 1)
+      .attr('opacity', backgroundOpacity);
+
+    // 角丸を設定
+    if (this.backgroundStyle.rx) {
+      background.attr('rx', this.backgroundStyle.rx);
+    }
+    if (this.backgroundStyle.ry) {
+      background.attr('ry', this.backgroundStyle.ry);
+    }
+  }
+
+  /**
+   * 凡例の境界ボックスを計算します
+   * @returns 境界ボックス
+   * @private
+   */
+  private calculateLegendBounds(): { x: number; y: number; width: number; height: number } {
+    if (!this.layerGroup) {
+      return { x: 0, y: 0, width: 100, height: 50 };
+    }
+
+    try {
+      // レイヤーグループのboundingBoxを取得
+      const bbox = (this.layerGroup.node() as SVGGElement).getBBox();
+      return {
+        x: bbox.x,
+        y: bbox.y,
+        width: bbox.width,
+        height: bbox.height
+      };
+    } catch (error) {
+      // フォールバック値
+      const itemCount = this.generateLegendData().data.length;
+      const titleHeight = this.title ? this.fontSize + 10 : 0;
+      
+      if (this.orientation === 'vertical') {
+        return {
+          x: 0,
+          y: 0,
+          width: 150,
+          height: titleHeight + itemCount * this.itemSpacing
+        };
+      } else {
+        return {
+          x: 0,
+          y: 0,
+          width: itemCount * 100,
+          height: titleHeight + 30
+        };
+      }
+    }
+  }
+
+  /**
    * 位置のtransformを更新します
    * @private
    */
@@ -655,6 +794,46 @@ export class LegendLayer extends BaseLayer {
         xValue.textContent = this.position.left.toString();
         yValue.textContent = this.position.top.toString();
       }
+    }
+  }
+
+  /**
+   * 背景ボックスの透明度のみを更新します
+   * @private
+   */
+  private updateBackgroundOpacity(): void {
+    if (!this.layerGroup) return;
+
+    const background = this.layerGroup.select('.cartography-legend-background');
+    if (!background.empty()) {
+      const backgroundOpacity = this.showBackground 
+        ? (this.backgroundStyle.opacity || 0.9) 
+        : 0;
+      
+      background.attr('opacity', backgroundOpacity);
+    }
+  }
+
+  /**
+   * 背景ボックスのスタイルを更新します
+   * @private
+   */
+  private updateBackgroundStyles(): void {
+    if (!this.layerGroup) return;
+
+    const background = this.layerGroup.select('.cartography-legend-background');
+    if (!background.empty()) {
+      const backgroundOpacity = this.showBackground 
+        ? (this.backgroundStyle.opacity || 0.9) 
+        : 0;
+
+      background
+        .attr('fill', this.backgroundStyle.fill || '#ffffff')
+        .attr('stroke', this.backgroundStyle.stroke || '#cccccc')
+        .attr('stroke-width', this.backgroundStyle.strokeWidth || 1)
+        .attr('opacity', backgroundOpacity)
+        .attr('rx', this.backgroundStyle.rx || null)
+        .attr('ry', this.backgroundStyle.ry || null);
     }
   }
 
