@@ -875,7 +875,8 @@ export class LegendLayer extends BaseLayer {
     // 面積から一辺の長さを計算
     const maxSide = Math.sqrt(maxSize);
     const centerX = maxSide / 2;
-    const centerY = titleOffset + maxSide / 2;
+    // ボトム揃えのため、最大セルの下端を基準にする
+    const bottomY = titleOffset + maxSide;
     
     // サイズでソート（大きい順）
     const sortedData = legendData.data
@@ -887,34 +888,62 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-symbols');
     
-    // セルを中心揃えで重ね表示
+    // セルをボトム揃えで重ね表示（枠線のみ）
     sortedData.forEach((item, i) => {
       const sideLength = Math.sqrt(item.size);
+      // 各セルの上端Y座標をボトム揃えで計算
+      const cellTopY = bottomY - sideLength;
+      
       symbolGroup
         .append('rect')
         .attr('x', centerX - sideLength / 2)
-        .attr('y', centerY - sideLength / 2)
+        .attr('y', cellTopY)
         .attr('width', sideLength)
         .attr('height', sideLength)
-        .attr('fill', item.color)
+        .attr('fill', 'none')
         .attr('stroke', '#333')
-        .attr('stroke-width', 0.5)
-        .attr('opacity', 0.7);
+        .attr('stroke-width', 1);
     });
     
-    // ラベルを右側に統一配置
+    // ガイドライン（リーダーライン）を描画
+    const guidelineGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-guidelines');
+    
+    const labelStartX = centerX + maxSide / 2 + 20; // ラベルを少し離す
+    const guidelineEndX = labelStartX - 4; // ラベルの少し手前まで
+    
+    sortedData.forEach((item, i) => {
+      const sideLength = Math.sqrt(item.size);
+      const cellTopY = bottomY - sideLength; // セルのトップ位置
+      const guidelineStartX = centerX; // セルの中心から開始
+      
+      // セルのトップから右に向かってガイドラインを引く（中心から開始）
+      guidelineGroup
+        .append('line')
+        .attr('x1', guidelineStartX)
+        .attr('y1', cellTopY)
+        .attr('x2', guidelineEndX)
+        .attr('y2', cellTopY)
+        .attr('stroke', '#333')
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', '3,3'); // 点線スタイル
+    });
+    
+    // ラベルを右側に統一配置（ガイドラインの終点に合わせて）
     const labelGroup = this.layerGroup
       .append('g')
       .attr('class', 'cartography-legend-labels');
     
-    const labelStartX = centerX + maxSide / 2 + 10;
-    const labelSpacing = this.fontSize + 4;
-    
+    // ラベルを各セルのトップの高さに配置
     sortedData.forEach((item, i) => {
+      const sideLength = Math.sqrt(item.size);
+      const cellTopY = bottomY - sideLength; // セルのトップ位置
+      
       labelGroup
         .append('text')
         .attr('x', labelStartX)
-        .attr('y', centerY - maxSide / 2 + i * labelSpacing + this.fontSize)
+        .attr('y', cellTopY)
         .attr('dy', '0.35em')
         .style('font-size', `${this.fontSize}px`)
         .style('fill', '#333')
