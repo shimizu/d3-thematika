@@ -787,7 +787,9 @@ export class LegendLayer extends BaseLayer {
     // 最大半径を計算（circleの場合、sizesは半径）
     const maxRadius = maxSize;
     const centerX = maxRadius;
-    const centerY = titleOffset + maxRadius;
+    // ボトム揃えのため、最大円の下端を基準にする
+    const bottomY = titleOffset + maxRadius * 2;
+    const centerY = bottomY - maxRadius;
     
     // サイズでソート（大きい順）
     const sortedData = legendData.data
@@ -799,32 +801,60 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-symbols');
     
-    // 円を同心円状に描画（大きい順）
+    // 円をボトム揃えで描画（大きい順）
     sortedData.forEach((item, i) => {
+      // 各円の中心Y座標をボトム揃えで計算
+      const circleCenterY = bottomY - item.size;
+      
       symbolGroup
         .append('circle')
         .attr('cx', centerX)
-        .attr('cy', centerY)
+        .attr('cy', circleCenterY)
         .attr('r', item.size)
-        .attr('fill', item.color)
+        .attr('fill', 'none')
         .attr('stroke', '#333')
-        .attr('stroke-width', 0.5)
-        .attr('opacity', 0.7);
+        .attr('stroke-width', 1);
     });
     
-    // ラベルを右側に統一配置
+    // ガイドライン（リーダーライン）を描画
+    const guidelineGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-guidelines');
+    
+    const labelStartX = centerX + maxRadius + 20; // ラベルを少し離す
+    const guidelineEndX = labelStartX - 4; // ラベルの少し手前まで
+    
+    sortedData.forEach((item, i) => {
+      const circleCenterY = bottomY - item.size;
+      const circleTopY = circleCenterY - item.size; // 円のトップ位置
+      const guidelineStartX = centerX; // 円の中心から開始
+      
+      // 円のトップから右に向かってガイドラインを引く（中心から開始）
+      guidelineGroup
+        .append('line')
+        .attr('x1', guidelineStartX)
+        .attr('y1', circleTopY)
+        .attr('x2', guidelineEndX)
+        .attr('y2', circleTopY)
+        .attr('stroke', '#333')
+        .attr('stroke-width', 1)
+        .attr('stroke-dasharray', '3,3'); // より見やすい点線スタイル
+    });
+    
+    // ラベルを右側に統一配置（ガイドラインの終点に合わせて）
     const labelGroup = this.layerGroup
       .append('g')
       .attr('class', 'cartography-legend-labels');
     
-    const labelStartX = centerX + maxRadius + 10;
-    const labelSpacing = this.fontSize + 4;
-    
+    // ラベルを各円のトップの高さに配置
     sortedData.forEach((item, i) => {
+      const circleCenterY = bottomY - item.size;
+      const circleTopY = circleCenterY - item.size; // 円のトップ位置
+      
       labelGroup
         .append('text')
         .attr('x', labelStartX)
-        .attr('y', centerY - maxRadius + i * labelSpacing + this.fontSize)
+        .attr('y', circleTopY)
         .attr('dy', '0.35em')
         .style('font-size', `${this.fontSize}px`)
         .style('fill', '#333')
