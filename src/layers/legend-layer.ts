@@ -507,9 +507,27 @@ export class LegendLayer extends BaseLayer {
       }
     };
     
+    // サイズスケールが有効かどうかを判定
+    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
+    const maxSize = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getSize(d, i))) : 0;
+    
     // 色見本を描画
     items
       .append('rect')
+      .attr('x', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return (maxSize - getSize(d, i)) / 2;
+        }
+        return 0;
+      })
+      .attr('y', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return (maxSize - getSize(d, i)) / 2;
+        }
+        return 0;
+      })
       .attr('width', (d, i) => getSize(d, i))
       .attr('height', (d, i) => getSize(d, i))
       .attr('fill', (d, i) => legendData.colors[i])
@@ -519,8 +537,18 @@ export class LegendLayer extends BaseLayer {
     // ラベルを描画
     items
       .append('text')
-      .attr('x', (d, i) => getSize(d, i) + 4)
-      .attr('y', (d, i) => getSize(d, i) / 2)
+      .attr('x', (d, i) => {
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxSize + 4;
+        }
+        return getSize(d, i) + 4;
+      })
+      .attr('y', (d, i) => {
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxSize / 2;
+        }
+        return getSize(d, i) / 2;
+      })
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
@@ -560,11 +588,27 @@ export class LegendLayer extends BaseLayer {
       }
     };
     
+    // サイズスケールが有効かどうかを判定
+    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
+    const maxRadius = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getRadius(d, i))) : 0;
+    
     // 円を描画
     items
       .append('circle')
-      .attr('cx', (d, i) => getRadius(d, i))
-      .attr('cy', (d, i) => getRadius(d, i))
+      .attr('cx', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxRadius;
+        }
+        return getRadius(d, i);
+      })
+      .attr('cy', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxRadius;
+        }
+        return getRadius(d, i);
+      })
       .attr('r', (d, i) => getRadius(d, i))
       .attr('fill', (d, i) => legendData.colors[i])
       .attr('stroke', '#333')
@@ -573,8 +617,18 @@ export class LegendLayer extends BaseLayer {
     // ラベルを描画
     items
       .append('text')
-      .attr('x', (d, i) => getRadius(d, i) * 2 + 4)
-      .attr('y', (d, i) => getRadius(d, i))
+      .attr('x', (d, i) => {
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxRadius * 2 + 4;
+        }
+        return getRadius(d, i) * 2 + 4;
+      })
+      .attr('y', (d, i) => {
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxRadius;
+        }
+        return getRadius(d, i);
+      })
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
@@ -614,14 +668,30 @@ export class LegendLayer extends BaseLayer {
       }
     };
     
+    // サイズスケールが有効かどうかを判定
+    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
+    const maxStrokeWidth = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getStrokeWidth(d, i))) : 0;
+    
     // 線を描画
     const lineLength = this.symbolSize.fixed || 24;
     items
       .append('line')
       .attr('x1', 0)
-      .attr('y1', 8)
+      .attr('y1', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxStrokeWidth / 2;
+        }
+        return 8;
+      })
       .attr('x2', lineLength)
-      .attr('y2', 8)
+      .attr('y2', (d, i) => {
+        // 縦方向かつサイズが可変の場合、中心を揃える
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxStrokeWidth / 2;
+        }
+        return 8;
+      })
       .attr('stroke', (d, i) => legendData.colors[i])
       .attr('stroke-width', (d, i) => getStrokeWidth(d, i));
     
@@ -629,7 +699,12 @@ export class LegendLayer extends BaseLayer {
     items
       .append('text')
       .attr('x', lineLength + 4)
-      .attr('y', 8)
+      .attr('y', (d, i) => {
+        if (this.orientation === 'vertical' && hasSizeVariation) {
+          return maxStrokeWidth / 2;
+        }
+        return 8;
+      })
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
