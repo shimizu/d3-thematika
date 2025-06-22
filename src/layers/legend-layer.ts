@@ -526,11 +526,19 @@ export class LegendLayer extends BaseLayer {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return (maxSize - getSize(d, i)) / 2;
         }
+        // 横方向かつサイズが可変の場合、ボトムを揃える
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxSize - getSize(d, i);
+        }
         return 0;
       })
       .attr('width', (d, i) => getSize(d, i))
       .attr('height', (d, i) => getSize(d, i))
       .attr('fill', (d, i) => legendData.colors[i])
+      .attr('fill-opacity', (d, i) => {
+        // サイズスケールがある場合は透明度を0に設定
+        return hasSizeVariation ? 0 : 1;
+      })      
       .attr('stroke', '#333')
       .attr('stroke-width', 0.5);
     
@@ -547,7 +555,18 @@ export class LegendLayer extends BaseLayer {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxSize / 2;
         }
+        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxSize + 16;
+        }
         return getSize(d, i) / 2;
+      })
+      .attr("text-anchor", (d, i) => {
+        // 横方向の場合は中央揃え
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return 'end';
+        }
+        return 'start';
       })
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
@@ -607,10 +626,18 @@ export class LegendLayer extends BaseLayer {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxRadius;
         }
+        // 横方向かつサイズが可変の場合、ボトムを揃える
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxRadius * 2 - getRadius(d, i);
+        }
         return getRadius(d, i);
       })
       .attr('r', (d, i) => getRadius(d, i))
       .attr('fill', (d, i) => legendData.colors[i])
+      .attr('fill-opacity', (d, i) => {
+        // サイズスケールがある場合は透明度を0に設定
+        return hasSizeVariation ? 0 : 1;
+      })
       .attr('stroke', '#333')
       .attr('stroke-width', 0.5);
     
@@ -621,15 +648,30 @@ export class LegendLayer extends BaseLayer {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxRadius * 2 + 4;
         }
+        // 横方向の場合は各円の中心にラベルを配置
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return getRadius(d, i);
+        }
         return getRadius(d, i) * 2 + 4;
       })
       .attr('y', (d, i) => {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxRadius;
         }
+        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxRadius * 2 + 16;
+        }
         return getRadius(d, i);
       })
       .attr('dy', '0.35em')
+      .attr('text-anchor', (d, i) => {
+        // 横方向の場合は中央揃え
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return 'middle';
+        }
+        return 'start';
+      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
@@ -682,6 +724,10 @@ export class LegendLayer extends BaseLayer {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxStrokeWidth / 2;
         }
+        // 横方向かつサイズが可変の場合、ボトムを揃える
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxStrokeWidth - getStrokeWidth(d, i) / 2;
+        }
         return 8;
       })
       .attr('x2', lineLength)
@@ -689,6 +735,10 @@ export class LegendLayer extends BaseLayer {
         // 縦方向かつサイズが可変の場合、中心を揃える
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxStrokeWidth / 2;
+        }
+        // 横方向かつサイズが可変の場合、ボトムを揃える
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxStrokeWidth - getStrokeWidth(d, i) / 2;
         }
         return 8;
       })
@@ -698,14 +748,31 @@ export class LegendLayer extends BaseLayer {
     // ラベルを描画
     items
       .append('text')
-      .attr('x', lineLength + 4)
+      .attr('x', (d, i) => {
+        // 横方向の場合は線の中心にラベルを配置
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return lineLength / 2;
+        }
+        return lineLength + 4;
+      })
       .attr('y', (d, i) => {
         if (this.orientation === 'vertical' && hasSizeVariation) {
           return maxStrokeWidth / 2;
         }
+        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return maxStrokeWidth + 16;
+        }
         return 8;
       })
       .attr('dy', '0.35em')
+      .attr('text-anchor', (d, i) => {
+        // 横方向の場合は中央揃え
+        if (this.orientation === 'horizontal' && hasSizeVariation) {
+          return 'middle';
+        }
+        return 'start';
+      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
