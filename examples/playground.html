@@ -27,6 +27,12 @@
         min-width: 300px;
     }
     
+    #map_container h2 {
+        margin-bottom: 10px;
+        font-size: 1.3em;
+        font-weight: 600;
+    }
+    
     textarea { 
         width: 400px; 
         height: 400px; 
@@ -51,7 +57,27 @@
     }
 
     #run {
-        display: block
+        padding: 8px 20px;
+        font-size: 14px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        height: 36px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: background 0.2s;
+    }
+    
+    #run:hover {
+        background: #45a049;
+    }
+    
+    #run:active {
+        background: #3d8b40;
     }
     
 
@@ -69,23 +95,36 @@
     
     h2 {
         margin-top: 0;
+        margin-bottom: 0;
         font-size: 1.2em;
-        display: inline-block;
     }
     
     .editor-header {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
         margin-bottom: 10px;
     }
     
+    .editor-header h2 {
+        margin: 0;
+        font-size: 1.3em;
+        font-weight: 600;
+    }
+    
     #example-selector {
-        padding: 5px;
+        padding: 8px 12px;
         font-size: 14px;
-        border: 1px solid #ccc;
+        border: 1px solid #ddd;
         border-radius: 4px;
         background: white;
+        height: 36px;
+        min-width: 200px;
+        cursor: pointer;
+    }
+    
+    #example-selector:hover {
+        border-color: #bbb;
     }
 
   </style>
@@ -111,6 +150,7 @@
                     <option value="texture">Texture Fill</option>
                     <option value="projection">Different Projections</option>
                 </select>
+                <button id="run">Run ▶</button>
             </div>
 <textarea id="editor"> // テクスチャをプリセットから取得
 const texture = Thematika.TexturePresets.lightOcean()
@@ -183,7 +223,6 @@ map.addLayer('outline', outlineLayer);
 map.addLayer('world_new', worldLayer);
 
 </textarea>
-            <button id="run">Run ▶</button>
         </div>
 
         <div id="map_container">
