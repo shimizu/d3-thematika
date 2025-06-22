@@ -58,7 +58,7 @@
 
     #map {
         width: 100%;
-        aspect-ratio: 16/9;
+        aspect-ratio: 5/2;
         background: white;
         position: relative;
     }
@@ -70,6 +70,22 @@
     h2 {
         margin-top: 0;
         font-size: 1.2em;
+        display: inline-block;
+    }
+    
+    .editor-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    #example-selector {
+        padding: 5px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background: white;
     }
 
   </style>
@@ -83,11 +99,19 @@
 
 </head>
 <body>
-    <h1>Playground</h1>
     
     <div class="container">
         <div id="editor_container">
-            <h2>Code Editor</h2>
+            <div class="editor-header">
+                <h2>Code Editor</h2>
+                <select id="example-selector">
+                    <option value="default">Basic World Map</option>
+                    <option value="graticule">Graticule Example</option>
+                    <option value="outline">Outline Layer</option>
+                    <option value="texture">Texture Fill</option>
+                    <option value="projection">Different Projections</option>
+                </select>
+            </div>
 <textarea id="editor"> // テクスチャをプリセットから取得
 const texture = Thematika.TexturePresets.lightOcean()
 
@@ -103,7 +127,7 @@ const height = document.querySelector("#map").clientHeight;
 
 // D3.jsの投影法を使用して地図の投影を設定
 const projection = d3.geoEqualEarth()
-    .fitExtent([[0, 0], [width, height]], geojson);
+    .fitExtent([[5, 5], [width-5, height-5]], geojson);
 
 // Thematika.Map インスタンスを作成
 const map = new Thematika.Map({
@@ -178,6 +202,20 @@ map.addLayer('world_new', worldLayer);
     const out     = document.getElementById('console');
     const runBtn  = document.getElementById('run');
 
+    async function run(){
+        // ユーザーコードを async IIFE で eval
+        const userCode = editor.value;
+        const wrapped  = `(async ()=>{\n${userCode}\n})()`;
+
+        try {
+            await eval(wrapped);
+        } catch (e) {
+            console.log('Error:', e);
+        }
+    }
+
+    run()
+
     runBtn.addEventListener('click', async () => {
       out.textContent = '';
       // console.log キャッチ
@@ -188,16 +226,254 @@ map.addLayer('world_new', worldLayer);
       };
 
       // ユーザーコードを async IIFE で eval
-      const userCode = editor.value;
-      const wrapped  = `(async ()=>{\n${userCode}\n})()`;
-
-      try {
-        await eval(wrapped);
-      } catch (e) {
-        console.log('Error:', e);
-      }
-
+      run();
       console.log = _log;
+    });
+    
+    // コード例の定義
+    const codeExamples = {
+      default: `// テクスチャをプリセットから取得
+const texture = Thematika.TexturePresets.lightOcean()
+
+// SVGフィルターをプリセットから取得
+const effect = Thematika.FilterPresets.standardDropShadow()
+
+//データ読み込み
+const geojson =  await d3.json("geojson/world.geojson");
+
+//mapエレメントのサイズを取得
+const width = document.querySelector("#map").clientWidth ;
+const height = document.querySelector("#map").clientHeight;
+
+// D3.jsの投影法を使用して地図の投影を設定
+const projection = d3.geoEqualEarth()
+    .fitExtent([[5, 5], [width-5, height-5]], geojson);
+
+// Thematika.Map インスタンスを作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    defs: [texture, effect], 
+    projection: projection
+});
+
+
+const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
+
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,                
+    attr: { 
+        fill:(d,i)=> fillStyles[i%3] , 
+        filter: effect.url(), 
+        stroke: '#1a3d1f',
+        strokeWidth: 0.8,
+        opacity: (d,i) => 0.9,
+    }
+});
+
+// OutlineLayerインスタンスを作成（クリップパス機能付き）
+const outlineLayer = new Thematika.OutlineLayer({
+    createClipPath: true,
+    clipPathId: 'earth-outline-clip',
+    attr: {
+        fill: 'none',
+        stroke: '#2c3e50',
+        strokeWidth: 2,
+        opacity: 0.8
+    }
+});
+
+// GraticuleLayerインスタンスを作成
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [10, 10], // 10度間隔
+    attr: {
+        fill: 'none',
+        stroke: '#000',
+        strokeWidth: 0.5,
+        strokeDasharray: '2, 2',
+        opacity: 0.9
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('world_new', worldLayer);`,
+
+      graticule: `// Graticule（経緯線）の例
+const geojson = await d3.json("geojson/world.geojson");
+const width = document.querySelector("#map").clientWidth;
+const height = document.querySelector("#map").clientHeight;
+
+const projection = d3.geoOrthographic()
+    .fitExtent([[10, 10], [width-10, height-10]], geojson)
+    .rotate([-20, -30]);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// Graticuleを前面に配置
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [20, 20], // 20度間隔
+    attr: {
+        fill: 'none',
+        stroke: '#4a90e2',
+        strokeWidth: 1,
+        opacity: 0.5
+    }
+});
+
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: { 
+        fill: '#f0f0f0',
+        stroke: '#333',
+        strokeWidth: 0.5
+    }
+});
+
+map.addLayer('world', worldLayer);
+map.addLayer('graticule', graticuleLayer);`,
+
+      outline: `// OutlineLayerの例
+const geojson = await d3.json("geojson/world.geojson");
+const width = document.querySelector("#map").clientWidth;
+const height = document.querySelector("#map").clientHeight;
+
+const projection = d3.geoNaturalEarth1()
+    .fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection,
+    backgroundColor: '#e3f2fd'
+});
+
+// 太い輪郭線
+const outlineLayer = new Thematika.OutlineLayer({
+    attr: {
+        fill: 'none',
+        stroke: '#1976d2',
+        strokeWidth: 4,
+        strokeLinejoin: 'round'
+    }
+});
+
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: { 
+        fill: '#ffffff',
+        stroke: '#666',
+        strokeWidth: 0.5
+    }
+});
+
+map.addLayer('world', worldLayer);
+map.addLayer('outline', outlineLayer);`,
+
+      texture: `// テクスチャフィルの例
+const texture1 = Thematika.TexturePresets.diagonalStripes();
+const texture2 = Thematika.TexturePresets.dots();
+const shadow = Thematika.FilterPresets.standardDropShadow();
+
+const geojson = await d3.json("geojson/world.geojson");
+const width = document.querySelector("#map").clientWidth;
+const height = document.querySelector("#map").clientHeight;
+
+const projection = d3.geoAzimuthalEqualArea()
+    .fitExtent([[20, 20], [width-20, height-20]], geojson)
+    .rotate([0, -90]);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    defs: [texture1, texture2, shadow],
+    projection: projection
+});
+
+const fillPatterns = [
+    '#e8f5e9',
+    texture1.url(),
+    '#c8e6c9', 
+    texture2.url()
+];
+
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: { 
+        fill: (d, i) => fillPatterns[i % fillPatterns.length],
+        filter: shadow.url(),
+        stroke: '#2e7d32',
+        strokeWidth: 0.8
+    }
+});
+
+map.addLayer('world', worldLayer);`,
+
+      projection: `// 異なる投影法の例
+const geojson = await d3.json("geojson/world.geojson");
+const width = document.querySelector("#map").clientWidth;
+const height = document.querySelector("#map").clientHeight;
+
+// Mollweide投影法
+const projection = d3.geoMollweide()
+    .fitExtent([[10, 10], [width-10, height-10]], geojson);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: { 
+        fill: '#ffeb3b',
+        stroke: '#f57f17',
+        strokeWidth: 1,
+        opacity: 0.8
+    }
+});
+
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [30, 30],
+    attr: {
+        fill: 'none',
+        stroke: '#666',
+        strokeWidth: 0.5,
+        strokeDasharray: '2, 2',
+        opacity: 0.3
+    }
+});
+
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('world', worldLayer);
+
+// 他の投影法の例:
+// d3.geoWinkelTripel()
+// d3.geoRobinson()
+// d3.geoEckert4()
+// d3.geoConicEqualArea()`
+    };
+    
+    // セレクトボックスの変更イベント
+    const selector = document.getElementById('example-selector');
+    selector.addEventListener('change', (e) => {
+        const selectedExample = e.target.value;
+        if (codeExamples[selectedExample]) {
+            editor.value = codeExamples[selectedExample];
+            run(); // 自動実行
+        }
     });
   </script>
 </body>
