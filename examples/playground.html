@@ -273,7 +273,11 @@ map.addLayer('world_new', worldLayer);
         </div>
 
         <div id="map_container">
-            <h2>Map Example</h2>
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <h2>Map Example</h2>
+                <button id="download-svg" style="padding: 6px 12px; font-size: 12px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">SVG</button>
+                <button id="download-png" style="padding: 6px 12px; font-size: 12px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer;">PNG</button>
+            </div>
             <div id="map"></div>
             
             <div id="console_container">
@@ -314,6 +318,64 @@ map.addLayer('world_new', worldLayer);
       // ユーザーコードを async IIFE で eval
       run();
       console.log = _log;
+    });
+    
+    // SVGダウンロード機能
+    document.getElementById('download-svg').addEventListener('click', () => {
+        const mapElement = document.querySelector('#map svg');
+        if (!mapElement) {
+            alert('地図が表示されていません');
+            return;
+        }
+        
+        const svgData = new XMLSerializer().serializeToString(mapElement);
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'map.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+    
+    // PNGダウンロード機能
+    document.getElementById('download-png').addEventListener('click', () => {
+        const mapElement = document.querySelector('#map svg');
+        if (!mapElement) {
+            alert('地図が表示されていません');
+            return;
+        }
+        
+        const svgData = new XMLSerializer().serializeToString(mapElement);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        // SVGのサイズを取得
+        const svgRect = mapElement.getBoundingClientRect();
+        canvas.width = svgRect.width;
+        canvas.height = svgRect.height;
+        
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'map.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        };
+        
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        img.src = url;
     });
     
     // コード例の定義

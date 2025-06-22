@@ -54,6 +54,14 @@ export class Map {
     // defsオプションが指定されている場合、テクスチャを初期化
     this.initializeDefs(options.defs);
 
+
+    //svg 背景rectを追加
+    this.svg.append('rect')
+      .attr('width', '100%')
+      .attr('height', '100%')
+      .attr('fill', options.backgroundColor || '#ffffff')
+      .attr('class', 'thematika-background'); 
+
     // メインのSVGグループを作成
     this.svgGroup = this.svg.append('g')
       .attr('class', 'thematika-main-group');
