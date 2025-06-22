@@ -573,8 +573,8 @@ export class LegendLayer extends BaseLayer {
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
 
   /**
@@ -617,8 +617,8 @@ export class LegendLayer extends BaseLayer {
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
 
   /**
@@ -662,8 +662,8 @@ export class LegendLayer extends BaseLayer {
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
 
   /**
@@ -1061,14 +1061,28 @@ export class LegendLayer extends BaseLayer {
     items
       .append('text')
       .attr('x', (d: any, i: number) => legendData.sizes![i] * 2 + 4)
-      .attr('y', (d: any, i: number) => legendData.sizes![i])
-      .attr('dy', '0.35em')
+      .attr('y', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は中央揃え
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return legendData.sizes![i]; // 中央揃え
+        }
+      })
+      .attr('dy', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は0.35em
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return '0.35em';
+        }
+      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d: any, i: number) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
   
   /**
@@ -1093,14 +1107,28 @@ export class LegendLayer extends BaseLayer {
     items
       .append('text')
       .attr('x', (d: any, i: number) => Math.sqrt(legendData.sizes![i]) + 4)
-      .attr('y', (d: any, i: number) => Math.sqrt(legendData.sizes![i]) / 2)
-      .attr('dy', '0.35em')
+      .attr('y', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は中央揃え
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return Math.sqrt(legendData.sizes![i]) / 2; // 中央揃え
+        }
+      })
+      .attr('dy', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は0.35em
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return '0.35em';
+        }
+      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d: any, i: number) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
   
   /**
@@ -1126,25 +1154,41 @@ export class LegendLayer extends BaseLayer {
     items
       .append('text')
       .attr('x', lineLength + 4)
-      .attr('y', 8)
-      .attr('dy', '0.35em')
+      .attr('y', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は線の中央
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return 8; // 線の中央
+        }
+      })
+      .attr('dy', (d: any, i: number) => {
+        // 横方向の場合は0、縦方向の場合は0.35em
+        if (this.orientation === 'horizontal') {
+          return 0;
+        } else {
+          return '0.35em';
+        }
+      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d: any, i: number) => legendData.labels[i]);
     
-    // 配置の設定
-    this.positionItems(items, titleOffset);
+    // 配置の設定（サイズ情報も渡す）
+    this.positionItems(items, titleOffset, legendData.sizes);
   }
 
   /**
    * アイテムの配置を設定します
    * @param items - アイテムの選択セット
    * @param titleOffset - タイトルのオフセット
+   * @param sizes - サイズ配列（サイズスケール時のボトム揃え用）
    * @private
    */
   private positionItems(
     items: Selection<SVGGElement, any, SVGGElement, any>,
-    titleOffset: number
+    titleOffset: number,
+    sizes?: number[]
   ): void {
     if (this.orientation === 'vertical') {
       items.attr('transform', (d, i) => 
@@ -1152,9 +1196,26 @@ export class LegendLayer extends BaseLayer {
       );
     } else {
       // 水平配置
-      items.attr('transform', (d, i) => 
-        `translate(${i * this.itemSpacing}, ${titleOffset})`
-      );
+      if (sizes && this.hasSizeScale()) {
+        // サイズスケール時はボトム揃え
+        const maxSize = Math.max(...sizes);
+        items.attr('transform', (d, i) => {
+          const symbolSize = sizes[i];
+          // シンボルタイプに応じてボトム揃えのオフセットを計算
+          let bottomOffset = 0;
+          if (this.symbolType === 'circle') {
+            bottomOffset = maxSize - symbolSize; // 半径の差
+          } else if (this.symbolType === 'cell') {
+            bottomOffset = Math.sqrt(maxSize) - Math.sqrt(symbolSize); // 一辺の長さの差
+          }
+          return `translate(${i * this.itemSpacing}, ${titleOffset + bottomOffset})`;
+        });
+      } else {
+        // 通常配置
+        items.attr('transform', (d, i) => 
+          `translate(${i * this.itemSpacing}, ${titleOffset})`
+        );
+      }
     }
   }
 
