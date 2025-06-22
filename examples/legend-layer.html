@@ -104,6 +104,7 @@
                 <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
                 <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）</li>
                 <li>機能: スケール型切り替え、X/Y座標による位置調整、シンボルタイプ選択</li>
+                <li>サイズスケール: チェックボックスで有効化（circle/cell/lineタイプで使用可能）</li>
                 <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
                 <li>外観: 背景ボックスの表示/非表示切り替え（opacityで制御、要素は常に存在）</li>
             </ul>
@@ -118,7 +119,6 @@
                     <option value="linear">連続スケール (Linear)</option>
                     <option value="threshold">閾値スケール (Threshold)</option>
                     <option value="sequential">連続色スケール (Sequential)</option>
-                    <option value="size">サイズスケール (Size)</option>
                 </select>
             </div>
 
@@ -131,6 +131,13 @@
                     <option value="line">線 (Line)</option>
                     <option value="gradient">グラデーション (Gradient)</option>
                 </select>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="enable-size-scale-checkbox">
+                    サイズスケールを有効化
+                </label>
             </div>
 
             <div class="control-group">
@@ -156,6 +163,11 @@
                     <input type="checkbox" id="show-background-checkbox" checked>
                     背景ボックスを表示
                 </label>
+            </div>
+
+            <div class="control-group">
+                <label for="item-spacing-slider">アイテム間隔: <span id="item-spacing-value">20</span>px</label>
+                <input type="range" id="item-spacing-slider" min="10" max="200" value="20" style="width: 300px;">
             </div>
 
         </div>
@@ -185,20 +197,26 @@ const legendLayer = new Thematika.LegendLayer({
     }
 });
 
-// 連続スケールの例
-const populationScale = d3.scaleSequential(d3.interpolateYlOrRd)
-    .domain([0, 1000000]);
+// サイズスケールの例（セルタイプ）
+const densityScale = d3.scaleOrdinal()
+    .domain(['低', '中', '高'])
+    .range(['#ffcccc', '#ff6666', '#ff0000']);
 
-const popLegend = new Thematika.LegendLayer({
-    scale: populationScale,
-    position: { top: 300, left: 200 },  // SVG座標系でのピクセル値
-    title: '人口密度',
-    orientation: 'horizontal'
+const sizeScale = d3.scaleLinear()
+    .domain([0, 1, 2])
+    .range([100, 400, 900]); // 面積値
+
+const sizeLegend = new Thematika.LegendLayer({
+    scale: densityScale,
+    sizeScale: sizeScale,
+    symbolType: 'cell',  // セルタイプを指定
+    position: { top: 300, left: 200 },
+    title: '人口密度'
 });
 
 // 地図に追加
 map.addLayer('legend', legendLayer);
-map.addLayer('population-legend', popLegend);
+map.addLayer('size-legend', sizeLegend);
         </div>
     </div>
 
@@ -213,6 +231,8 @@ map.addLayer('population-legend', popLegend);
         let currentOrientation = 'vertical';
         let currentSymbolType = 'auto';
         let showBackground = true;
+        let currentItemSpacing = 20;
+        let enableSizeScale = false;
         
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
@@ -257,17 +277,20 @@ map.addLayer('population-legend', popLegend);
                     const value = Math.random();
                     return scaleData.sequential.scale(value);
                 }
-            },
-            size: {
-                scale: d3.scaleLinear()
-                    .domain([0, 100])
-                    .range(['#0066cc', '#0066cc']), // 同じ色
-                sizeScale: d3.scaleLinear()
-                    .domain([0, 100])
-                    .range([5, 30]),
-                title: '人口 (万人)',
-                colorFunction: (d, i) => '#0066cc' // 同じ色
             }
+        };
+        
+        // サイズスケールの定義（シンボルタイプごと）
+        const sizeScales = {
+            circle: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([5, 15, 30]),
+            cell: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([100, 400, 900]), // 面積値
+            line: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([1, 3, 6]) // 線の太さ
         };
         
         async function draw() {
@@ -311,7 +334,8 @@ map.addLayer('population-legend', popLegend);
                 position: currentPosition,
                 title: currentScale.title,
                 orientation: currentOrientation,
-                showBackground: showBackground
+                showBackground: showBackground,
+                itemSpacing: currentItemSpacing
             };
             
             // シンボルタイプが指定されている場合
@@ -319,10 +343,9 @@ map.addLayer('population-legend', popLegend);
                 legendOptions.symbolType = currentSymbolType;
             }
             
-            // サイズスケールの場合
-            if (currentScaleType === 'size') {
-                legendOptions.symbolType = 'circle';
-                legendOptions.sizeScale = currentScale.sizeScale;
+            // サイズスケールが有効な場合
+            if (enableSizeScale && currentSymbolType !== 'auto' && currentSymbolType !== 'gradient') {
+                legendOptions.sizeScale = sizeScales[currentSymbolType];
             }
             
             const legendLayer = new Thematika.LegendLayer(legendOptions);
@@ -403,6 +426,19 @@ map.addLayer('population-legend', popLegend);
         
         document.getElementById('show-background-checkbox').addEventListener('change', (e) => {
             showBackground = e.target.checked;
+            draw();
+        });
+        
+        // アイテム間隔スライダー
+        document.getElementById('item-spacing-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('item-spacing-value').textContent = value;
+            currentItemSpacing = value;
+            draw();
+        });
+        
+        document.getElementById('enable-size-scale-checkbox').addEventListener('change', (e) => {
+            enableSizeScale = e.target.checked;
             draw();
         });
 

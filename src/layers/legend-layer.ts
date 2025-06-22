@@ -55,6 +55,7 @@ export interface SymbolSize {
   fixed?: number;
 }
 
+
 /**
  * 背景ボックスのスタイル設定
  */
@@ -87,7 +88,7 @@ export interface LegendLayerOptions {
   title?: string;
   /** 配置の向き */
   orientation?: 'vertical' | 'horizontal';
-  /** アイテム間のスペース */
+  /** アイテム間のスペース（ピクセル） */
   itemSpacing?: number;
   /** フォントサイズ */
   fontSize?: number;
@@ -303,6 +304,28 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
+   * 値が色を表す文字列かどうかを判定します
+   * @param value - 判定する値
+   * @returns 色の場合true
+   * @private
+   */
+  private isColorValue(value: any): boolean {
+    if (typeof value !== 'string') return false;
+    
+    // 一般的な色のパターンをチェック
+    // #RGB, #RRGGBB, #RRGGBBAA
+    if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(value)) return true;
+    // rgb(), rgba()
+    if (/^rgba?\(/.test(value)) return true;
+    // hsl(), hsla()
+    if (/^hsla?\(/.test(value)) return true;
+    // 名前付き色
+    if (/^(red|green|blue|black|white|yellow|cyan|magenta|gray|grey|orange|purple|brown|pink)$/i.test(value)) return true;
+    
+    return false;
+  }
+
+  /**
    * スケール型に応じた凡例データを生成します
    * @returns 凡例データ
    * @private
@@ -350,17 +373,29 @@ export class LegendLayer extends BaseLayer {
     const scale = this.scale as any;
     const range = scale.range();
     
-    return {
+    // rangeが数値か色かを判定
+    const isNumericRange = range.length > 0 && typeof range[0] === 'number';
+    
+    const legendData: LegendData = {
       data: range,
-      labels: range.map((color: string) => {
-        const extent = scale.invertExtent(color);
+      labels: range.map((value: any) => {
+        const extent = scale.invertExtent(value);
         if (extent[0] != null && extent[1] != null) {
           return `${extent[0]} - ${extent[1]}`;
         }
-        return color;
+        return value.toString();
       }),
-      colors: range
+      colors: isNumericRange 
+        ? range.map(() => '#0066cc') // 数値の場合はデフォルト色
+        : range
     };
+    
+    // 数値rangeの場合はサイズデータとして追加
+    if (isNumericRange) {
+      legendData.sizes = range;
+    }
+    
+    return legendData;
   }
 
   /**
@@ -371,12 +406,25 @@ export class LegendLayer extends BaseLayer {
   private generateOrdinalLegend(): LegendData {
     const scale = this.scale as any;
     const domain = scale.domain();
+    const range = scale.range();
     
-    return {
+    // rangeが数値か色かを判定
+    const isNumericRange = range.length > 0 && typeof range[0] === 'number';
+    
+    const legendData: LegendData = {
       data: domain,
       labels: domain.map((d: any) => d.toString()),
-      colors: domain.map((d: any) => scale(d))
+      colors: isNumericRange
+        ? domain.map(() => '#0066cc') // 数値の場合はデフォルト色
+        : domain.map((d: any) => scale(d))
     };
+    
+    // 数値rangeの場合はサイズデータとして追加
+    if (isNumericRange) {
+      legendData.sizes = domain.map((d: any) => scale(d));
+    }
+    
+    return legendData;
   }
 
   /**
@@ -445,12 +493,25 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-item');
     
+    // サイズスケールがある場合は使用、なければ固定サイズ
+    const getSize = (d: any, i: number) => {
+      if (this.sizeScale) {
+        // インデックスを使用してサイズを取得
+        const area = this.sizeScale(i);
+        return Math.sqrt(area);
+      } else if (legendData.sizes && legendData.sizes[i]) {
+        // スケールのrangeが数値の場合
+        return Math.sqrt(legendData.sizes[i]);
+      } else {
+        return this.symbolSize.fixed || 16;
+      }
+    };
+    
     // 色見本を描画
-    const cellSize = this.symbolSize.fixed || 16;
     items
       .append('rect')
-      .attr('width', cellSize)
-      .attr('height', cellSize)
+      .attr('width', (d, i) => getSize(d, i))
+      .attr('height', (d, i) => getSize(d, i))
       .attr('fill', (d, i) => legendData.colors[i])
       .attr('stroke', '#333')
       .attr('stroke-width', 0.5);
@@ -458,8 +519,8 @@ export class LegendLayer extends BaseLayer {
     // ラベルを描画
     items
       .append('text')
-      .attr('x', cellSize + 4)
-      .attr('y', cellSize / 2)
+      .attr('x', (d, i) => getSize(d, i) + 4)
+      .attr('y', (d, i) => getSize(d, i) / 2)
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
@@ -489,8 +550,10 @@ export class LegendLayer extends BaseLayer {
     // サイズスケールがある場合は使用、なければ固定サイズ
     const getRadius = (d: any, i: number) => {
       if (this.sizeScale) {
-        return this.sizeScale(d) / 2;
+        // インデックスを使用してサイズを取得
+        return this.sizeScale(i) / 2;
       } else if (legendData.sizes && legendData.sizes[i]) {
+        // スケールのrangeが数値の場合
         return legendData.sizes[i] / 2;
       } else {
         return (this.symbolSize.fixed || 16) / 2;
@@ -538,6 +601,19 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-item');
     
+    // サイズスケールがある場合は線の太さに使用
+    const getStrokeWidth = (d: any, i: number) => {
+      if (this.sizeScale) {
+        // インデックスを使用してサイズを取得
+        return this.sizeScale(i);
+      } else if (legendData.sizes && legendData.sizes[i]) {
+        // スケールのrangeが数値の場合
+        return legendData.sizes[i];
+      } else {
+        return 2; // デフォルトの線の太さ
+      }
+    };
+    
     // 線を描画
     const lineLength = this.symbolSize.fixed || 24;
     items
@@ -547,7 +623,7 @@ export class LegendLayer extends BaseLayer {
       .attr('x2', lineLength)
       .attr('y2', 8)
       .attr('stroke', (d, i) => legendData.colors[i])
-      .attr('stroke-width', 2);
+      .attr('stroke-width', (d, i) => getStrokeWidth(d, i));
     
     // ラベルを描画
     items
@@ -639,9 +715,9 @@ export class LegendLayer extends BaseLayer {
         `translate(0, ${titleOffset + i * this.itemSpacing})`
       );
     } else {
-      // 水平配置（要改善）
+      // 水平配置
       items.attr('transform', (d, i) => 
-        `translate(${i * 100}, ${titleOffset})`
+        `translate(${i * this.itemSpacing}, ${titleOffset})`
       );
     }
   }
