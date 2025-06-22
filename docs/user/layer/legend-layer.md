@@ -122,7 +122,7 @@ const sizeLegend = new LegendLayer({
 
 ### 重ね表示モード
 
-サイズスケールを使用する際に、美しい重ね表示を実現できます。
+サイズスケールを使用する際に、重ね表示を実現できます。
 
 ```typescript
 const sizeLegend = new LegendLayer({
@@ -165,7 +165,6 @@ const legendLayer = new LegendLayer({
 });
 ```
 
-サイズスケール使用時の横方向配置では、シンボルとラベルが自動的にボトム揃えされます。
 
 ## 背景とスタイリング
 
