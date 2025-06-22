@@ -112,6 +112,8 @@ export interface LegendLayerOptions {
   showBackground?: boolean;
   /** 背景ボックスのスタイル */
   backgroundStyle?: LegendBackgroundStyle;
+  /** 重ね表示モード（サイズスケール時のみ有効） */
+  overlapping?: boolean;
 }
 
 /**
@@ -157,6 +159,8 @@ export class LegendLayer extends BaseLayer {
   private showBackground: boolean;
   /** 背景ボックスのスタイル */
   private backgroundStyle: LegendBackgroundStyle;
+  /** 重ね表示モード */
+  private overlapping: boolean;
 
   /**
    * LegendLayerを初期化します
@@ -180,6 +184,7 @@ export class LegendLayer extends BaseLayer {
     this.gradientSteps = options.gradientSteps || 256;
     this.enableDrag = options.enableDrag !== false; // デフォルトで有効
     this.showBackground = options.showBackground !== false; // デフォルトで有効
+    this.overlapping = options.overlapping || false; // デフォルトで無効
     this.backgroundStyle = {
       fill: '#ffffff',
       stroke: '#cccccc',
@@ -208,6 +213,16 @@ export class LegendLayer extends BaseLayer {
       default:
         return 'cell';
     }
+  }
+
+  /**
+   * サイズスケールが有効かどうかを判定します
+   * @returns サイズスケールが有効な場合true
+   * @private
+   */
+  private hasSizeScale(): boolean {
+    // 明示的なsizeScaleが設定されている場合
+    return !!this.sizeScale;
   }
 
   /**
@@ -428,6 +443,42 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
+   * サイズスケール用の凡例データを生成します
+   * @returns 凡例データ
+   * @private
+   */
+  private generateSizeScaleLegendData(): LegendData {
+    if (!this.sizeScale) {
+      throw new Error('Size scale is not defined');
+    }
+    
+    const sizeScale = this.sizeScale;
+    const domain = sizeScale.domain();
+    const range = sizeScale.range();
+    
+    // 色スケールから色を取得（メインスケールを使用）
+    const colorScale = this.scale as any;
+    
+    return {
+      data: domain,
+      labels: domain.map((d: any) => d.toString()),
+      colors: domain.map(() => {
+        // カラースケールの場合は最初のドメイン値を使用、なければデフォルト色
+        if (typeof colorScale === 'function') {
+          try {
+            const colorDomain = colorScale.domain();
+            return colorScale(colorDomain[0]) || '#0066cc';
+          } catch {
+            return '#0066cc';
+          }
+        }
+        return '#0066cc';
+      }),
+      sizes: range
+    };
+  }
+
+  /**
    * 凡例を描画します
    * @private
    */
@@ -439,22 +490,27 @@ export class LegendLayer extends BaseLayer {
       this.renderTitle();
     }
     
-    // シンボルタイプに応じて適切なレンダリング関数を呼び出す
-    switch (this.symbolType) {
-      case 'cell':
-        this.renderCellLegend();
-        break;
-      case 'circle':
-        this.renderCircleLegend();
-        break;
-      case 'line':
-        this.renderLineLegend();
-        break;
-      case 'gradient':
-        this.renderGradientLegend();
-        break;
-      default:
-        throw new Error(`Unsupported symbol type: ${this.symbolType}`);
+    // サイズスケールが有効な場合は専用関数を使用
+    if (this.hasSizeScale()) {
+      this.renderSizeScaleLegend();
+    } else {
+      // シンボルタイプに応じて適切なレンダリング関数を呼び出す
+      switch (this.symbolType) {
+        case 'cell':
+          this.renderCellLegend();
+          break;
+        case 'circle':
+          this.renderCircleLegend();
+          break;
+        case 'line':
+          this.renderLineLegend();
+          break;
+        case 'gradient':
+          this.renderGradientLegend();
+          break;
+        default:
+          throw new Error(`Unsupported symbol type: ${this.symbolType}`);
+      }
     }
   }
 
@@ -477,7 +533,7 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
-   * セル（矩形）タイプの凡例を描画します
+   * セル（矩形）タイプの凡例を描画します（固定サイズ版）
    * @private
    */
   private renderCellLegend(): void {
@@ -493,81 +549,25 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-item');
     
-    // サイズスケールがある場合は使用、なければ固定サイズ
-    const getSize = (d: any, i: number) => {
-      if (this.sizeScale) {
-        // インデックスを使用してサイズを取得
-        const area = this.sizeScale(i);
-        return Math.sqrt(area);
-      } else if (legendData.sizes && legendData.sizes[i]) {
-        // スケールのrangeが数値の場合
-        return Math.sqrt(legendData.sizes[i]);
-      } else {
-        return this.symbolSize.fixed || 16;
-      }
-    };
-    
-    // サイズスケールが有効かどうかを判定
-    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
-    const maxSize = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getSize(d, i))) : 0;
+    // 固定サイズのセル
+    const cellSize = this.symbolSize.fixed || 16;
     
     // 色見本を描画
     items
       .append('rect')
-      .attr('x', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return (maxSize - getSize(d, i)) / 2;
-        }
-        return 0;
-      })
-      .attr('y', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return (maxSize - getSize(d, i)) / 2;
-        }
-        // 横方向かつサイズが可変の場合、ボトムを揃える
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxSize - getSize(d, i);
-        }
-        return 0;
-      })
-      .attr('width', (d, i) => getSize(d, i))
-      .attr('height', (d, i) => getSize(d, i))
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', cellSize)
+      .attr('height', cellSize)
       .attr('fill', (d, i) => legendData.colors[i])
-      .attr('fill-opacity', (d, i) => {
-        // サイズスケールがある場合は透明度を0に設定
-        return hasSizeVariation ? 0 : 1;
-      })      
       .attr('stroke', '#333')
       .attr('stroke-width', 0.5);
     
     // ラベルを描画
     items
       .append('text')
-      .attr('x', (d, i) => {
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxSize + 4;
-        }
-        return getSize(d, i) + 4;
-      })
-      .attr('y', (d, i) => {
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxSize / 2;
-        }
-        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxSize + 16;
-        }
-        return getSize(d, i) / 2;
-      })
-      .attr("text-anchor", (d, i) => {
-        // 横方向の場合は中央揃え
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return 'end';
-        }
-        return 'start';
-      })
+      .attr('x', cellSize + 4)
+      .attr('y', cellSize / 2)
       .attr('dy', '0.35em')
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
@@ -578,7 +578,7 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
-   * 円タイプの凡例を描画します
+   * 円タイプの凡例を描画します（固定サイズ版）
    * @private
    */
   private renderCircleLegend(): void {
@@ -594,84 +594,25 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-item');
     
-    // サイズスケールがある場合は使用、なければ固定サイズ
-    const getRadius = (d: any, i: number) => {
-      if (this.sizeScale) {
-        // インデックスを使用してサイズを取得
-        return this.sizeScale(i) / 2;
-      } else if (legendData.sizes && legendData.sizes[i]) {
-        // スケールのrangeが数値の場合
-        return legendData.sizes[i] / 2;
-      } else {
-        return (this.symbolSize.fixed || 16) / 2;
-      }
-    };
-    
-    // サイズスケールが有効かどうかを判定
-    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
-    const maxRadius = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getRadius(d, i))) : 0;
+    // 固定サイズの円
+    const radius = (this.symbolSize.fixed || 16) / 2;
     
     // 円を描画
     items
       .append('circle')
-      .attr('cx', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxRadius;
-        }
-        return getRadius(d, i);
-      })
-      .attr('cy', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxRadius;
-        }
-        // 横方向かつサイズが可変の場合、ボトムを揃える
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxRadius * 2 - getRadius(d, i);
-        }
-        return getRadius(d, i);
-      })
-      .attr('r', (d, i) => getRadius(d, i))
+      .attr('cx', radius)
+      .attr('cy', radius)
+      .attr('r', radius)
       .attr('fill', (d, i) => legendData.colors[i])
-      .attr('fill-opacity', (d, i) => {
-        // サイズスケールがある場合は透明度を0に設定
-        return hasSizeVariation ? 0 : 1;
-      })
       .attr('stroke', '#333')
       .attr('stroke-width', 0.5);
     
     // ラベルを描画
     items
       .append('text')
-      .attr('x', (d, i) => {
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxRadius * 2 + 4;
-        }
-        // 横方向の場合は各円の中心にラベルを配置
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return getRadius(d, i);
-        }
-        return getRadius(d, i) * 2 + 4;
-      })
-      .attr('y', (d, i) => {
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxRadius;
-        }
-        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxRadius * 2 + 16;
-        }
-        return getRadius(d, i);
-      })
+      .attr('x', radius * 2 + 4)
+      .attr('y', radius)
       .attr('dy', '0.35em')
-      .attr('text-anchor', (d, i) => {
-        // 横方向の場合は中央揃え
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return 'middle';
-        }
-        return 'start';
-      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
@@ -681,7 +622,7 @@ export class LegendLayer extends BaseLayer {
   }
 
   /**
-   * 線タイプの凡例を描画します
+   * 線タイプの凡例を描画します（固定サイズ版）
    * @private
    */
   private renderLineLegend(): void {
@@ -697,82 +638,26 @@ export class LegendLayer extends BaseLayer {
       .append('g')
       .attr('class', 'cartography-legend-item');
     
-    // サイズスケールがある場合は線の太さに使用
-    const getStrokeWidth = (d: any, i: number) => {
-      if (this.sizeScale) {
-        // インデックスを使用してサイズを取得
-        return this.sizeScale(i);
-      } else if (legendData.sizes && legendData.sizes[i]) {
-        // スケールのrangeが数値の場合
-        return legendData.sizes[i];
-      } else {
-        return 2; // デフォルトの線の太さ
-      }
-    };
-    
-    // サイズスケールが有効かどうかを判定
-    const hasSizeVariation = this.sizeScale || (legendData.sizes && legendData.sizes.length > 0);
-    const maxStrokeWidth = hasSizeVariation ? Math.max(...legendData.data.map((d, i) => getStrokeWidth(d, i))) : 0;
+    // 固定サイズの線
+    const lineLength = this.symbolSize.fixed || 24;
+    const strokeWidth = 2; // 固定の線の太さ
     
     // 線を描画
-    const lineLength = this.symbolSize.fixed || 24;
     items
       .append('line')
       .attr('x1', 0)
-      .attr('y1', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxStrokeWidth / 2;
-        }
-        // 横方向かつサイズが可変の場合、ボトムを揃える
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxStrokeWidth - getStrokeWidth(d, i) / 2;
-        }
-        return 8;
-      })
+      .attr('y1', 8)
       .attr('x2', lineLength)
-      .attr('y2', (d, i) => {
-        // 縦方向かつサイズが可変の場合、中心を揃える
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxStrokeWidth / 2;
-        }
-        // 横方向かつサイズが可変の場合、ボトムを揃える
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxStrokeWidth - getStrokeWidth(d, i) / 2;
-        }
-        return 8;
-      })
+      .attr('y2', 8)
       .attr('stroke', (d, i) => legendData.colors[i])
-      .attr('stroke-width', (d, i) => getStrokeWidth(d, i));
+      .attr('stroke-width', strokeWidth);
     
     // ラベルを描画
     items
       .append('text')
-      .attr('x', (d, i) => {
-        // 横方向の場合は線の中心にラベルを配置
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return lineLength / 2;
-        }
-        return lineLength + 4;
-      })
-      .attr('y', (d, i) => {
-        if (this.orientation === 'vertical' && hasSizeVariation) {
-          return maxStrokeWidth / 2;
-        }
-        // 横方向かつサイズが可変の場合、ボトムにラベルを配置
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return maxStrokeWidth + 16;
-        }
-        return 8;
-      })
+      .attr('x', lineLength + 4)
+      .attr('y', 8)
       .attr('dy', '0.35em')
-      .attr('text-anchor', (d, i) => {
-        // 横方向の場合は中央揃え
-        if (this.orientation === 'horizontal' && hasSizeVariation) {
-          return 'middle';
-        }
-        return 'start';
-      })
       .style('font-size', `${this.fontSize}px`)
       .style('fill', '#333')
       .text((d, i) => legendData.labels[i]);
@@ -840,6 +725,356 @@ export class LegendLayer extends BaseLayer {
         .style('fill', '#333')
         .text(tick.toString());
     });
+  }
+
+  /**
+   * サイズスケール用の凡例を描画します
+   * @private
+   */
+  private renderSizeScaleLegend(): void {
+    if (!this.layerGroup) return;
+    
+    const legendData = this.generateSizeScaleLegendData();
+    const titleOffset = this.title ? this.fontSize + 10 : 0;
+    
+    // overlappingモードの場合は重ね表示
+    if (this.overlapping) {
+      this.renderOverlappingSizeScale(legendData, titleOffset);
+    } else {
+      // 通常モードは既存の並列表示
+      this.renderRegularSizeScale(legendData, titleOffset);
+    }
+  }
+
+  /**
+   * 重ね表示モードでサイズスケール凡例を描画します
+   * @param legendData - 凡例データ
+   * @param titleOffset - タイトルのオフセット
+   * @private
+   */
+  private renderOverlappingSizeScale(legendData: LegendData, titleOffset: number): void {
+    if (!this.layerGroup || !legendData.sizes || legendData.sizes.length === 0) return;
+    
+    // 最大サイズを取得してレイアウトを計算
+    const maxSize = Math.max(...legendData.sizes);
+    
+    switch (this.symbolType) {
+      case 'circle':
+        this.renderOverlappingCircles(legendData, titleOffset, maxSize);
+        break;
+      case 'cell':
+        this.renderOverlappingCells(legendData, titleOffset, maxSize);
+        break;
+      case 'line':
+        this.renderOverlappingLines(legendData, titleOffset, maxSize);
+        break;
+      default:
+        this.renderOverlappingCircles(legendData, titleOffset, maxSize);
+        break;
+    }
+  }
+
+  /**
+   * 重ね表示モードで円を描画します（同心円配置）
+   * @param legendData - 凡例データ
+   * @param titleOffset - タイトルのオフセット
+   * @param maxSize - 最大サイズ
+   * @private
+   */
+  private renderOverlappingCircles(legendData: LegendData, titleOffset: number, maxSize: number): void {
+    if (!this.layerGroup || !legendData.sizes) return;
+    
+    // 最大半径を計算（circleの場合、sizesは半径）
+    const maxRadius = maxSize;
+    const centerX = maxRadius;
+    const centerY = titleOffset + maxRadius;
+    
+    // サイズでソート（大きい順）
+    const sortedData = legendData.data
+      .map((d, i) => ({ data: d, label: legendData.labels[i], color: legendData.colors[i], size: legendData.sizes![i] }))
+      .sort((a, b) => b.size - a.size);
+    
+    // シンボルグループを作成
+    const symbolGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-symbols');
+    
+    // 円を同心円状に描画（大きい順）
+    sortedData.forEach((item, i) => {
+      symbolGroup
+        .append('circle')
+        .attr('cx', centerX)
+        .attr('cy', centerY)
+        .attr('r', item.size)
+        .attr('fill', item.color)
+        .attr('stroke', '#333')
+        .attr('stroke-width', 0.5)
+        .attr('opacity', 0.7);
+    });
+    
+    // ラベルを右側に統一配置
+    const labelGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-labels');
+    
+    const labelStartX = centerX + maxRadius + 10;
+    const labelSpacing = this.fontSize + 4;
+    
+    sortedData.forEach((item, i) => {
+      labelGroup
+        .append('text')
+        .attr('x', labelStartX)
+        .attr('y', centerY - maxRadius + i * labelSpacing + this.fontSize)
+        .attr('dy', '0.35em')
+        .style('font-size', `${this.fontSize}px`)
+        .style('fill', '#333')
+        .text(item.label);
+    });
+  }
+
+  /**
+   * 重ね表示モードでセルを描画します
+   * @param legendData - 凡例データ
+   * @param titleOffset - タイトルのオフセット
+   * @param maxSize - 最大サイズ（面積）
+   * @private
+   */
+  private renderOverlappingCells(legendData: LegendData, titleOffset: number, maxSize: number): void {
+    if (!this.layerGroup || !legendData.sizes) return;
+    
+    // 面積から一辺の長さを計算
+    const maxSide = Math.sqrt(maxSize);
+    const centerX = maxSide / 2;
+    const centerY = titleOffset + maxSide / 2;
+    
+    // サイズでソート（大きい順）
+    const sortedData = legendData.data
+      .map((d, i) => ({ data: d, label: legendData.labels[i], color: legendData.colors[i], size: legendData.sizes![i] }))
+      .sort((a, b) => b.size - a.size);
+    
+    // シンボルグループを作成
+    const symbolGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-symbols');
+    
+    // セルを中心揃えで重ね表示
+    sortedData.forEach((item, i) => {
+      const sideLength = Math.sqrt(item.size);
+      symbolGroup
+        .append('rect')
+        .attr('x', centerX - sideLength / 2)
+        .attr('y', centerY - sideLength / 2)
+        .attr('width', sideLength)
+        .attr('height', sideLength)
+        .attr('fill', item.color)
+        .attr('stroke', '#333')
+        .attr('stroke-width', 0.5)
+        .attr('opacity', 0.7);
+    });
+    
+    // ラベルを右側に統一配置
+    const labelGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-labels');
+    
+    const labelStartX = centerX + maxSide / 2 + 10;
+    const labelSpacing = this.fontSize + 4;
+    
+    sortedData.forEach((item, i) => {
+      labelGroup
+        .append('text')
+        .attr('x', labelStartX)
+        .attr('y', centerY - maxSide / 2 + i * labelSpacing + this.fontSize)
+        .attr('dy', '0.35em')
+        .style('font-size', `${this.fontSize}px`)
+        .style('fill', '#333')
+        .text(item.label);
+    });
+  }
+
+  /**
+   * 重ね表示モードで線を描画します
+   * @param legendData - 凡例データ
+   * @param titleOffset - タイトルのオフセット
+   * @param maxSize - 最大サイズ（線幅）
+   * @private
+   */
+  private renderOverlappingLines(legendData: LegendData, titleOffset: number, maxSize: number): void {
+    if (!this.layerGroup || !legendData.sizes) return;
+    
+    const lineLength = 30;
+    const centerY = titleOffset + maxSize / 2 + 10;
+    
+    // サイズでソート（大きい順）
+    const sortedData = legendData.data
+      .map((d, i) => ({ data: d, label: legendData.labels[i], color: legendData.colors[i], size: legendData.sizes![i] }))
+      .sort((a, b) => b.size - a.size);
+    
+    // シンボルグループを作成
+    const symbolGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-symbols');
+    
+    // 線を中央揃えで重ね表示
+    sortedData.forEach((item, i) => {
+      symbolGroup
+        .append('line')
+        .attr('x1', 0)
+        .attr('y1', centerY)
+        .attr('x2', lineLength)
+        .attr('y2', centerY)
+        .attr('stroke', item.color)
+        .attr('stroke-width', item.size)
+        .attr('opacity', 0.8);
+    });
+    
+    // ラベルを右側に統一配置
+    const labelGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'cartography-legend-labels');
+    
+    const labelStartX = lineLength + 10;
+    const labelSpacing = this.fontSize + 4;
+    
+    sortedData.forEach((item, i) => {
+      labelGroup
+        .append('text')
+        .attr('x', labelStartX)
+        .attr('y', centerY - maxSize / 2 + i * labelSpacing + this.fontSize)
+        .attr('dy', '0.35em')
+        .style('font-size', `${this.fontSize}px`)
+        .style('fill', '#333')
+        .text(item.label);
+    });
+  }
+
+  /**
+   * 通常モードでサイズスケール凡例を描画します
+   * @param legendData - 凡例データ
+   * @param titleOffset - タイトルのオフセット
+   * @private
+   */
+  private renderRegularSizeScale(legendData: LegendData, titleOffset: number): void {
+    if (!this.layerGroup || !legendData.sizes) return;
+    
+    const items = this.layerGroup
+      .selectAll('.cartography-legend-item')
+      .data(legendData.data)
+      .enter()
+      .append('g')
+      .attr('class', 'cartography-legend-item');
+    
+    // サイズスケールが有効な場合の可変サイズ表示
+    switch (this.symbolType) {
+      case 'circle':
+        this.renderRegularSizeCircles(items, legendData, titleOffset);
+        break;
+      case 'cell':
+        this.renderRegularSizeCells(items, legendData, titleOffset);
+        break;
+      case 'line':
+        this.renderRegularSizeLines(items, legendData, titleOffset);
+        break;
+      default:
+        this.renderRegularSizeCircles(items, legendData, titleOffset);
+        break;
+    }
+  }
+  
+  /**
+   * 通常モードでサイズ可変の円を描画します
+   * @private
+   */
+  private renderRegularSizeCircles(items: any, legendData: LegendData, titleOffset: number): void {
+    if (!legendData.sizes) return;
+    
+    // 円の描画
+    items
+      .append('circle')
+      .attr('cx', (d: any, i: number) => legendData.sizes![i])
+      .attr('cy', (d: any, i: number) => legendData.sizes![i])
+      .attr('r', (d: any, i: number) => legendData.sizes![i])
+      .attr('fill', (d: any, i: number) => legendData.colors[i])
+      .attr('stroke', '#333')
+      .attr('stroke-width', 0.5);
+    
+    // ラベルの描画
+    items
+      .append('text')
+      .attr('x', (d: any, i: number) => legendData.sizes![i] * 2 + 4)
+      .attr('y', (d: any, i: number) => legendData.sizes![i])
+      .attr('dy', '0.35em')
+      .style('font-size', `${this.fontSize}px`)
+      .style('fill', '#333')
+      .text((d: any, i: number) => legendData.labels[i]);
+    
+    // 配置の設定
+    this.positionItems(items, titleOffset);
+  }
+  
+  /**
+   * 通常モードでサイズ可変のセルを描画します
+   * @private
+   */
+  private renderRegularSizeCells(items: any, legendData: LegendData, titleOffset: number): void {
+    if (!legendData.sizes) return;
+    
+    // セルの描画（面積からサイズを計算）
+    items
+      .append('rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('width', (d: any, i: number) => Math.sqrt(legendData.sizes![i]))
+      .attr('height', (d: any, i: number) => Math.sqrt(legendData.sizes![i]))
+      .attr('fill', (d: any, i: number) => legendData.colors[i])
+      .attr('stroke', '#333')
+      .attr('stroke-width', 0.5);
+    
+    // ラベルの描画
+    items
+      .append('text')
+      .attr('x', (d: any, i: number) => Math.sqrt(legendData.sizes![i]) + 4)
+      .attr('y', (d: any, i: number) => Math.sqrt(legendData.sizes![i]) / 2)
+      .attr('dy', '0.35em')
+      .style('font-size', `${this.fontSize}px`)
+      .style('fill', '#333')
+      .text((d: any, i: number) => legendData.labels[i]);
+    
+    // 配置の設定
+    this.positionItems(items, titleOffset);
+  }
+  
+  /**
+   * 通常モードでサイズ可変の線を描画します
+   * @private
+   */
+  private renderRegularSizeLines(items: any, legendData: LegendData, titleOffset: number): void {
+    if (!legendData.sizes) return;
+    
+    const lineLength = 24;
+    
+    // 線の描画
+    items
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', 8)
+      .attr('x2', lineLength)
+      .attr('y2', 8)
+      .attr('stroke', (d: any, i: number) => legendData.colors[i])
+      .attr('stroke-width', (d: any, i: number) => legendData.sizes![i]);
+    
+    // ラベルの描画
+    items
+      .append('text')
+      .attr('x', lineLength + 4)
+      .attr('y', 8)
+      .attr('dy', '0.35em')
+      .style('font-size', `${this.fontSize}px`)
+      .style('fill', '#333')
+      .text((d: any, i: number) => legendData.labels[i]);
+    
+    // 配置の設定
+    this.positionItems(items, titleOffset);
   }
 
   /**

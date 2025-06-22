@@ -141,6 +141,13 @@
             </div>
 
             <div class="control-group">
+                <label>
+                    <input type="checkbox" id="overlapping-checkbox">
+                    重ね表示モード（サイズスケール時）
+                </label>
+            </div>
+
+            <div class="control-group">
                 <label for="legend-x-slider">X座標: <span id="legend-x-value">20</span></label>
                 <input type="range" id="legend-x-slider" min="0" max="800" value="20" style="width: 300px;">
             </div>
@@ -233,6 +240,7 @@ map.addLayer('size-legend', sizeLegend);
         let showBackground = true;
         let currentItemSpacing = 20;
         let enableSizeScale = false;
+        let overlappingMode = false;
         
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
@@ -346,6 +354,8 @@ map.addLayer('size-legend', sizeLegend);
             // サイズスケールが有効な場合
             if (enableSizeScale && currentSymbolType !== 'auto' && currentSymbolType !== 'gradient') {
                 legendOptions.sizeScale = sizeScales[currentSymbolType];
+                // 重ね表示モードを設定
+                legendOptions.overlapping = overlappingMode;
             }
             
             const legendLayer = new Thematika.LegendLayer(legendOptions);
@@ -439,6 +449,11 @@ map.addLayer('size-legend', sizeLegend);
         
         document.getElementById('enable-size-scale-checkbox').addEventListener('change', (e) => {
             enableSizeScale = e.target.checked;
+            draw();
+        });
+        
+        document.getElementById('overlapping-checkbox').addEventListener('change', (e) => {
+            overlappingMode = e.target.checked;
             draw();
         });
 
