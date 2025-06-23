@@ -191,6 +191,49 @@ export function createBloom(options: BloomOptions) {
   return filterFunction;
 }
 
+
+/**
+ * GeoJSONポリゴンからクリップパスを生成します
+ * @param options - クリップポリゴンのオプション
+ * @returns D3セレクションで使用可能なコールバック関数
+ */
+export function createClipPolygon(options: ClipPolygonOptions) {
+  const clipFunction = (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
+
+    // パス生成器を作成
+    const path = geoPath(options.projection);
+    
+    // clipPath要素を作成
+    const clipPath = defs.append('clipPath')
+      .attr('id', options.id);
+    
+    // GeoJSONの型に応じて処理
+    if (options.polygon.type === 'Feature') {
+      // 単一のFeatureの場合
+      const pathData = path(options.polygon);
+      if (pathData) {
+        clipPath.append('path')
+          .attr('d', pathData);
+      }
+    } else if (options.polygon.type === 'FeatureCollection') {
+      // FeatureCollectionの場合、各フィーチャーをパスとして追加
+      options.polygon.features.forEach((feature, index) => {
+        const pathData = path(feature);
+        if (pathData) {
+          clipPath.append('path')
+            .attr('d', pathData)
+            .attr('class', `clip-path-${index}`);
+        }
+      });
+    }
+  };
+  
+  // id名を返す.url()メソッドを追加
+  (clipFunction as any).url = () => getFilterUrl(options.id);
+  
+  return clipFunction;
+}
+
 /**
  * よく使用されるフィルターのプリセット
  */
@@ -286,50 +329,3 @@ export function chainFilters(filterIds: string[]): string {
   return filterIds.map(id => `url(#${id})`).join(' ');
 }
 
-/**
- * GeoJSONポリゴンからクリップパスを生成します
- * @param options - クリップポリゴンのオプション
- * @returns D3セレクションで使用可能なコールバック関数
- */
-export function createClipPolygon(options: ClipPolygonOptions) {
-    console.log('run createClipPolygon'); //debug:コンソールに出力されない
-
-  const clipFunction = (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
-
-    console.log('run clipFunction'); //debug:コンソールに出力されない
-    
-    console.log('Creating clip path for polygon:', options.polygon);
-
-    // パス生成器を作成
-    const path = geoPath(options.projection);
-    
-    // clipPath要素を作成
-    const clipPath = defs.append('clipPath')
-      .attr('id', options.id);
-    
-    // GeoJSONの型に応じて処理
-    if (options.polygon.type === 'Feature') {
-      // 単一のFeatureの場合
-      const pathData = path(options.polygon);
-      if (pathData) {
-        clipPath.append('path')
-          .attr('d', pathData);
-      }
-    } else if (options.polygon.type === 'FeatureCollection') {
-      // FeatureCollectionの場合、各フィーチャーをパスとして追加
-      options.polygon.features.forEach((feature, index) => {
-        const pathData = path(feature);
-        if (pathData) {
-          clipPath.append('path')
-            .attr('d', pathData)
-            .attr('class', `clip-path-${index}`);
-        }
-      });
-    }
-  };
-  
-  // id名を返す.url()メソッドを追加
-  (clipFunction as any).url = () => getFilterUrl(options.id);
-  
-  return clipFunction;
-}

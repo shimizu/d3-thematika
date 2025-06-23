@@ -1,4 +1,4 @@
-import { Selection, select } from 'd3-selection';
+import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
 import { LayerStyle, IGeojsonLayer } from '../types';

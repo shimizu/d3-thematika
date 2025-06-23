@@ -19,44 +19,75 @@ npm install d3-thematika
 <script src="./dist/thematika.umd.js"></script>
 
 <script>
+  //geojsonデータの読み込み
+  const geojson =  await d3.json("geojson/world.geojson");
+
+
+  // D3.jsの投影法を使用して地図の投影を設定
+  const projection = d3.geoEqualEarth()
+      .fitExtent([[0, 0], [width, height]], geojson);
+
+        
   const map = new Thematika.Map({
-    container: '#map',
-    width: 800,
-    height: 600,
-    projection: 'naturalEarth1'
+      container: '#map',
+      width: width,
+      height: height,
+      defs: [texture, effect], 
+      projection: projection
   });
-  
-  map.addLayer('base', {
-    data: geoJsonData,
-    style: {
-      fill: '#f8f9fa',
-      stroke: '#dee2e6',
-      strokeWidth: 1
-    }
+
+  // GeojsonLayerインスタンスを作成
+  const worldLayer = new Thematika.GeojsonLayer({
+      data: geojson,                
+      attr: { 
+          fill:'#f8f9fa', 
+          stroke: '#1a3d1f',
+          strokeWidth: 0.8,
+          opacity: 0.9,
+      }
   });
+
+  // レイヤーを追加
+  map.addLayer('world_layer', worldLayer);
+
+
 </script>
 ```
 
 ### ES Modules
 
 ```javascript
-import { Map } from 'd3-thematika';
+import { Map, GeojsonLayer } from 'd3-thematika';
+import * as d3 from 'd3';
 
+// GeoJSONデータの読み込み
+const geojson = await d3.json("geojson/world.geojson");
+
+// D3.jsの投影法を使用して地図の投影を設定
+const projection = d3.geoEqualEarth()
+    .fitExtent([[0, 0], [width, height]], geojson);
+
+// 地図インスタンスを作成
 const map = new Map({
-  container: '#map',
-  width: 800,
-  height: 600,
-  projection: 'naturalEarth1'
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
 });
 
-map.addLayer('base', {
-  data: geoJsonData,
-  style: {
-    fill: '#f8f9fa',
-    stroke: '#dee2e6',
-    strokeWidth: 1
-  }
+// GeojsonLayerインスタンスを作成
+const worldLayer = new GeojsonLayer({
+    data: geojson,
+    style: { 
+        fill: '#f8f9fa', 
+        stroke: '#1a3d1f',
+        strokeWidth: 0.8,
+        opacity: 0.9,
+    }
 });
+
+// レイヤーを追加
+map.addLayer('world_layer', worldLayer);
 ```
 
 ## 開発

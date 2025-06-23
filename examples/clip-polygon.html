@@ -117,33 +117,47 @@
             <!-- サンプルコード -->
             <pre>// createClipPolygonの使用例
 
-// 日本のポリゴンデータを読み込み
-const japanGeoJSON = await d3.json('./geojson/japan/pref.geojson');
+// アフリカ大陸outlineデータを読み込み
+const aflicaClipGeoJSON = await d3.json('./geojson/aflica.geojson');
+
+
+// 投影法を地図データに合わせて設定
+currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+
 
 // クリップエフェクトを作成
 const clipEffect = Thematika.createClipPolygon({
-    id: 'japan-clip',
-    polygon: japanGeoJSON,
-    projection: projection
+    id: 'aflica-clip',
+    polygon: aflicaClipGeoJSON,
+    projection: currentProjection
 });
 
-// 地図作成時にdefsに追加
+
+// 地図を作成
 const map = new Thematika.Map({
     container: '#map',
-    width: width,
-    height: height,
-    projection: projection,
+    width: 800,
+    height: 400,
+    projection: currentProjection,
     defs: [clipEffect]  // クリップエフェクトを追加
 });
 
-// レイヤーにクリップパスを適用
-const worldLayer = new Thematika.GeojsonLayer({
-    data: worldGeoJSON,
-    attr: { 
-        fill: '#1a3d1f',
+
+// ラスターレイヤー（アフリカの画像を使用）
+rasterLayer = new Thematika.RasterLayer('raster', {
+    src: './img/africa_img.png',
+    bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
+    style: { 
+        opacity: 0.7 ,
         clipPath: clipEffect.url()  // クリップパスを適用
-    }
+    },
+    
 });
+map.addLayer('raster', rasterLayer);
+            </pre>
+
+
+
         </div>
     </div>
 
@@ -158,16 +172,14 @@ const worldLayer = new Thematika.GeojsonLayer({
         async function draw() {
 
 
-            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+            // アフリカ大陸outlineデータを読み込み
             const aflicaClipGeoJSON = await d3.json('./geojson/aflica.geojson');
 
 
-            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-            const geojson = await d3.json('./geojson/world.geojson');
-
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
-
 
 
             // クリップエフェクトを作成
@@ -178,9 +190,8 @@ const worldLayer = new Thematika.GeojsonLayer({
             });
 
 
-
             // 地図を作成
-            map = new Thematika.Map({
+            const map = new Thematika.Map({
                 container: '#map',
                 width: 800,
                 height: 400,
@@ -188,7 +199,6 @@ const worldLayer = new Thematika.GeojsonLayer({
                 defs: [clipEffect]  // クリップエフェクトを追加
             });
 
-            console.log(clipEffect.url());
 
             // 背景レイヤー（国境）
             backgroundLayer = new Thematika.GeojsonLayer({
@@ -197,29 +207,23 @@ const worldLayer = new Thematika.GeojsonLayer({
                     fill: '#ffffff',
                     stroke: '#333333',
                     strokeWidth: 0.5
-                },
-                clipPath: clipEffect.url()  // クリップパスを適用
-
+                }
             });
             map.addLayer('countries', backgroundLayer);
 
-
-
             
             // ラスターレイヤー（アフリカの画像を使用）
-            // GeoJSONと同じ座標を使用（西端は負の値）
             rasterLayer = new Thematika.RasterLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { 
                     opacity: 0.7 ,
-                    clipPath: clipEffect.url() 
+                    clipPath: clipEffect.url()  // クリップパスを適用
                 },
                 
             });
             map.addLayer('raster', rasterLayer);
             
-
 
             // 経緯線レイヤー
             graticuleLayer = new Thematika.GraticuleLayer({
