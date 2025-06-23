@@ -33,7 +33,8 @@ export abstract class BaseLayer implements ILayer {
     { key: 'strokeWidth', method: 'attr', attr: 'stroke-width' },
     { key: 'strokeDasharray', method: 'attr', attr: 'stroke-dasharray' },
     { key: 'opacity', method: 'attr' },
-    { key: 'filter', method: 'attr' }
+    { key: 'filter', method: 'attr' },
+    { key: 'clipPath', method: 'attr', attr: 'clip-path' }
   ];
 
   /**
@@ -187,6 +188,8 @@ export abstract class BaseLayer implements ILayer {
     index?: number
   ): void {
     BaseLayer.STYLE_PROPERTIES.forEach(({ key, method, attr }) => {
+
+      console.log("single", key)
       const value = this.style[key];
       const attrName = attr || key;
       
@@ -210,8 +213,17 @@ export abstract class BaseLayer implements ILayer {
     BaseLayer.STYLE_PROPERTIES.forEach(({ key, method, attr }) => {
       const value = this.style[key];
       const attrName = attr || key;
+
+      console.log("maluti", key)
+
       
-      if (typeof value === 'function') {
+      // clipPathは常にレイヤーグループに適用
+      if (key === 'clipPath') {
+        if (value !== undefined) {
+          const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
+          layerGroup[method](attrName, finalValue);
+        }
+      } else if (typeof value === 'function') {
         // 関数型の場合は個別の要素に適用
         elements[method](attrName, (d: any, i: number) => value(d, i));
       } else if (value !== undefined) {

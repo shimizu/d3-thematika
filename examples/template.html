@@ -255,37 +255,6 @@ map.addLayer('world_new', worldLayer);
         draw()
 
 
-        // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
-        });
-
-        // コントロールのイベントハンドラ
-        document.getElementById('projection-select').addEventListener('change', (e) => {
-            const projectionName = e.target.value;
-            switch (projectionName) {
-                case 'equirectangular':
-                    currentProjection = d3.geoEquirectangular();
-                    break;
-                case 'mercator':
-                    currentProjection = d3.geoMercator();
-                    break;
-                case 'naturalEarth1':
-                    currentProjection = d3.geoNaturalEarth1();
-                    break;
-                case 'orthographic':
-                    currentProjection = d3.geoOrthographic();
-                    break;
-                case 'azimuthalEqualArea':
-                    currentProjection = d3.geoAzimuthalEqualArea();
-                    break;
-            }
-            draw();
-        });
 
 
     </script>

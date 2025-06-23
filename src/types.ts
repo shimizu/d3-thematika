@@ -37,6 +37,8 @@ export interface LayerStyle {
   opacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
   /** SVGフィルター */
   filter?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  /** クリップパス */
+  clipPath?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 追加のCSSクラス名 */
   className?: string;
 }

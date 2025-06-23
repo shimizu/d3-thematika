@@ -90,6 +90,8 @@ export class RasterLayer extends BaseLayer {
     } catch (error) {
       console.error('RasterLayer: 画像の描画に失敗しました', error);
     }
+
+
   }
 
   /**
@@ -237,7 +239,7 @@ export class RasterLayer extends BaseLayer {
     }
 
     if (this.imageElement) {
-      this.applyStyle(this.imageElement);
+      this.applyStylesToElement(this.imageElement);
     }
   }
 
@@ -267,7 +269,7 @@ export class RasterLayer extends BaseLayer {
       .attr('preserveAspectRatio', 'none');
 
     if (this.imageElement) {
-      this.applyStyle(this.imageElement);
+      this.applyStylesToElement(this.imageElement);
     }
   }
 
@@ -509,7 +511,7 @@ export class RasterLayer extends BaseLayer {
         .attr('preserveAspectRatio', 'none');
 
       if (this.imageElement) {
-        this.applyStyle(this.imageElement);
+        this.applyStylesToElement(this.imageElement);
       }
 
       // bbox マーカーを表示（オプション）
@@ -824,16 +826,5 @@ export class RasterLayer extends BaseLayer {
     }
   }
 
-  /**
-   * スタイルを適用します
-   * @param element - 対象要素
-   */
-  private applyStyle(element: Selection<SVGImageElement, unknown, any, any>): void {
-    if (this.style.opacity !== undefined) {
-      element.attr('opacity', this.style.opacity as number);
-    }
-    if (this.style.filter) {
-      element.attr('filter', this.style.filter as string);
-    }
-  }
+
 }

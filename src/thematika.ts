@@ -2,7 +2,6 @@ import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { ThematikaOptions, LayerStyle, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
-import { GeojsonLayer } from './layers/geojson-layer';
 
 /**
  * 主題図描画を行うメインクラス（リファクタリング版）
