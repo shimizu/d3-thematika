@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { JSDOM } from 'jsdom';
+// import { JSDOM } from 'jsdom';
 import { select } from 'd3-selection';
 import { scaleOrdinal, scaleLinear, scaleThreshold, scaleSequential } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
@@ -20,7 +19,7 @@ describe('LegendLayer', () => {
     container = svg.append('g');
 
     // window.addEventListenerをモック
-    vi.spyOn(dom.window, 'addEventListener').mockImplementation(() => {});
+    jest.spyOn(dom.window, 'addEventListener').mockImplementation(() => {});
   });
 
   describe('constructor', () => {
@@ -31,7 +30,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       expect(legend.id).toMatch(/^legend-/);
@@ -46,7 +45,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '20%', left: '70%' },
+        position: { top: 100, left: 350 },
         title: 'Land Use',
         orientation: 'horizontal',
         itemSpacing: 30,
@@ -65,7 +64,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: ordinalScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -76,13 +75,13 @@ describe('LegendLayer', () => {
     });
 
     it('連続スケールを正しく判別する', () => {
-      const linearScale = scaleLinear<string>()
+      const linearScale = scaleLinear()
         .domain([0, 100])
         .range(['#ffffff', '#ff0000']);
 
       const legend = new LegendLayer({
         scale: linearScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -99,7 +98,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: thresholdScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -115,7 +114,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: sequentialScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -134,7 +133,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -151,7 +150,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' },
+        position: { top: 50, left: 400 },
         title: 'Land Use Types'
       });
 
@@ -169,7 +168,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -193,7 +192,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: initialScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -223,7 +222,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -233,7 +232,7 @@ describe('LegendLayer', () => {
       const initialTransform = layerGroup.attr('transform');
 
       // 位置を更新
-      legend.updatePosition({ top: '50%', left: '20%' });
+      legend.updatePosition({ top: 250, left: 100 });
 
       // 更新後の位置を確認
       const updatedTransform = layerGroup.attr('transform');
@@ -249,7 +248,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);
@@ -275,7 +274,7 @@ describe('LegendLayer', () => {
 
       const legend = new LegendLayer({
         scale: colorScale,
-        position: { top: '10%', left: '80%' }
+        position: { top: 50, left: 400 }
       });
 
       legend.render(container);

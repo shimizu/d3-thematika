@@ -135,6 +135,19 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
 
 
   /**
+   * レイヤーのスタイルを更新します
+   * @protected
+   */
+  protected updateLayerStyle(): void {
+    if (!this.layerGroup) return;
+    
+    const paths = this.layerGroup.selectAll('path');
+    if (!paths.empty()) {
+      this.applyStylesToElements(paths, this.layerGroup);
+    }
+  }
+
+  /**
    * GeoJSONデータを取得します
    * @returns 現在のGeoJSONデータ
    */
