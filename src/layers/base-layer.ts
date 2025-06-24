@@ -29,6 +29,7 @@ export abstract class BaseLayer implements ILayer {
   /** 共通のスタイル属性マッピング */
   protected static readonly STYLE_PROPERTIES: StylePropertyMapping[] = [
     { key: 'fill', method: 'attr' },
+    { key: 'fillOpacity', method: 'attr', attr: 'fill-opacity' },
     { key: 'stroke', method: 'attr' },
     { key: 'strokeWidth', method: 'attr', attr: 'stroke-width' },
     { key: 'strokeDasharray', method: 'attr', attr: 'stroke-dasharray' },

@@ -27,6 +27,8 @@ export interface ThematikaOptions {
 export interface LayerStyle {
   /** 塗りつぶし色 */
   fill?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  /** 塗りつぶしの透明度（0-1） */
+  fillOpacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
   /** 境界線の色 */
   stroke?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 境界線の幅 */
@@ -75,6 +77,32 @@ export interface ILayer {
  * GeoJSONレイヤーインターフェース
  */
 export interface IGeojsonLayer extends ILayer {
+  /** 投影法を設定する */
+  setProjection(projection: GeoProjection): void;
+}
+
+/**
+ * LineConnectionLayerで使用するライン接続データ
+ */
+export interface LineConnectionData {
+  /** 開始点の座標 [経度, 緯度] */
+  start: [number, number];
+  /** 終了点の座標 [経度, 緯度] */
+  end: [number, number];
+  /** データの属性情報 */
+  properties?: { [key: string]: any };
+}
+
+/**
+ * LineConnectionLayerのインターフェース
+ */
+export interface ILineConnectionLayer extends ILayer {
+  /** データを更新する */
+  updateData(data: LineConnectionData[]): void;
+  /** ライン描画タイプを更新する */
+  updateLineType(lineType: 'straight' | 'arc'): void;
+  /** アーク描画時の高さを更新する */
+  updateArcHeight(height: number): void;
   /** 投影法を設定する */
   setProjection(projection: GeoProjection): void;
 }
