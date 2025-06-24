@@ -104,8 +104,7 @@
                 <select id="arc-control-point" onchange="updateArcControlPoint()">
                     <option value="center">中点</option>
                     <option value="weighted">重み付け</option>
-                    <option value="north-pacific">北太平洋</option>
-                    <option value="south-pacific">南太平洋</option>
+                    <option value="north-pacific">カスタムポイント</option>
                 </select>
             </div>
             
@@ -223,12 +222,10 @@
                 }
             });
 
-            console.log('Line layer created:', lineLayer);
 
             // 地図に追加
             mapInstance.addLayer('connections', lineLayer);
 
-            console.log('Layer added to map');
         }
 
         function toggleLineType() {
@@ -284,9 +281,6 @@
             switch (selectedValue) {
                 case 'north-pacific':
                     arcControlPoint = [28.143147457292145, 69.40268156017285]; // 北太平洋の一点
-                    break;
-                case 'south-pacific':
-                    arcControlPoint = [-150, 10]; // 南太平洋の一点
                     break;
                 default:
                     arcControlPoint = selectedValue;
