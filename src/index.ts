@@ -35,7 +35,9 @@ export type {
   LayerStyle, 
   ILayer,
   LineConnectionData,
-  ILineConnectionLayer
+  ILineConnectionLayer,
+  ArcControlPointType,
+  ArcOffsetType
 } from './types';
 export type { RasterLayerOptions } from './layers/raster-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';

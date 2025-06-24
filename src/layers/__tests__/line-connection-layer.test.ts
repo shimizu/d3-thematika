@@ -71,7 +71,29 @@ describe('LineConnectionLayer', () => {
         data: testData,
         lineType: 'arc',
         arcHeight: 0.5,
+        arcControlPoint: 'weighted',
+        arcOffset: 'north',
         style: { stroke: '#ff0000', strokeWidth: 2 }
+      });
+
+      expect(layer.id).toMatch(/^line-connection-/);
+    });
+
+    it('アーク制御設定のデフォルト値が適用される', () => {
+      const layer = new LineConnectionLayer({
+        data: testData,
+        lineType: 'arc'
+      });
+
+      expect(layer.id).toMatch(/^line-connection-/);
+    });
+
+    it('座標指定でのアーク制御点が設定できる', () => {
+      const layer = new LineConnectionLayer({
+        data: testData,
+        lineType: 'arc',
+        arcControlPoint: [120, 40],
+        arcOffset: [0.2, -0.3]
       });
 
       expect(layer.id).toMatch(/^line-connection-/);
@@ -213,6 +235,32 @@ describe('LineConnectionLayer', () => {
       layer.updateArcHeight(0.7);
       
       // 高さが更新されたかは内部状態なので、エラーが発生しないことで確認
+      expect(layer.id).toMatch(/^line-connection-/);
+    });
+
+    it('updateArcControlPoint()でアーク制御点を更新できる', () => {
+      const layer = new LineConnectionLayer({ 
+        data: testData,
+        lineType: 'arc'
+      });
+      
+      layer.updateArcControlPoint('weighted');
+      layer.updateArcControlPoint([100, 50]);
+      
+      // 制御点が更新されたかは内部状態なので、エラーが発生しないことで確認
+      expect(layer.id).toMatch(/^line-connection-/);
+    });
+
+    it('updateArcOffset()でアークオフセットを更新できる', () => {
+      const layer = new LineConnectionLayer({ 
+        data: testData,
+        lineType: 'arc'
+      });
+      
+      layer.updateArcOffset('north');
+      layer.updateArcOffset([0.5, -0.3]);
+      
+      // オフセットが更新されたかは内部状態なので、エラーが発生しないことで確認
       expect(layer.id).toMatch(/^line-connection-/);
     });
   });

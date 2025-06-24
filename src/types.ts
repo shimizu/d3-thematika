@@ -94,6 +94,16 @@ export interface LineConnectionData {
 }
 
 /**
+ * アーク制御点の位置タイプ
+ */
+export type ArcControlPointType = 'center' | 'weighted' | [number, number];
+
+/**
+ * アークオフセットの方向タイプ
+ */
+export type ArcOffsetType = 'perpendicular' | 'north' | 'south' | 'east' | 'west' | [number, number];
+
+/**
  * LineConnectionLayerのインターフェース
  */
 export interface ILineConnectionLayer extends ILayer {
@@ -103,6 +113,10 @@ export interface ILineConnectionLayer extends ILayer {
   updateLineType(lineType: 'straight' | 'arc'): void;
   /** アーク描画時の高さを更新する */
   updateArcHeight(height: number): void;
+  /** アーク制御点の位置を更新する */
+  updateArcControlPoint(controlPoint: ArcControlPointType): void;
+  /** アークオフセットの方向を更新する */
+  updateArcOffset(offset: ArcOffsetType): void;
   /** 投影法を設定する */
   setProjection(projection: GeoProjection): void;
 }

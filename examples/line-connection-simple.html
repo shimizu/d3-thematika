@@ -36,6 +36,10 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #333;
+        }
+        .control-group select {
+            width: 200px;
         }
         .slider-container {
             display: flex;
@@ -71,6 +75,17 @@
 
         <div class="controls">
             <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select" onchange="updateProjection()">
+                    <option value="mercator" selected>Mercator</option>
+                    <option value="equirectangular">Equirectangular</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="orthographic">Orthographic</option>
+                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
                 <button onclick="toggleLineType()">直線/アーク切り替え</button>
                 <button onclick="changeColor()">色変更</button>
                 <button onclick="logData()">データ確認</button>
@@ -79,9 +94,30 @@
             <div class="control-group" id="arc-height-control" style="display: none;">
                 <label>アーク高さ:</label>
                 <div class="slider-container">
-                    <input type="range" id="arc-height" min="0.1" max="1.0" step="0.1" value="0.3" oninput="updateArcHeight()">
+                    <input type="range" id="arc-height" min="0.0" max="1.0" step="0.01" value="0.3" oninput="updateArcHeight()">
                     <span id="arc-height-value">0.3</span>
                 </div>
+            </div>
+            
+            <div class="control-group" id="arc-control-point-control" style="display: none;">
+                <label>制御点位置:</label>
+                <select id="arc-control-point" onchange="updateArcControlPoint()">
+                    <option value="center">中点</option>
+                    <option value="weighted">重み付け</option>
+                    <option value="north-pacific">北太平洋</option>
+                    <option value="south-pacific">南太平洋</option>
+                </select>
+            </div>
+            
+            <div class="control-group" id="arc-offset-control" style="display: none;">
+                <label>オフセット方向:</label>
+                <select id="arc-offset" onchange="updateArcOffset()">
+                    <option value="perpendicular">垂直</option>
+                    <option value="north">北</option>
+                    <option value="south">南</option>
+                    <option value="east">東</option>
+                    <option value="west">西</option>
+                </select>
             </div>
         </div>
 
@@ -99,20 +135,53 @@
             }
         ];
 
-        let mapInstance, lineLayer;
+        let mapInstance, lineLayer, worldLayer;
         let isArcType = false;
         let currentColor = '#ff6b35';
         let arcHeight = 0.3;
+        let arcControlPoint = 'center';
+        let arcOffset = 'perpendicular';
+        let currentProjection = 'mercator';
+
+        // 投影法を作成する関数
+        function createProjection(type, width, height) {
+            switch (type) {
+                case 'mercator':
+                    return d3.geoMercator()
+                        .scale(120)
+                        .translate([width / 2, height / 2]);
+                case 'equirectangular':
+                    return d3.geoEquirectangular()
+                        .scale(120)
+                        .translate([width / 2, height / 2]);
+                case 'naturalEarth1':
+                    return d3.geoNaturalEarth1()
+                        .scale(120)
+                        .translate([width / 2, height / 2]);
+                case 'orthographic':
+                    return d3.geoOrthographic()
+                        .scale(200)
+                        .translate([width / 2, height / 2])
+                        .rotate([-50, -30]);
+                case 'azimuthalEqualArea':
+                    return d3.geoAzimuthalEqualArea()
+                        .scale(150)
+                        .translate([width / 2, height / 2])
+                        .rotate([-50, -30]);
+                default:
+                    return d3.geoMercator()
+                        .scale(120)
+                        .translate([width / 2, height / 2]);
+            }
+        }
 
         // 地図初期化
         function initMap() {
             const width = 760;
             const height = 500;
 
-            // 投影法設定（世界地図用）
-            const projection = d3.geoMercator()
-                .scale(120)
-                .translate([width / 2, height / 2]);
+            // 投影法設定
+            const projection = createProjection(currentProjection, width, height);
 
             console.log('Creating map...');
             
@@ -145,6 +214,8 @@
                 data: connectionData,
                 lineType: isArcType ? 'arc' : 'straight',
                 arcHeight: arcHeight,
+                arcControlPoint: arcControlPoint,
+                arcOffset: arcOffset,
                 style: {
                     stroke: currentColor,
                     strokeWidth: 2,
@@ -164,12 +235,19 @@
             isArcType = !isArcType;
             console.log('Line type changed to:', isArcType ? 'arc' : 'straight');
             
-            // アーク高さ調整UIの表示/非表示
-            const arcControl = document.getElementById('arc-height-control');
+            // アーク関連UIの表示/非表示
+            const arcHeightControl = document.getElementById('arc-height-control');
+            const arcControlPointControl = document.getElementById('arc-control-point-control');
+            const arcOffsetControl = document.getElementById('arc-offset-control');
+            
             if (isArcType) {
-                arcControl.style.display = 'block';
+                arcHeightControl.style.display = 'block';
+                arcControlPointControl.style.display = 'block';
+                arcOffsetControl.style.display = 'block';
             } else {
-                arcControl.style.display = 'none';
+                arcHeightControl.style.display = 'none';
+                arcControlPointControl.style.display = 'none';
+                arcOffsetControl.style.display = 'none';
             }
             
             createLineLayer();
@@ -198,6 +276,53 @@
             }
         }
 
+        function updateArcControlPoint() {
+            const select = document.getElementById('arc-control-point');
+            const selectedValue = select.value;
+            
+            // 特定の地点を座標で指定
+            switch (selectedValue) {
+                case 'north-pacific':
+                    arcControlPoint = [28.143147457292145, 69.40268156017285]; // 北太平洋の一点
+                    break;
+                case 'south-pacific':
+                    arcControlPoint = [-150, 10]; // 南太平洋の一点
+                    break;
+                default:
+                    arcControlPoint = selectedValue;
+                    break;
+            }
+            
+            console.log('Arc control point changed to:', arcControlPoint);
+            
+            // アークモードの場合のみレイヤーを更新
+            if (isArcType) {
+                createLineLayer();
+            }
+        }
+
+        function updateArcOffset() {
+            const select = document.getElementById('arc-offset');
+            arcOffset = select.value;
+            
+            console.log('Arc offset changed to:', arcOffset);
+            
+            // アークモードの場合のみレイヤーを更新
+            if (isArcType) {
+                createLineLayer();
+            }
+        }
+
+        function updateProjection() {
+            const select = document.getElementById('projection-select');
+            currentProjection = select.value;
+            
+            console.log('Projection changed to:', currentProjection);
+            
+            // 新しい投影法で地図を再作成
+            initMap();
+        }
+
         function loadWorldMap() {
             console.log('Loading world.geojson...');
             
@@ -205,7 +330,7 @@
                 console.log('World data loaded:', worldData);
                 
                 // GeojsonLayerを作成
-                const worldLayer = new Thematika.GeojsonLayer({
+                worldLayer = new Thematika.GeojsonLayer({
                     data: worldData,
                     style: {
                         fill: '#f0f0f0',

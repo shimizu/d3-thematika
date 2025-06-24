@@ -2,7 +2,7 @@ import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { geoInterpolate } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, ILineConnectionLayer, LineConnectionData } from '../types';
+import { LayerStyle, ILineConnectionLayer, LineConnectionData, ArcControlPointType, ArcOffsetType } from '../types';
 
 /**
  * LineConnectionLayerの初期化オプション
@@ -18,6 +18,10 @@ export interface LineConnectionLayerOptions {
   lineType?: 'straight' | 'arc';
   /** アーク描画時の高さ（デフォルト: 0.3） */
   arcHeight?: number;
+  /** アーク制御点の位置（デフォルト: 'center'） */
+  arcControlPoint?: ArcControlPointType;
+  /** アークオフセットの方向（デフォルト: 'perpendicular'） */
+  arcOffset?: ArcOffsetType;
 }
 
 /**
@@ -34,6 +38,10 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private lineType: 'straight' | 'arc';
   /** アーク描画時の高さ */
   private arcHeight: number;
+  /** アーク制御点の位置 */
+  private arcControlPoint: ArcControlPointType;
+  /** アークオフセットの方向 */
+  private arcOffset: ArcOffsetType;
   /** 投影法 */
   private projection?: GeoProjection;
 
@@ -51,6 +59,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     
     this.lineType = options.lineType || 'straight';
     this.arcHeight = options.arcHeight || 0.3;
+    this.arcControlPoint = options.arcControlPoint || 'center';
+    this.arcOffset = options.arcOffset || 'perpendicular';
   }
 
   /**
@@ -152,6 +162,28 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   }
 
   /**
+   * アーク制御点の位置を更新します
+   * @param controlPoint - アーク制御点の位置
+   */
+  updateArcControlPoint(controlPoint: ArcControlPointType): void {
+    this.arcControlPoint = controlPoint;
+    if (this.lineType === 'arc') {
+      this.update();
+    }
+  }
+
+  /**
+   * アークオフセットの方向を更新します
+   * @param offset - アークオフセットの方向
+   */
+  updateArcOffset(offset: ArcOffsetType): void {
+    this.arcOffset = offset;
+    if (this.lineType === 'arc') {
+      this.update();
+    }
+  }
+
+  /**
    * ラインを描画します
    * @private
    */
@@ -219,30 +251,108 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   ): string {
     if (!this.projection) return '';
 
-    // 地理的な中点を計算
-    const interpolator = geoInterpolate(start, end);
-    const midGeo = interpolator(0.5);
-    
-    // 中点をピクセル座標に変換
-    const midPoint = this.projection(midGeo);
-    if (!midPoint) return '';
+    // 制御点の基準位置を計算
+    const baseControlPoint = this.calculateBaseControlPoint(start, end, startPoint, endPoint);
+    if (!baseControlPoint) return '';
 
-    // アークの高さを適用（中点から垂直方向にオフセット）
-    const dx = endPoint[0] - startPoint[0];
-    const dy = endPoint[1] - startPoint[1];
-    const distance = Math.sqrt(dx * dx + dy * dy);
-    
-    // 垂直方向のオフセットを計算
-    const offsetX = -dy / distance * this.arcHeight * distance;
-    const offsetY = dx / distance * this.arcHeight * distance;
-    
-    const controlPoint: [number, number] = [
-      midPoint[0] + offsetX,
-      midPoint[1] + offsetY
-    ];
+    // オフセットを適用して最終的な制御点を計算
+    const controlPoint = this.applyArcOffset(baseControlPoint, startPoint, endPoint);
 
     // 二次ベジェ曲線でアークを描画
     return `M${startPoint[0]},${startPoint[1]}Q${controlPoint[0]},${controlPoint[1]} ${endPoint[0]},${endPoint[1]}`;
+  }
+
+  /**
+   * アーク制御点の基準位置を計算します
+   * @private
+   */
+  private calculateBaseControlPoint(
+    start: [number, number], 
+    end: [number, number], 
+    startPoint: [number, number], 
+    endPoint: [number, number]
+  ): [number, number] | null {
+    if (!this.projection) return null;
+
+    switch (this.arcControlPoint) {
+      case 'center':
+        // 単純な数学的中点（地理的要因を無視）
+        const simpleMidGeo: [number, number] = [
+          (start[0] + end[0]) / 2,
+          (start[1] + end[1]) / 2
+        ];
+        return this.projection(simpleMidGeo);
+
+      case 'weighted':
+        // 2点間の重み付け中点（単純計算）
+        const weight = 0.5; // TODO: 重みを設定可能にする
+        const weightedGeo: [number, number] = [
+          start[0] + (end[0] - start[0]) * weight,
+          start[1] + (end[1] - start[1]) * weight
+        ];
+        return this.projection(weightedGeo);
+
+      default:
+        // 絶対座標で制御点を指定
+        if (Array.isArray(this.arcControlPoint)) {
+          return this.projection(this.arcControlPoint);
+        }
+        return null;
+    }
+  }
+
+  /**
+   * 制御点にオフセットを適用します
+   * @private
+   */
+  private applyArcOffset(
+    basePoint: [number, number], 
+    startPoint: [number, number], 
+    endPoint: [number, number]
+  ): [number, number] {
+    const dx = endPoint[0] - startPoint[0];
+    const dy = endPoint[1] - startPoint[1];
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    let offsetX = 0;
+    let offsetY = 0;
+
+    switch (this.arcOffset) {
+      case 'perpendicular':
+        // 垂直方向のオフセット（現在の実装）
+        offsetX = -dy / distance * this.arcHeight * distance;
+        offsetY = dx / distance * this.arcHeight * distance;
+        break;
+
+      case 'north':
+        offsetY = -this.arcHeight * distance;
+        break;
+
+      case 'south':
+        offsetY = this.arcHeight * distance;
+        break;
+
+      case 'east':
+        offsetX = this.arcHeight * distance;
+        break;
+
+      case 'west':
+        offsetX = -this.arcHeight * distance;
+        break;
+
+      default:
+        // 相対座標でオフセットを指定
+        if (Array.isArray(this.arcOffset)) {
+          offsetX = this.arcOffset[0] * distance;
+          offsetY = this.arcOffset[1] * distance;
+        }
+        break;
+    }
+
+    return [
+      basePoint[0] + offsetX,
+      basePoint[1] + offsetY
+    ];
   }
 
   /**
