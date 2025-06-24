@@ -40,7 +40,10 @@ module.exports = {
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^d3-selection$': '<rootDir>/tests/mocks/d3-selection.js',
-    '^d3-geo$': '<rootDir>/tests/mocks/d3-geo.js'
+    '^d3-geo$': '<rootDir>/tests/mocks/d3-geo.js',
+    '^d3-drag$': '<rootDir>/tests/mocks/d3-drag.js',
+    '^d3-scale$': '<rootDir>/tests/mocks/d3-scale.js',
+    '^d3-scale-chromatic$': '<rootDir>/tests/mocks/d3-scale-chromatic.js'
   },
   
   // セットアップファイル
