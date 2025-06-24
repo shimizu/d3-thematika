@@ -1,6 +1,6 @@
-# Claude Code プロジェクト設定
+# CLAUDE.md
 
-このファイルは Claude Code がプロジェクトを理解するための設定ファイルです。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## プロジェクト概要
 
@@ -12,6 +12,21 @@
 - D3.jsの機能をフルに活用し、CSSやSVGのエフェクトを適用しやすい作りにする
 - 一般的な地図ライブラリとは違い、パンやズームといった機能は持たない
 - 目標とする地図スタイル: img/reference_map_style.png を参照
+
+## アーキテクチャ概要
+
+### レイヤーベースアーキテクチャ
+- **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
+- **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
+- **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
+- **各種レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, RasterLayer, LegendLayer
+
+### ビルド出力
+- **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間
+- **ESM** (`dist/thematika.esm.js`): ESモジュール
+- **CJS** (`dist/thematika.cjs.js`): CommonJS
+
+注意: d3-geoとd3-selectionは外部依存として扱われ、UMDビルド使用時は別途読み込みが必要
 
 ## 開発環境
 
@@ -27,12 +42,34 @@
 - コミットメッセージ: 日本語で作成する
 - Push: 明示的な指示があるまで自動でpushしない
 
-## 開発ワークフロー
+## 開発コマンド
 
-- `npm run build`: プロダクションビルド
-- `npm run dev`: 開発サーバー起動（http://localhost:3000/index.html）
-- 開発サーバーは examples/ と dist/ フォルダをホスティング
-- ライブリロード機能付き
+```bash
+# 開発サーバー起動（http://localhost:3000）
+npm run dev
+
+# プロダクションビルド
+npm run build
+
+# テスト実行
+npm test
+
+# テスト（ウォッチモード）
+npm run test:watch
+
+# カバレッジレポート付きテスト
+npm run test:coverage
+
+# デモページのデプロイ
+npm run deploy
+```
+
+### テスト要件
+- Jest使用、TypeScript対応
+- カバレッジ要件: 全指標で80%以上
+- 新機能追加時は必ずユニットテストを作成
+
+## 開発ワークフロー
 
 ### Examples作成時の必須手順
 
@@ -64,16 +101,17 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - 小さな単位で段階的に進行
 - キャッシュ活用で同一ファイル再読み込み回避
 
-## 注意事項
-
-- ファイルの変更や新規作成時は既存のコード規約に従ってください
-- コミット前に必ずビルドとテストを実行してください
-
-## メモリーログ
+## 重要な設計方針とメモリーログ
 
 - ライブラリの正式名称は「d3-thematika」です。
 - ライブラリは開発中のため後方互換を保つ必要はありません。
 - 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
-- **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する。
+- **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
+
+## 注意事項
+
+- ファイルの変更や新規作成時は既存のコード規約に従ってください
+- コミット前に必ずビルドとテストを実行してください
+- 新機能追加時は必ず対応するexamplesページを作成してください

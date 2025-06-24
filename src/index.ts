@@ -53,3 +53,4 @@ export { LegendLayer } from './layers/legend-layer';
 export * from './utils/effect-utils';
 export * from './utils/texture-utils';
 export * from './utils/test-utils';
+export * from './utils/gis-utils';

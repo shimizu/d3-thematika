@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIS Utilities - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+        .info-panel {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .info-item {
+            padding: 10px;
+            background-color: white;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 5px;
+        }
+        .info-value {
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GIS Utilities デモ</h1>
+        <p class="description">
+            GIS関連ユーティリティ関数（getBbox、getCentroid等）の使用例を示します。
+            日本のデータを例に、境界ボックスや中心点の計算結果を可視化します。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                <li>GIS関数: getBbox（境界ボックス）、getCentroid（中心点）、getBboxCenter（BBox中心）、expandBbox（BBox拡張）</li>
+                <li>可視化: 選択した国の境界ボックスと中心点を表示</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="country-select">国を選択:</label>
+                <select id="country-select">
+                    <option value="Japan" selected>日本</option>
+                    <option value="United States of America">アメリカ</option>
+                    <option value="China">中国</option>
+                    <option value="Brazil">ブラジル</option>
+                    <option value="Australia">オーストラリア</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="padding-slider">BBox拡張パディング: <span id="padding-value">0.2</span></label>
+                <input type="range" id="padding-slider" min="0" max="0.5" step="0.05" value="0.2">
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="info-panel">
+            <h3>計算結果</h3>
+            <div id="info-content" class="info-grid">
+                <!-- 計算結果がここに表示されます -->
+            </div>
+        </div>
+
+        <div class="code-example">
+            <pre>// GIS Utilities の使用例
+// 日本のデータを取得
+const japan = worldData.features.find(f => f.properties.name === 'Japan');
+
+// Bounding Box を取得
+const bbox = Thematika.getBbox(japan);
+// { minX: 122.93, minY: 24.04, maxX: 145.82, maxY: 45.52 }
+
+// 中心点を取得（座標の平均）
+const centroid = Thematika.getCentroid(japan);
+// { x: 138.25, y: 36.20 }
+
+// Bounding Box の中心を取得
+const bboxCenter = Thematika.getBboxCenter(bbox);
+// { x: 134.37, y: 34.78 }
+
+// Bounding Box を拡張（20%のパディング）
+const expandedBbox = Thematika.expandBbox(bbox, 0.2);
+
+// その他の便利な関数
+const dimensions = Thematika.getBboxDimensions(bbox);
+// { width: 22.89, height: 21.48 }
+
+const isValid = Thematika.isValidGeoJSON(japan);
+// true</pre>
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        let worldData = null;
+        let map = null;
+        let selectedCountryName = 'Japan';
+        
+        async function initializeMap() {
+            try {
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+                
+                // 世界地図データを読み込み
+                worldData = await d3.json('./geojson/world.geojson');
+                
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
+                
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+                
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [20, 20],
+                    attr: {
+                        fill: 'none',
+                        stroke: '#ddd',
+                        strokeWidth: 0.5,
+                        opacity: 0.6
+                    }
+                });
+                
+                // 世界地図レイヤー
+                const worldLayer = new Thematika.GeojsonLayer({
+                    data: worldData,
+                    attr: {
+                        fill: '#f0f0f0',
+                        stroke: '#999',
+                        strokeWidth: 0.5
+                    }
+                });
+                
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('world', worldLayer);
+                
+                // 初期表示
+                updateDisplay();
+                
+            } catch (error) {
+                console.error('マップの初期化に失敗しました:', error);
+                document.getElementById('info-content').innerHTML = 
+                    '<div class="info-item"><div class="info-label">エラー</div><div class="info-value">データの読み込みに失敗しました</div></div>';
+            }
+        }
+        
+        function updateDisplay() {
+            if (!worldData || !map) return;
+            
+            try {
+                // 選択された国を取得
+                const selectedCountry = worldData.features.find(f => f.properties.NAME === selectedCountryName);
+                
+                if (!selectedCountry) {
+                    console.warn(`Country not found: ${selectedCountryName}`);
+                    return;
+                }
+                
+                // 既存の強調表示を削除
+                if (map.hasLayer && map.hasLayer('selected-country')) {
+                    map.removeLayer('selected-country');
+                }
+                
+                // SVGオーバーレイを削除
+                d3.select('#map svg .overlays').remove();
+                
+                // 選択された国を強調表示
+                const countryLayer = new Thematika.GeojsonLayer({
+                    data: {
+                        type: 'FeatureCollection',
+                        features: [selectedCountry]
+                    },
+                    attr: {
+                        fill: '#ff6b6b',
+                        stroke: '#d63031',
+                        strokeWidth: 2,
+                        opacity: 0.8
+                    }
+                });
+                
+                map.addLayer('selected-country', countryLayer);
+                
+                // GIS関数を使用して計算
+                const bbox = Thematika.getBbox(selectedCountry);
+                const centroid = Thematika.getCentroid(selectedCountry);
+                const bboxCenter = Thematika.getBboxCenter(bbox);
+                const dimensions = Thematika.getBboxDimensions(bbox);
+                const paddingValue = parseFloat(document.getElementById('padding-slider').value);
+                const expandedBbox = Thematika.expandBbox(bbox, paddingValue);
+                
+                // 情報を表示
+                displayInfo(selectedCountry.properties.NAME, bbox, centroid, bboxCenter, dimensions, expandedBbox);
+                
+                // 可視化オーバーレイを追加
+                addVisualizationOverlay(bbox, centroid, bboxCenter, expandedBbox);
+                
+            } catch (error) {
+                console.error('表示の更新に失敗しました:', error);
+            }
+        }
+        
+        function displayInfo(countryName, bbox, centroid, bboxCenter, dimensions, expandedBbox) {
+            const infoContent = document.getElementById('info-content');
+            infoContent.innerHTML = `
+                <div class="info-item">
+                    <div class="info-label">国名</div>
+                    <div class="info-value">${countryName}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Bounding Box</div>
+                    <div class="info-value">
+                        X: ${bbox.minX.toFixed(2)} ～ ${bbox.maxX.toFixed(2)}<br>
+                        Y: ${bbox.minY.toFixed(2)} ～ ${bbox.maxY.toFixed(2)}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">中心点 (平均)</div>
+                    <div class="info-value">
+                        X: ${centroid.x.toFixed(2)}<br>
+                        Y: ${centroid.y.toFixed(2)}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">BBox中心</div>
+                    <div class="info-value">
+                        X: ${bboxCenter.x.toFixed(2)}<br>
+                        Y: ${bboxCenter.y.toFixed(2)}
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">寸法</div>
+                    <div class="info-value">
+                        幅: ${dimensions.width.toFixed(2)}°<br>
+                        高さ: ${dimensions.height.toFixed(2)}°
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">拡張BBox</div>
+                    <div class="info-value">
+                        X: ${expandedBbox.minX.toFixed(2)} ～ ${expandedBbox.maxX.toFixed(2)}<br>
+                        Y: ${expandedBbox.minY.toFixed(2)} ～ ${expandedBbox.maxY.toFixed(2)}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function addVisualizationOverlay(bbox, centroid, bboxCenter, expandedBbox) {
+            try {
+                const svg = d3.select('#map svg');
+                const projection = map.getProjection();
+                
+                // オーバーレイグループを作成
+                const overlay = svg.append('g').attr('class', 'overlays');
+                
+                // 通常のBounding Box
+                const bboxCorners = [
+                    [bbox.minX, bbox.minY],
+                    [bbox.maxX, bbox.minY],
+                    [bbox.maxX, bbox.maxY],
+                    [bbox.minX, bbox.maxY],
+                    [bbox.minX, bbox.minY]
+                ];
+                
+                const bboxPath = bboxCorners.map(d => projection(d)).filter(d => d);
+                
+                if (bboxPath.length > 0) {
+                    overlay.append('path')
+                        .datum(bboxPath)
+                        .attr('d', d3.line())
+                        .attr('fill', 'none')
+                        .attr('stroke', '#0984e3')
+                        .attr('stroke-width', 2)
+                        .attr('stroke-dasharray', '5,3');
+                }
+                
+                // 拡張されたBounding Box
+                const expandedCorners = [
+                    [expandedBbox.minX, expandedBbox.minY],
+                    [expandedBbox.maxX, expandedBbox.minY],
+                    [expandedBbox.maxX, expandedBbox.maxY],
+                    [expandedBbox.minX, expandedBbox.maxY],
+                    [expandedBbox.minX, expandedBbox.minY]
+                ];
+                
+                const expandedPath = expandedCorners.map(d => projection(d)).filter(d => d);
+                
+                if (expandedPath.length > 0) {
+                    overlay.append('path')
+                        .datum(expandedPath)
+                        .attr('d', d3.line())
+                        .attr('fill', 'none')
+                        .attr('stroke', '#fdcb6e')
+                        .attr('stroke-width', 2)
+                        .attr('stroke-dasharray', '10,5');
+                }
+                
+                // 中心点（平均）
+                const projectedCentroid = projection([centroid.x, centroid.y]);
+                if (projectedCentroid) {
+                    overlay.append('circle')
+                        .attr('cx', projectedCentroid[0])
+                        .attr('cy', projectedCentroid[1])
+                        .attr('r', 6)
+                        .attr('fill', '#00b894')
+                        .attr('stroke', '#00a085')
+                        .attr('stroke-width', 2);
+                }
+                
+                // BBox中心点
+                const projectedBboxCenter = projection([bboxCenter.x, bboxCenter.y]);
+                if (projectedBboxCenter) {
+                    overlay.append('circle')
+                        .attr('cx', projectedBboxCenter[0])
+                        .attr('cy', projectedBboxCenter[1])
+                        .attr('r', 6)
+                        .attr('fill', '#e17055')
+                        .attr('stroke', '#d63031')
+                        .attr('stroke-width', 2);
+                }
+                
+            } catch (error) {
+                console.error('可視化オーバーレイの追加に失敗しました:', error);
+            }
+        }
+        
+        // イベントリスナー
+        document.getElementById('country-select').addEventListener('change', function() {
+            selectedCountryName = this.value;
+            updateDisplay();
+        });
+        
+        document.getElementById('padding-slider').addEventListener('input', function() {
+            document.getElementById('padding-value').textContent = this.value;
+            updateDisplay();
+        });
+        
+        // 初期化
+        initializeMap();
+    </script>
+</body>
+</html>
