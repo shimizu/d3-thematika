@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PointCircleLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PointCircleLayer デモ</h1>
+        <p class="description">
+            PointCircleLayerを使用してGeoJSONデータをサークル要素として表示します。
+            ポイントはそのまま、ポリゴンやラインは中心点にサークルを配置します。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                <li>レイヤー: PointCircleLayer（サークル表示）、GraticuleLayer（経緯線）</li>
+                <li>機能: 半径調整、固定値/関数切り替え</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="radius-type">半径タイプ:</label>
+                <select id="radius-type">
+                    <option value="fixed" selected>固定値</option>
+                    <option value="index">インデックスベース</option>
+                    <option value="population">人口ベース</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="radius-slider">半径: <span id="radius-value">5</span></label>
+                <input type="range" id="radius-slider" min="1" max="20" step="1" value="5">
+            </div>
+            <div class="control-group">
+                <label for="fill-color">塗りつぶし色:</label>
+                <input type="color" id="fill-color" value="#ff6b6b">
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// PointCircleLayerの使用例
+
+const geojson = await d3.json("./geojson/world.geojson");
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoNaturalEarth1()
+});
+
+// PointCircleLayerインスタンスを作成
+const circleLayer = new Thematika.PointCircleLayer({
+    data: geojson,
+    r: 5, // 固定半径
+    attr: {
+        fill: '#ff6b6b',
+        stroke: '#d63031',
+        strokeWidth: 1,
+        opacity: 0.8
+    }
+});
+
+// または関数を使った動的半径設定
+const dynamicCircleLayer = new Thematika.PointCircleLayer({
+    data: geojson,
+    r: (feature, index) => {
+        // 人口に基づいて半径を決定
+        const population = feature.properties?.POP_EST || 0;
+        return Math.sqrt(population / 1000000) + 2;
+    },
+    attr: {
+        fill: (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
+        stroke: '#2d3436',
+        strokeWidth: 0.5
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('circles', circleLayer);
+
+// 半径を動的に更新
+circleLayer.updateRadius((feature, index) => index % 3 + 3);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        let map = null;
+        let circleLayer = null;
+        let worldData = null;
+
+        async function initializeDemo() {
+            try {
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 世界地図データを読み込み
+                worldData = await d3.json('./geojson/world.geojson');
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [20, 20],
+                    attr: {
+                        fill: 'none',
+                        stroke: '#ddd',
+                        strokeWidth: 0.5,
+                        opacity: 0.6
+                    }
+                });
+
+                // PointCircleLayerを作成
+                circleLayer = new Thematika.PointCircleLayer({
+                    data: worldData,
+                    r: 5,
+                    attr: {
+                        fill: '#ff6b6b',
+                        stroke: '#d63031',
+                        strokeWidth: 1,
+                        opacity: 0.8
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('circles', circleLayer);
+
+                // イベントリスナーを設定
+                setupEventListeners();
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            // 半径タイプの変更
+            document.getElementById('radius-type').addEventListener('change', updateCircles);
+            
+            // 半径スライダーの変更
+            document.getElementById('radius-slider').addEventListener('input', function() {
+                document.getElementById('radius-value').textContent = this.value;
+                updateCircles();
+            });
+            
+            // 色の変更
+            document.getElementById('fill-color').addEventListener('change', function() {
+                if (circleLayer) {
+                    circleLayer.setStyle({ fill: this.value });
+                }
+            });
+        }
+
+        function updateCircles() {
+            if (!circleLayer) return;
+
+            const radiusType = document.getElementById('radius-type').value;
+            const baseRadius = parseInt(document.getElementById('radius-slider').value);
+
+            let radiusFunction;
+
+            switch (radiusType) {
+                case 'fixed':
+                    radiusFunction = baseRadius;
+                    break;
+                case 'index':
+                    radiusFunction = (feature, index) => (index % 5) + baseRadius;
+                    break;
+                case 'population':
+                    radiusFunction = (feature, index) => {
+                        const population = feature.properties?.POP_EST || 0;
+                        return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
+                    };
+                    break;
+                default:
+                    radiusFunction = baseRadius;
+            }
+
+            circleLayer.updateRadius(radiusFunction);
+        }
+
+        // 初期化
+        initializeDemo();
+    </script>
+</body>
+</html>

@@ -80,7 +80,7 @@ export abstract class BaseLayer implements ILayer {
    */
   setStyle(style: LayerStyle): void {
     this.style = { ...this.style, ...style };
-    this.updateStyle();
+    this.updateLayerStyle();
   }
 
   /**
@@ -112,6 +112,14 @@ export abstract class BaseLayer implements ILayer {
    * スタイルを更新します（サブクラスでオーバーライド可能）
    * @protected
    */
+  /**
+   * レイヤーのスタイルを更新します（サブクラスでオーバーライド可能）
+   * @protected
+   */
+  protected updateLayerStyle(): void {
+    this.updateStyle();
+  }
+
   protected updateStyle(): void {
     if (!this.element) return;
 
@@ -189,7 +197,6 @@ export abstract class BaseLayer implements ILayer {
   ): void {
     BaseLayer.STYLE_PROPERTIES.forEach(({ key, method, attr }) => {
 
-      console.log("single", key)
       const value = this.style[key];
       const attrName = attr || key;
       
@@ -214,7 +221,6 @@ export abstract class BaseLayer implements ILayer {
       const value = this.style[key];
       const attrName = attr || key;
 
-      console.log("maluti", key)
 
       
       // clipPathは常にレイヤーグループに適用

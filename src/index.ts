@@ -37,6 +37,7 @@ export type {
 } from './types';
 export type { RasterLayerOptions } from './layers/raster-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
+export type { PointCircleLayerOptions } from './layers/point-circle-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
@@ -48,6 +49,7 @@ export { OutlineLayer } from './layers/outline-layer';
 export { GraticuleLayer } from './layers/graticule-layer';
 export { RasterLayer } from './layers/raster-layer';
 export { LegendLayer } from './layers/legend-layer';
+export { PointCircleLayer } from './layers/point-circle-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';
