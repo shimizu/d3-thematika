@@ -15,6 +15,10 @@ export interface RasterLayerOptions {
   style?: LayerStyle;
   /** bboxの四隅にマーカーを表示するかどうか */
   showBboxMarkers?: boolean;
+  /** 高度な再投影を使用するかどうか（デフォルト: true） */
+  useAdvancedReprojection?: boolean;
+  /** マスク処理を使用するかどうか（デフォルト: true） */
+  useMask?: boolean;
 }
 
 /**
@@ -41,6 +45,8 @@ export class RasterLayer extends BaseLayer {
     this.src = options.src;
     this.bounds = options.bounds;
     this.showBboxMarkers = options.showBboxMarkers ?? false;
+    this.useAdvancedReprojection = options.useAdvancedReprojection ?? true;
+    this.useMask = options.useMask ?? true;
   }
 
   /**
@@ -456,52 +462,7 @@ export class RasterLayer extends BaseLayer {
     });
   }
 
-  /**
-   * bboxマーカーの表示/非表示を切り替えます
-   * @param show - 表示するかどうか
-   */
-  public setShowBboxMarkers(show: boolean): void {
-    this.showBboxMarkers = show;
-    if (this.element) {
-      const selection = select(this.element);
-      if (show) {
-        // 再描画して表示
-        if (!this.element || !this.projection) return;
-        
-        // 既存の画像とマーカーを削除して再描画
-        selection.selectAll('image').remove();
-        selection.selectAll('.bbox-marker').remove();
-        selection.selectAll('.bbox-marker-label').remove();
-        
-        this.loadImage(this.src).then(img => {
-          // Equirectangular投影法の場合は高速描画
-          if (this.projection && this.isEquirectangularProjection(this.projection)) {
-            this.renderSimpleImage(img);
-          } else if (this.useAdvancedReprojection) {
-            // その他の投影法では高度な再投影を実行
-            this.renderAdvancedReprojection(img);
-          } else {
-            // フォールバック: 単純な画像配置
-            this.renderSimpleImage(img);
-          }
-        }).catch(error => {
-          console.error('RasterLayer: 更新に失敗しました', error);
-        });
-      } else {
-        // マーカーのみ削除
-        selection.selectAll('.bbox-marker').remove();
-        selection.selectAll('.bbox-marker-label').remove();
-      }
-    }
-  }
 
-  /**
-   * bboxマーカーが表示されているかを取得します
-   * @returns マーカーが表示されている場合はtrue
-   */
-  public getShowBboxMarkers(): boolean {
-    return this.showBboxMarkers;
-  }
 
   /**
    * 高度な再投影を使用して画像を描画します
@@ -818,69 +779,7 @@ export class RasterLayer extends BaseLayer {
     return result;
   }
 
-  /**
-   * 高度な再投影の使用を設定します
-   * @param use - 使用するかどうか
-   */
-  public setUseAdvancedReprojection(use: boolean): void {
-    this.useAdvancedReprojection = use;
-    if (this.isRendered()) {
-      if (!this.element || !this.projection) return;
-      
-      // 既存の画像とマーカーを削除して再描画
-      const selection = select(this.element);
-      selection.selectAll('image').remove();
-      selection.selectAll('.bbox-marker').remove();
-      selection.selectAll('.bbox-marker-label').remove();
-      
-      this.loadImage(this.src).then(img => {
-        // Equirectangular投影法の場合は高速描画
-        if (this.projection && this.isEquirectangularProjection(this.projection)) {
-          this.renderSimpleImage(img);
-        } else if (this.useAdvancedReprojection) {
-          // その他の投影法では高度な再投影を実行
-          this.renderAdvancedReprojection(img);
-        } else {
-          // フォールバック: 単純な画像配置
-          this.renderSimpleImage(img);
-        }
-      }).catch(error => {
-        console.error('RasterLayer: 更新に失敗しました', error);
-      });
-    }
-  }
 
-  /**
-   * マスク処理の使用を設定します
-   * @param use - 使用するかどうか
-   */
-  public setUseMask(use: boolean): void {
-    this.useMask = use;
-    if (this.isRendered()) {
-      if (!this.element || !this.projection) return;
-      
-      // 既存の画像とマーカーを削除して再描画
-      const selection = select(this.element);
-      selection.selectAll('image').remove();
-      selection.selectAll('.bbox-marker').remove();
-      selection.selectAll('.bbox-marker-label').remove();
-      
-      this.loadImage(this.src).then(img => {
-        // Equirectangular投影法の場合は高速描画
-        if (this.projection && this.isEquirectangularProjection(this.projection)) {
-          this.renderSimpleImage(img);
-        } else if (this.useAdvancedReprojection) {
-          // その他の投影法では高度な再投影を実行
-          this.renderAdvancedReprojection(img);
-        } else {
-          // フォールバック: 単純な画像配置
-          this.renderSimpleImage(img);
-        }
-      }).catch(error => {
-        console.error('RasterLayer: 更新に失敗しました', error);
-      });
-    }
-  }
 
 
 }

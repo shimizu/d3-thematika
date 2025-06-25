@@ -258,24 +258,29 @@ describe('RasterLayer', () => {
       expect(mockContainer.append).toHaveBeenCalledWith('g');
     });
 
-    test('setShowBboxMarkersで表示切り替えができる', () => {
-      expect(rasterLayer.getShowBboxMarkers()).toBe(false);
+    test('showBboxMarkersオプションが正しく設定される', () => {
+      // デフォルトはfalse
+      expect(rasterLayer['showBboxMarkers']).toBe(false);
       
-      rasterLayer.setShowBboxMarkers(true);
-      expect(rasterLayer.getShowBboxMarkers()).toBe(true);
-      
-      rasterLayer.setShowBboxMarkers(false);
-      expect(rasterLayer.getShowBboxMarkers()).toBe(false);
+      // trueを指定したレイヤー
+      const layerWithMarkers = new RasterLayer('test-markers', {
+        ...defaultOptions,
+        showBboxMarkers: true
+      });
+      expect(layerWithMarkers['showBboxMarkers']).toBe(true);
     });
 
-    test('既にレンダリング済みの場合は表示状態が即座に反映される', async () => {
-      // 先にレンダリング
-      await rasterLayer.render(mockContainer);
-      rasterLayer['element'] = { remove: jest.fn() } as any;
-
+    test('新しいオプションでインスタンス作成可能', () => {
+      const layerWithOptions = new RasterLayer('test-options', {
+        ...defaultOptions,
+        showBboxMarkers: true,
+        useAdvancedReprojection: false,
+        useMask: false
+      });
       
-      rasterLayer.setShowBboxMarkers(true);
-      // Test passes if no error is thrown
+      expect(layerWithOptions['showBboxMarkers']).toBe(true);
+      expect(layerWithOptions['useAdvancedReprojection']).toBe(false);
+      expect(layerWithOptions['useMask']).toBe(false);
     });
   });
 

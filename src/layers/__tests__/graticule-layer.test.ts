@@ -60,8 +60,8 @@ describe('GraticuleLayer', () => {
     test('デフォルト設定が正しく適用される', () => {
       const defaultLayer = new GraticuleLayer();
       
-      expect(defaultLayer.getStep()).toEqual([10, 10]);
-      expect(defaultLayer.getExtent()).toBeUndefined();
+      expect(defaultLayer['step']).toEqual([10, 10]);
+      expect(defaultLayer['extent']).toBeUndefined();
       expect(defaultLayer['style'].fill).toBe('none');
       expect(defaultLayer['style'].stroke).toBe('#cccccc');
       expect(defaultLayer['style'].strokeWidth).toBe(0.5);
@@ -82,8 +82,8 @@ describe('GraticuleLayer', () => {
 
       const customLayer = new GraticuleLayer(customOptions);
 
-      expect(customLayer.getStep()).toEqual([20, 20]);
-      expect(customLayer.getExtent()).toEqual([[-180, -90], [180, 90]]);
+      expect(customLayer['step']).toEqual([20, 20]);
+      expect(customLayer['extent']).toEqual([[-180, -90], [180, 90]]);
       expect(customLayer['style'].fill).toBe('blue');
       expect(customLayer['style'].stroke).toBe('red');
       expect(customLayer['style'].strokeWidth).toBe(1.5);
@@ -118,34 +118,41 @@ describe('GraticuleLayer', () => {
   });
 
   describe('step management', () => {
-    test('setStep()で間隔を変更できる', () => {
-      expect(graticuleLayer.getStep()).toEqual([15, 15]);
+    test('コンストラクタで間隔を設定できる', () => {
+      expect(graticuleLayer['step']).toEqual([15, 15]);
 
-      graticuleLayer.setStep([30, 30]);
-      expect(graticuleLayer.getStep()).toEqual([30, 30]);
+      const customStepLayer = new GraticuleLayer({
+        step: [30, 30]
+      });
+      expect(customStepLayer['step']).toEqual([30, 30]);
     });
 
-
     test('異なる経度・緯度間隔を設定できる', () => {
-      graticuleLayer.setStep([10, 5]);
-      expect(graticuleLayer.getStep()).toEqual([10, 5]);
+      const customStepLayer = new GraticuleLayer({
+        step: [10, 5]
+      });
+      expect(customStepLayer['step']).toEqual([10, 5]);
     });
   });
 
   describe('extent management', () => {
-    test('setExtent()で範囲を設定できる', () => {
+    test('コンストラクタで範囲を設定できる', () => {
       const extent: [[number, number], [number, number]] = [[-90, -45], [90, 45]];
       
-      graticuleLayer.setExtent(extent);
-      expect(graticuleLayer.getExtent()).toEqual(extent);
+      const customExtentLayer = new GraticuleLayer({
+        extent: extent
+      });
+      expect(customExtentLayer['extent']).toEqual(extent);
     });
 
-    test('setExtent()でundefinedを設定できる', () => {
-      graticuleLayer.setExtent([[-90, -45], [90, 45]]);
-      expect(graticuleLayer.getExtent()).toBeDefined();
+    test('コンストラクタでundefinedを設定できる', () => {
+      const layerWithExtent = new GraticuleLayer({
+        extent: [[-90, -45], [90, 45]]
+      });
+      expect(layerWithExtent['extent']).toBeDefined();
 
-      graticuleLayer.setExtent(undefined);
-      expect(graticuleLayer.getExtent()).toBeUndefined();
+      const layerWithoutExtent = new GraticuleLayer();
+      expect(layerWithoutExtent['extent']).toBeUndefined();
     });
 
   });
@@ -188,9 +195,13 @@ describe('GraticuleLayer', () => {
 
     test('extentが設定されている場合はgraticule.extent()が呼ばれる', () => {
       const extent: [[number, number], [number, number]] = [[-90, -45], [90, 45]];
-      graticuleLayer.setExtent(extent);
+      const layerWithExtent = new GraticuleLayer({
+        extent: extent
+      });
+      layerWithExtent['path'] = jest.fn() as any;
+      layerWithExtent['layerGroup'] = mockContainer;
 
-      graticuleLayer['renderGraticule']();
+      layerWithExtent['renderGraticule']();
 
       expect(mockGraticule.extent).toHaveBeenCalledWith(extent);
     });
@@ -276,17 +287,21 @@ describe('GraticuleLayer', () => {
 
   describe('parameter validation', () => {
     test('step配列の長さが2であることを確認', () => {
-      expect(graticuleLayer.getStep()).toHaveLength(2);
+      expect(graticuleLayer['step']).toHaveLength(2);
       
-      graticuleLayer.setStep([5, 10]);
-      expect(graticuleLayer.getStep()).toHaveLength(2);
+      const customLayer = new GraticuleLayer({
+        step: [5, 10]
+      });
+      expect(customLayer['step']).toHaveLength(2);
     });
 
     test('extent配列の構造が正しいことを確認', () => {
       const extent: [[number, number], [number, number]] = [[-180, -90], [180, 90]];
-      graticuleLayer.setExtent(extent);
+      const layerWithExtent = new GraticuleLayer({
+        extent: extent
+      });
       
-      const result = graticuleLayer.getExtent();
+      const result = layerWithExtent['extent'];
       expect(result).toHaveLength(2);
       expect(result![0]).toHaveLength(2);
       expect(result![1]).toHaveLength(2);
@@ -324,8 +339,8 @@ describe('GraticuleLayer', () => {
         extent: [[-180, -90], [180, 90]]
       });
 
-      expect(globalLayer.getStep()).toEqual([30, 15]);
-      expect(globalLayer.getExtent()).toEqual([[-180, -90], [180, 90]]);
+      expect(globalLayer['step']).toEqual([30, 15]);
+      expect(globalLayer['extent']).toEqual([[-180, -90], [180, 90]]);
     });
 
     test('地域限定の経緯線設定', () => {
@@ -334,8 +349,8 @@ describe('GraticuleLayer', () => {
         extent: [[120, 20], [150, 50]] // 日本周辺
       });
 
-      expect(regionalLayer.getStep()).toEqual([5, 5]);
-      expect(regionalLayer.getExtent()).toEqual([[120, 20], [150, 50]]);
+      expect(regionalLayer['step']).toEqual([5, 5]);
+      expect(regionalLayer['extent']).toEqual([[120, 20], [150, 50]]);
     });
 
     test('高密度経緯線設定', () => {
@@ -347,7 +362,7 @@ describe('GraticuleLayer', () => {
         }
       });
 
-      expect(denseLayer.getStep()).toEqual([1, 1]);
+      expect(denseLayer['step']).toEqual([1, 1]);
       expect(denseLayer['style'].strokeWidth).toBe(0.25);
       expect(denseLayer['style'].opacity).toBe(0.3);
     });

@@ -67,6 +67,8 @@ export interface ILayer {
   setZIndex(zIndex: number): void;
   /** レイヤーが描画されているかを確認する */
   isRendered(): boolean;
+  /** レイヤーのD3セレクションを取得する */
+  getLayerGroup(): Selection<SVGGElement, unknown, HTMLElement, any> | null;
 }
 
 /**

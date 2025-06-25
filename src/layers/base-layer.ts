@@ -97,6 +97,15 @@ export abstract class BaseLayer implements ILayer {
   }
 
   /**
+   * レイヤーのD3セレクションを取得します
+   * @returns レイヤーグループのD3セレクション、未描画の場合はnull
+   */
+  getLayerGroup(): Selection<SVGGElement, unknown, HTMLElement, any> | null {
+    if (!this.element) return null;
+    return select(this.element) as unknown as Selection<SVGGElement, unknown, HTMLElement, any>;
+  }
+
+  /**
    * 表示状態を更新します
    * @protected
    */

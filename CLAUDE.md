@@ -111,6 +111,63 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - **重要**: HTMLファイルでのスクリプト参照は必ず `<script src="thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
 
+### Immutableパターンの採用
+
+**基本方針**: レイヤーの状態変更は動的更新ではなく、新しいインスタンス作成で対応する
+
+- **禁止**: `setXxx()` メソッドによる動的な状態変更（setProjection除く）
+- **推奨**: 設定変更が必要な場合は新しいオプションで新しいインスタンスを作成
+- **例外**: `setProjection()` のみ許可（投影法の変更は必須機能のため）
+- **UIでの変更**: 設定変更時は `draw()` 関数内で地図全体を再作成
+
+#### 具体例
+
+```typescript
+// ❌ 動的変更（削除済み）
+layer.setStep([10, 10]);
+layer.setShowBboxMarkers(true);
+
+// ✅ 新インスタンス作成
+const newLayer = new GraticuleLayer({
+  step: [10, 10],
+  // その他のオプション
+});
+
+const newRasterLayer = new RasterLayer('id', {
+  src: 'image.png',
+  bounds: bounds,
+  showBboxMarkers: true,
+  useAdvancedReprojection: false
+});
+```
+
+#### examples/での実装
+
+UIコントロールの変更時は地図全体を再描画：
+
+```javascript
+function draw() {
+  // 既存の地図を削除
+  d3.select('#map').selectAll('*').remove();
+  
+  // UIの状態を取得
+  const showMarkers = document.getElementById('markers').checked;
+  
+  // 新しい設定で地図を再作成
+  const map = new Thematika.Map({...});
+  const layer = new Thematika.RasterLayer('raster', {
+    // ...
+    showBboxMarkers: showMarkers
+  });
+  map.addLayer('raster', layer);
+}
+
+// UI変更時に再描画
+document.getElementById('markers').addEventListener('change', draw);
+```
+
+この方針により、状態管理が単純化され、予期しない副作用を防止できる。
+
 ## コード品質チェックリスト（セッション間での品質維持のため必須）
 
 ### 作業開始前の必須確認（この順序で必ず実行）

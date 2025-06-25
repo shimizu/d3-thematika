@@ -55,18 +55,6 @@ export class PointCircleLayer extends BaseLayer {
   }
 
   /**
-   * 投影法を設定します
-   * @param projection - 地図投影法
-   */
-  setProjection(projection: GeoProjection): void {
-    this.projection = projection;
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('circle').remove();
-      this.renderCircles();
-    }
-  }
-
-  /**
    * レイヤーを描画します
    * @param container - 描画先のSVGコンテナ
    */

@@ -115,4 +115,5 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
   getData(): GeoJSON.FeatureCollection {
     return this.data;
   }
+
 }

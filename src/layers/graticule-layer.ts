@@ -74,29 +74,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
   }
 
 
-  /**
-   * 経緯線の間隔を設定します
-   * @param step - 新しい間隔 [経度間隔, 緯度間隔]
-   */
-  setStep(step: [number, number]): void {
-    this.step = step;
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.renderGraticule();
-    }
-  }
 
-  /**
-   * 経緯線の範囲を設定します
-   * @param extent - 新しい範囲 [[西端, 南端], [東端, 北端]]
-   */
-  setExtent(extent?: [[number, number], [number, number]]): void {
-    this.extent = extent;
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.renderGraticule();
-    }
-  }
 
   /**
    * 経緯線を描画します
@@ -133,19 +111,4 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     this.applyStylesToElement(graticulePath, graticuleGeometry, 0);
   }
 
-  /**
-   * 現在の経緯線間隔を取得します
-   * @returns 経緯線の間隔
-   */
-  getStep(): [number, number] {
-    return this.step;
-  }
-
-  /**
-   * 現在の経緯線範囲を取得します
-   * @returns 経緯線の範囲
-   */
-  getExtent(): [[number, number], [number, number]] | undefined {
-    return this.extent;
-  }
 }
