@@ -155,17 +155,23 @@ map.addLayer('raster', rasterLayer);</pre>
         async function draw() {
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-            const geojson = await d3.json('./geojson/world.geojson');
+            const geojson = await d3.json('./geojson/world.geojson');   
+
+
+            const aoi = await d3.json('./geojson/aflica_bbox.geojson');   
+
+            console.log('GeoJSON data loaded:', geojson);
 
             // 投影法を地図データに合わせて設定
-            currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+            currentProjection.fitExtent([[10, 10], [790, 390]], aoi);
 
             // 地図を作成
             map = new Thematika.Map({
                 container: '#map',
                 width: 800,
                 height: 400,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor:"#e6f3ff"
             });
 
             // 背景レイヤー（国境）
@@ -173,11 +179,10 @@ map.addLayer('raster', rasterLayer);</pre>
                 data: geojson,
                 attr: {
                     fill: '#ffffff',
-                    stroke: '#333333',
-                    strokeWidth: 0.5
+                    stroke: '#ff0000',
+                    strokeWidth: 2
                 }
             });
-            map.addLayer('countries', backgroundLayer);
 
             // ラスターレイヤー（アフリカの画像を使用）
             // GeoJSONと同じ座標を使用（西端は負の値）
@@ -189,9 +194,7 @@ map.addLayer('raster', rasterLayer);</pre>
 
             rasterLayer.setProjection(currentProjection);
             
-            //rasterLayer.setUseMask(false)
 
-            map.addLayer('raster', rasterLayer);
 
             // 経緯線レイヤー
             graticuleLayer = new Thematika.GraticuleLayer({
@@ -202,7 +205,11 @@ map.addLayer('raster', rasterLayer);</pre>
                     strokeDasharray: '2,2'
                 }
             });
+
+            map.addLayer('countries', backgroundLayer);
             map.addLayer('graticule', graticuleLayer);
+            map.addLayer('raster', rasterLayer);
+
         }
 
         draw();

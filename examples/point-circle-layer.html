@@ -177,7 +177,7 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
         let circleLayer = null;
         let worldData = null;
 
-        async function initializeDemo() {
+        async function draw() {
             try {
                 // 地図の寸法を取得
                 const mapElement = document.querySelector('#map');
@@ -234,6 +234,9 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
             }
         }
 
+        draw();
+
+
         function setupEventListeners() {
             // 半径タイプの変更
             document.getElementById('radius-type').addEventListener('change', updateCircles);
@@ -280,8 +283,6 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
             circleLayer.updateRadius(radiusFunction);
         }
 
-        // 初期化
-        initializeDemo();
     </script>
 </body>
 </html>
