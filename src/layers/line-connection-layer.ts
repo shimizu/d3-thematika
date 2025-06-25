@@ -22,6 +22,12 @@ export interface LineConnectionLayerOptions {
   arcControlPoint?: ArcControlPointType;
   /** アークオフセットの方向（デフォルト: 'perpendicular'） */
   arcOffset?: ArcOffsetType;
+  /** 開始点に矢印を表示（デフォルト: false） */
+  startArrow?: boolean;
+  /** 終了点に矢印を表示（デフォルト: false） */
+  endArrow?: boolean;
+  /** 矢印のサイズ（デフォルト: 10） */
+  arrowSize?: number;
 }
 
 /**
@@ -42,6 +48,12 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private arcControlPoint: ArcControlPointType;
   /** アークオフセットの方向 */
   private arcOffset: ArcOffsetType;
+  /** 開始点に矢印を表示 */
+  private startArrow: boolean;
+  /** 終了点に矢印を表示 */
+  private endArrow: boolean;
+  /** 矢印のサイズ */
+  private arrowSize: number;
   /** 投影法 */
   private projection?: GeoProjection;
 
@@ -61,6 +73,9 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     this.arcHeight = options.arcHeight || 0.3;
     this.arcControlPoint = options.arcControlPoint || 'center';
     this.arcOffset = options.arcOffset || 'perpendicular';
+    this.startArrow = options.startArrow || false;
+    this.endArrow = options.endArrow || false;
+    this.arrowSize = options.arrowSize || 10;
   }
 
   /**
@@ -118,6 +133,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    */
   render(container: Selection<SVGGElement, unknown, HTMLElement, any>): void {
     this.layerGroup = this.createLayerGroup(container);
+    this.createArrowMarkers();
     this.renderLines();
   }
 
@@ -127,6 +143,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   update(): void {
     if (this.layerGroup) {
       this.layerGroup.selectAll('path').remove();
+      this.layerGroup.selectAll('defs').remove();
+      this.createArrowMarkers();
       this.renderLines();
     }
   }
@@ -184,6 +202,80 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   }
 
   /**
+   * 開始点の矢印表示を更新します
+   * @param show - 矢印を表示するかどうか
+   */
+  updateStartArrow(show: boolean): void {
+    this.startArrow = show;
+    this.update();
+  }
+
+  /**
+   * 終了点の矢印表示を更新します
+   * @param show - 矢印を表示するかどうか
+   */
+  updateEndArrow(show: boolean): void {
+    this.endArrow = show;
+    this.update();
+  }
+
+  /**
+   * 矢印のサイズを更新します
+   * @param size - 矢印のサイズ
+   */
+  updateArrowSize(size: number): void {
+    this.arrowSize = size;
+    if (this.startArrow || this.endArrow) {
+      this.update();
+    }
+  }
+
+  /**
+   * 矢印のマーカーを作成します
+   * @private
+   */
+  private createArrowMarkers(): void {
+    if (!this.layerGroup || (!this.startArrow && !this.endArrow)) return;
+
+    const markerId = `arrow-${this.id}`;
+    
+    
+    // defsを作成
+    const defs = this.layerGroup.append('defs')
+      .attr('class', 'cartography-line-connection-defs');
+
+    // 開始点用の矢印マーカー
+    if (this.startArrow) {
+      defs.append('marker')
+        .attr('id', `${markerId}-start`)
+        .attr('viewBox', '0 0 10 10')
+        .attr('refX', 0)
+        .attr('refY', 5)
+        .attr('markerWidth', this.arrowSize / 2)
+        .attr('markerHeight', this.arrowSize / 2)
+        .attr('orient', 'auto-start-reverse')
+        .append('path')
+        .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+        .style('fill', (typeof this.style.stroke === 'function' ? '#333' : this.style.stroke) || '#333');
+    }
+
+    // 終了点用の矢印マーカー
+    if (this.endArrow) {
+      defs.append('marker')
+        .attr('id', `${markerId}-end`)
+        .attr('viewBox', '0 0 10 10')
+        .attr('refX', 10)
+        .attr('refY', 5)
+        .attr('markerWidth', this.arrowSize / 2)
+        .attr('markerHeight', this.arrowSize / 2)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+        .style('fill', (typeof this.style.stroke === 'function' ? '#333' : this.style.stroke) || '#333');
+    }
+  }
+
+  /**
    * ラインを描画します
    * @private
    */
@@ -207,6 +299,17 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
       })
       .style('fill', 'none')
       .style('cursor', 'pointer');
+
+    // 矢印マーカーを適用
+    if (this.startArrow || this.endArrow) {
+      const markerId = `arrow-${this.id}`;
+      if (this.startArrow) {
+        lines.attr('marker-start', `url(#${markerId}-start)`);
+      }
+      if (this.endArrow) {
+        lines.attr('marker-end', `url(#${markerId}-end)`);
+      }
+    }
 
     // スタイル属性を適用
     this.applyStylesToElements(lines, this.layerGroup);
