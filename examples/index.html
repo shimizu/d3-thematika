@@ -3,167 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartography ライブラリ テスト</title>
+    <title>d3-thematika Examples</title>
     <style>
         body {
             margin: 0;
             padding: 20px;
             font-family: system-ui, sans-serif;
             background: #f8f9fa;
+            line-height: 1.6;
         }
         
-        #map {
-            width: 100%;
-            aspect-ratio: 16/9;
-            margin: 20px auto;
-            display: block;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            position: relative;
-        }
-        
-        .info {
-            max-width: 800px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
             text-align: center;
             color: #666;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .example-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            text-decoration: none;
+        }
+        
+        .example-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .example-description {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+        }
+        
+        .example-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .category-header {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #34495e;
+            margin: 40px 0 20px 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 8px;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .github-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        .github-link:hover {
+            text-decoration: underline;
         }
     </style>
-
 </head>
 <body>
-    <div class="info">
-        <h1>Cartography ライブラリ テスト</h1>
-        <p>基本的な地図描画機能と新しいレイヤーシステムをテストします</p>
-        <p>上の地図：従来のAPI、下の地図：新しいレイヤークラスベースAPI</p>
-            </div>
-    
-    <div id="map"></div>
-    
-    <!-- D3.js CDN -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
-    
-    <!-- UMD版のライブラリを使用 -->
-    <script src="./thematika.umd.js"></script>
-    
-    <script>
-
-        // テクスチャとフィルターを定義
-        /*
-        const texture = Thematika.createDotsTexture({
-            id: 'circleTexture',
-            background: '#e0f7fa',
-            size: 4,
-            radius: 2
-        });
-        */
-
-        // テクスチャをプリセットから取得
-        const texture = Thematika.TexturePresets.lightOcean()
+    <div class="container">
+        <h1>d3-thematika Examples</h1>
+        <p class="subtitle">主題図作成ライブラリのサンプル集</p>
         
-
-
-
-        // SVGフィルターを作成
-        const effect = Thematika.FilterPresets.standardDropShadow()
-
-
-        /*
-        const shadowFilter = Thematika.createDropShadow({
-            id: 'mapShadow',
-            dx: 8,
-            dy: 8,
-            stdDeviation: 3,
-            floodColor: '#000000',
-            floodOpacity: 1
-        });
-        */
-        
-        async function draw() {
-            const id = "#map"
-
-           const geojson =  await d3.json("geojson/takasaki/building.geojson");
-
-
-
-
-            const width = document.querySelector(id).clientWidth ;
-            const height = document.querySelector(id).clientHeight;
-
-            // D3.jsの投影法を使用して地図の投影を設定（マージン付き）
-            const projection = d3.geoEquirectangular()
-                .fitExtent([[10, 10], [width-10, height-10]], geojson);
-
-                
-
-            // === 新しいAPI（レイヤークラスベース） ===
-            const map = new Thematika.Map({
-                container: '#map',
-                width: width,
-                height: height,
-                defs: [texture, effect], 
-                projection: projection
-            });
-
-
-            const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
-
-            // GeojsonLayerインスタンスを作成
-            const worldLayer = new Thematika.GeojsonLayer({
-                data: geojson,                
-                attr: { 
-                    fill:(d,i)=> fillStyles[i%3] , 
-                    filter: effect.url(), 
-                    stroke: '#1a3d1f',
-                    strokeWidth: 0.8,
-                    opacity: (d,i) => 0.9,
-                }
-            });
-
-
-
-
-            // OutlineLayerインスタンスを作成（クリップパス機能付き）
-            const outlineLayer = new Thematika.OutlineLayer({
-                createClipPath: true,
-                clipPathId: 'earth-outline-clip',
-                attr: {
-                    fill: 'none',
-                    stroke: '#2c3e50',
-                    strokeWidth: 2,
-                    opacity: 0.8
-                }
-            });
-
-            // GraticuleLayerインスタンスを作成
-            const graticuleLayer = new Thematika.GraticuleLayer({
-                step: [10, 10], // 10度間隔
-                attr: {
-                    fill: 'none',
-                    stroke: '#000',
-                    strokeWidth: 0.5,
-                    strokeDasharray: '2, 2',
-                    opacity: 0.9
-                }
-            });
-
-            // レイヤーインスタンスを地図に追加
-            map.addLayer('graticule', graticuleLayer);
-            map.addLayer('outline', outlineLayer);
-            map.addLayer('world_new', worldLayer);
-
-
-
+        <div class="category-header">基本レイヤー</div>
+        <div class="examples-grid">
+            <a href="geojson-layer.html" class="example-card">
+                <div class="example-title">GeoJSONレイヤー</div>
+                <div class="example-description">GeoJSONデータを表示する基本的なレイヤー。様々なスタイルオプションと動的スタイル関数の使用例。</div>
+                <div class="example-tags">
+                    <span class="tag">GeoJSON</span>
+                    <span class="tag">基本</span>
+                    <span class="tag">スタイル</span>
+                </div>
+            </a>
             
-        }
-
-        draw()
-
-
-
-
-    </script>
+            <a href="point-circle-layer.html" class="example-card">
+                <div class="example-title">ポイント円レイヤー</div>
+                <div class="example-description">GeoJSONのフィーチャを円で表示するレイヤー。サイズや色を動的に変更できます。</div>
+                <div class="example-tags">
+                    <span class="tag">ポイント</span>
+                    <span class="tag">円</span>
+                    <span class="tag">動的サイズ</span>
+                </div>
+            </a>
+            
+            <a href="raster-layer.html" class="example-card">
+                <div class="example-title">ラスターレイヤー</div>
+                <div class="example-description">画像データを地図投影に合わせて表示するレイヤー。衛星画像や地形データの表示に最適。</div>
+                <div class="example-tags">
+                    <span class="tag">ラスター</span>
+                    <span class="tag">画像</span>
+                    <span class="tag">投影変換</span>
+                </div>
+            </a>
+            
+            <a href="legend-layer.html" class="example-card">
+                <div class="example-title">凡例レイヤー</div>
+                <div class="example-description">地図の凡例を自動生成するレイヤー。D3スケールと連携して様々な凡例タイプに対応。</div>
+                <div class="example-tags">
+                    <span class="tag">凡例</span>
+                    <span class="tag">スケール</span>
+                    <span class="tag">自動生成</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="category-header">線・接続レイヤー</div>
+        <div class="examples-grid">
+            <a href="line-connection-layer.html" class="example-card">
+                <div class="example-title">線接続レイヤー</div>
+                <div class="example-description">2点間を直線または弧で結ぶレイヤー。都市間の接続や移動経路の可視化に使用。</div>
+                <div class="example-tags">
+                    <span class="tag">線</span>
+                    <span class="tag">接続</span>
+                    <span class="tag">弧</span>
+                </div>
+            </a>
+            
+            <a href="line-connection-arrow.html" class="example-card">
+                <div class="example-title">矢印付き線接続</div>
+                <div class="example-description">始点・終点に矢印を付けることができる線接続レイヤー。方向性のある移動やフローの表現。</div>
+                <div class="example-tags">
+                    <span class="tag">矢印</span>
+                    <span class="tag">方向</span>
+                    <span class="tag">フロー</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="category-header">エフェクト・ユーティリティ</div>
+        <div class="examples-grid">
+            <a href="clip-polygon.html" class="example-card">
+                <div class="example-title">クリップポリゴン</div>
+                <div class="example-description">ポリゴンの形状でマップをクリップする機能のデモ。特定の領域のみを表示したい場合に使用。</div>
+                <div class="example-tags">
+                    <span class="tag">クリップ</span>
+                    <span class="tag">マスク</span>
+                    <span class="tag">領域制限</span>
+                </div>
+            </a>
+            
+            <a href="gis-utils.html" class="example-card">
+                <div class="example-title">GISユーティリティ</div>
+                <div class="example-description">地理空間データ処理のユーティリティ関数の使用例。座標変換や距離計算など。</div>
+                <div class="example-tags">
+                    <span class="tag">GIS</span>
+                    <span class="tag">ユーティリティ</span>
+                    <span class="tag">計算</span>
+                </div>
+            </a>
+            
+            <a href="playground.html" class="example-card">
+                <div class="example-title">プレイグラウンド</div>
+                <div class="example-description">複数の機能を組み合わせた実験的なデモ。新しいアイデアやテスト用。</div>
+                <div class="example-tags">
+                    <span class="tag">実験</span>
+                    <span class="tag">複合</span>
+                    <span class="tag">テスト</span>
+                </div>
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>
+                <a href="https://github.com/shimizu/d3-thematika" class="github-link">GitHub リポジトリ</a> |
+                ライブラリバージョン: 1.0.0
+            </p>
+        </div>
+    </div>
 </body>
 </html>
