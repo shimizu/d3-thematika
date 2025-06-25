@@ -213,8 +213,8 @@ const width = document.querySelector("#map").clientWidth ;
 const height = document.querySelector("#map").clientHeight;
 
 // D3.jsの投影法を使用して地図の投影を設定
-const projection = d3.geoEqualEarth()
-    .fitExtent([[5, 5], [width-5, height-5]], geojson);
+const projection = d3.geoEquirectangular()
+    .fitExtent([[15, 15], [width-15, height-15]], geojson);
 
 // Thematika.Map インスタンスを作成
 const map = new Thematika.Map({
@@ -394,8 +394,8 @@ const width = document.querySelector("#map").clientWidth ;
 const height = document.querySelector("#map").clientHeight;
 
 // D3.jsの投影法を使用して地図の投影を設定
-const projection = d3.geoEqualEarth()
-    .fitExtent([[5, 5], [width-5, height-5]], geojson);
+const projection = d3.geoEquirectangular()
+    .fitExtent([[15, 15], [width-15, height-15]], geojson);
 
 // Thematika.Map インスタンスを作成
 const map = new Thematika.Map({
@@ -528,23 +528,21 @@ map.addLayer('world', worldLayer);
 map.addLayer('outline', outlineLayer);`,
 
       texture: `// テクスチャフィルの例
-const texture1 = Thematika.TexturePresets.diagonalStripes();
-const texture2 = Thematika.TexturePresets.dots();
-const shadow = Thematika.FilterPresets.standardDropShadow();
+const texture1 = Thematika.TexturePresets.standardForest();
+const texture2 = Thematika.TexturePresets.simpleDots();
 
 const geojson = await d3.json("geojson/world.geojson");
 const width = document.querySelector("#map").clientWidth;
 const height = document.querySelector("#map").clientHeight;
 
-const projection = d3.geoAzimuthalEqualArea()
+const projection = d3.geoMercator()
     .fitExtent([[20, 20], [width-20, height-20]], geojson)
-    .rotate([0, -90]);
 
 const map = new Thematika.Map({
     container: '#map',
     width: width,
     height: height,
-    defs: [texture1, texture2, shadow],
+    defs: [texture1, texture2],
     projection: projection
 });
 
@@ -559,7 +557,6 @@ const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: { 
         fill: (d, i) => fillPatterns[i % fillPatterns.length],
-        filter: shadow.url(),
         stroke: '#2e7d32',
         strokeWidth: 0.8
     }
@@ -573,7 +570,7 @@ const width = document.querySelector("#map").clientWidth;
 const height = document.querySelector("#map").clientHeight;
 
 // Mollweide投影法
-const projection = d3.geoMollweide()
+const projection = d3.geoInterruptedMollweideHemispheres()
     .fitExtent([[10, 10], [width-10, height-10]], geojson);
 
 const map = new Thematika.Map({
@@ -604,8 +601,22 @@ const graticuleLayer = new Thematika.GraticuleLayer({
     }
 });
 
+// 太い輪郭線
+const outlineLayer = new Thematika.OutlineLayer({
+    attr: {
+        fill: 'none',
+        stroke: '#1976d2',
+        strokeWidth: 4,
+        strokeLinejoin: 'round',
+    },
+    createClipPath: true,
+
+});
+
 map.addLayer('graticule', graticuleLayer);
 map.addLayer('world', worldLayer);
+map.addLayer('outline', outlineLayer);
+
 
 // 他の投影法の例:
 // d3.geoWinkelTripel()

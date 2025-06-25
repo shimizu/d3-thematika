@@ -87,14 +87,19 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
    * @private
    */
   private renderOutline(): void {
+
     if (!this.layerGroup || !this.path) return;
 
     // Sphereジオメトリを使用してアウトラインパスを生成
     const sphereGeometry = { type: "Sphere" as const };
     const outlinePathData = this.path(sphereGeometry);
+
     
+            console.log(this.createClipPath, outlinePathData);
+
     // クリップパスを作成（オプションが有効な場合）
     if (this.createClipPath && outlinePathData) {
+
       // SVG要素を取得
       const svg = this.layerGroup.node()?.closest('svg');
       if (svg) {
@@ -112,7 +117,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
           .attr('d', outlinePathData);
         
         // cartography-main-groupにクリップパスを適用
-        const mainGroup = svgSelection.select('.cartography-main-group');
+        const mainGroup = svgSelection.select('.thematika-main-group');
         if (!mainGroup.empty()) {
           mainGroup.attr('clip-path', this.getClipPathUrl());
         }
