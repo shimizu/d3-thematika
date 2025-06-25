@@ -84,7 +84,7 @@
         async function draw() {
             const id = "#map"
 
-           const geojson =  await d3.json("geojson/world.geojson");
+           const geojson =  await d3.json("geojson/takasaki/building.geojson");
 
 
 
@@ -93,7 +93,7 @@
             const height = document.querySelector(id).clientHeight;
 
             // D3.jsの投影法を使用して地図の投影を設定（マージン付き）
-            const projection = d3.geoEqualEarth()
+            const projection = d3.geoEquirectangular()
                 .fitExtent([[10, 10], [width-10, height-10]], geojson);
 
                 
