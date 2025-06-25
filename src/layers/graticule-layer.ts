@@ -59,7 +59,8 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
   setProjection(projection: GeoProjection): void {
     this.path = geoPath(projection);
     if (this.layerGroup) {
-      this.update();
+      this.layerGroup.selectAll('path').remove();
+      this.renderGraticule();
     }
   }
 
@@ -72,15 +73,6 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     this.renderGraticule();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.renderGraticule();
-    }
-  }
 
   /**
    * 経緯線の間隔を設定します
@@ -88,7 +80,10 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
    */
   setStep(step: [number, number]): void {
     this.step = step;
-    this.update();
+    if (this.layerGroup) {
+      this.layerGroup.selectAll('path').remove();
+      this.renderGraticule();
+    }
   }
 
   /**
@@ -97,7 +92,10 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
    */
   setExtent(extent?: [[number, number], [number, number]]): void {
     this.extent = extent;
-    this.update();
+    if (this.layerGroup) {
+      this.layerGroup.selectAll('path').remove();
+      this.renderGraticule();
+    }
   }
 
   /**

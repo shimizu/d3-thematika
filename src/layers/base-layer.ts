@@ -60,10 +60,6 @@ export abstract class BaseLayer implements ILayer {
    */
   abstract render(container: Selection<SVGGElement, unknown, HTMLElement, any>): void;
 
-  /**
-   * レイヤーを更新します（サブクラスで実装）
-   */
-  abstract update(): void;
 
   /**
    * レイヤーを削除します

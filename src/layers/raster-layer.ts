@@ -50,7 +50,28 @@ export class RasterLayer extends BaseLayer {
   public setProjection(projection: GeoProjection): void {
     this.projection = projection;
     if (this.isRendered()) {
-      this.update();
+      if (!this.element || !this.projection) return;
+      
+      // 既存の画像とマーカーを削除して再描画
+      const selection = select(this.element);
+      selection.selectAll('image').remove();
+      selection.selectAll('.bbox-marker').remove();
+      selection.selectAll('.bbox-marker-label').remove();
+      
+      this.loadImage(this.src).then(img => {
+        // Equirectangular投影法の場合は高速描画
+        if (this.projection && this.isEquirectangularProjection(this.projection)) {
+          this.renderSimpleImage(img);
+        } else if (this.useAdvancedReprojection) {
+          // その他の投影法では高度な再投影を実行
+          this.renderAdvancedReprojection(img);
+        } else {
+          // フォールバック: 単純な画像配置
+          this.renderSimpleImage(img);
+        }
+      }).catch(error => {
+        console.error('RasterLayer: 更新に失敗しました', error);
+      });
     }
   }
 
@@ -94,33 +115,6 @@ export class RasterLayer extends BaseLayer {
 
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  public update(): void {
-    if (!this.element || !this.projection) return;
-    
-    // 既存の画像とマーカーを削除して再描画
-    const selection = select(this.element);
-    selection.selectAll('image').remove();
-    selection.selectAll('.bbox-marker').remove();
-    selection.selectAll('.bbox-marker-label').remove();
-    
-    this.loadImage(this.src).then(img => {
-      // Equirectangular投影法の場合は高速描画
-      if (this.projection && this.isEquirectangularProjection(this.projection)) {
-        this.renderSimpleImage(img);
-      } else if (this.useAdvancedReprojection) {
-        // その他の投影法では高度な再投影を実行
-        this.renderAdvancedReprojection(img);
-      } else {
-        // フォールバック: 単純な画像配置
-        this.renderSimpleImage(img);
-      }
-    }).catch(error => {
-      console.error('RasterLayer: 更新に失敗しました', error);
-    });
-  }
 
   /**
    * 画像を読み込みます
@@ -472,7 +466,27 @@ export class RasterLayer extends BaseLayer {
       const selection = select(this.element);
       if (show) {
         // 再描画して表示
-        this.update();
+        if (!this.element || !this.projection) return;
+        
+        // 既存の画像とマーカーを削除して再描画
+        selection.selectAll('image').remove();
+        selection.selectAll('.bbox-marker').remove();
+        selection.selectAll('.bbox-marker-label').remove();
+        
+        this.loadImage(this.src).then(img => {
+          // Equirectangular投影法の場合は高速描画
+          if (this.projection && this.isEquirectangularProjection(this.projection)) {
+            this.renderSimpleImage(img);
+          } else if (this.useAdvancedReprojection) {
+            // その他の投影法では高度な再投影を実行
+            this.renderAdvancedReprojection(img);
+          } else {
+            // フォールバック: 単純な画像配置
+            this.renderSimpleImage(img);
+          }
+        }).catch(error => {
+          console.error('RasterLayer: 更新に失敗しました', error);
+        });
       } else {
         // マーカーのみ削除
         selection.selectAll('.bbox-marker').remove();
@@ -811,7 +825,28 @@ export class RasterLayer extends BaseLayer {
   public setUseAdvancedReprojection(use: boolean): void {
     this.useAdvancedReprojection = use;
     if (this.isRendered()) {
-      this.update();
+      if (!this.element || !this.projection) return;
+      
+      // 既存の画像とマーカーを削除して再描画
+      const selection = select(this.element);
+      selection.selectAll('image').remove();
+      selection.selectAll('.bbox-marker').remove();
+      selection.selectAll('.bbox-marker-label').remove();
+      
+      this.loadImage(this.src).then(img => {
+        // Equirectangular投影法の場合は高速描画
+        if (this.projection && this.isEquirectangularProjection(this.projection)) {
+          this.renderSimpleImage(img);
+        } else if (this.useAdvancedReprojection) {
+          // その他の投影法では高度な再投影を実行
+          this.renderAdvancedReprojection(img);
+        } else {
+          // フォールバック: 単純な画像配置
+          this.renderSimpleImage(img);
+        }
+      }).catch(error => {
+        console.error('RasterLayer: 更新に失敗しました', error);
+      });
     }
   }
 
@@ -822,7 +857,28 @@ export class RasterLayer extends BaseLayer {
   public setUseMask(use: boolean): void {
     this.useMask = use;
     if (this.isRendered()) {
-      this.update();
+      if (!this.element || !this.projection) return;
+      
+      // 既存の画像とマーカーを削除して再描画
+      const selection = select(this.element);
+      selection.selectAll('image').remove();
+      selection.selectAll('.bbox-marker').remove();
+      selection.selectAll('.bbox-marker-label').remove();
+      
+      this.loadImage(this.src).then(img => {
+        // Equirectangular投影法の場合は高速描画
+        if (this.projection && this.isEquirectangularProjection(this.projection)) {
+          this.renderSimpleImage(img);
+        } else if (this.useAdvancedReprojection) {
+          // その他の投影法では高度な再投影を実行
+          this.renderAdvancedReprojection(img);
+        } else {
+          // フォールバック: 単純な画像配置
+          this.renderSimpleImage(img);
+        }
+      }).catch(error => {
+        console.error('RasterLayer: 更新に失敗しました', error);
+      });
     }
   }
 

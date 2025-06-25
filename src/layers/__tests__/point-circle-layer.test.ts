@@ -174,77 +174,8 @@ describe('PointCircleLayer', () => {
       expect(pointCircleLayer['projection']).toBe(mockProjection);
     });
 
-    test('updateProjection()で投影法を更新できる', () => {
-      pointCircleLayer['layerGroup'] = mockContainer;
-      pointCircleLayer.updateProjection(mockProjection);
-      expect(pointCircleLayer['projection']).toBe(mockProjection);
-    });
   });
 
-  describe('data management', () => {
-    test('updateData()でデータを更新できる', () => {
-      const newGeoJSON: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          properties: { name: 'New Point' },
-          geometry: {
-            type: 'Point',
-            coordinates: [0, 0]
-          }
-        }]
-      };
-
-      pointCircleLayer['layerGroup'] = mockContainer;
-      pointCircleLayer.updateData(newGeoJSON);
-
-      expect(pointCircleLayer.getData()).toEqual(newGeoJSON);
-    });
-
-    test('配列データをupdateData()で更新できる', () => {
-      const newFeatures = [{
-        type: 'Feature' as const,
-        properties: { name: 'Array Point' },
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [1, 1]
-        }
-      }];
-
-      pointCircleLayer['layerGroup'] = mockContainer;
-      pointCircleLayer.updateData(newFeatures);
-
-      const result = pointCircleLayer.getData();
-      expect(result.type).toBe('FeatureCollection');
-      expect(result.features).toEqual(newFeatures);
-    });
-  });
-
-  describe('radius management', () => {
-    test('updateRadius()で固定半径を更新できる', () => {
-      pointCircleLayer.updateRadius(15);
-      
-      const radiusFunction = pointCircleLayer.getRadiusFunction();
-      expect(radiusFunction({} as any, 0)).toBe(15);
-    });
-
-    test('updateRadius()で関数半径を更新できる', () => {
-      const newRadiusFunc = (feature: GeoJSON.Feature, index: number) => index * 2 + 3;
-      pointCircleLayer.updateRadius(newRadiusFunc);
-      
-      const radiusFunction = pointCircleLayer.getRadiusFunction();
-      expect(radiusFunction({} as any, 3)).toBe(9);
-    });
-
-    test('updateRadius()後にupdate()が呼ばれる', () => {
-      const updateSpy = jest.spyOn(pointCircleLayer, 'update');
-      pointCircleLayer['layerGroup'] = mockContainer;
-      
-      pointCircleLayer.updateRadius(20);
-      
-      expect(updateSpy).toHaveBeenCalled();
-    });
-  });
 
   describe('render', () => {
     test('render()でレイヤーグループが作成される', () => {
@@ -269,22 +200,6 @@ describe('PointCircleLayer', () => {
     });
   });
 
-  describe('update', () => {
-    test('update()で既存の要素が削除される', () => {
-      const mockSubSelection = {
-        remove: jest.fn()
-      };
-      const mockLayerGroup = {
-        selectAll: jest.fn(() => mockSubSelection)
-      };
-      
-      pointCircleLayer['layerGroup'] = mockLayerGroup as any;
-      pointCircleLayer.update();
-
-      expect(mockLayerGroup.selectAll).toHaveBeenCalledWith('circle');
-      expect(mockSubSelection.remove).toHaveBeenCalled();
-    });
-  });
 
   describe('event handling', () => {
     test('on()でイベントリスナーを追加できる', () => {
@@ -347,9 +262,12 @@ describe('PointCircleLayer', () => {
         }
       };
 
-      pointCircleLayer['projection'] = mockProjection;
-      pointCircleLayer['layerGroup'] = mockContainer;
-      pointCircleLayer.updateData({ type: 'FeatureCollection', features: [pointFeature] });
+      const layer = new PointCircleLayer({
+        data: { type: 'FeatureCollection', features: [pointFeature] }
+      });
+      layer['projection'] = mockProjection;
+      layer['layerGroup'] = mockContainer;
+      layer.render(mockContainer);
 
       // renderCircles内でPoint座標が直接使用されることを確認
       expect(mockProjection).toHaveBeenCalledWith([10, 20]);
@@ -365,9 +283,12 @@ describe('PointCircleLayer', () => {
         }
       };
 
-      pointCircleLayer['projection'] = mockProjection;
-      pointCircleLayer['layerGroup'] = mockContainer;
-      pointCircleLayer.updateData({ type: 'FeatureCollection', features: [polygonFeature] });
+      const layer = new PointCircleLayer({
+        data: { type: 'FeatureCollection', features: [polygonFeature] }
+      });
+      layer['projection'] = mockProjection;
+      layer['layerGroup'] = mockContainer;
+      layer.render(mockContainer);
 
       // 中心点が計算されて投影法に渡されることを確認（具体的な値は getCentroid の実装に依存）
       expect(mockProjection).toHaveBeenCalled();

@@ -9,9 +9,6 @@ class TestLayer extends BaseLayer {
     this.createLayerGroup(container);
   }
 
-  update(): void {
-    // テスト用の空実装
-  }
 }
 
 describe('BaseLayer', () => {

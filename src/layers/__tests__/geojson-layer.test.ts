@@ -134,54 +134,8 @@ describe('GeojsonLayer', () => {
       expect(geojsonLayer['path']).toBeDefined();
     });
 
-    test('updateProjection()で投影法を更新できる', () => {
-      const mockPath = jest.fn() as any;
-      geojsonLayer['path'] = mockPath;
-      geojsonLayer['layerGroup'] = mockContainer;
-
-      geojsonLayer.updateProjection(mockProjection);
-      expect(geojsonLayer['path']).toBeDefined();
-    });
   });
 
-  describe('data management', () => {
-    test('updateData()でデータを更新できる', () => {
-      const newGeoJSON: GeoJSON.FeatureCollection = {
-        type: 'FeatureCollection',
-        features: [{
-          type: 'Feature',
-          properties: { name: 'New Feature' },
-          geometry: {
-            type: 'Point',
-            coordinates: [0, 0]
-          }
-        }]
-      };
-
-      geojsonLayer['layerGroup'] = mockContainer;
-      geojsonLayer.updateData(newGeoJSON);
-
-      expect(geojsonLayer.getData()).toEqual(newGeoJSON);
-    });
-
-    test('配列データをupdateData()で更新できる', () => {
-      const newFeatures = [{
-        type: 'Feature' as const,
-        properties: { name: 'Array Feature' },
-        geometry: {
-          type: 'Point' as const,
-          coordinates: [1, 1]
-        }
-      }];
-
-      geojsonLayer['layerGroup'] = mockContainer;
-      geojsonLayer.updateData(newFeatures);
-
-      const result = geojsonLayer.getData();
-      expect(result.type).toBe('FeatureCollection');
-      expect(result.features).toEqual(newFeatures);
-    });
-  });
 
   describe('render', () => {
     test('render()でレイヤーグループが作成される', () => {
@@ -207,22 +161,6 @@ describe('GeojsonLayer', () => {
     });
   });
 
-  describe('update', () => {
-    test('update()で既存の要素が削除される', () => {
-      const mockSubSelection = {
-        remove: jest.fn()
-      };
-      const mockLayerGroup = {
-        selectAll: jest.fn(() => mockSubSelection)
-      };
-      
-      geojsonLayer['layerGroup'] = mockLayerGroup as any;
-      geojsonLayer.update();
-
-      expect(mockLayerGroup.selectAll).toHaveBeenCalledWith('path');
-      expect(mockSubSelection.remove).toHaveBeenCalled();
-    });
-  });
 
   describe('event handling', () => {
     test('on()でイベントリスナーを追加できる', () => {

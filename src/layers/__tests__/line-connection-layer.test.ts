@@ -179,91 +179,9 @@ describe('LineConnectionLayer', () => {
       expect(layer.isRendered()).toBe(false);
     });
 
-    it('投影法設定後にupdate()が呼ばれる', () => {
-      const layer = new LineConnectionLayer({ data: testData });
-      layer.render(container);
-      
-      const updateSpy = jest.spyOn(layer, 'update');
-      const projection = geoMercator();
-      
-      layer.setProjection(projection);
-      
-      expect(updateSpy).toHaveBeenCalled();
-    });
   });
 
-  describe('data management', () => {
-    it('updateData()でデータを更新できる', () => {
-      const layer = new LineConnectionLayer({ data: testData });
-      
-      const newData: LineConnectionData[] = [
-        { start: [139.6917, 35.6895], end: [135.5023, 34.6937] }
-      ];
-      
-      layer.updateData(newData);
-      
-      // データが更新されたかは内部状態なので、直接的な確認は困難
-      // エラーが発生しないことで正常性を確認
-      expect(layer.id).toMatch(/^line-connection-/);
-    });
 
-    it('updateData()で無効なデータを渡すとエラーが発生する', () => {
-      const layer = new LineConnectionLayer({ data: testData });
-      
-      expect(() => {
-        layer.updateData([{ start: 'invalid' } as any]);
-      }).toThrow();
-    });
-  });
-
-  describe('line type management', () => {
-    it('updateLineType()でライン描画タイプを更新できる', () => {
-      const layer = new LineConnectionLayer({ data: testData });
-      
-      layer.updateLineType('arc');
-      
-      // タイプが更新されたかは内部状態なので、エラーが発生しないことで確認
-      expect(layer.id).toMatch(/^line-connection-/);
-    });
-
-    it('updateArcHeight()でアーク高さを更新できる', () => {
-      const layer = new LineConnectionLayer({ 
-        data: testData,
-        lineType: 'arc'
-      });
-      
-      layer.updateArcHeight(0.7);
-      
-      // 高さが更新されたかは内部状態なので、エラーが発生しないことで確認
-      expect(layer.id).toMatch(/^line-connection-/);
-    });
-
-    it('updateArcControlPoint()でアーク制御点を更新できる', () => {
-      const layer = new LineConnectionLayer({ 
-        data: testData,
-        lineType: 'arc'
-      });
-      
-      layer.updateArcControlPoint('weighted');
-      layer.updateArcControlPoint([100, 50]);
-      
-      // 制御点が更新されたかは内部状態なので、エラーが発生しないことで確認
-      expect(layer.id).toMatch(/^line-connection-/);
-    });
-
-    it('updateArcOffset()でアークオフセットを更新できる', () => {
-      const layer = new LineConnectionLayer({ 
-        data: testData,
-        lineType: 'arc'
-      });
-      
-      layer.updateArcOffset('north');
-      layer.updateArcOffset([0.5, -0.3]);
-      
-      // オフセットが更新されたかは内部状態なので、エラーが発生しないことで確認
-      expect(layer.id).toMatch(/^line-connection-/);
-    });
-  });
 
   describe('render', () => {
     it('render()でレイヤーグループが作成される', () => {
@@ -295,17 +213,6 @@ describe('LineConnectionLayer', () => {
     });
   });
 
-  describe('update', () => {
-    it('update()で既存の要素が削除される', () => {
-      const layer = new LineConnectionLayer({ data: testData });
-      
-      layer.render(container);
-      layer.update();
-      
-      expect(container.selectAll).toHaveBeenCalled();
-      expect(container.remove).toHaveBeenCalled();
-    });
-  });
 
   describe('event handling', () => {
     it('on()でイベントリスナーを追加できる', () => {
@@ -385,15 +292,7 @@ describe('LineConnectionLayer', () => {
       layer.setProjection(projection);
       layer.render(container);
       
-      // ライン描画タイプを変更
-      layer.updateLineType('arc');
-      layer.updateArcHeight(0.4);
-      
-      // データを更新
-      const newData: LineConnectionData[] = [
-        { start: [139.6917, 35.6895], end: [135.5023, 34.6937] }
-      ];
-      layer.updateData(newData);
+      // レイヤーが正常に動作することを確認
       
       expect(layer.isRendered()).toBe(true);
     });

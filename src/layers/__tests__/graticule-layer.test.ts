@@ -115,14 +115,6 @@ describe('GraticuleLayer', () => {
       expect(graticuleLayer['path']).toBeDefined();
     });
 
-    test('投影法設定後にupdate()が呼ばれる', () => {
-      const mockUpdate = jest.spyOn(graticuleLayer, 'update');
-      graticuleLayer['layerGroup'] = mockContainer;
-
-      graticuleLayer.setProjection(mockProjection);
-
-      expect(mockUpdate).toHaveBeenCalled();
-    });
   });
 
   describe('step management', () => {
@@ -133,14 +125,6 @@ describe('GraticuleLayer', () => {
       expect(graticuleLayer.getStep()).toEqual([30, 30]);
     });
 
-    test('setStep()後にupdate()が呼ばれる', () => {
-      const mockUpdate = jest.spyOn(graticuleLayer, 'update');
-      graticuleLayer['layerGroup'] = mockContainer;
-
-      graticuleLayer.setStep([20, 20]);
-
-      expect(mockUpdate).toHaveBeenCalled();
-    });
 
     test('異なる経度・緯度間隔を設定できる', () => {
       graticuleLayer.setStep([10, 5]);
@@ -164,14 +148,6 @@ describe('GraticuleLayer', () => {
       expect(graticuleLayer.getExtent()).toBeUndefined();
     });
 
-    test('setExtent()後にupdate()が呼ばれる', () => {
-      const mockUpdate = jest.spyOn(graticuleLayer, 'update');
-      graticuleLayer['layerGroup'] = mockContainer;
-
-      graticuleLayer.setExtent([[-180, -90], [180, 90]]);
-
-      expect(mockUpdate).toHaveBeenCalled();
-    });
   });
 
   describe('render', () => {
@@ -197,15 +173,6 @@ describe('GraticuleLayer', () => {
     });
   });
 
-  describe('update', () => {
-    test('update()で既存の要素が削除される', () => {
-      graticuleLayer['layerGroup'] = mockContainer;
-      graticuleLayer.update();
-
-      expect(mockContainer.selectAll).toHaveBeenCalledWith('path');
-      expect(mockContainer.remove).toHaveBeenCalled();
-    });
-  });
 
   describe('graticule rendering', () => {
     beforeEach(() => {

@@ -100,14 +100,6 @@ describe('OutlineLayer', () => {
       expect(outlineLayer['path']).toBeDefined();
     });
 
-    test('投影法設定後にupdate()が呼ばれる', () => {
-      const mockUpdate = jest.spyOn(outlineLayer, 'update');
-      outlineLayer['layerGroup'] = mockContainer;
-
-      outlineLayer.setProjection(mockProjection);
-
-      expect(mockUpdate).toHaveBeenCalled();
-    });
   });
 
   describe('render', () => {
@@ -133,15 +125,6 @@ describe('OutlineLayer', () => {
     });
   });
 
-  describe('update', () => {
-    test('update()で既存の要素が削除される', () => {
-      outlineLayer['layerGroup'] = mockContainer;
-      outlineLayer.update();
-
-      expect(mockContainer.selectAll).toHaveBeenCalledWith('path');
-      expect(mockContainer.remove).toHaveBeenCalled();
-    });
-  });
 
   describe('clipping functionality', () => {
     let clipLayer: OutlineLayer;

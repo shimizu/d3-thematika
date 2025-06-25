@@ -59,7 +59,8 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
   setProjection(projection: GeoProjection): void {
     this.path = geoPath(projection);
     if (this.layerGroup) {
-      this.update();
+      this.layerGroup.selectAll('path').remove();
+      this.renderOutline();
     }
   }
 
@@ -72,15 +73,6 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     this.renderOutline();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.renderOutline();
-    }
-  }
 
   /**
    * アウトラインを描画します

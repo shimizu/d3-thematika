@@ -59,8 +59,6 @@ export interface ILayer {
   
   /** レイヤーを描画する */
   render(container: Selection<SVGGElement, unknown, HTMLElement, any>): void;
-  /** レイヤーを更新する */
-  update(): void;
   /** レイヤーを削除する */
   destroy(): void;
   /** 表示状態を設定する */
@@ -105,16 +103,6 @@ export type ArcOffsetType = 'perpendicular' | 'north' | 'south' | 'east' | 'west
  * LineConnectionLayerのインターフェース
  */
 export interface ILineConnectionLayer extends ILayer {
-  /** データを更新する */
-  updateData(data: LineConnectionData[]): void;
-  /** ライン描画タイプを更新する */
-  updateLineType(lineType: 'straight' | 'arc'): void;
-  /** アーク描画時の高さを更新する */
-  updateArcHeight(height: number): void;
-  /** アーク制御点の位置を更新する */
-  updateArcControlPoint(controlPoint: ArcControlPointType): void;
-  /** アークオフセットの方向を更新する */
-  updateArcOffset(offset: ArcOffsetType): void;
   /** 投影法を設定する */
   setProjection(projection: GeoProjection): void;
 }

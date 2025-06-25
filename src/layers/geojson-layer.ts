@@ -48,7 +48,8 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
   setProjection(projection: GeoProjection): void {
     this.path = geoPath(projection);
     if (this.layerGroup) {
-      this.update();
+      this.layerGroup.selectAll('path').remove();
+      this.renderFeatures();
     }
   }
 
@@ -61,35 +62,7 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
     this.renderFeatures();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.renderFeatures();
-    }
-  }
 
-  /**
-   * 投影法を更新します
-   * @param projection - 新しい投影法
-   */
-  updateProjection(projection: GeoProjection): void {
-    this.path = geoPath(projection);
-    this.update();
-  }
-
-  /**
-   * データを更新します
-   * @param data - 新しいGeoJSONデータ
-   */
-  updateData(data: GeoJSON.FeatureCollection | GeoJSON.Feature[]): void {
-    this.data = Array.isArray(data)
-      ? { type: 'FeatureCollection', features: data }
-      : data as GeoJSON.FeatureCollection;
-    this.update();
-  }
 
   /**
    * フィーチャーにイベントリスナーを追加します

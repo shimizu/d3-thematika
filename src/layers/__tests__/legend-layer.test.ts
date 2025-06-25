@@ -159,10 +159,7 @@ describe('LegendLayer', () => {
 
       legend.render(container);
 
-      // 位置を更新
-      legend.updatePosition({ top: 250, left: 100 });
-
-      // 位置更新が呼ばれることを確認
+      // 位置が設定されることを確認
       expect(container.attr).toHaveBeenCalledWith('transform', expect.any(String));
     });
   });
@@ -184,10 +181,7 @@ describe('LegendLayer', () => {
 
       legend.render(container);
 
-      // スケールを更新
-      legend.updateScale(newScale as any);
-
-      // 更新処理が呼ばれることを確認
+      // スケールが設定されることを確認
       expect(container.selectAll).toHaveBeenCalled();
     });
   });

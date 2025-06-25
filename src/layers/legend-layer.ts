@@ -225,41 +225,6 @@ export class LegendLayer extends BaseLayer {
     return !!this.sizeScale;
   }
 
-  /**
-   * スケールを更新します
-   * @param newScale - 新しいスケール
-   */
-  updateScale(newScale: SupportedScale): void {
-    this.scale = newScale;
-    this.update();
-  }
-
-  /**
-   * 位置を更新します
-   * @param newPosition - 新しい位置
-   */
-  updatePosition(newPosition: LegendPosition): void {
-    this.position = newPosition;
-    this.updatePositionTransform();
-  }
-
-  /**
-   * 背景ボックスの表示状態を更新します
-   * @param show - 表示するかどうか
-   */
-  updateBackgroundVisibility(show: boolean): void {
-    this.showBackground = show;
-    this.updateBackgroundOpacity();
-  }
-
-  /**
-   * 背景ボックスのスタイルを更新します
-   * @param style - 新しい背景スタイル
-   */
-  updateBackgroundStyle(style: Partial<LegendBackgroundStyle>): void {
-    this.backgroundStyle = { ...this.backgroundStyle, ...style };
-    this.updateBackgroundStyles();
-  }
 
   /**
    * レイヤーを描画します
@@ -282,19 +247,6 @@ export class LegendLayer extends BaseLayer {
     this.setupResizeListener();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (!this.layerGroup) return;
-    
-    // 既存の凡例要素をクリア
-    this.layerGroup.selectAll('*').remove();
-    
-    // 凡例を再描画
-    this.renderLegend();
-    this.renderBackground();
-  }
 
   /**
    * d3-legendの設計思想に基づいてスケール型を自動判別します

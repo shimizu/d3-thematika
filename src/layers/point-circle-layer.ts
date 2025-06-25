@@ -61,7 +61,8 @@ export class PointCircleLayer extends BaseLayer {
   setProjection(projection: GeoProjection): void {
     this.projection = projection;
     if (this.layerGroup) {
-      this.update();
+      this.layerGroup.selectAll('circle').remove();
+      this.renderCircles();
     }
   }
 
@@ -74,48 +75,7 @@ export class PointCircleLayer extends BaseLayer {
     this.renderCircles();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('circle').remove();
-      this.renderCircles();
-    }
-  }
 
-  /**
-   * 投影法を更新します
-   * @param projection - 新しい投影法
-   */
-  updateProjection(projection: GeoProjection): void {
-    this.projection = projection;
-    this.update();
-  }
-
-  /**
-   * データを更新します
-   * @param data - 新しいGeoJSONデータ
-   */
-  updateData(data: GeoJSON.FeatureCollection | GeoJSON.Feature[]): void {
-    this.data = Array.isArray(data)
-      ? { type: 'FeatureCollection', features: data }
-      : data as GeoJSON.FeatureCollection;
-    this.update();
-  }
-
-  /**
-   * 半径設定を更新します
-   * @param r - 新しい半径設定（固定値または関数）
-   */
-  updateRadius(r: number | ((feature: GeoJSON.Feature, index: number) => number)): void {
-    if (typeof r === 'function') {
-      this.radiusFunction = r;
-    } else {
-      this.radiusFunction = () => r;
-    }
-    this.update();
-  }
 
   /**
    * フィーチャーにイベントリスナーを追加します

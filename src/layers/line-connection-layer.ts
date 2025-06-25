@@ -123,7 +123,10 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     this.projection = projection;
     this.path = geoPath(projection);
     if (this.layerGroup) {
-      this.update();
+      this.layerGroup.selectAll('path').remove();
+      this.layerGroup.selectAll('defs').remove();
+      this.createArrowMarkers();
+      this.renderLines();
     }
   }
 
@@ -137,98 +140,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     this.renderLines();
   }
 
-  /**
-   * レイヤーを更新します
-   */
-  update(): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('path').remove();
-      this.layerGroup.selectAll('defs').remove();
-      this.createArrowMarkers();
-      this.renderLines();
-    }
-  }
 
-  /**
-   * データを更新します
-   * @param data - 新しいライン接続データ
-   */
-  updateData(data: LineConnectionData[]): void {
-    this.validateData(data);
-    this.data = data;
-    this.update();
-  }
-
-  /**
-   * ライン描画タイプを更新します
-   * @param lineType - ライン描画タイプ
-   */
-  updateLineType(lineType: 'straight' | 'arc'): void {
-    this.lineType = lineType;
-    this.update();
-  }
-
-  /**
-   * アーク描画時の高さを更新します
-   * @param height - アークの高さ（0-1の範囲推奨）
-   */
-  updateArcHeight(height: number): void {
-    this.arcHeight = height;
-    if (this.lineType === 'arc') {
-      this.update();
-    }
-  }
-
-  /**
-   * アーク制御点の位置を更新します
-   * @param controlPoint - アーク制御点の位置
-   */
-  updateArcControlPoint(controlPoint: ArcControlPointType): void {
-    this.arcControlPoint = controlPoint;
-    if (this.lineType === 'arc') {
-      this.update();
-    }
-  }
-
-  /**
-   * アークオフセットの方向を更新します
-   * @param offset - アークオフセットの方向
-   */
-  updateArcOffset(offset: ArcOffsetType): void {
-    this.arcOffset = offset;
-    if (this.lineType === 'arc') {
-      this.update();
-    }
-  }
-
-  /**
-   * 開始点の矢印表示を更新します
-   * @param show - 矢印を表示するかどうか
-   */
-  updateStartArrow(show: boolean): void {
-    this.startArrow = show;
-    this.update();
-  }
-
-  /**
-   * 終了点の矢印表示を更新します
-   * @param show - 矢印を表示するかどうか
-   */
-  updateEndArrow(show: boolean): void {
-    this.endArrow = show;
-    this.update();
-  }
-
-  /**
-   * 矢印のサイズを更新します
-   * @param size - 矢印のサイズ
-   */
-  updateArrowSize(size: number): void {
-    this.arrowSize = size;
-    if (this.startArrow || this.endArrow) {
-      this.update();
-    }
-  }
 
   /**
    * 矢印のマーカーを作成します
