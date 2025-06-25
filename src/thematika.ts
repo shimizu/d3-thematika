@@ -92,15 +92,6 @@ export class Map {
   }
 
   /**
-   * レイヤーのスタイルを更新します
-   * @param id - 更新するレイヤーのID
-   * @param style - 新しいスタイル
-   */
-  updateLayerStyle(id: string, style: Partial<LayerStyle>): void {
-    this.layerManager.updateLayerStyle(id, style);
-  }
-
-  /**
    * レイヤーの表示/非表示を切り替えます
    * @param id - 切り替えるレイヤーのID
    * @param visible - 表示状態

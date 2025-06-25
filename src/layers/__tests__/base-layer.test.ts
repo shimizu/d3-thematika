@@ -75,20 +75,6 @@ describe('BaseLayer', () => {
     });
   });
 
-  describe('style management', () => {
-    test('setStyle()でスタイルを更新できる', () => {
-      const newStyle: LayerStyle = {
-        fill: 'green',
-        opacity: 0.5
-      };
-      
-      testLayer.setStyle(newStyle);
-      
-      expect(testLayer['style'].fill).toBe('green');
-      expect(testLayer['style'].opacity).toBe(0.5);
-      expect(testLayer['style'].stroke).toBe('#000000'); // 既存の値は保持
-    });
-  });
 
   describe('render management', () => {
     test('render()でレイヤーグループが作成される', () => {

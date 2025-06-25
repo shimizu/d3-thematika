@@ -329,21 +329,6 @@ describe('LineConnectionLayer', () => {
     });
   });
 
-  describe('style application', () => {
-    it('updateLayerStyle()が正しく動作する', () => {
-      const layer = new LineConnectionLayer({ 
-        data: testData,
-        style: { stroke: '#ff0000' }
-      });
-      
-      const projection = geoMercator();
-      layer.setProjection(projection);
-      layer.render(container);
-      
-      // スタイルが適用されることを確認
-      expect(container.selectAll).toHaveBeenCalled();
-    });
-  });
 
   describe('CSS class application', () => {
     it('レイヤーグループが作成される', () => {

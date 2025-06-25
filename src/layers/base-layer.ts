@@ -76,15 +76,6 @@ export abstract class BaseLayer implements ILayer {
   }
 
   /**
-   * スタイルを設定します
-   * @param style - 新しいスタイル設定
-   */
-  setStyle(style: LayerStyle): void {
-    this.style = { ...this.style, ...style };
-    this.updateLayerStyle();
-  }
-
-  /**
    * 表示状態を設定します
    * @param visible - 表示状態
    */
@@ -107,14 +98,6 @@ export abstract class BaseLayer implements ILayer {
    */
   isRendered(): boolean {
     return this.element !== undefined;
-  }
-
-  /**
-   * レイヤーのスタイルを更新します（サブクラスでオーバーライド可能）
-   * @protected
-   */
-  protected updateLayerStyle(): void {
-    // サブクラスでオーバーライドして実装
   }
 
   /**

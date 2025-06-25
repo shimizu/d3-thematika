@@ -380,15 +380,6 @@ map.addLayer('size-legend', sizeLegend);
         draw()
 
 
-        // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                updateSliderMaxValues();
-                draw();
-            }, 250);
-        });
         
         // 初回ロード時にスライダーの最大値を設定
         setTimeout(updateSliderMaxValues, 100);

@@ -472,16 +472,4 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     }
   }
 
-  /**
-   * レイヤーのスタイルを更新します
-   * @protected
-   */
-  protected updateLayerStyle(): void {
-    if (!this.layerGroup) return;
-    
-    const paths = this.layerGroup.selectAll('path');
-    if (!paths.empty()) {
-      this.applyStylesToElements(paths, this.layerGroup);
-    }
-  }
 }

@@ -186,18 +186,6 @@ export class PointCircleLayer extends BaseLayer {
     this.applyStylesToElements(circles, this.layerGroup);
   }
 
-  /**
-   * レイヤーのスタイルを更新します
-   * @protected
-   */
-  protected updateLayerStyle(): void {
-    if (!this.layerGroup) return;
-    
-    const circles = this.layerGroup.selectAll('circle');
-    if (!circles.empty()) {
-      this.applyStylesToElements(circles, this.layerGroup);
-    }
-  }
 
   /**
    * GeoJSONデータを取得します

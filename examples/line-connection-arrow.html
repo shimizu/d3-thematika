@@ -190,15 +190,25 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
         
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
-        let connectionLayer;
+        let worldData = null;
+        let startArrow = true;
+        let endArrow = true;
+        let arrowSize = 10;
+        let lineType = 'arc';
         
         async function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
+
             const id = "#map"
             const width = document.querySelector(id).clientWidth ;
             const height = document.querySelector(id).clientHeight;
 
-            // 世界地図データを読み込み
-            const geojson = await d3.json('./geojson/world.geojson');
+            // 世界地図データを読み込み（初回のみ）
+            if (!worldData) {
+                worldData = await d3.json('./geojson/world.geojson');
+            }
+            const geojson = worldData;
 
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
@@ -247,13 +257,13 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
             ];
 
             // 矢印付きLineConnectionLayer
-            connectionLayer = new Thematika.LineConnectionLayer({
+            const connectionLayer = new Thematika.LineConnectionLayer({
                 data: connections,
-                lineType: 'arc',
+                lineType: lineType,
                 arcHeight: 0.3,
-                startArrow: true,
-                endArrow: true,
-                arrowSize: 10,
+                startArrow: startArrow,
+                endArrow: endArrow,
+                arrowSize: arrowSize,
                 attr: {
                     stroke: '#ff4757',
                     strokeWidth: 2,
@@ -264,54 +274,65 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
             // レイヤーを地図に追加
             map.addLayer('world', worldLayer);
             map.addLayer('connections', connectionLayer);
-
-            // 投影法切り替えの設定
-            document.getElementById('projection-select').addEventListener('change', (e) => {
-                const projectionName = e.target.value;
-                switch(projectionName) {
-                    case 'equirectangular':
-                        currentProjection = d3.geoEquirectangular();
-                        break;
-                    case 'mercator':
-                        currentProjection = d3.geoMercator();
-                        break;
-                    case 'naturalEarth1':
-                        currentProjection = d3.geoNaturalEarth1();
-                        break;
-                    case 'orthographic':
-                        currentProjection = d3.geoOrthographic();
-                        break;
-                    case 'azimuthalEqualArea':
-                        currentProjection = d3.geoAzimuthalEqualArea();
-                        break;
-                }
-                currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
-                map.updateProjection(currentProjection);
-            });
-
-            // 矢印表示のコントロール
-            document.getElementById('start-arrow').addEventListener('change', (e) => {
-                connectionLayer.updateStartArrow(e.target.checked);
-            });
-
-            document.getElementById('end-arrow').addEventListener('change', (e) => {
-                connectionLayer.updateEndArrow(e.target.checked);
-            });
-
-            // 矢印サイズのコントロール
-            document.getElementById('arrow-size').addEventListener('input', (e) => {
-                const size = parseInt(e.target.value);
-                document.getElementById('arrow-size-value').textContent = size;
-                connectionLayer.updateArrowSize(size);
-            });
-
-            // ラインタイプのコントロール
-            document.getElementById('line-type').addEventListener('change', (e) => {
-                connectionLayer.updateLineType(e.target.value);
-            });
         }
 
-        draw()
+        draw();
+
+        // 投影法切り替えの設定
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch(projectionName) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            draw();
+        });
+
+        // 矢印表示のコントロール
+        document.getElementById('start-arrow').addEventListener('change', (e) => {
+            startArrow = e.target.checked;
+            draw();
+        });
+
+        document.getElementById('end-arrow').addEventListener('change', (e) => {
+            endArrow = e.target.checked;
+            draw();
+        });
+
+        // 矢印サイズのコントロール
+        document.getElementById('arrow-size').addEventListener('input', (e) => {
+            arrowSize = parseInt(e.target.value);
+            document.getElementById('arrow-size-value').textContent = arrowSize;
+            draw();
+        });
+
+        // ラインタイプのコントロール
+        document.getElementById('line-type').addEventListener('change', (e) => {
+            lineType = e.target.value;
+            draw();
+        });
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
     </script>
 </body>
 </html>

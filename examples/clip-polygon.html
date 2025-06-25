@@ -166,11 +166,12 @@ map.addLayer('raster', rasterLayer);
 
     <script >
         
-         let currentProjection = d3.geoEquirectangular();
-
+        let currentProjection = d3.geoEquirectangular();
+        let isClipEnabled = true;
 
         async function draw() {
-
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
 
             // 世界地図データを読み込み
             const geojson = await d3.json('./geojson/world.geojson');
@@ -218,7 +219,7 @@ map.addLayer('raster', rasterLayer);
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { 
                     opacity: 0.7 ,
-                    clipPath: clipEffect.url()  // クリップパスを適用
+                    clipPath: isClipEnabled ? clipEffect.url() : undefined  // クリップパスを条件付きで適用
                 },
                 
             });
@@ -236,9 +237,6 @@ map.addLayer('raster', rasterLayer);
             });
             map.addLayer('graticule', graticuleLayer);        
 
-            
-
-
         }
 
         draw()
@@ -255,12 +253,8 @@ map.addLayer('raster', rasterLayer);
 
         // クリップトグルのイベントハンドラ
         document.getElementById('clip-toggle').addEventListener('change', (e) => {
-            if (worldLayer) {
-                const isChecked = e.target.checked;
-                map.updateLayerStyle('world', {
-                    clipPath: isChecked ? clipEffect.url() : undefined
-                });
-            }
+            isClipEnabled = e.target.checked;
+            draw(); // 地図全体を再描画
         });
 
 

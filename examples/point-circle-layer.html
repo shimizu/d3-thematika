@@ -176,16 +176,24 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
         let map = null;
         let circleLayer = null;
         let worldData = null;
+        let radiusType = 'fixed';
+        let baseRadius = 5;
+        let fillColor = '#ff6b6b';
 
         async function draw() {
             try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
                 // 地図の寸法を取得
                 const mapElement = document.querySelector('#map');
                 const width = mapElement.clientWidth;
                 const height = mapElement.clientHeight;
 
-                // 世界地図データを読み込み
-                worldData = await d3.json('./geojson/world.geojson');
+                // 世界地図データを読み込み（初回のみ）
+                if (!worldData) {
+                    worldData = await d3.json('./geojson/world.geojson');
+                }
 
                 // 投影法を設定
                 const projection = d3.geoNaturalEarth1()
@@ -210,12 +218,31 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
                     }
                 });
 
+                // 半径の設定
+                let radiusFunction;
+                switch (radiusType) {
+                    case 'fixed':
+                        radiusFunction = baseRadius;
+                        break;
+                    case 'index':
+                        radiusFunction = (feature, index) => (index % 5) + baseRadius;
+                        break;
+                    case 'population':
+                        radiusFunction = (feature, index) => {
+                            const population = feature.properties?.POP_EST || 0;
+                            return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
+                        };
+                        break;
+                    default:
+                        radiusFunction = baseRadius;
+                }
+
                 // PointCircleLayerを作成
                 circleLayer = new Thematika.PointCircleLayer({
                     data: worldData,
-                    r: 5,
+                    r: radiusFunction,
                     attr: {
-                        fill: '#ff6b6b',
+                        fill: fillColor,
                         stroke: '#d63031',
                         strokeWidth: 1,
                         opacity: 0.8
@@ -226,9 +253,6 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
                 map.addLayer('graticule', graticuleLayer);
                 map.addLayer('circles', circleLayer);
 
-                // イベントリスナーを設定
-                setupEventListeners();
-
             } catch (error) {
                 console.error('デモの初期化に失敗しました:', error);
             }
@@ -236,52 +260,33 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
 
         draw();
 
+        // 半径タイプの変更
+        document.getElementById('radius-type').addEventListener('change', function() {
+            radiusType = this.value;
+            draw();
+        });
+        
+        // 半径スライダーの変更
+        document.getElementById('radius-slider').addEventListener('input', function() {
+            baseRadius = parseInt(this.value);
+            document.getElementById('radius-value').textContent = this.value;
+            draw();
+        });
+        
+        // 色の変更
+        document.getElementById('fill-color').addEventListener('change', function() {
+            fillColor = this.value;
+            draw();
+        });
 
-        function setupEventListeners() {
-            // 半径タイプの変更
-            document.getElementById('radius-type').addEventListener('change', updateCircles);
-            
-            // 半径スライダーの変更
-            document.getElementById('radius-slider').addEventListener('input', function() {
-                document.getElementById('radius-value').textContent = this.value;
-                updateCircles();
-            });
-            
-            // 色の変更
-            document.getElementById('fill-color').addEventListener('change', function() {
-                if (circleLayer) {
-                    circleLayer.setStyle({ fill: this.value });
-                }
-            });
-        }
-
-        function updateCircles() {
-            if (!circleLayer) return;
-
-            const radiusType = document.getElementById('radius-type').value;
-            const baseRadius = parseInt(document.getElementById('radius-slider').value);
-
-            let radiusFunction;
-
-            switch (radiusType) {
-                case 'fixed':
-                    radiusFunction = baseRadius;
-                    break;
-                case 'index':
-                    radiusFunction = (feature, index) => (index % 5) + baseRadius;
-                    break;
-                case 'population':
-                    radiusFunction = (feature, index) => {
-                        const population = feature.properties?.POP_EST || 0;
-                        return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
-                    };
-                    break;
-                default:
-                    radiusFunction = baseRadius;
-            }
-
-            circleLayer.updateRadius(radiusFunction);
-        }
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
 
     </script>
 </body>

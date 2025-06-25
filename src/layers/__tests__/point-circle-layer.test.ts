@@ -334,26 +334,6 @@ describe('PointCircleLayer', () => {
       expect(strokeResult).toBe(2);
     });
 
-    test('updateLayerStyle()が正しく動作する', () => {
-      const mockCircleSelection = {
-        empty: jest.fn(() => false),
-        style: jest.fn().mockReturnThis(),
-        attr: jest.fn().mockReturnThis()
-      };
-      const mockLayerGroup = {
-        selectAll: jest.fn(() => mockCircleSelection),
-        style: jest.fn().mockReturnThis(),
-        attr: jest.fn().mockReturnThis()
-      };
-      
-      pointCircleLayer['layerGroup'] = mockLayerGroup as any;
-      const applySpy = jest.spyOn(pointCircleLayer as any, 'applyStylesToElements');
-      
-      pointCircleLayer['updateLayerStyle']();
-      
-      expect(mockLayerGroup.selectAll).toHaveBeenCalledWith('circle');
-      expect(applySpy).toHaveBeenCalledWith(mockCircleSelection, mockLayerGroup);
-    });
   });
 
   describe('geometry handling', () => {

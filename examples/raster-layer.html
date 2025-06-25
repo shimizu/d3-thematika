@@ -151,14 +151,23 @@ map.addLayer('raster', rasterLayer);</pre>
         // 地図の初期化
         let currentProjection = d3.geoEquirectangular();
         let map, rasterLayer, graticuleLayer, backgroundLayer;
+        let worldData = null;
+        let aoiData = null;
+        let showBboxMarkers = false;
 
         async function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
 
-            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-            const geojson = await d3.json('./geojson/world.geojson');   
-
-
-            const aoi = await d3.json('./geojson/aflica_bbox.geojson');   
+            // 世界地図データを読み込み（初回のみ）
+            if (!worldData) {
+                worldData = await d3.json('./geojson/world.geojson');
+            }
+            if (!aoiData) {
+                aoiData = await d3.json('./geojson/aflica_bbox.geojson');
+            }
+            const geojson = worldData;
+            const aoi = aoiData;   
 
             console.log('GeoJSON data loaded:', geojson);
 
@@ -189,7 +198,8 @@ map.addLayer('raster', rasterLayer);</pre>
             rasterLayer = new Thematika.RasterLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
-                style: { opacity: 0.7 }
+                style: { opacity: 0.7 },
+                showBboxMarkers: showBboxMarkers
             });
 
             rasterLayer.setProjection(currentProjection);
@@ -238,9 +248,17 @@ map.addLayer('raster', rasterLayer);</pre>
         });
 
         document.getElementById('bbox-markers-checkbox').addEventListener('change', (e) => {
-            if (rasterLayer) {
-                rasterLayer.setShowBboxMarkers(e.target.checked);
-            }
+            showBboxMarkers = e.target.checked;
+            draw();
+        });
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
         });
     </script>
 </body>
