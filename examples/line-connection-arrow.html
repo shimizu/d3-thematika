@@ -194,8 +194,12 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
         let startArrow = true;
         let endArrow = true;
         let arrowSize = 10;
-        let lineType = 'arc';
+        let lineType = 'straight';
         
+
+        // SVGフィルターをプリセットから取得
+        const effect = Thematika.FilterPresets.standardDropShadow()
+
         async function draw() {
             // 既存の地図を削除
             d3.select('#map').selectAll('*').remove();
@@ -218,6 +222,7 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
                 container: '#map',
                 width: width,
                 height: height,
+                defs: [effect],
                 projection: currentProjection
             });
 
@@ -265,6 +270,7 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
                 endArrow: endArrow,
                 arrowSize: arrowSize,
                 attr: {
+                    filter: effect.url(),
                     stroke: '#ff4757',
                     strokeWidth: 2,
                     opacity: 0.8
