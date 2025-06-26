@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle } from '../types';
+import { LayerStyle, IGeojsonLayer } from '../types';
 import { getCentroid } from '../utils/gis-utils';
 
 /**
@@ -22,7 +22,7 @@ export interface PointCircleLayerOptions {
  * GeoJSONデータをサークル要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にサークルを配置
  */
-export class PointCircleLayer extends BaseLayer {
+export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */
@@ -80,11 +80,26 @@ export class PointCircleLayer extends BaseLayer {
   }
 
   /**
+   * 投影法を設定します
+   * @param projection - 新しい投影法
+   */
+  setProjection(projection: GeoProjection): void {
+    this.projection = projection;
+    // 投影法が変更されたら再描画
+    if (this.layerGroup) {
+      this.renderCircles();
+    }
+  }
+
+  /**
    * サークルを描画します
    * @private
    */
   private renderCircles(): void {
     if (!this.layerGroup || !this.projection) return;
+
+    // 既存のサークルを削除
+    this.layerGroup.selectAll('g.cartography-point-circle-layer').remove();
 
     // 各フィーチャーの座標を取得
     const circleData = this.data.features.map((feature, index) => {
@@ -143,11 +158,4 @@ export class PointCircleLayer extends BaseLayer {
     return this.data;
   }
 
-  /**
-   * 現在の半径設定関数を取得します
-   * @returns 半径設定関数
-   */
-  getRadiusFunction(): (feature: GeoJSON.Feature, index: number) => number {
-    return this.radiusFunction;
-  }
-}
+ 
