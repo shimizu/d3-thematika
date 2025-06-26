@@ -39,7 +39,7 @@ export type {
   ArcControlPointType,
   ArcOffsetType
 } from './types';
-export type { RasterLayerOptions } from './layers/raster-layer';
+export type { ImageLayerOptions } from './layers/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
 export type { PointCircleLayerOptions } from './layers/point-circle-layer';
 export type { LineConnectionLayerOptions } from './layers/line-connection-layer';
@@ -52,7 +52,7 @@ export { BaseLayer } from './layers/base-layer';
 export { GeojsonLayer } from './layers/geojson-layer';
 export { OutlineLayer } from './layers/outline-layer';
 export { GraticuleLayer } from './layers/graticule-layer';
-export { RasterLayer } from './layers/raster-layer';
+export { ImageLayer } from './layers/image-layer';
 export { LegendLayer } from './layers/legend-layer';
 export { PointCircleLayer } from './layers/point-circle-layer';
 export { LineConnectionLayer } from './layers/line-connection-layer';

@@ -19,7 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
 - **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
-- **各種レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, RasterLayer, LegendLayer
+- **各種レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, ImageLayer, LegendLayer
 
 ### ビルド出力
 - **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間
@@ -167,7 +167,7 @@ const newLayer = new GraticuleLayer({
   // その他のオプション
 });
 
-const newRasterLayer = new RasterLayer('id', {
+const newImageLayer = new ImageLayer('id', {
   src: 'image.png',
   bounds: bounds,
   showBboxMarkers: true,
@@ -189,7 +189,7 @@ function draw() {
   
   // 新しい設定で地図を再作成
   const map = new Thematika.Map({...});
-  const layer = new Thematika.RasterLayer('raster', {
+  const layer = new Thematika.ImageLayer('image', {
     // ...
     showBboxMarkers: showMarkers
   });

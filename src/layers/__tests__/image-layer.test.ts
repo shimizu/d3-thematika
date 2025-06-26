@@ -1,4 +1,4 @@
-import { RasterLayer, RasterLayerOptions } from '../raster-layer';
+import { ImageLayer, ImageLayerOptions } from '../image-layer';
 import { Selection } from 'd3-selection';
 import * as d3 from 'd3-geo';
 
@@ -68,12 +68,12 @@ Object.defineProperty(global, 'document', {
   writable: true
 });
 
-describe('RasterLayer', () => {
-  let rasterLayer: RasterLayer;
+describe('ImageLayer', () => {
+  let imageLayer: ImageLayer;
   let mockContainer: any;
   let mockProjection: any;
 
-  const defaultOptions: RasterLayerOptions = {
+  const defaultOptions: ImageLayerOptions = {
     src: './test-image.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176],
     style: { opacity: 0.7 }
@@ -132,7 +132,7 @@ describe('RasterLayer', () => {
     mockProjection.scale = jest.fn(() => 100);
     mockProjection.translate = jest.fn(() => [400, 200]);
 
-    rasterLayer = new RasterLayer('test-raster', defaultOptions);
+    imageLayer = new ImageLayer('test-image', defaultOptions);
 
     // MockImageを成功モードに設定
     MockImage.setFailMode(false);
@@ -152,14 +152,14 @@ describe('RasterLayer', () => {
 
   describe('constructor', () => {
     test('オプションが正しく設定される', () => {
-      expect(rasterLayer.id).toBe('test-raster');
-      expect(rasterLayer['src']).toBe('./test-image.png');
-      expect(rasterLayer['bounds']).toEqual([-25.855061, -38.477223, 66.427949, 41.479176]);
-      expect(rasterLayer['showBboxMarkers']).toBe(false);
+      expect(imageLayer.id).toBe('test-image');
+      expect(imageLayer['src']).toBe('./test-image.png');
+      expect(imageLayer['bounds']).toEqual([-25.855061, -38.477223, 66.427949, 41.479176]);
+      expect(imageLayer['showBboxMarkers']).toBe(false);
     });
 
     test('showBboxMarkersオプションが正しく設定される', () => {
-      const layerWithMarkers = new RasterLayer('test-markers', {
+      const layerWithMarkers = new ImageLayer('test-markers', {
         ...defaultOptions,
         showBboxMarkers: true
       });
@@ -167,7 +167,7 @@ describe('RasterLayer', () => {
     });
 
     test('デフォルト値が適用される', () => {
-      const minimalLayer = new RasterLayer('minimal', {
+      const minimalLayer = new ImageLayer('minimal', {
         src: 'test.png',
         bounds: [0, 0, 1, 1]
       });
@@ -177,38 +177,38 @@ describe('RasterLayer', () => {
 
   describe('setProjection', () => {
     test('投影法が設定される', () => {
-      rasterLayer.setProjection(mockProjection);
-      expect(rasterLayer['projection']).toBe(mockProjection);
+      imageLayer.setProjection(mockProjection);
+      expect(imageLayer['projection']).toBe(mockProjection);
     });
 
   });
 
   describe('render', () => {
     beforeEach(() => {
-      rasterLayer.setProjection(mockProjection);
+      imageLayer.setProjection(mockProjection);
     });
 
     test('投影法が設定されていない場合は警告を出す', async () => {
-      const layerWithoutProjection = new RasterLayer('no-proj', defaultOptions);
+      const layerWithoutProjection = new ImageLayer('no-proj', defaultOptions);
       await layerWithoutProjection.render(mockContainer);
-      expect(console.warn).toHaveBeenCalledWith('RasterLayer: 投影法が設定されていません');
+      expect(console.warn).toHaveBeenCalledWith('ImageLayer: 投影法が設定されていません');
     });
 
     test('レイヤーグループが作成される', async () => {
-      await rasterLayer.render(mockContainer);
+      await imageLayer.render(mockContainer);
       
       // グループが作成される
       expect(mockContainer.append).toHaveBeenCalledWith('g');
       
       // 内部グループに属性が設定される
       const innerGroup = mockContainer.append();
-      expect(innerGroup.attr).toHaveBeenCalledWith('class', 'raster-layer ');
-      expect(innerGroup.attr).toHaveBeenCalledWith('id', 'layer-test-raster');
+      expect(innerGroup.attr).toHaveBeenCalledWith('class', 'image-layer ');
+      expect(innerGroup.attr).toHaveBeenCalledWith('id', 'layer-test-image');
     });
 
     test('非表示レイヤーは display:none が設定される', async () => {
-      rasterLayer.setVisible(false);
-      await rasterLayer.render(mockContainer);
+      imageLayer.setVisible(false);
+      await imageLayer.render(mockContainer);
       
       // 内部グループにスタイルが設定される
       const innerGroup = mockContainer.append();
@@ -216,7 +216,7 @@ describe('RasterLayer', () => {
     });
 
     test('画像が正常にレンダリングされる', async () => {
-      await rasterLayer.render(mockContainer);
+      await imageLayer.render(mockContainer);
       
       // 少し待機してから検証
       await new Promise(resolve => setTimeout(resolve, 20));
@@ -225,15 +225,15 @@ describe('RasterLayer', () => {
       expect(mockContainer.append).toHaveBeenCalledWith('g');
       
       // レイヤーが正常にレンダリングされたことを確認
-      expect(rasterLayer.isRendered()).toBe(true);
+      expect(imageLayer.isRendered()).toBe(true);
     });
 
     test('投影変換の詳細ログが出力される', async () => {
-      await rasterLayer.render(mockContainer);
+      await imageLayer.render(mockContainer);
       
       await new Promise(resolve => setTimeout(resolve, 20));
       
-      expect(console.log).toHaveBeenCalledWith('=== RasterLayer bbox projection ===');
+      expect(console.log).toHaveBeenCalledWith('=== ImageLayer bbox projection ===');
       expect(console.log).toHaveBeenCalledWith('Original bbox:', expect.any(Object));
       expect(console.log).toHaveBeenCalledWith('Projected coordinates (output):');
     });
@@ -241,11 +241,11 @@ describe('RasterLayer', () => {
 
   describe('bboxマーカー機能', () => {
     beforeEach(() => {
-      rasterLayer.setProjection(mockProjection);
+      imageLayer.setProjection(mockProjection);
     });
 
     test('showBboxMarkersがtrueの場合にマーカーが表示される', async () => {
-      const layerWithMarkers = new RasterLayer('markers', {
+      const layerWithMarkers = new ImageLayer('markers', {
         ...defaultOptions,
         showBboxMarkers: true
       });
@@ -260,10 +260,10 @@ describe('RasterLayer', () => {
 
     test('showBboxMarkersオプションが正しく設定される', () => {
       // デフォルトはfalse
-      expect(rasterLayer['showBboxMarkers']).toBe(false);
+      expect(imageLayer['showBboxMarkers']).toBe(false);
       
       // trueを指定したレイヤー
-      const layerWithMarkers = new RasterLayer('test-markers', {
+      const layerWithMarkers = new ImageLayer('test-markers', {
         ...defaultOptions,
         showBboxMarkers: true
       });
@@ -271,7 +271,7 @@ describe('RasterLayer', () => {
     });
 
     test('新しいオプションでインスタンス作成可能', () => {
-      const layerWithOptions = new RasterLayer('test-options', {
+      const layerWithOptions = new ImageLayer('test-options', {
         ...defaultOptions,
         showBboxMarkers: true,
         useAdvancedReprojection: false,
@@ -287,25 +287,25 @@ describe('RasterLayer', () => {
   describe('isEquirectangularProjection', () => {
     test('Equirectangular投影法を正しく判定する', () => {
       const equirectProj = { toString: () => 'geoEquirectangular' };
-      expect(rasterLayer['isEquirectangularProjection'](equirectProj as any)).toBe(true);
+      expect(imageLayer['isEquirectangularProjection'](equirectProj as any)).toBe(true);
 
       const equirectProj2 = { toString: () => 'equirectangular' };
-      expect(rasterLayer['isEquirectangularProjection'](equirectProj2 as any)).toBe(true);
+      expect(imageLayer['isEquirectangularProjection'](equirectProj2 as any)).toBe(true);
     });
 
     test('他の投影法はfalseを返す', () => {
       const mercatorProj = { toString: () => 'geoMercator' };
-      expect(rasterLayer['isEquirectangularProjection'](mercatorProj as any)).toBe(false);
+      expect(imageLayer['isEquirectangularProjection'](mercatorProj as any)).toBe(false);
 
       const orthographicProj = { toString: () => 'geoOrthographic' };
-      expect(rasterLayer['isEquirectangularProjection'](orthographicProj as any)).toBe(false);
+      expect(imageLayer['isEquirectangularProjection'](orthographicProj as any)).toBe(false);
     });
   });
 
 
   describe('loadImage', () => {
     test('画像の読み込みが成功する', async () => {
-      const img = await rasterLayer['loadImage']('test.png');
+      const img = await imageLayer['loadImage']('test.png');
       expect(img).toBeInstanceOf(MockImage);
       expect(img.crossOrigin).toBe('anonymous');
     });
@@ -314,7 +314,7 @@ describe('RasterLayer', () => {
       // 失敗モードに設定
       MockImage.setFailMode(true);
       
-      await expect(rasterLayer['loadImage']('invalid.png'))
+      await expect(imageLayer['loadImage']('invalid.png'))
         .rejects.toThrow('画像の読み込みに失敗しました: invalid.png');
         
       // 成功モードに戻す
@@ -324,45 +324,45 @@ describe('RasterLayer', () => {
 
   describe('approximateInverseProjection', () => {
     beforeEach(() => {
-      rasterLayer.setProjection(mockProjection);
+      imageLayer.setProjection(mockProjection);
     });
 
     test('逆投影を近似的に計算する', () => {
-      const result = rasterLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
+      const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
       expect(result).not.toBeNull();
       expect(Array.isArray(result)).toBe(true);
       expect(result).toHaveLength(2);
     });
 
     test('投影法が設定されていない場合はnullを返す', () => {
-      const layerWithoutProj = new RasterLayer('no-proj', defaultOptions);
+      const layerWithoutProj = new ImageLayer('no-proj', defaultOptions);
       const result = layerWithoutProj['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
       expect(result).toBeNull();
     });
 
     test('投影結果がnullの場合はnullを返す', () => {
       const failingProjection = jest.fn(() => null) as any;
-      rasterLayer['projection'] = failingProjection;
+      imageLayer['projection'] = failingProjection;
       
-      const result = rasterLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
+      const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
       expect(result).toBeNull();
     });
   });
 
   describe('エラーハンドリング', () => {
     beforeEach(() => {
-      rasterLayer.setProjection(mockProjection);
+      imageLayer.setProjection(mockProjection);
     });
 
     test('画像読み込みエラーが適切にハンドリングされる', async () => {
       // 失敗モードに設定
       MockImage.setFailMode(true);
       
-      await rasterLayer.render(mockContainer);
+      await imageLayer.render(mockContainer);
       await new Promise(resolve => setTimeout(resolve, 30));
       
       expect(console.error).toHaveBeenCalledWith(
-        'RasterLayer: 画像の描画に失敗しました', 
+        'ImageLayer: 画像の描画に失敗しました', 
         expect.any(Error)
       );
       
@@ -373,22 +373,22 @@ describe('RasterLayer', () => {
     test('投影範囲外の境界は警告を出す', async () => {
       // 常にnullを返す投影法
       const failingProjection = jest.fn(() => null) as any;
-      rasterLayer.setProjection(failingProjection);
+      imageLayer.setProjection(failingProjection);
       
-      await rasterLayer.render(mockContainer);
+      await imageLayer.render(mockContainer);
       await new Promise(resolve => setTimeout(resolve, 20));
       
-      expect(console.warn).toHaveBeenCalledWith('RasterLayer: 境界が投影範囲外です');
+      expect(console.warn).toHaveBeenCalledWith('ImageLayer: 境界が投影範囲外です');
     });
   });
 
   describe('スタイル適用', () => {
     beforeEach(() => {
-      rasterLayer.setProjection(mockProjection);
+      imageLayer.setProjection(mockProjection);
     });
 
     test('透明度が適用される', async () => {
-      const layerWithOpacity = new RasterLayer('opacity-test', {
+      const layerWithOpacity = new ImageLayer('opacity-test', {
         ...defaultOptions,
         style: { opacity: 0.5 }
       });
@@ -403,7 +403,7 @@ describe('RasterLayer', () => {
     });
 
     test('フィルターが適用される', async () => {
-      const layerWithFilter = new RasterLayer('filter-test', {
+      const layerWithFilter = new ImageLayer('filter-test', {
         ...defaultOptions,
         style: { filter: 'url(#shadow)' }
       });

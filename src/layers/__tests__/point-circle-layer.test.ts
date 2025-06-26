@@ -116,7 +116,7 @@ describe('PointCircleLayer', () => {
         r: 10
       });
 
-      const radiusFunction = layer.getRadiusFunction();
+      const radiusFunction = layer['radiusFunction'];
       expect(radiusFunction({} as any, 0)).toBe(10);
     });
 
@@ -127,7 +127,7 @@ describe('PointCircleLayer', () => {
         r: radiusFunc
       });
 
-      const radiusFunction = layer.getRadiusFunction();
+      const radiusFunction = layer['radiusFunction'];
       expect(radiusFunction({} as any, 2)).toBe(7);
     });
 
@@ -136,7 +136,7 @@ describe('PointCircleLayer', () => {
         data: sampleGeoJSON
       });
 
-      const radiusFunction = layer.getRadiusFunction();
+      const radiusFunction = layer['radiusFunction'];
       expect(radiusFunction({} as any, 0)).toBe(5);
     });
 

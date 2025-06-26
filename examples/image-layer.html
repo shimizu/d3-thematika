@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RasterLayer - d3-thematika</title>
+    <title>ImageLayer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <style>
@@ -81,9 +81,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>RasterLayer デモ</h1>
+        <h1>ImageLayer デモ</h1>
         <p class="description">
-            RasterLayerを使用して地図上にラスター画像を表示します。
+            ImageLayerを使用して地図上にラスター画像を表示します。
             Equirectangular投影法の場合は高速に描画し、その他の投影法では画像を変換して表示します。
         </p>
 
@@ -122,7 +122,7 @@
         </div>
 
         <div class="code-example">
-            <pre>// RasterLayerの使用例（アフリカ画像）
+            <pre>// ImageLayerの使用例（アフリカ画像）
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
@@ -131,15 +131,15 @@ const map = new Thematika.Map({
 });
 
 // ラスター画像レイヤーの追加
-const rasterLayer = new Thematika.RasterLayer('raster', {
+const imageLayer = new Thematika.ImageLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
     style: { opacity: 0.7 }
 });
 
 // 投影法を設定
-rasterLayer.setProjection(map.getProjection());
-map.addLayer('raster', rasterLayer);</pre>
+imageLayer.setProjection(map.getProjection());
+map.addLayer('raster', imageLayer);</pre>
         </div>
     </div>
 
@@ -150,7 +150,7 @@ map.addLayer('raster', rasterLayer);</pre>
 
         // 地図の初期化
         let currentProjection = d3.geoEquirectangular();
-        let map, rasterLayer, graticuleLayer, backgroundLayer;
+        let map, imageLayer, graticuleLayer, backgroundLayer;
         let worldData = null;
         let aoiData = null;
         let showBboxMarkers = false;
@@ -195,14 +195,14 @@ map.addLayer('raster', rasterLayer);</pre>
 
             // ラスターレイヤー（アフリカの画像を使用）
             // GeoJSONと同じ座標を使用（西端は負の値）
-            rasterLayer = new Thematika.RasterLayer('raster', {
+            imageLayer = new Thematika.ImageLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { opacity: 0.7 },
                 showBboxMarkers: showBboxMarkers
             });
 
-            rasterLayer.setProjection(currentProjection);
+            imageLayer.setProjection(currentProjection);
             
 
 
@@ -218,7 +218,7 @@ map.addLayer('raster', rasterLayer);</pre>
 
             map.addLayer('countries', backgroundLayer);
             map.addLayer('graticule', graticuleLayer);
-            map.addLayer('raster', rasterLayer);
+            map.addLayer('raster', imageLayer);
 
         }
 

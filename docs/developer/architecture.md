@@ -12,7 +12,7 @@ d3-Cartgraphy
 ├── Layer System (レイヤーシステム)
 │   ├── BaseLayer (基底クラス)
 │   ├── GeojsonLayer (GeoJSONレイヤー)
-│   └── [Future: RasterLayer, etc.]
+│   └── [Future: ImageLayer, etc.]
 ├── Utilities (ユーティリティ)
 │   ├── FilterUtils (SVGフィルター)
 │   ├── PatternUtils (SVGパターン)

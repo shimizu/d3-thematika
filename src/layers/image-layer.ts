@@ -4,9 +4,9 @@ import { BaseLayer } from './base-layer';
 import { LayerStyle } from '../types';
 
 /**
- * ラスターレイヤーのオプション
+ * 画像レイヤーのオプション
  */
-export interface RasterLayerOptions {
+export interface ImageLayerOptions {
   /** 画像のURL */
   src: string;
   /** 画像の地理的境界 [west, south, east, north] */
@@ -22,11 +22,11 @@ export interface RasterLayerOptions {
 }
 
 /**
- * ラスター画像を地図上に表示するレイヤー
+ * 画像を地図上に表示するレイヤー
  * Equirectangular投影法の場合は高速に描画し、
  * その他の投影法では画像を変換して表示します
  */
-export class RasterLayer extends BaseLayer {
+export class ImageLayer extends BaseLayer {
   private src: string;
   private bounds: [number, number, number, number];
   private projection?: GeoProjection;
@@ -36,11 +36,11 @@ export class RasterLayer extends BaseLayer {
   private useMask: boolean = true;
 
   /**
-   * RasterLayerを初期化します
+   * ImageLayerを初期化します
    * @param id - レイヤーの一意識別子
    * @param options - レイヤーのオプション
    */
-  constructor(id: string, options: RasterLayerOptions) {
+  constructor(id: string, options: ImageLayerOptions) {
     super(id, options.style);
     this.src = options.src;
     this.bounds = options.bounds;
@@ -76,7 +76,7 @@ export class RasterLayer extends BaseLayer {
           this.renderSimpleImage(img);
         }
       }).catch(error => {
-        console.error('RasterLayer: 更新に失敗しました', error);
+        console.error('ImageLayer: 更新に失敗しました', error);
       });
     }
   }
@@ -87,12 +87,12 @@ export class RasterLayer extends BaseLayer {
    */
   public async render(container: Selection<SVGGElement, unknown, HTMLElement, any>): Promise<void> {
     if (!this.projection) {
-      console.warn('RasterLayer: 投影法が設定されていません');
+      console.warn('ImageLayer: 投影法が設定されていません');
       return;
     }
 
     const g = container.append('g')
-      .attr('class', `raster-layer ${this.style.className || ''}`)
+      .attr('class', `image-layer ${this.style.className || ''}`)
       .attr('id', `layer-${this.id}`);
     
     if (!this.visible) {
@@ -115,7 +115,7 @@ export class RasterLayer extends BaseLayer {
         await this.renderSimpleImage(img);
       }
     } catch (error) {
-      console.error('RasterLayer: 画像の描画に失敗しました', error);
+      console.error('ImageLayer: 画像の描画に失敗しました', error);
     }
 
 
@@ -163,7 +163,7 @@ export class RasterLayer extends BaseLayer {
     const bottomLeft = this.projection([west, south]);
     const bottomRight = this.projection([east, south]);
     
-    console.log('=== RasterLayer bbox projection ===');
+    console.log('=== ImageLayer bbox projection ===');
     console.log('Original bbox coordinates:');
     console.log('  West (left):', west);
     console.log('  South (bottom):', south);
@@ -196,7 +196,7 @@ export class RasterLayer extends BaseLayer {
     }
     
     if (!topLeft || !bottomRight) {
-      console.warn('RasterLayer: 境界が投影範囲外です');
+      console.warn('ImageLayer: 境界が投影範囲外です');
       return;
     }
     
@@ -252,7 +252,7 @@ export class RasterLayer extends BaseLayer {
 
     // 画像サイズチェック（1000×1000まで）
     if (img.width > 1000 || img.height > 1000) {
-      throw new Error('RasterLayer: 投影変換を行う場合、画像サイズは1000×1000ピクセル以下にしてください');
+      throw new Error('ImageLayer: 投影変換を行う場合、画像サイズは1000×1000ピクセル以下にしてください');
     }
 
     const transformedDataUrl = await this.transformRasterImage(img);
@@ -306,7 +306,7 @@ export class RasterLayer extends BaseLayer {
       .filter(p => p !== null) as [number, number][];
     
     if (projectedPoints.length === 0) {
-      throw new Error('RasterLayer: 画像が投影範囲外です');
+      throw new Error('ImageLayer: 画像が投影範囲外です');
     }
     
     const minX = Math.floor(Math.min(...projectedPoints.map(p => p[0])));

@@ -144,7 +144,7 @@ const map = new Thematika.Map({
 
 
 // ラスターレイヤー（アフリカの画像を使用）
-rasterLayer = new Thematika.RasterLayer('raster', {
+imageLayer = new Thematika.ImageLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
     style: { 
@@ -153,7 +153,7 @@ rasterLayer = new Thematika.RasterLayer('raster', {
     },
     
 });
-map.addLayer('raster', rasterLayer);
+map.addLayer('raster', imageLayer);
             </pre>
 
 
@@ -214,7 +214,7 @@ map.addLayer('raster', rasterLayer);
 
             
             // ラスターレイヤー（アフリカの画像を使用）
-            rasterLayer = new Thematika.RasterLayer('raster', {
+            imageLayer = new Thematika.ImageLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { 
@@ -223,7 +223,7 @@ map.addLayer('raster', rasterLayer);
                 },
                 
             });
-            map.addLayer('raster', rasterLayer);
+            map.addLayer('raster', imageLayer);
             
 
             // 経緯線レイヤー
