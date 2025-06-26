@@ -31,17 +31,17 @@ const meta: Meta<GraticuleLayerArgs> = {
     stroke: {
       control: { type: 'color' },
       description: '線の色',
-      defaultValue: '#ddd'
+      defaultValue: '#333333'
     },
     strokeWidth: {
-      control: { type: 'range', min: 0.1, max: 3, step: 0.1 },
+      control: { type: 'range', min: 0.5, max: 5, step: 0.5 },
       description: '線の太さ',
-      defaultValue: 0.5
+      defaultValue: 1.5
     },
     opacity: {
       control: { type: 'range', min: 0, max: 1, step: 0.1 },
       description: '透明度',
-      defaultValue: 0.6
+      defaultValue: 1
     },
     projection: {
       control: { type: 'select' },
@@ -109,10 +109,10 @@ const render = (args: GraticuleLayerArgs) => {
 
 export const Default: Story = {
   args: {
-    step: [10, 10],
-    stroke: '#ddd',
-    strokeWidth: 0.5,
-    opacity: 0.6,
+    step: [20, 20],
+    stroke: '#333333',
+    strokeWidth: 1.5,
+    opacity: 1,
     projection: 'naturalEarth1'
   },
   render
@@ -120,10 +120,10 @@ export const Default: Story = {
 
 export const DenseGrid: Story = {
   args: {
-    step: [5, 5],
-    stroke: '#ccc',
-    strokeWidth: 0.3,
-    opacity: 0.8,
+    step: [10, 10],
+    stroke: '#4444ff',
+    strokeWidth: 1,
+    opacity: 1,
     projection: 'naturalEarth1'
   },
   render
@@ -132,9 +132,9 @@ export const DenseGrid: Story = {
 export const SparseGrid: Story = {
   args: {
     step: [30, 30],
-    stroke: '#999',
-    strokeWidth: 1,
-    opacity: 0.4,
+    stroke: '#ff4444',
+    strokeWidth: 2,
+    opacity: 1,
     projection: 'naturalEarth1'
   },
   render
@@ -143,9 +143,9 @@ export const SparseGrid: Story = {
 export const OrthographicProjection: Story = {
   args: {
     step: [20, 20],
-    stroke: '#666',
-    strokeWidth: 0.5,
-    opacity: 0.7,
+    stroke: '#228822',
+    strokeWidth: 1.5,
+    opacity: 1,
     projection: 'orthographic'
   },
   render

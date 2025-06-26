@@ -25,8 +25,6 @@
   "dependencies": {
     "@turf/turf": "^7.2.0",
     "@types/d3-drag": "^3.0.7",
-    "@types/d3-scale": "^4.0.9",
-    "@types/d3-scale-chromatic": "^3.1.0",
     "d3-drag": "^3.0.0",
     "d3-geo": "^3.1.1",
     "d3-scale": "^4.0.2",
@@ -44,6 +42,8 @@
     "@storybook/html": "^9.0.13",
     "@storybook/html-vite": "^9.0.13",
     "@types/d3-geo": "^3.1.0",
+    "@types/d3-scale": "^4.0.9",
+    "@types/d3-scale-chromatic": "^3.1.0",
     "@types/d3-selection": "^3.0.11",
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
