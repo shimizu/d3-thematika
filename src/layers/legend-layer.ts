@@ -475,7 +475,7 @@ export class LegendLayer extends BaseLayer {
     
     this.layerGroup
       .append('text')
-      .attr('class', 'cartography-legend-title')
+      .attr('class', 'thematika-legend-title')
       .attr('x', 0)
       .attr('y', 0)
       .style('font-size', `${this.fontSize + 2}px`)
@@ -495,11 +495,11 @@ export class LegendLayer extends BaseLayer {
     const titleOffset = this.title ? this.fontSize + 10 : 0;
     
     const items = this.layerGroup
-      .selectAll('.cartography-legend-item')
+      .selectAll('.thematika-legend-item')
       .data(legendData.data)
       .enter()
       .append('g')
-      .attr('class', 'cartography-legend-item');
+      .attr('class', 'thematika-legend-item');
     
     // 固定サイズのセル
     const cellSize = this.symbolSize.fixed || 16;
@@ -540,11 +540,11 @@ export class LegendLayer extends BaseLayer {
     const titleOffset = this.title ? this.fontSize + 10 : 0;
     
     const items = this.layerGroup
-      .selectAll('.cartography-legend-item')
+      .selectAll('.thematika-legend-item')
       .data(legendData.data)
       .enter()
       .append('g')
-      .attr('class', 'cartography-legend-item');
+      .attr('class', 'thematika-legend-item');
     
     // 固定サイズの円
     const radius = (this.symbolSize.fixed || 16) / 2;
@@ -584,11 +584,11 @@ export class LegendLayer extends BaseLayer {
     const titleOffset = this.title ? this.fontSize + 10 : 0;
     
     const items = this.layerGroup
-      .selectAll('.cartography-legend-item')
+      .selectAll('.thematika-legend-item')
       .data(legendData.data)
       .enter()
       .append('g')
-      .attr('class', 'cartography-legend-item');
+      .attr('class', 'thematika-legend-item');
     
     // 固定サイズの線
     const lineLength = this.symbolSize.fixed || 24;
@@ -751,7 +751,7 @@ export class LegendLayer extends BaseLayer {
     // シンボルグループを作成
     const symbolGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-symbols');
+      .attr('class', 'thematika-legend-symbols');
     
     // 円をボトム揃えで描画（大きい順）
     sortedData.forEach((item, i) => {
@@ -771,7 +771,7 @@ export class LegendLayer extends BaseLayer {
     // ガイドライン（リーダーライン）を描画
     const guidelineGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-guidelines');
+      .attr('class', 'thematika-legend-guidelines');
     
     const labelStartX = centerX + maxRadius + 20; // ラベルを少し離す
     const guidelineEndX = labelStartX - 4; // ラベルの少し手前まで
@@ -796,7 +796,7 @@ export class LegendLayer extends BaseLayer {
     // ラベルを右側に統一配置（ガイドラインの終点に合わせて）
     const labelGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-labels');
+      .attr('class', 'thematika-legend-labels');
     
     // ラベルを各円のトップの高さに配置
     sortedData.forEach((item, i) => {
@@ -838,7 +838,7 @@ export class LegendLayer extends BaseLayer {
     // シンボルグループを作成
     const symbolGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-symbols');
+      .attr('class', 'thematika-legend-symbols');
     
     // セルをボトム揃えで重ね表示（枠線のみ）
     sortedData.forEach((item, i) => {
@@ -860,7 +860,7 @@ export class LegendLayer extends BaseLayer {
     // ガイドライン（リーダーライン）を描画
     const guidelineGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-guidelines');
+      .attr('class', 'thematika-legend-guidelines');
     
     const labelStartX = centerX + maxSide / 2 + 20; // ラベルを少し離す
     const guidelineEndX = labelStartX - 4; // ラベルの少し手前まで
@@ -885,7 +885,7 @@ export class LegendLayer extends BaseLayer {
     // ラベルを右側に統一配置（ガイドラインの終点に合わせて）
     const labelGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-labels');
+      .attr('class', 'thematika-legend-labels');
     
     // ラベルを各セルのトップの高さに配置
     sortedData.forEach((item, i) => {
@@ -924,7 +924,7 @@ export class LegendLayer extends BaseLayer {
     // シンボルグループを作成
     const symbolGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-symbols');
+      .attr('class', 'thematika-legend-symbols');
     
     // 線を中央揃えで重ね表示
     sortedData.forEach((item, i) => {
@@ -942,7 +942,7 @@ export class LegendLayer extends BaseLayer {
     // ラベルを右側に統一配置
     const labelGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-legend-labels');
+      .attr('class', 'thematika-legend-labels');
     
     const labelStartX = lineLength + 10;
     const labelSpacing = this.fontSize + 4;
@@ -969,11 +969,11 @@ export class LegendLayer extends BaseLayer {
     if (!this.layerGroup || !legendData.sizes) return;
     
     const items = this.layerGroup
-      .selectAll('.cartography-legend-item')
+      .selectAll('.thematika-legend-item')
       .data(legendData.data)
       .enter()
       .append('g')
-      .attr('class', 'cartography-legend-item');
+      .attr('class', 'thematika-legend-item');
     
     // サイズスケールが有効な場合の可変サイズ表示
     switch (this.symbolType) {
@@ -1190,7 +1190,7 @@ export class LegendLayer extends BaseLayer {
     // 背景矩形を最初に挿入（z-orderを背面にするため）
     const background = this.layerGroup
       .insert('rect', ':first-child')
-      .attr('class', 'cartography-legend-background')
+      .attr('class', 'thematika-legend-background')
       .attr('x', legendBBox.x - padding)
       .attr('y', legendBBox.y - padding)
       .attr('width', legendBBox.width + padding * 2)
@@ -1329,7 +1329,7 @@ export class LegendLayer extends BaseLayer {
   private updateBackgroundOpacity(): void {
     if (!this.layerGroup) return;
 
-    const background = this.layerGroup.select('.cartography-legend-background');
+    const background = this.layerGroup.select('.thematika-legend-background');
     if (!background.empty()) {
       const backgroundOpacity = this.showBackground 
         ? (this.backgroundStyle.opacity || 0.9) 
@@ -1346,7 +1346,7 @@ export class LegendLayer extends BaseLayer {
   private updateBackgroundStyles(): void {
     if (!this.layerGroup) return;
 
-    const background = this.layerGroup.select('.cartography-legend-background');
+    const background = this.layerGroup.select('.thematika-legend-background');
     if (!background.empty()) {
       const backgroundOpacity = this.showBackground 
         ? (this.backgroundStyle.opacity || 0.9) 

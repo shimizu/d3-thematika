@@ -79,7 +79,7 @@ describe('LegendLayer', () => {
       legend.render(container);
 
       expect(container.append).toHaveBeenCalledWith('g');
-      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('cartography-layer'));
+      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('thematika-layer'));
     });
 
     it('凡例アイテムが生成される', () => {

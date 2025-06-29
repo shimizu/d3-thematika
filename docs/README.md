@@ -47,7 +47,7 @@ D3 Cartographyは、[bertin.js](https://github.com/neocarto/bertin)に代わる�
 
 実際の動作を確認できるデモページをGitHub Pagesで公開しています：
 
-🔗 **[Live Demo](https://shimizu.github.io/d3-cartography/)**
+🔗 **[Live Demo](https://shimizu.github.io/d3-thematika/)**
 
 ## 📄 ライセンス
 

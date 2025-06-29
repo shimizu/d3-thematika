@@ -1,11 +1,11 @@
 # アーキテクチャ
 
-d3-Cartgraphyライブラリの全体構造と設計思想について説明します。
+d3-Thematikaライブラリの全体構造と設計思想について説明します。
 
 ## 全体構造
 
 ```
-d3-Cartgraphy
+d3-Thematika
 ├── Core Layer (コア機能)
 │   ├── Cartography (メインクラス)
 │   └── LayerManager (レイヤー管理)

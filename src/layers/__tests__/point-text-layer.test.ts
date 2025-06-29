@@ -181,7 +181,7 @@ describe('PointTextLayer', () => {
       layer.render(container);
       
       expect(container.append).toHaveBeenCalledWith('g');
-      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('cartography-layer'));
+      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('thematika-layer'));
     });
 
     it('投影法が設定されていない場合は描画されない', () => {
@@ -232,7 +232,7 @@ describe('PointTextLayer', () => {
       
       layer.render(container);
       
-      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('cartography-layer'));
+      expect(container.attr).toHaveBeenCalledWith('class', expect.stringContaining('thematika-layer'));
     });
 
     it('投影法設定後にテキスト要素にクラスが適用される', () => {

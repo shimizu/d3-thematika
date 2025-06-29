@@ -178,7 +178,7 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
     if (!this.layerGroup || !this.projection) return;
 
     // 既存のテキストを削除
-    this.layerGroup.selectAll('g.cartography-point-text-layer').remove();
+    this.layerGroup.selectAll('g.thematika-point-text-layer').remove();
 
     // 各フィーチャーの座標とテキストデータを取得
     const textData = this.data.features.map((feature, index) => {
@@ -220,7 +220,7 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
     // テキスト要素を作成
     const texts = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-point-text-layer')
+      .attr('class', 'thematika-point-text-layer')
       .selectAll('text')
       .data(textData)
       .enter()
@@ -237,7 +237,7 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
       .attr('font-size', d => d.fontSize)
       .attr('font-weight', d => d.fontWeight)
       .attr('class', d => {
-        const baseClass = 'cartography-point-text';
+        const baseClass = 'thematika-point-text';
         const customClass = this.style.className || '';
         const featureClass = (d.feature.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');

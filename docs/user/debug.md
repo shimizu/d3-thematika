@@ -1,6 +1,6 @@
 # デバッグガイド
 
-このページでは、d3-cartographyライブラリのデバッグに役立つ機能について説明します。
+このページでは、d3-thematikaライブラリのデバッグに役立つ機能について説明します。
 
 ## 座標変換テスト機能
 
@@ -86,7 +86,7 @@ interface ProjectionTestResult {
 #### 基本的な使用法
 
 ```javascript
-import { testProjectionBounds } from 'd3-cartography';
+import { testProjectionBounds } from 'd3-thematika';
 
 const boundsTest = testProjectionBounds(projection, geoJsonData);
 console.log(boundsTest.message);

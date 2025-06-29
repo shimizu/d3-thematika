@@ -97,12 +97,12 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     // 経緯線パス要素を作成
     const graticulePath = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-graticule-layer')
+      .attr('class', 'thematika-graticule-layer')
       .append('path')
       .datum(graticuleGeometry)
       .attr('d', this.path)
       .attr('class', () => {
-        const baseClass = 'cartography-graticule';
+        const baseClass = 'thematika-graticule';
         const customClass = this.style.className || '';
         return [baseClass, customClass].filter(Boolean).join(' ');
       });

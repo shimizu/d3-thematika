@@ -88,14 +88,14 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
     // パス要素を作成
     const paths = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-geojson-layer')
+      .attr('class', 'thematika-geojson-layer')
       .selectAll('path')
       .data(this.data.features)
       .enter()
       .append('path')
       .attr('d', this.path)
       .attr('class', d => {
-        const baseClass = 'cartography-feature';
+        const baseClass = 'thematika-feature';
         const customClass = this.style.className || '';
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');

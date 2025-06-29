@@ -119,12 +119,12 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     // アウトラインパス要素を作成
     const outlinePath = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-outline-layer')
+      .attr('class', 'thematika-outline-layer')
       .append('path')
       .datum(sphereGeometry)
       .attr('d', this.path)
       .attr('class', () => {
-        const baseClass = 'cartography-outline';
+        const baseClass = 'thematika-outline';
         const customClass = this.style.className || '';
         return [baseClass, customClass].filter(Boolean).join(' ');
       });

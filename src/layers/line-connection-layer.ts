@@ -193,7 +193,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     
     // defsを作成
     const defs = this.layerGroup.append('defs')
-      .attr('class', 'cartography-line-connection-defs');
+      .attr('class', 'thematika-line-connection-defs');
 
     // 開始点用の矢印マーカー
     if (this.startArrow) {
@@ -235,7 +235,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
 
     const lineGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-line-connection-layer');
+      .attr('class', 'thematika-line-connection-layer');
 
     // 各フィーチャーを処理
     this.data.features.forEach((feature, featureIndex) => {
@@ -289,7 +289,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
         .datum(segmentData)
         .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
         .attr('class', () => {
-          const baseClass = 'cartography-connection-line';
+          const baseClass = 'thematika-connection-line';
           const customClass = this.style.className || '';
           const dataClass = feature.properties?.class || '';
           const segmentClass = `segment-${i}`;

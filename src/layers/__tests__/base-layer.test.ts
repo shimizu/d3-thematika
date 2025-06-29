@@ -78,7 +78,7 @@ describe('BaseLayer', () => {
       testLayer.render(mockContainer);
       
       expect(mockContainer.append).toHaveBeenCalledWith('g');
-      expect(mockContainer.attr).toHaveBeenCalledWith('class', 'cartography-layer cartography-layer--test-layer');
+      expect(mockContainer.attr).toHaveBeenCalledWith('class', 'thematika-layer thematika-layer--test-layer');
       expect(testLayer.isRendered()).toBe(true);
     });
 

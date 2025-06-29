@@ -142,7 +142,7 @@ describe('GeojsonLayer', () => {
       geojsonLayer.render(mockContainer);
 
       expect(mockContainer.append).toHaveBeenCalledWith('g');
-      expect(mockContainer.attr).toHaveBeenCalledWith('class', expect.stringContaining('cartography-layer'));
+      expect(mockContainer.attr).toHaveBeenCalledWith('class', expect.stringContaining('thematika-layer'));
     });
 
     test('投影法が設定されていない場合は描画されない', () => {

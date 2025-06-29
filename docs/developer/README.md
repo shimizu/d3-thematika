@@ -1,6 +1,6 @@
 # 開発者ドキュメント
 
-d3-cartographyライブラリの開発に関するドキュメントです。
+d3-thematikaライブラリの開発に関するドキュメントです。
 
 ## 目次
 
@@ -12,8 +12,8 @@ d3-cartographyライブラリの開発に関するドキュメントです。
 
 ```bash
 # リポジトリをクローン
-git clone https://github.com/shimizu/d3-cartography.git
-cd d3-cartography
+git clone https://github.com/shimizu/d3-thematika.git
+cd d3-thematika
 
 # 依存関係をインストール
 npm install

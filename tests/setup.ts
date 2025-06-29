@@ -26,7 +26,7 @@ global.console = {
   expect(actual).toBeCloseTo(expected, precision);
 };
 
-// Cartography固有のテストヘルパー関数
+// Thematika固有のテストヘルパー関数
 (global as any).expectCoordinateToBeValid = (coord: [number, number]) => {
   expect(Array.isArray(coord)).toBe(true);
   expect(coord).toHaveLength(2);

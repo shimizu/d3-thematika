@@ -128,7 +128,7 @@ export abstract class BaseLayer implements ILayer {
   ): Selection<SVGGElement, unknown, HTMLElement, any> {
     const group = container
       .append('g')
-      .attr('class', `cartography-layer cartography-layer--${this.id}`)
+      .attr('class', `thematika-layer thematika-layer--${this.id}`)
       .style('display', this.visible ? '' : 'none');
 
     this.element = group.node()!;

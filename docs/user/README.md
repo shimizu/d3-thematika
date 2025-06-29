@@ -1,14 +1,14 @@
-# d3-cartography ユーザーガイド
+# d3-thematika ユーザーガイド
 
-d3-cartographyは、美しいスタティックな主題図を作成するためのJavaScriptライブラリです。
+d3-thematikaは、美しいスタティックな主題図を作成するためのJavaScriptライブラリです。
 
 ## 目次
 
-- [デバッグ](./debug.md) - d3-cartographyを使用時のデバッグ方法
+- [デバッグ](./debug.md) - d3-thematikaを使用時のデバッグ方法
 
 ## 概要
 
-d3-cartographyは以下のような特徴を持ちます：
+d3-thematikaは以下のような特徴を持ちます：
 
 - 📊 **主題図に特化**: スタティックな主題図作成に最適化
 - 🎨 **美しいデザイン**: CSS/SVGエフェクトを活用した美しい地図
@@ -21,7 +21,7 @@ d3-cartographyは以下のような特徴を持ちます：
 ### インストール
 
 ```bash
-npm install d3-cartography
+npm install d3-thematika
 ```
 
 ### 基本的な使用例
@@ -31,7 +31,7 @@ npm install d3-cartography
 <html>
 <head>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="./dist/cartography.umd.js"></script>
+    <script src="./dist/thematika.umd.js"></script>
 </head>
 <body>
     <div id="map"></div>
@@ -89,5 +89,5 @@ ISC License
 
 ## コミュニティ
 
-- [GitHub Issues](https://github.com/shimizu/d3-cartography/issues) - バグ報告や機能要望
-- [GitHub Discussions](https://github.com/shimizu/d3-cartography/discussions) - 質問や議論
+- [GitHub Issues](https://github.com/shimizu/d3-thematika/issues) - バグ報告や機能要望
+- [GitHub Discussions](https://github.com/shimizu/d3-thematika/discussions) - 質問や議論

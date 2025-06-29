@@ -99,7 +99,7 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
     if (!this.layerGroup || !this.projection) return;
 
     // 既存のサークルを削除
-    this.layerGroup.selectAll('g.cartography-point-circle-layer').remove();
+    this.layerGroup.selectAll('g.thematika-point-circle-layer').remove();
 
     // 各フィーチャーの座標を取得
     const circleData = this.data.features.map((feature, index) => {
@@ -129,7 +129,7 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
     // サークル要素を作成
     const circles = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-point-circle-layer')
+      .attr('class', 'thematika-point-circle-layer')
       .selectAll('circle')
       .data(circleData)
       .enter()
@@ -138,7 +138,7 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
       .attr('cy', d => d.y)
       .attr('r', d => d.r)
       .attr('class', d => {
-        const baseClass = 'cartography-point-circle';
+        const baseClass = 'thematika-point-circle';
         const customClass = this.style.className || '';
         const featureClass = (d.feature.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');

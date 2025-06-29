@@ -5,11 +5,11 @@ const path = require('path');
 
 /**
  * demoPages用のファイルを構築するスクリプト
- * examples/とdist/cartography.umd.jsをdemoPagesにコピーします
+ * examples/とdist/thematika.umd.jsをdemoPagesにコピーします
  */
 
 const sourceExamplesDir = path.join(__dirname, '../examples');
-const sourceDistFile = path.join(__dirname, '../dist/cartography.umd.js');
+const sourceDistFile = path.join(__dirname, '../dist/thematika.umd.js');
 const targetDir = path.join(__dirname, '../demoPages');
 
 /**
@@ -57,17 +57,17 @@ try {
   console.log('📁 Copying examples directory...');
   copyDirectory(sourceExamplesDir, targetDir);
 
-  // dist/cartography.umd.js をコピー
-  console.log('📦 Copying cartography.umd.js...');
-  const targetDistFile = path.join(targetDir, 'cartography.umd.js');
+  // dist/thematika.umd.js をコピー
+  console.log('📦 Copying thematika.umd.js...');
+  const targetDistFile = path.join(targetDir, 'thematika.umd.js');
   copyFile(sourceDistFile, targetDistFile);
 
   // index.htmlのパス調整（必要に応じて）
   const indexPath = path.join(targetDir, 'index.html');
   if (fs.existsSync(indexPath)) {
     let content = fs.readFileSync(indexPath, 'utf8');
-    // 相対パスの調整（./cartography.umd.jsに変更）
-    content = content.replace('./cartography.umd.js', './cartography.umd.js');
+    // 相対パスの調整（./thematika.umd.jsに変更）
+    content = content.replace('./thematika.umd.js', './thematika.umd.js');
     fs.writeFileSync(indexPath, content);
     console.log('📝 Updated index.html paths');
   }
