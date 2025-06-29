@@ -79,17 +79,6 @@ export interface IGeojsonLayer extends ILayer {
   setProjection(projection: GeoProjection): void;
 }
 
-/**
- * LineConnectionLayerで使用するライン接続データ
- */
-export interface LineConnectionData {
-  /** 開始点の座標 [経度, 緯度] */
-  start: [number, number];
-  /** 終了点の座標 [経度, 緯度] */
-  end: [number, number];
-  /** データの属性情報 */
-  properties?: { [key: string]: any };
-}
 
 /**
  * アーク制御点の位置タイプ

@@ -1,15 +1,15 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
-import { geoInterpolate } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, ILineConnectionLayer, LineConnectionData, ArcControlPointType, ArcOffsetType } from '../types';
+import { LayerStyle, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
+import * as GeoJSON from 'geojson';
 
 /**
  * LineConnectionLayerの初期化オプション
  */
 export interface LineConnectionLayerOptions {
-  /** ライン接続データ */
-  data: LineConnectionData[];
+  /** GeoJSONデータ（LineString/MultiLineString） */
+  data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
   /** レイヤーのスタイル設定 */
   style?: LayerStyle;
   /** レイヤーの属性設定（styleのエイリアス） */
@@ -31,11 +31,12 @@ export interface LineConnectionLayerOptions {
 }
 
 /**
- * 2点間をラインで接続するレイヤークラス
+ * 複数点間をラインで接続するレイヤークラス
+ * LineString/MultiLineString形式のGeoJSONデータをサポート
  */
 export class LineConnectionLayer extends BaseLayer implements ILineConnectionLayer {
-  /** ライン接続データ */
-  private data: LineConnectionData[];
+  /** GeoJSONデータ */
+  private data: GeoJSON.FeatureCollection;
   /** パス生成器 */
   private path?: GeoPath;
   /** レイヤーグループ */
@@ -65,9 +66,20 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     // 一意のIDを自動生成
     super(`line-connection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || options.style);
     
+    // データをFeatureCollectionに正規化
+    if (Array.isArray(options.data)) {
+      // Feature配列の場合
+      this.data = { type: 'FeatureCollection', features: options.data };
+    } else if (options.data.type === 'Feature') {
+      // 単一Featureの場合
+      this.data = { type: 'FeatureCollection', features: [options.data as GeoJSON.Feature] };
+    } else {
+      // FeatureCollectionの場合
+      this.data = options.data as GeoJSON.FeatureCollection;
+    }
+    
     // データ検証
-    this.validateData(options.data);
-    this.data = options.data;
+    this.validateData(this.data);
     
     this.lineType = options.lineType || 'straight';
     this.arcHeight = options.arcHeight || 0.3;
@@ -83,34 +95,61 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    * @param data - 検証対象のデータ
    * @private
    */
-  private validateData(data: LineConnectionData[]): void {
-    if (!Array.isArray(data)) {
-      throw new Error('LineConnectionLayer: データは配列である必要があります');
+  private validateData(data: GeoJSON.FeatureCollection): void {
+    if (!data || data.type !== 'FeatureCollection') {
+      throw new Error('LineConnectionLayer: データはFeatureCollectionである必要があります');
     }
 
-    data.forEach((item, index) => {
-      if (!item.start || !item.end) {
-        throw new Error(`LineConnectionLayer: データ[${index}]にstartまたはendが存在しません`);
+    if (!Array.isArray(data.features)) {
+      throw new Error('LineConnectionLayer: featuresが配列ではありません');
+    }
+
+    data.features.forEach((feature, index) => {
+      if (!feature.geometry) {
+        throw new Error(`LineConnectionLayer: フィーチャー[${index}]にgeometryが存在しません`);
       }
 
-      if (!Array.isArray(item.start) || item.start.length !== 2) {
-        throw new Error(`LineConnectionLayer: データ[${index}].startは[経度, 緯度]の配列である必要があります`);
+      const geometry = feature.geometry as GeoJSON.LineString | GeoJSON.MultiLineString;
+      const { type, coordinates } = geometry;
+      
+      if (type !== 'LineString' && type !== 'MultiLineString') {
+        throw new Error(`LineConnectionLayer: フィーチャー[${index}]は'LineString'または'MultiLineString'である必要があります`);
       }
 
-      if (!Array.isArray(item.end) || item.end.length !== 2) {
-        throw new Error(`LineConnectionLayer: データ[${index}].endは[経度, 緯度]の配列である必要があります`);
+      // 座標の検証
+      if (type === 'LineString') {
+        this.validateCoordinates(coordinates as GeoJSON.Position[], index);
+      } else if (type === 'MultiLineString') {
+        (coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
+          this.validateCoordinates(line, index, lineIndex);
+        });
+      }
+    });
+  }
+
+  /**
+   * 座標配列を検証します
+   * @private
+   */
+  private validateCoordinates(coordinates: GeoJSON.Position[], featureIndex: number, lineIndex?: number): void {
+    const lineId = lineIndex !== undefined ? `[${featureIndex}]のライン[${lineIndex}]` : `[${featureIndex}]`;
+    
+    if (!Array.isArray(coordinates) || coordinates.length < 2) {
+      throw new Error(`LineConnectionLayer: フィーチャー${lineId}は少なくとも2点の座標が必要です`);
+    }
+
+    coordinates.forEach((coord, coordIndex) => {
+      if (!Array.isArray(coord) || coord.length < 2) {
+        throw new Error(`LineConnectionLayer: フィーチャー${lineId}の座標[${coordIndex}]は[経度, 緯度]の配列である必要があります`);
       }
 
-      // 座標値の範囲チェック
-      const [startLon, startLat] = item.start;
-      const [endLon, endLat] = item.end;
-
-      if (startLon < -180 || startLon > 180 || endLon < -180 || endLon > 180) {
-        throw new Error(`LineConnectionLayer: データ[${index}]の経度は-180から180の範囲である必要があります`);
+      const [lon, lat] = coord;
+      if (lon < -180 || lon > 180) {
+        throw new Error(`LineConnectionLayer: フィーチャー${lineId}の座標[${coordIndex}]の経度は-180から180の範囲である必要があります`);
       }
 
-      if (startLat < -90 || startLat > 90 || endLat < -90 || endLat > 90) {
-        throw new Error(`LineConnectionLayer: データ[${index}]の緯度は-90から90の範囲である必要があります`);
+      if (lat < -90 || lat > 90) {
+        throw new Error(`LineConnectionLayer: フィーチャー${lineId}の座標[${coordIndex}]の緯度は-90から90の範囲である必要があります`);
       }
     });
   }
@@ -194,58 +233,106 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private renderLines(): void {
     if (!this.layerGroup || !this.path || !this.projection) return;
 
-    // ライン要素を作成
-    const lines = this.layerGroup
+    const lineGroup = this.layerGroup
       .append('g')
-      .attr('class', 'cartography-line-connection-layer')
-      .selectAll('path')
-      .data(this.data)
-      .enter()
-      .append('path')
-      .attr('d', (d, i) => this.generateLinePath(d, i))
-      .attr('class', d => {
-        const baseClass = 'cartography-connection-line';
-        const customClass = this.style.className || '';
-        const dataClass = d.properties?.class || '';
-        return [baseClass, customClass, dataClass].filter(Boolean).join(' ');
-      })
-      .style('fill', 'none')
-      .style('cursor', 'pointer');
+      .attr('class', 'cartography-line-connection-layer');
 
-    // 矢印マーカーを適用
-    if (this.startArrow || this.endArrow) {
-      const markerId = `arrow-${this.id}`;
-      if (this.startArrow) {
-        lines.attr('marker-start', `url(#${markerId}-start)`);
+    // 各フィーチャーを処理
+    this.data.features.forEach((feature, featureIndex) => {
+      const geometry = feature.geometry;
+      
+      if (geometry.type === 'LineString') {
+        this.renderLineString(
+          lineGroup,
+          geometry.coordinates as GeoJSON.Position[],
+          feature,
+          featureIndex
+        );
+      } else if (geometry.type === 'MultiLineString') {
+        (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
+          this.renderLineString(
+            lineGroup,
+            line,
+            feature,
+            featureIndex,
+            lineIndex
+          );
+        });
       }
-      if (this.endArrow) {
-        lines.attr('marker-end', `url(#${markerId}-end)`);
-      }
-    }
-
-    // スタイル属性を適用
-    this.applyStylesToElements(lines, this.layerGroup);
+    });
   }
 
   /**
-   * ラインのパスを生成します
-   * @param connection - ライン接続データ
-   * @param index - データのインデックス
+   * LineStringをセグメントごとに描画します
+   * @private
+   */
+  private renderLineString(
+    container: Selection<SVGGElement, unknown, HTMLElement, any>,
+    coordinates: GeoJSON.Position[],
+    feature: GeoJSON.Feature,
+    featureIndex: number,
+    lineIndex?: number
+  ): void {
+    // 連続する2点ごとにセグメントを作成
+    for (let i = 0; i < coordinates.length - 1; i++) {
+      const segmentData = {
+        start: coordinates[i],
+        end: coordinates[i + 1],
+        feature: feature,
+        segmentIndex: i,
+        isFirst: i === 0,
+        isLast: i === coordinates.length - 2
+      };
+
+      const path = container
+        .append('path')
+        .datum(segmentData)
+        .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
+        .attr('class', () => {
+          const baseClass = 'cartography-connection-line';
+          const customClass = this.style.className || '';
+          const dataClass = feature.properties?.class || '';
+          const segmentClass = `segment-${i}`;
+          const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
+          return [baseClass, customClass, dataClass, segmentClass, lineClass].filter(Boolean).join(' ');
+        })
+        .style('fill', 'none')
+        .style('cursor', 'pointer');
+
+      // 矢印マーカーを適用
+      const markerId = `arrow-${this.id}`;
+      if (this.startArrow && segmentData.isFirst) {
+        path.attr('marker-start', `url(#${markerId}-start)`);
+      }
+      if (this.endArrow && segmentData.isLast) {
+        path.attr('marker-end', `url(#${markerId}-end)`);
+      }
+
+      // スタイル属性を適用
+      super.applyStylesToElement(path, feature, featureIndex);
+    }
+  }
+
+
+  /**
+   * セグメントのパスを生成します
+   * @param start - 開始点の地理座標
+   * @param end - 終了点の地理座標
    * @returns SVGパス文字列
    * @private
    */
-  private generateLinePath(connection: LineConnectionData, index: number): string {
+  private generateSegmentPath(start: [number, number], end: [number, number]): string {
     if (!this.projection) return '';
 
-    const startPoint = this.projection(connection.start);
-    const endPoint = this.projection(connection.end);
+    const startPoint = this.projection(start);
+    const endPoint = this.projection(end);
 
     if (!startPoint || !endPoint) return '';
 
     if (this.lineType === 'straight') {
       return `M${startPoint[0]},${startPoint[1]}L${endPoint[0]},${endPoint[1]}`;
     } else {
-      return this.generateArcPath(connection.start, connection.end, startPoint, endPoint);
+      return this.generateArcPath(start, end, startPoint, endPoint);
     }
   }
 
@@ -375,11 +462,19 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    * @param eventType - イベントタイプ
    * @param handler - イベントハンドラー
    */
-  on(eventType: string, handler: (event: Event, data: LineConnectionData) => void): void {
+  on(eventType: string, handler: (event: Event, data: any) => void): void {
     if (this.layerGroup) {
       this.layerGroup.selectAll('path')
-        .on(eventType, function(event, d) {
-          handler(event, d as LineConnectionData);
+        .on(eventType, function(event, d: any) {
+          // セグメントデータにfeature情報を含めて返す
+          handler(event, {
+            feature: d.feature,
+            segmentIndex: d.segmentIndex,
+            start: d.start,
+            end: d.end,
+            isFirst: d.isFirst,
+            isLast: d.isLast
+          });
         });
     }
   }

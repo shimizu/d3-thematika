@@ -144,19 +144,34 @@
             <!-- サンプルコード -->
             <pre>// LineConnectionLayer矢印機能の使用例
 
-// 都市間の接続データ
-const connections = [
-    {
-        start: [139.6917, 35.6895], // 東京
-        end: [-0.1276, 51.5074],    // ロンドン
-        properties: { name: "Tokyo-London" }
-    },
-    {
-        start: [-74.0060, 40.7128], // ニューヨーク
-        end: [116.4074, 39.9042],   // 北京
-        properties: { name: "NewYork-Beijing" }
-    }
-];
+// 都市間の接続データ（GeoJSON形式）
+const connections = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: [
+                    [139.6917, 35.6895],  // 東京
+                    [-0.1276, 51.5074]    // ロンドン
+                ]
+            },
+            properties: { name: "Tokyo-London" }
+        },
+        {
+            type: "Feature", 
+            geometry: {
+                type: "LineString",
+                coordinates: [
+                    [-74.0060, 40.7128],  // ニューヨーク
+                    [116.4074, 39.9042]   // 北京
+                ]
+            },
+            properties: { name: "NewYork-Beijing" }
+        }
+    ]
+};
 
 // 矢印付きラインレイヤーを作成
 const connectionLayer = new Thematika.LineConnectionLayer({
@@ -237,29 +252,56 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
                 }
             });
 
-            // 主要都市間の接続データ
-            const connections = [
-                {
-                    start: [139.6917, 35.6895], // 東京
-                    end: [-0.1276, 51.5074],    // ロンドン
-                    properties: { name: "Tokyo-London", type: "flight" }
-                },
-                {
-                    start: [-74.0060, 40.7128], // ニューヨーク
-                    end: [116.4074, 39.9042],   // 北京
-                    properties: { name: "NewYork-Beijing", type: "flight" }
-                },
-                {
-                    start: [2.3522, 48.8566],   // パリ
-                    end: [151.2093, -33.8688],  // シドニー
-                    properties: { name: "Paris-Sydney", type: "flight" }
-                },
-                {
-                    start: [-122.4194, 37.7749], // サンフランシスコ
-                    end: [139.6917, 35.6895],    // 東京
-                    properties: { name: "SanFrancisco-Tokyo", type: "business" }
-                }
-            ];
+            // 主要都市間の接続データ（GeoJSON形式）
+            const connections = {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [
+                                [139.6917, 35.6895],  // 東京
+                                [-0.1276, 51.5074]    // ロンドン
+                            ]
+                        },
+                        properties: { name: "Tokyo-London", type: "flight" }
+                    },
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [
+                                [-74.0060, 40.7128],  // ニューヨーク
+                                [116.4074, 39.9042]   // 北京
+                            ]
+                        },
+                        properties: { name: "NewYork-Beijing", type: "flight" }
+                    },
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [
+                                [2.3522, 48.8566],    // パリ
+                                [151.2093, -33.8688]  // シドニー
+                            ]
+                        },
+                        properties: { name: "Paris-Sydney", type: "flight" }
+                    },
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [
+                                [-122.4194, 37.7749], // サンフランシスコ
+                                [139.6917, 35.6895]   // 東京
+                            ]
+                        },
+                        properties: { name: "SanFrancisco-Tokyo", type: "business" }
+                    }
+                ]
+            };
 
             // 矢印付きLineConnectionLayer
             const connectionLayer = new Thematika.LineConnectionLayer({

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineConnectionLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LineConnectionLayer デモ</h1>
+        <p class="description">
+            LineConnectionLayerを使用して複数点間を結ぶラインを地図上に表示します。
+            LineString/MultiLineString形式のGeoJSONデータをサポートし、直線またはアークで描画できます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>世界地図: examples/geojson/world.geojson（背景用）</li>
+                <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
+                <li>機能: ライン描画タイプ切り替え（直線/アーク）、矢印表示、投影法切り替え</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="equirectangular" selected>Equirectangular</option>
+                    <option value="mercator">Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="orthographic">Orthographic</option>
+                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="line-type">ライン描画タイプ:</label>
+                <select id="line-type">
+                    <option value="straight">直線</option>
+                    <option value="arc" selected>アーク</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="arc-height">アークの高さ:</label>
+                <input type="range" id="arc-height" min="0" max="1" step="0.1" value="0.3">
+                <span id="arc-height-value">0.3</span>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="start-arrow">
+                    開始点に矢印を表示
+                </label>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="end-arrow" checked>
+                    終了点に矢印を表示
+                </label>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// LineConnectionLayerの使用例（GeoJSON形式）
+
+// LineString形式のデータ（複数点を結ぶ1本のライン）
+const lineStringData = {
+    type: "Feature",
+    geometry: {
+        type: "LineString",
+        coordinates: [
+            [139.7, 35.6],  // 東京
+            [2.3, 48.8],    // パリ
+            [-74.0, 40.7],  // ニューヨーク
+            [-122.4, 37.7]  // サンフランシスコ
+        ]
+    },
+    properties: { name: "世界都市接続ライン" }
+};
+
+// MultiLineString形式のデータ（複数のライン）
+const multiLineStringData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: [[139.7, 35.6], [2.3, 48.8], [-74.0, 40.7]]
+            },
+            properties: { route: "東京-パリ-NY" }
+        },
+        {
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: [[151.2, -33.8], [103.8, 1.3], [77.2, 28.6]]
+            },
+            properties: { route: "シドニー-シンガポール-デリー" }
+        }
+    ]
+};
+
+// LineConnectionLayerインスタンスを作成
+const connectionLayer = new Thematika.LineConnectionLayer({
+    data: lineStringData,  // またはmultiLineStringData
+    lineType: 'arc',       // 'straight' または 'arc'
+    arcHeight: 0.3,        // アークの高さ
+    startArrow: false,     // 開始点の矢印
+    endArrow: true,        // 終了点の矢印
+    arrowSize: 12,         // 矢印のサイズ
+    attr: {
+        stroke: '#ff6b6b',
+        strokeWidth: 2,
+        opacity: 0.8
+    }
+});
+
+map.addLayer('connections', connectionLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // プロジェクション
+        let currentProjection = d3.geoNaturalEarth1();
+        
+        // サンプルデータ作成
+        function createSampleData() {
+            // 主要都市の座標
+            const cities = [
+                { name: "東京", coords: [139.7, 35.6] },
+                { name: "ロンドン", coords: [-0.1, 51.5] },
+                { name: "ニューヨーク", coords: [-74.0, 40.7] },
+                { name: "パリ", coords: [2.3, 48.8] },
+                { name: "シドニー", coords: [151.2, -33.8] },
+                { name: "リオデジャネイロ", coords: [-43.2, -22.9] },
+                { name: "カイロ", coords: [31.2, 30.0] },
+                { name: "モスクワ", coords: [37.6, 55.7] },
+                { name: "北京", coords: [116.4, 39.9] },
+                { name: "ムンバイ", coords: [72.8, 19.0] }
+            ];
+            
+            // LineString形式（複数都市を1本のラインで接続）
+            const worldTour = {
+                type: "Feature",
+                geometry: {
+                    type: "LineString",
+                    coordinates: [
+                        cities[0].coords,  // 東京
+                        cities[8].coords,  // 北京
+                        cities[7].coords,  // モスクワ
+                        cities[3].coords,  // パリ
+                        cities[1].coords,  // ロンドン
+                        cities[2].coords,  // ニューヨーク
+                        cities[5].coords,  // リオデジャネイロ
+                    ]
+                },
+                properties: { 
+                    name: "世界一周ルート",
+                    class: "world-tour"
+                }
+            };
+            
+            // MultiLineString形式（複数の独立したライン）
+            const tradeRoutes = {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [cities[0].coords, cities[4].coords, cities[9].coords]
+                        },
+                        properties: { 
+                            name: "アジア太平洋ルート",
+                            class: "asia-pacific"
+                        }
+                    },
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [cities[1].coords, cities[3].coords, cities[6].coords, cities[9].coords]
+                        },
+                        properties: { 
+                            name: "ヨーロッパ・アジアルート",
+                            class: "europe-asia"
+                        }
+                    },
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: [cities[2].coords, cities[5].coords, cities[4].coords]
+                        },
+                        properties: { 
+                            name: "アメリカ・オセアニアルート",
+                            class: "america-oceania"
+                        }
+                    }
+                ]
+            };
+            
+            return { worldTour, tradeRoutes };
+        }
+        
+        async function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
+            
+            const width = document.querySelector('#map').clientWidth;
+            const height = document.querySelector('#map').clientHeight;
+            
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+            
+            // 投影法を設定
+            currentProjection.fitExtent([[10, 10], [width-10, height-10]], geojson);
+            
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+            
+            // 背景の世界地図レイヤー
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,
+                attr: {
+                    fill: '#f0f0f0',
+                    stroke: '#ccc',
+                    strokeWidth: 0.5,
+                    opacity: 0.8
+                }
+            });
+            
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    fill: 'none',
+                    stroke: '#333',
+                    strokeWidth: 1.5,
+                    opacity: 0.6
+                }
+            });
+            
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [20, 20],
+                attr: {
+                    fill: 'none',
+                    stroke: '#ddd',
+                    strokeWidth: 0.3,
+                    strokeDasharray: '2,2',
+                    opacity: 0.5
+                }
+            });
+            
+            // サンプルデータを作成
+            const { worldTour, tradeRoutes } = createSampleData();
+            
+            // LineConnectionLayerの設定を取得
+            const lineType = document.getElementById('line-type').value;
+            const arcHeight = parseFloat(document.getElementById('arc-height').value);
+            const startArrow = document.getElementById('start-arrow').checked;
+            const endArrow = document.getElementById('end-arrow').checked;
+            
+            // LineConnectionLayerインスタンスを作成（世界一周ルート）
+            const worldTourLayer = new Thematika.LineConnectionLayer({
+                data: worldTour,
+                lineType: lineType,
+                arcHeight: arcHeight,
+                startArrow: startArrow,
+                endArrow: endArrow,
+                arrowSize: 10,
+                attr: {
+                    stroke: '#ff6b6b',
+                    strokeWidth: 3,
+                    opacity: 0.8
+                }
+            });
+            
+            // LineConnectionLayerインスタンスを作成（貿易ルート）
+            const tradeRoutesLayer = new Thematika.LineConnectionLayer({
+                data: tradeRoutes,
+                lineType: lineType,
+                arcHeight: arcHeight,
+                startArrow: false,
+                endArrow: true,
+                arrowSize: 8,
+                attr: {
+                    stroke: (d, i) => ['#4ecdc4', '#45b7d1', '#96ceb4'][i % 3],
+                    strokeWidth: 2,
+                    opacity: 0.7,
+                    strokeDasharray: '5,3'
+                }
+            });
+            
+            // レイヤーを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('trade-routes', tradeRoutesLayer);
+            map.addLayer('world-tour', worldTourLayer);
+            
+            // イベントリスナーを追加
+            worldTourLayer.on('click', (event, data) => {
+                console.log('World Tour clicked:', data);
+            });
+            
+            tradeRoutesLayer.on('mouseover', (event, data) => {
+                console.log('Trade Route hover:', data);
+            });
+        }
+        
+        // 初回描画
+        draw();
+        
+        // コントロールのイベントリスナー
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch(projectionName) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            draw();
+        });
+        
+        // LineConnectionLayer固有のコントロール
+        document.getElementById('line-type').addEventListener('change', draw);
+        document.getElementById('arc-height').addEventListener('input', (e) => {
+            document.getElementById('arc-height-value').textContent = e.target.value;
+            draw();
+        });
+        document.getElementById('start-arrow').addEventListener('change', draw);
+        document.getElementById('end-arrow').addEventListener('change', draw);
+    </script>
+</body>
+</html>

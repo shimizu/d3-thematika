@@ -34,7 +34,6 @@ export type {
   ThematikaOptions, 
   LayerStyle, 
   ILayer,
-  LineConnectionData,
   ILineConnectionLayer,
   ArcControlPointType,
   ArcOffsetType

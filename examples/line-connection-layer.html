@@ -125,14 +125,18 @@
 
     <script src="./thematika.umd.js"></script>
     <script>
-        // ニューヨーク - 東京
-        const connectionData = [
-            { 
-                start: [-74.0060, 40.7128], // ニューヨーク
-                end: [139.6917, 35.6895],   // 東京
-                properties: { name: 'NYC-Tokyo' } 
-            }
-        ];
+        // ニューヨーク - 東京（GeoJSON形式）
+        const connectionData = {
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: [
+                    [-74.0060, 40.7128], // ニューヨーク
+                    [139.6917, 35.6895]  // 東京
+                ]
+            },
+            properties: { name: 'NYC-Tokyo' }
+        };
 
         let mapInstance, lineLayer, worldLayer;
         let isArcType = false;
