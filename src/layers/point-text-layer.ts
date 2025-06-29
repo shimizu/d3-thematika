@@ -242,7 +242,6 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
         const featureClass = (d.feature.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .style('cursor', 'pointer')
       .text(d => d.text);
 
     // スタイル属性を適用（共通メソッドを使用）
