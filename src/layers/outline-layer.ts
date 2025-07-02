@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, IGeojsonLayer } from '../types';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
 
 /**
  * OutlineLayerの初期化オプション
@@ -9,6 +9,8 @@ import { LayerAttr, IGeojsonLayer } from '../types';
 export interface OutlineLayerOptions {
   /** レイヤーの属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
   /** クリップパスを作成するかどうか */
   createClipPath?: boolean;
   /** クリップパスのID（指定しない場合は自動生成） */
@@ -43,7 +45,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     };
     
     super(`outline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
-          { ...defaultAttr, ...options.attr });
+          { ...defaultAttr, ...options.attr }, options.style || {});
     
     this.createClipPath = options.createClipPath ?? false;
     this.clipPathId = options.clipPathId || `outline-clip-${this.id}`;
@@ -124,8 +126,8 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
         return [baseClass, customClass].filter(Boolean).join(' ');
       });
 
-    // 属性を適用（共通メソッドを使用）
-    this.applyAttributesToElement(outlinePath, sphereGeometry, 0);
+    // 属性とスタイルを適用（共通メソッドを使用）
+    this.applyAllStylesToElement(outlinePath, sphereGeometry, 0);
   }
 
   /**

@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, IGeojsonLayer } from '../types';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
 
 /**
  * GeojsonLayerの初期化オプション
@@ -11,6 +11,8 @@ export interface GeojsonLayerOptions {
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   /** レイヤーのSVG属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
 }
 
 /**
@@ -30,7 +32,7 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: GeojsonLayerOptions) {
     // 一意のIDを自動生成
-    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {});
+    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {}, options.style || {});
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -98,8 +100,8 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
 
-    // SVG属性を適用（共通メソッドを使用）
-    this.applyAttributesToElements(paths, this.layerGroup);
+    // SVG属性とスタイルを適用（共通メソッドを使用）
+    this.applyAllStylesToElements(paths, this.layerGroup);
   }
 
 

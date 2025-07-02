@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
+import { LayerAttr, LayerStyle, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
 import * as GeoJSON from 'geojson';
 
 /**
@@ -12,6 +12,8 @@ export interface LineConnectionLayerOptions {
   data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
   /** レイヤーの属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
   /** ライン描画タイプ（デフォルト: 'straight'） */
   lineType?: 'straight' | 'arc';
   /** アーク描画時の高さ（デフォルト: 0.3） */
@@ -62,7 +64,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    */
   constructor(options: LineConnectionLayerOptions) {
     // 一意のIDを自動生成
-    super(`line-connection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr);
+    super(`line-connection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {}, options.style || {});
     
     // データをFeatureCollectionに正規化
     if (Array.isArray(options.data)) {
@@ -305,8 +307,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
         path.attr('marker-end', `url(#${markerId}-end)`);
       }
 
-      // 属性を適用
-      super.applyAttributesToElement(path, feature, featureIndex);
+      // 属性とスタイルを適用
+      super.applyAllStylesToElement(path, feature, featureIndex);
     }
   }
 

@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, IGeojsonLayer } from '../types';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
 import { getCentroid } from '../utils/gis-utils';
 
 /**
@@ -12,6 +12,8 @@ export interface PointCircleLayerOptions {
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   /** レイヤーの属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
   /** サークルの半径（固定値または関数） */
   r?: number | ((feature: GeoJSON.Feature, index: number) => number);
 }
@@ -36,7 +38,7 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: PointCircleLayerOptions) {
     // 一意のIDを自動生成
-    super(`point-circle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr);
+    super(`point-circle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {}, options.style || {});
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -142,8 +144,8 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
 
-    // 属性を適用（共通メソッドを使用）
-    this.applyAttributesToElements(circles, this.layerGroup);
+    // 属性とスタイルを適用（共通メソッドを使用）
+    this.applyAllStylesToElements(circles, this.layerGroup);
   }
 
 

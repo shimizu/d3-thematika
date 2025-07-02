@@ -153,7 +153,6 @@ export abstract class BaseLayer implements ILayer {
     index?: number
   ): void {
     BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
-
       const value = this.attr[key];
       const finalAttrName = attrName || key;
       
@@ -162,6 +161,44 @@ export abstract class BaseLayer implements ILayer {
         element[method](finalAttrName, finalValue);
       }
     });
+  }
+
+  /**
+   * 単一要素にCSS style属性を適用します
+   * @param element - 対象要素
+   * @param data - データ（関数型スタイル用）
+   * @param index - インデックス（関数型スタイル用）
+   * @protected
+   */
+  protected applyStylesToElement(
+    element: Selection<any, any, any, any>, 
+    data?: any, 
+    index?: number
+  ): void {
+    if (this.style) {
+      Object.entries(this.style).forEach(([property, value]) => {
+        if (value !== undefined) {
+          const finalValue = typeof value === 'function' ? value(data || {}, index || 0) : value;
+          element.style(property, finalValue);
+        }
+      });
+    }
+  }
+
+  /**
+   * 単一要素にSVG属性とCSS style属性の両方を適用します
+   * @param element - 対象要素
+   * @param data - データ（関数型用）
+   * @param index - インデックス（関数型用）
+   * @protected
+   */
+  protected applyAllStylesToElement(
+    element: Selection<any, any, any, any>, 
+    data?: any, 
+    index?: number
+  ): void {
+    this.applyAttributesToElement(element, data, index);
+    this.applyStylesToElement(element, data, index);
   }
 
   /**
@@ -177,8 +214,6 @@ export abstract class BaseLayer implements ILayer {
     BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
       const value = this.attr[key];
       const finalAttrName = attrName || key;
-
-
       
       // clipPathは常にレイヤーグループに適用
       if (key === 'clipPath') {
@@ -194,6 +229,45 @@ export abstract class BaseLayer implements ILayer {
         layerGroup[method](finalAttrName, value);
       }
     });
+  }
+
+  /**
+   * 複数要素にCSS style属性を適用します（GeojsonLayer用）
+   * @param elements - 対象要素群
+   * @param layerGroup - レイヤーグループ
+   * @protected
+   */
+  protected applyStylesToElements(
+    elements: Selection<any, any, any, any>, 
+    layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
+  ): void {
+    if (this.style) {
+      Object.entries(this.style).forEach(([property, value]) => {
+        if (value !== undefined) {
+          if (typeof value === 'function') {
+            // 関数型の場合は個別の要素に適用
+            elements.style(property, (d: any, i: number) => value(d, i));
+          } else {
+            // 非関数型の場合はレイヤーグループに適用
+            layerGroup.style(property, value);
+          }
+        }
+      });
+    }
+  }
+
+  /**
+   * 複数要素にSVG属性とCSS style属性の両方を適用します（GeojsonLayer用）
+   * @param elements - 対象要素群
+   * @param layerGroup - レイヤーグループ
+   * @protected
+   */
+  protected applyAllStylesToElements(
+    elements: Selection<any, any, any, any>, 
+    layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
+  ): void {
+    this.applyAttributesToElements(elements, layerGroup);
+    this.applyStylesToElements(elements, layerGroup);
   }
 
 }

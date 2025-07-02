@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { GeoProjection, geoPath, geoEquirectangular } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr } from '../types';
+import { LayerAttr, LayerStyle } from '../types';
 
 /**
  * 画像レイヤーのオプション
@@ -11,8 +11,10 @@ export interface ImageLayerOptions {
   src: string;
   /** 画像の地理的境界 [west, south, east, north] */
   bounds: [number, number, number, number];
-  /** 属性設定 */
+  /** SVG属性設定 */
   attr?: LayerAttr;
+  /** CSS style属性設定 */
+  style?: LayerStyle;
   /** bboxの四隅にマーカーを表示するかどうか */
   showBboxMarkers?: boolean;
   /** 高度な再投影を使用するかどうか（デフォルト: true） */
@@ -41,7 +43,7 @@ export class ImageLayer extends BaseLayer {
    * @param options - レイヤーのオプション
    */
   constructor(id: string, options: ImageLayerOptions) {
-    super(id, options.attr);
+    super(id, options.attr, options.style);
     this.src = options.src;
     this.bounds = options.bounds;
     this.showBboxMarkers = options.showBboxMarkers ?? false;
@@ -239,7 +241,7 @@ export class ImageLayer extends BaseLayer {
     }
 
     if (this.imageElement) {
-      this.applyAttributesToElement(this.imageElement);
+      this.applyAllStylesToElement(this.imageElement);
     }
   }
 
@@ -269,7 +271,7 @@ export class ImageLayer extends BaseLayer {
       .attr('preserveAspectRatio', 'none');
 
     if (this.imageElement) {
-      this.applyAttributesToElement(this.imageElement);
+      this.applyAllStylesToElement(this.imageElement);
     }
   }
 
@@ -486,7 +488,7 @@ export class ImageLayer extends BaseLayer {
         .attr('preserveAspectRatio', 'none');
 
       if (this.imageElement) {
-        this.applyAttributesToElement(this.imageElement);
+        this.applyAllStylesToElement(this.imageElement);
       }
 
       // bbox マーカーを表示（オプション）

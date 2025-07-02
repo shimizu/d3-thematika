@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection, geoGraticule } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, IGeojsonLayer } from '../types';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
 
 /**
  * GraticuleLayerの初期化オプション
@@ -9,6 +9,8 @@ import { LayerAttr, IGeojsonLayer } from '../types';
 export interface GraticuleLayerOptions {
   /** レイヤーのSVG属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
   /** 経緯線の間隔 [経度間隔, 緯度間隔] (度) */
   step?: [number, number];
   /** 経緯線の範囲 [[西端, 南端], [東端, 北端]] (度) */
@@ -43,7 +45,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     };
     
     super(`graticule-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
-          { ...defaultAttr, ...(options.attr || {}) });
+          { ...defaultAttr, ...(options.attr || {}) }, options.style || {});
     
     this.step = options.step || [10, 10];
     this.extent = options.extent;
@@ -104,8 +106,8 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
         return [baseClass, customClass].filter(Boolean).join(' ');
       });
 
-    // SVG属性を適用（共通メソッドを使用）
-    this.applyAttributesToElement(graticulePath, graticuleGeometry, 0);
+    // SVG属性とスタイルを適用（共通メソッドを使用）
+    this.applyAllStylesToElement(graticulePath, graticuleGeometry, 0);
   }
 
 }

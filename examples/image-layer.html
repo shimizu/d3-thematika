@@ -198,7 +198,9 @@ map.addLayer('raster', imageLayer);</pre>
             imageLayer = new Thematika.ImageLayer('raster', {
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
-                style: { opacity: 0.7 },
+                style: { 
+                    opacity: 0.7  // todo:画像の不透明度
+                },
                 showBboxMarkers: showBboxMarkers
             });
 

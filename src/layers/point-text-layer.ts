@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttr, IGeojsonLayer } from '../types';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
 import { getCentroid } from '../utils/gis-utils';
 
 /**
@@ -12,6 +12,8 @@ export interface PointTextLayerOptions {
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   /** レイヤーの属性設定 */
   attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
   /** テキストの内容を取得するプロパティ名（デフォルト: 'text'、次候補: 'name'） */
   textProperty?: string;
   /** X方向のオフセット（デフォルト: 0） */
@@ -72,7 +74,7 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: PointTextLayerOptions) {
     // 一意のIDを自動生成
-    super(`point-text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr);
+    super(`point-text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {}, options.style || {});
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -242,8 +244,8 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
       })
       .text(d => d.text);
 
-    // 属性を適用（共通メソッドを使用）
-    this.applyAttributesToElements(texts, this.layerGroup);
+    // 属性とスタイルを適用（共通メソッドを使用）
+    this.applyAllStylesToElements(texts, this.layerGroup);
   }
 
   /**
