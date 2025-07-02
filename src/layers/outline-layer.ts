@@ -87,8 +87,6 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     const outlinePathData = this.path(sphereGeometry);
 
     
-            console.log(this.createClipPath, outlinePathData);
-
     // クリップパスを作成（オプションが有効な場合）
     if (this.createClipPath && outlinePathData) {
 

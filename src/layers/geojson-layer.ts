@@ -100,7 +100,6 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .style('cursor', 'pointer');
 
     // スタイル属性を適用（共通メソッドを使用）
     this.applyStylesToElements(paths, this.layerGroup);

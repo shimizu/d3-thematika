@@ -143,7 +143,6 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
         const featureClass = (d.feature.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
-      .style('cursor', 'pointer');
 
     // スタイル属性を適用（共通メソッドを使用）
     this.applyStylesToElements(circles, this.layerGroup);

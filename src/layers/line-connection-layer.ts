@@ -297,7 +297,6 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
           return [baseClass, customClass, dataClass, segmentClass, lineClass].filter(Boolean).join(' ');
         })
         .style('fill', 'none')
-        .style('cursor', 'pointer');
 
       // 矢印マーカーを適用
       const markerId = `arrow-${this.id}`;
