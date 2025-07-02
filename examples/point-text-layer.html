@@ -174,13 +174,13 @@ const textLayer = new Thematika.PointTextLayer({
     textProperty: 'text',  // テキスト取得元プロパティ
     dx: 5,                 // X方向オフセット
     dy: -10,               // Y方向オフセット
-    fontSize: 14,          // フォントサイズ
-    fontWeight: 'bold',    // フォントウェイト
-    textAnchor: 'start',   // テキストアンカー
+    "font-size": 14,          // フォントサイズ
+    "font-weight": 'bold',    // フォントウェイト
+    "text-anchor": 'start',   // テキストアンカー
     attr: {
-        fill: '#333',      // テキスト色
-        stroke: '#fff',    // アウトライン色
-        strokeWidth: 2     // アウトライン幅
+        "fill": '#333',      // テキスト色
+        "stroke": '#fff',    // アウトライン色
+        "stroke-width": 2     // アウトライン幅
     }
 });
 
@@ -287,9 +287,9 @@ map.addLayer('cityLabels', textLayer);
                 const backgroundLayer = new Thematika.GeojsonLayer({
                     data: backgroundData,
                     attr: {
-                        fill: '#e3f2fd',
-                        stroke: '#1976d2',
-                        strokeWidth: 1
+                        "fill": '#e3f2fd',
+                        "stroke": '#1976d2',
+                        "stroke-width": 1
                     }
                 });
 
@@ -297,10 +297,10 @@ map.addLayer('cityLabels', textLayer);
                 const graticuleLayer = new Thematika.GraticuleLayer({
                     step: [30, 30],
                     attr: {
-                        fill: 'none',
-                        stroke: '#90a4ae',
-                        strokeWidth: 0.8,
-                        opacity: 0.6
+                        "fill": 'none',
+                        "stroke": '#90a4ae',
+                        "stroke-width": 0.8,
+                        "opacity": 0.6
                     }
                 });
 
@@ -311,14 +311,14 @@ map.addLayer('cityLabels', textLayer);
                     dx: dxOffset,
                     dy: dyOffset,
                     rotate: rotation,
-                    fontSize: fontSize,
-                    fontWeight: fontWeight,
-                    textAnchor: textAnchor,
+                    "font-size": fontSize,
+                    "font-weight": fontWeight,
+                    "text-anchor": textAnchor,
                     alignmentBaseline: 'middle',
                     attr: {
-                        fill: '#ff0000',
-                        stroke: '#000000',
-                        strokeWidth: 1
+                        "fill": '#ff0000',
+                        "stroke": '#000000',
+                        "stroke-width": 1
                     }
                 });
 

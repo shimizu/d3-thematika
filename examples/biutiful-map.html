@@ -178,10 +178,10 @@ const oceanGradient = defs.append('radialGradient')
 const worldLayer = new Thematika.GeojsonLayer({
     data: worldData,
     attr: {
-        fill: 'url(#oceanGradient)',
-        filter: 'url(#glow)',
-        stroke: '#00ffff',
-        strokeWidth: 0.5
+        "fill": 'url(#oceanGradient)',
+        "filter": 'url(#glow)',
+        "stroke": '#00ffff',
+        "stroke-width": 0.5
     }
 });
 
@@ -189,9 +189,9 @@ const citiesLayer = new Thematika.PointCircleLayer({
     data: citiesData,
     radius: d => Math.sqrt(d.properties.population) / 500,
     attr: {
-        fill: '#ff6b6b',
-        filter: 'url(#cityGlow)',
-        opacity: 0.8
+        "fill": '#ff6b6b',
+        "filter": 'url(#cityGlow)',
+        "opacity": 0.8
     }
 });
         </div>
@@ -343,11 +343,11 @@ const citiesLayer = new Thematika.PointCircleLayer({
                     createClipPath: true,
                     clipPathId: 'earth-clip',
                     attr: {
-                        fill: 'url(#oceanGradient)',
-                        stroke: themes[currentTheme].landStroke,
-                        strokeWidth: 2,
-                        filter: 'url(#glow)',
-                        opacity: 0.9
+                        "fill": 'url(#oceanGradient)',
+                        "stroke": themes[currentTheme].landStroke,
+                        "stroke-width": 2,
+                        "filter": 'url(#glow)',
+                        "opacity": 0.9
                     }
                 });
                 
@@ -357,12 +357,12 @@ const citiesLayer = new Thematika.PointCircleLayer({
                     graticuleLayer = new Thematika.GraticuleLayer({
                         step: [15, 15],
                         attr: {
-                            fill: 'none',
-                            stroke: themes[currentTheme].graticuleStroke,
-                            strokeWidth: 0.5,
-                            strokeDasharray: '2,3',
-                            opacity: 0.4,
-                            filter: 'url(#glow)'
+                            "fill": 'none',
+                            "stroke": themes[currentTheme].graticuleStroke,
+                            "stroke-width": 0.5,
+                            "stroke-dasharray": '2,3',
+                            "opacity": 0.4,
+                            "filter": 'url(#glow)'
                         }
                     });
                 }
@@ -371,12 +371,12 @@ const citiesLayer = new Thematika.PointCircleLayer({
                 const worldLayer = new Thematika.GeojsonLayer({
                     data: worldData,
                     attr: {
-                        fill: themes[currentTheme].landFill,
-                        stroke: themes[currentTheme].landStroke,
-                        strokeWidth: 0.5,
-                        filter: 'url(#glow)',
-                        opacity: 0.9,
-                        clipPath: 'url(#earth-clip)'
+                        "fill": themes[currentTheme].landFill,
+                        "stroke": themes[currentTheme].landStroke,
+                        "stroke-width": 0.5,
+                        "filter": 'url(#glow)',
+                        "opacity": 0.9,
+                        "clip-path": 'url(#earth-clip)'
                     },
                     on: {
                         mouseover: function(event, d) {
@@ -403,12 +403,12 @@ const citiesLayer = new Thematika.PointCircleLayer({
                         data: citiesData,
                         radius: d => Math.sqrt(d.properties.population) / 800 + 2,
                         attr: {
-                            fill: themes[currentTheme].cityFill,
-                            stroke: '#ffffff',
-                            strokeWidth: 0.5,
-                            filter: 'url(#cityGlow)',
-                            opacity: 0.8,
-                            clipPath: 'url(#earth-clip)'
+                            "fill": themes[currentTheme].cityFill,
+                            "stroke": '#ffffff',
+                            "stroke-width": 0.5,
+                            "filter": 'url(#cityGlow)',
+                            "opacity": 0.8,
+                            "clip-path": 'url(#earth-clip)'
                         },
                         on: {
                             mouseover: function(event, d) {
@@ -461,9 +461,9 @@ const citiesLayer = new Thematika.PointCircleLayer({
                         title: '都市人口',
                         symbolType: 'circle',
                         attr: {
-                            fill: themes[currentTheme].cityFill,
-                            stroke: '#ffffff',
-                            strokeWidth: 0.5
+                            "fill": themes[currentTheme].cityFill,
+                            "stroke": '#ffffff',
+                            "stroke-width": 0.5
                         }
                     });
                     

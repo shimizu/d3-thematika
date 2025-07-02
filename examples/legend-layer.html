@@ -197,9 +197,9 @@ const legendLayer = new Thematika.LegendLayer({
     orientation: 'vertical',
     showBackground: true,  // 背景ボックスを表示
     backgroundStyle: {
-        fill: '#ffffff',
-        stroke: '#cccccc', 
-        opacity: 0.9,
+        "fill": '#ffffff',
+        "stroke": '#cccccc', 
+        "opacity": 0.9,
         rx: 4
     }
 });
@@ -329,10 +329,10 @@ map.addLayer('size-legend', sizeLegend);
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    fill: currentScale.colorFunction,
-                    stroke: '#333',
-                    strokeWidth: 0.5,
-                    opacity: 0.8
+                    "fill": currentScale.colorFunction,
+                    "stroke": '#333',
+                    "stroke-width": 0.5,
+                    "opacity": 0.8
                 }
             });
             
@@ -363,10 +363,10 @@ map.addLayer('size-legend', sizeLegend);
             // OutlineLayerインスタンスを作成
             const outlineLayer = new Thematika.OutlineLayer({
                 attr: {
-                    fill: 'none',
-                    stroke: '#2c3e50',
-                    strokeWidth: 2,
-                    opacity: 0.8
+                    "fill": 'none',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
                 }
             });
 

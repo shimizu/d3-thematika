@@ -182,9 +182,9 @@ const connectionLayer = new Thematika.LineConnectionLayer({
     arrowSize: 10,     // 矢印のサイズ
     arcHeight: 0.3,
     attr: {
-        stroke: '#ff4757',
-        strokeWidth: 2,
-        opacity: 0.8
+        "stroke": '#ff4757',
+        "stroke-width": 2,
+        "opacity": 0.8
     }
 });
 
@@ -245,10 +245,10 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    fill: '#f5f5f5',
-                    stroke: '#ccc',
-                    strokeWidth: 0.5,
-                    opacity: 1
+                    "fill": '#f5f5f5',
+                    "stroke": '#ccc',
+                    "stroke-width": 0.5,
+                    "opacity": 1
                 }
             });
 
@@ -312,10 +312,10 @@ connectionLayer.updateArrowSize(15);      // 矢印サイズを変更
                 endArrow: endArrow,
                 arrowSize: arrowSize,
                 attr: {
-                    filter: effect.url(),
-                    stroke: '#ff4757',
-                    strokeWidth: 2,
-                    opacity: 0.8
+                    "filter": effect.url(),
+                    "stroke": '#ff4757',
+                    "stroke-width": 2,
+                    "opacity": 0.8
                 }
             });
 

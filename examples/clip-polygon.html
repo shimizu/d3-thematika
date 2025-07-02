@@ -148,8 +148,8 @@ imageLayer = new Thematika.ImageLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
     style: { 
-        opacity: 0.7 ,
-        clipPath: clipEffect.url()  // クリップパスを適用
+        "opacity": 0.7 ,
+        "clip-path": clipEffect.url()  // クリップパスを適用
     },
     
 });
@@ -205,9 +205,9 @@ map.addLayer('raster', imageLayer);
             backgroundLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
-                    fill: '#ffffff',
-                    stroke: '#333333',
-                    strokeWidth: 0.5
+                    "fill": '#ffffff',
+                    "stroke": '#333333',
+                    "stroke-width": 0.5
                 }
             });
             map.addLayer('countries', backgroundLayer);
@@ -221,7 +221,7 @@ map.addLayer('raster', imageLayer);
                     "clip-path": isClipEnabled ? clipEffect.url() : undefined  // クリップパスを条件付きで適用
                 },
                 style: { 
-                    opacity: 0.7 ,
+                    "opacity": 0.7 ,
                 },
                 
             });
@@ -232,9 +232,9 @@ map.addLayer('raster', imageLayer);
             graticuleLayer = new Thematika.GraticuleLayer({
                 step: [15, 15],
                 attr: {
-                    stroke: '#999999',
-                    strokeWidth: 0.5,
-                    strokeDasharray: '2,2'
+                    "stroke": '#999999',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '2,2'
                 }
             });
             map.addLayer('graticule', graticuleLayer);        

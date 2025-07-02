@@ -134,7 +134,7 @@ const map = new Thematika.Map({
 const imageLayer = new Thematika.ImageLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
-    style: { opacity: 0.7 }
+    style: { "opacity": 0.7 }
 });
 
 // 投影法を設定
@@ -187,9 +187,9 @@ map.addLayer('raster', imageLayer);</pre>
             backgroundLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
-                    fill: '#ffffff',
-                    stroke: '#ff0000',
-                    strokeWidth: 2
+                    "fill": '#ffffff',
+                    "stroke": '#ff0000',
+                    "stroke-width": 2
                 }
             });
 
@@ -199,7 +199,7 @@ map.addLayer('raster', imageLayer);</pre>
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { 
-                    opacity: 0.7  // todo:画像の不透明度
+                    "opacity": 0.7  // todo:画像の不透明度
                 },
                 showBboxMarkers: showBboxMarkers
             });
@@ -212,9 +212,9 @@ map.addLayer('raster', imageLayer);</pre>
             graticuleLayer = new Thematika.GraticuleLayer({
                 step: [15, 15],
                 attr: {
-                    stroke: '#999999',
-                    strokeWidth: 0.5,
-                    strokeDasharray: '2,2'
+                    "stroke": '#999999',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '2,2'
                 }
             });
 

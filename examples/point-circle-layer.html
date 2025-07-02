@@ -139,10 +139,10 @@ const circleLayer = new Thematika.PointCircleLayer({
     data: geojson,
     r: 5, // 固定半径
     attr: {
-        fill: '#ff6b6b',
-        stroke: '#d63031',
-        strokeWidth: 1,
-        opacity: 0.8
+        "fill": '#ff6b6b',
+        "stroke": '#d63031',
+        "stroke-width": 1,
+        "opacity": 0.8
     }
 });
 
@@ -155,9 +155,9 @@ const dynamicCircleLayer = new Thematika.PointCircleLayer({
         return Math.sqrt(population / 1000000) + 2;
     },
     attr: {
-        fill: (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
-        stroke: '#2d3436',
-        strokeWidth: 0.5
+        "fill": (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
+        "stroke": '#2d3436',
+        "stroke-width": 0.5
     }
 });
 
@@ -211,10 +211,10 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
                 const graticuleLayer = new Thematika.GraticuleLayer({
                     step: [20, 20],
                     attr: {
-                        fill: 'none',
-                        stroke: '#ddd',
-                        strokeWidth: 0.5,
-                        opacity: 0.6
+                        "fill": 'none',
+                        "stroke": '#ddd',
+                        "stroke-width": 0.5,
+                        "opacity": 0.6
                     }
                 });
 
@@ -242,10 +242,10 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);
                     data: worldData,
                     r: radiusFunction,
                     attr: {
-                        fill: fillColor,
-                        stroke: '#d63031',
-                        strokeWidth: 1,
-                        opacity: 0.8
+                        "fill": fillColor,
+                        "stroke": '#d63031',
+                        "stroke-width": 1,
+                        "opacity": 0.8
                     }
                 });
 

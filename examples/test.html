@@ -129,11 +129,11 @@
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    fill:(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
-                    filter: "#2c3e50", 
-                    stroke: '#1a3d1f',
-                    strokeWidth: 0.8,
-                    opacity: (d,i) => 0.9,
+                    "fill":(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    "filter": "#2c3e50", 
+                    "stroke": '#1a3d1f',
+                    "stroke-width": 0.8,
+                    "opacity": (d,i) => 0.9,
                 }
             });
 
@@ -142,10 +142,10 @@
                 createClipPath: true,
                 clipPathId: 'earth-outline-clip',
                 attr: {
-                    fill: 'none',
-                    stroke: '#2c3e50',
-                    strokeWidth: 2,
-                    opacity: 0.8
+                    "fill": 'none',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
                 }
             });
 
@@ -153,11 +153,11 @@
             const graticuleLayer = new Thematika.GraticuleLayer({
                 step: [10, 10], // 10度間隔
                 attr: {
-                    fill: 'none',
-                    stroke: '#000',
-                    strokeWidth: 0.5,
-                    strokeDasharray: '1,2',
-                    opacity: 0.6
+                    "fill": 'none',
+                    "stroke": '#000',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '1,2',
+                    "opacity": 0.6
                 }
             });
 

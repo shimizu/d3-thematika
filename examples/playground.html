@@ -232,11 +232,11 @@ const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
-        fill:(d,i)=> fillStyles[i%3] , 
-        filter: effect.url(), 
-        stroke: '#1a3d1f',
-        strokeWidth: 0.8,
-        opacity: (d,i) => 0.9,
+        "fill":(d,i)=> fillStyles[i%3] , 
+        "filter": effect.url(), 
+        "stroke": '#1a3d1f',
+        "stroke-width": 0.8,
+        "opacity": (d,i) => 0.9,
     }
 });
 
@@ -245,10 +245,10 @@ const outlineLayer = new Thematika.OutlineLayer({
     createClipPath: true,
     clipPathId: 'earth-outline-clip',
     attr: {
-        fill: 'none',
-        stroke: '#2c3e50',
-        strokeWidth: 2,
-        opacity: 0.8
+        "fill": 'none',
+        "stroke": '#2c3e50',
+        "stroke-width": 2,
+        "opacity": 0.8
     }
 });
 
@@ -256,11 +256,11 @@ const outlineLayer = new Thematika.OutlineLayer({
 const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10], // 10度間隔
     attr: {
-        fill: 'none',
-        stroke: '#000',
-        strokeWidth: 0.5,
-        strokeDasharray: '2, 2',
-        opacity: 0.9
+        "fill": 'none',
+        "stroke": '#000',
+        "stroke-width": 0.5,
+        "stroke-dasharray": '2, 2',
+        "opacity": 0.9
     }
 });
 
@@ -413,11 +413,11 @@ const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
-        fill:(d,i)=> fillStyles[i%3] , 
-        filter: effect.url(), 
-        stroke: '#1a3d1f',
-        strokeWidth: 0.8,
-        opacity: (d,i) => 0.9,
+        "fill":(d,i)=> fillStyles[i%3] , 
+        "filter": effect.url(), 
+        "stroke": '#1a3d1f',
+        "stroke-width": 0.8,
+        "opacity": (d,i) => 0.9,
     }
 });
 
@@ -426,10 +426,10 @@ const outlineLayer = new Thematika.OutlineLayer({
     createClipPath: true,
     clipPathId: 'earth-outline-clip',
     attr: {
-        fill: 'none',
-        stroke: '#2c3e50',
-        strokeWidth: 2,
-        opacity: 0.8
+        "fill": 'none',
+        "stroke": '#2c3e50',
+        "stroke-width": 2,
+        "opacity": 0.8
     }
 });
 
@@ -437,11 +437,11 @@ const outlineLayer = new Thematika.OutlineLayer({
 const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10], // 10度間隔
     attr: {
-        fill: 'none',
-        stroke: '#000',
-        strokeWidth: 0.5,
-        strokeDasharray: '2, 2',
-        opacity: 0.9
+        "fill": 'none',
+        "stroke": '#000',
+        "stroke-width": 0.5,
+        "stroke-dasharray": '2, 2',
+        "opacity": 0.9
     }
 });
 
@@ -470,19 +470,19 @@ const map = new Thematika.Map({
 const graticuleLayer = new Thematika.GraticuleLayer({
     step: [20, 20], // 20度間隔
     attr: {
-        fill: 'none',
-        stroke: '#4a90e2',
-        strokeWidth: 1,
-        opacity: 0.5
+        "fill": 'none',
+        "stroke": '#4a90e2',
+        "stroke-width": 1,
+        "opacity": 0.5
     }
 });
 
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: { 
-        fill: '#f0f0f0',
-        stroke: '#333',
-        strokeWidth: 0.5
+        "fill": '#f0f0f0',
+        "stroke": '#333',
+        "stroke-width": 0.5
     }
 });
 
@@ -508,9 +508,9 @@ const map = new Thematika.Map({
 // 太い輪郭線
 const outlineLayer = new Thematika.OutlineLayer({
     attr: {
-        fill: 'none',
-        stroke: '#1976d2',
-        strokeWidth: 4,
+        "fill": 'none',
+        "stroke": '#1976d2',
+        "stroke-width": 4,
         strokeLinejoin: 'round'
     }
 });
@@ -518,9 +518,9 @@ const outlineLayer = new Thematika.OutlineLayer({
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: { 
-        fill: '#ffffff',
-        stroke: '#666',
-        strokeWidth: 0.5
+        "fill": '#ffffff',
+        "stroke": '#666',
+        "stroke-width": 0.5
     }
 });
 
@@ -556,9 +556,9 @@ const fillPatterns = [
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: { 
-        fill: (d, i) => fillPatterns[i % fillPatterns.length],
-        stroke: '#2e7d32',
-        strokeWidth: 0.8
+        "fill": (d, i) => fillPatterns[i % fillPatterns.length],
+        "stroke": '#2e7d32',
+        "stroke-width": 0.8
     }
 });
 
@@ -583,30 +583,30 @@ const map = new Thematika.Map({
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: { 
-        fill: '#ffeb3b',
-        stroke: '#f57f17',
-        strokeWidth: 1,
-        opacity: 0.8
+        "fill": '#ffeb3b',
+        "stroke": '#f57f17',
+        "stroke-width": 1,
+        "opacity": 0.8
     }
 });
 
 const graticuleLayer = new Thematika.GraticuleLayer({
     step: [30, 30],
     attr: {
-        fill: 'none',
-        stroke: '#666',
-        strokeWidth: 0.5,
-        strokeDasharray: '2, 2',
-        opacity: 0.3
+        "fill": 'none',
+        "stroke": '#666',
+        "stroke-width": 0.5,
+        "stroke-dasharray": '2, 2',
+        "opacity": 0.3
     }
 });
 
 // 太い輪郭線
 const outlineLayer = new Thematika.OutlineLayer({
     attr: {
-        fill: 'none',
-        stroke: '#1976d2',
-        strokeWidth: 4,
+        "fill": 'none',
+        "stroke": '#1976d2',
+        "stroke-width": 4,
         strokeLinejoin: 'round',
     },
     createClipPath: true,

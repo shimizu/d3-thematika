@@ -195,9 +195,9 @@ const connectionLayer = new Thematika.LineConnectionLayer({
     endArrow: true,        // 終了点の矢印
     arrowSize: 12,         // 矢印のサイズ
     attr: {
-        stroke: '#ff6b6b',
-        strokeWidth: 2,
-        opacity: 0.8
+        "stroke": '#ff6b6b',
+        "stroke-width": 2,
+        "opacity": 0.8
     }
 });
 
@@ -317,20 +317,20 @@ map.addLayer('connections', connectionLayer);
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
-                    fill: '#f0f0f0',
-                    stroke: '#ccc',
-                    strokeWidth: 0.5,
-                    opacity: 0.8
+                    "fill": '#f0f0f0',
+                    "stroke": '#ccc',
+                    "stroke-width": 0.5,
+                    "opacity": 0.8
                 }
             });
             
             // OutlineLayerインスタンスを作成
             const outlineLayer = new Thematika.OutlineLayer({
                 attr: {
-                    fill: 'none',
-                    stroke: '#333',
-                    strokeWidth: 1.5,
-                    opacity: 0.6
+                    "fill": 'none',
+                    "stroke": '#333',
+                    "stroke-width": 1.5,
+                    "opacity": 0.6
                 }
             });
             
@@ -338,11 +338,11 @@ map.addLayer('connections', connectionLayer);
             const graticuleLayer = new Thematika.GraticuleLayer({
                 step: [20, 20],
                 attr: {
-                    fill: 'none',
-                    stroke: '#ddd',
-                    strokeWidth: 0.3,
-                    strokeDasharray: '2,2',
-                    opacity: 0.5
+                    "fill": 'none',
+                    "stroke": '#ddd',
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '2,2',
+                    "opacity": 0.5
                 }
             });
             
@@ -364,9 +364,9 @@ map.addLayer('connections', connectionLayer);
                 endArrow: endArrow,
                 arrowSize: 10,
                 attr: {
-                    stroke: '#ff6b6b',
-                    strokeWidth: 3,
-                    opacity: 0.8
+                    "stroke": '#ff6b6b',
+                    "stroke-width": 3,
+                    "opacity": 0.8
                 }
             });
             
@@ -379,10 +379,10 @@ map.addLayer('connections', connectionLayer);
                 endArrow: true,
                 arrowSize: 8,
                 attr: {
-                    stroke: (d, i) => ['#4ecdc4', '#45b7d1', '#96ceb4'][i % 3],
-                    strokeWidth: 2,
-                    opacity: 0.7,
-                    strokeDasharray: '5,3'
+                    "stroke": (d, i) => ['#4ecdc4', '#45b7d1', '#96ceb4'][i % 3],
+                    "stroke-width": 2,
+                    "opacity": 0.7,
+                    "stroke-dasharray": '5,3'
                 }
             });
             
