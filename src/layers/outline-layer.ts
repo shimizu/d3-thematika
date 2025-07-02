@@ -127,7 +127,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
       });
 
     // 属性とスタイルを適用（共通メソッドを使用）
-    this.applyAllStylesToElement(outlinePath, sphereGeometry, 0);
+    this.applyAllStylesToElement(outlinePath, this.layerGroup!);
   }
 
   /**

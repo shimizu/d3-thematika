@@ -107,7 +107,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
       });
 
     // SVG属性とスタイルを適用（共通メソッドを使用）
-    this.applyAllStylesToElement(graticulePath, graticuleGeometry, 0);
+    this.applyAllStylesToElement(graticulePath, this.layerGroup!);
   }
 
 }

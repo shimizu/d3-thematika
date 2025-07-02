@@ -241,7 +241,7 @@ export class ImageLayer extends BaseLayer {
     }
 
     if (this.imageElement) {
-      this.applyAllStylesToElement(this.imageElement);
+      this.applyAllStylesToElement(this.imageElement, this.getLayerGroup()!);
     }
   }
 
@@ -271,7 +271,7 @@ export class ImageLayer extends BaseLayer {
       .attr('preserveAspectRatio', 'none');
 
     if (this.imageElement) {
-      this.applyAllStylesToElement(this.imageElement);
+      this.applyAllStylesToElement(this.imageElement, this.getLayerGroup()!);
     }
   }
 
@@ -488,7 +488,7 @@ export class ImageLayer extends BaseLayer {
         .attr('preserveAspectRatio', 'none');
 
       if (this.imageElement) {
-        this.applyAllStylesToElement(this.imageElement);
+        this.applyAllStylesToElement(this.imageElement, this.getLayerGroup()!);
       }
 
       // bbox マーカーを表示（オプション）

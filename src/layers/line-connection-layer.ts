@@ -308,7 +308,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
       }
 
       // 属性とスタイルを適用
-      super.applyAllStylesToElement(path, feature, featureIndex);
+      super.applyAllStylesToElement(path, this.layerGroup!);
     }
   }
 

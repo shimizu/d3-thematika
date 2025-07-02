@@ -124,19 +124,17 @@ export abstract class BaseLayer implements ILayer {
   /**
    * 単一要素にSVG属性を適用します
    * @param element - 対象要素
-   * @param data - データ（関数型属性用）
-   * @param index - インデックス（関数型属性用）
    * @protected
    */
   protected applyAttributesToElement(
-    element: Selection<any, any, any, any>, 
-    data?: any, 
-    index?: number
+    element: Selection<any, any, any, any>,
+    layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
     Object.entries(this.attr).forEach(([property, value]) => {
       if (value !== undefined) {
-        const finalValue = typeof value === 'function' ? value(data || {}, index || 0) : value;
-        element.attr(property, finalValue);
+        // 関数型・固定値に関わらず常にレイヤーグループに適用
+        const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
+        layerGroup.attr(property, finalValue);
       }
     });
   }
@@ -144,20 +142,18 @@ export abstract class BaseLayer implements ILayer {
   /**
    * 単一要素にCSS style属性を適用します
    * @param element - 対象要素
-   * @param data - データ（関数型スタイル用）
-   * @param index - インデックス（関数型スタイル用）
    * @protected
    */
   protected applyStylesToElement(
-    element: Selection<any, any, any, any>, 
-    data?: any, 
-    index?: number
+    element: Selection<any, any, any, any>,
+    layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
     if (this.style) {
       Object.entries(this.style).forEach(([property, value]) => {
         if (value !== undefined) {
-          const finalValue = typeof value === 'function' ? value(data || {}, index || 0) : value;
-          element.style(property, finalValue);
+          // 関数型・固定値に関わらず常にレイヤーグループに適用
+          const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
+          layerGroup.style(property, finalValue);
         }
       });
     }
@@ -166,17 +162,15 @@ export abstract class BaseLayer implements ILayer {
   /**
    * 単一要素にSVG属性とCSS style属性の両方を適用します
    * @param element - 対象要素
-   * @param data - データ（関数型用）
-   * @param index - インデックス（関数型用）
+   * @param layerGroup - レイヤーグループ
    * @protected
    */
   protected applyAllStylesToElement(
-    element: Selection<any, any, any, any>, 
-    data?: any, 
-    index?: number
+    element: Selection<any, any, any, any>,
+    layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
-    this.applyAttributesToElement(element, data, index);
-    this.applyStylesToElement(element, data, index);
+    this.applyAttributesToElement(element, layerGroup);
+    this.applyStylesToElement(element, layerGroup);
   }
 
   /**
