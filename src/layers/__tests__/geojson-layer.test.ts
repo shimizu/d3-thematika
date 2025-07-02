@@ -1,5 +1,5 @@
 import { GeojsonLayer } from '../geojson-layer';
-import { LayerStyle } from '../../types';
+import { LayerAttributes } from '../../types';
 
 describe('GeojsonLayer', () => {
   let geojsonLayer: GeojsonLayer;
@@ -33,7 +33,7 @@ describe('GeojsonLayer', () => {
 
     geojsonLayer = new GeojsonLayer({
       data: sampleGeoJSON,
-      style: {
+      attributes: {
         fill: '#ff0000',
         stroke: '#000000',
         strokeWidth: 1
@@ -109,22 +109,21 @@ describe('GeojsonLayer', () => {
 
       const layer = new GeojsonLayer({
         data: sampleGeoJSON,
-        style: customStyle
+        attributes: customStyle
       });
 
-      expect(layer['style'].fill).toBe('blue');
-      expect(layer['style'].stroke).toBe('red');
-      expect(layer['style'].strokeWidth).toBe(2);
+      expect(layer['attributes'].fill).toBe('blue');
+      expect(layer['attributes'].stroke).toBe('red');
+      expect(layer['attributes'].strokeWidth).toBe(2);
     });
 
     test('attr設定がstyleよりも優先される', () => {
       const layer = new GeojsonLayer({
         data: sampleGeoJSON,
-        style: { fill: 'blue' },
-        attr: { fill: 'green' }
+        attributes: { fill: 'green' }
       });
 
-      expect(layer['style'].fill).toBe('green');
+      expect(layer['attributes'].fill).toBe('green');
     });
   });
 
@@ -193,20 +192,20 @@ describe('GeojsonLayer', () => {
     test('動的スタイル関数が適用される', () => {
       const dynamicLayer = new GeojsonLayer({
         data: sampleGeoJSON,
-        style: {
+        attributes: {
           fill: (d, i) => (i || 0) % 2 === 0 ? 'red' : 'blue',
           strokeWidth: (d) => d.properties?.population > 100000 ? 2 : 1
         }
       });
 
-      expect(typeof dynamicLayer['style'].fill).toBe('function');
-      expect(typeof dynamicLayer['style'].strokeWidth).toBe('function');
+      expect(typeof dynamicLayer['attributes'].fill).toBe('function');
+      expect(typeof dynamicLayer['attributes'].strokeWidth).toBe('function');
 
       // 関数の実行テスト
-      const fillResult = (dynamicLayer['style'].fill as Function)(sampleGeoJSON.features[0], 0);
+      const fillResult = (dynamicLayer['attributes'].fill as Function)(sampleGeoJSON.features[0], 0);
       expect(fillResult).toBe('red');
 
-      const strokeResult = (dynamicLayer['style'].strokeWidth as Function)(sampleGeoJSON.features[0]);
+      const strokeResult = (dynamicLayer['attributes'].strokeWidth as Function)(sampleGeoJSON.features[0]);
       expect(strokeResult).toBe(2);
     });
   });
@@ -232,12 +231,12 @@ describe('GeojsonLayer', () => {
     test('カスタムクラス名が適用される', () => {
       const layerWithClass = new GeojsonLayer({
         data: sampleGeoJSON,
-        style: {
+        attributes: {
           className: 'custom-layer'
         }
       });
 
-      expect(layerWithClass['style'].className).toBe('custom-layer');
+      expect(layerWithClass['attributes'].className).toBe('custom-layer');
     });
 
     test('フィーチャー固有のクラスが適用される', () => {

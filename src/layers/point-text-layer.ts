@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, IGeojsonLayer } from '../types';
+import { LayerAttributes, IGeojsonLayer } from '../types';
 import { getCentroid } from '../utils/gis-utils';
 
 /**
@@ -10,10 +10,8 @@ import { getCentroid } from '../utils/gis-utils';
 export interface PointTextLayerOptions {
   /** GeoJSONデータ */
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  /** レイヤーのスタイル設定 */
-  style?: LayerStyle;
-  /** レイヤーの属性設定（styleのエイリアス） */
-  attr?: LayerStyle;
+  /** レイヤーの属性設定 */
+  attributes?: LayerAttributes;
   /** テキストの内容を取得するプロパティ名（デフォルト: 'text'、次候補: 'name'） */
   textProperty?: string;
   /** X方向のオフセット（デフォルト: 0） */
@@ -74,7 +72,7 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: PointTextLayerOptions) {
     // 一意のIDを自動生成
-    super(`point-text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || options.style);
+    super(`point-text-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attributes);
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -238,14 +236,14 @@ export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
       .attr('font-weight', d => d.fontWeight)
       .attr('class', d => {
         const baseClass = 'thematika-point-text';
-        const customClass = this.style.className || '';
+        const customClass = this.attributes.className || '';
         const featureClass = (d.feature.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
       .text(d => d.text);
 
-    // スタイル属性を適用（共通メソッドを使用）
-    this.applyStylesToElements(texts, this.layerGroup);
+    // 属性を適用（共通メソッドを使用）
+    this.applyAttributesToElements(texts, this.layerGroup);
   }
 
   /**

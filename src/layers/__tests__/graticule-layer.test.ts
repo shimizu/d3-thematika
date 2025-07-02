@@ -1,5 +1,5 @@
 import { GraticuleLayer } from '../graticule-layer';
-import { LayerStyle } from '../../types';
+import { LayerAttributes } from '../../types';
 
 // d3-geoのモック
 jest.mock('d3-geo', () => ({
@@ -31,7 +31,7 @@ describe('GraticuleLayer', () => {
 
     graticuleLayer = new GraticuleLayer({
       step: [15, 15],
-      style: {
+      attributes: {
         fill: 'none',
         stroke: '#cccccc',
         strokeWidth: 0.5
@@ -62,17 +62,17 @@ describe('GraticuleLayer', () => {
       
       expect(defaultLayer['step']).toEqual([10, 10]);
       expect(defaultLayer['extent']).toBeUndefined();
-      expect(defaultLayer['style'].fill).toBe('none');
-      expect(defaultLayer['style'].stroke).toBe('#cccccc');
-      expect(defaultLayer['style'].strokeWidth).toBe(0.5);
-      expect(defaultLayer['style'].opacity).toBe(0.7);
+      expect(defaultLayer['attributes'].fill).toBe('none');
+      expect(defaultLayer['attributes'].stroke).toBe('#cccccc');
+      expect(defaultLayer['attributes'].strokeWidth).toBe(0.5);
+      expect(defaultLayer['attributes'].opacity).toBe(0.7);
     });
 
     test('カスタム設定が正しく適用される', () => {
       const customOptions = {
         step: [20, 20] as [number, number],
         extent: [[-180, -90], [180, 90]] as [[number, number], [number, number]],
-        style: {
+        attributes: {
           fill: 'blue',
           stroke: 'red',
           strokeWidth: 1.5,
@@ -84,19 +84,18 @@ describe('GraticuleLayer', () => {
 
       expect(customLayer['step']).toEqual([20, 20]);
       expect(customLayer['extent']).toEqual([[-180, -90], [180, 90]]);
-      expect(customLayer['style'].fill).toBe('blue');
-      expect(customLayer['style'].stroke).toBe('red');
-      expect(customLayer['style'].strokeWidth).toBe(1.5);
-      expect(customLayer['style'].opacity).toBe(0.9);
+      expect(customLayer['attributes'].fill).toBe('blue');
+      expect(customLayer['attributes'].stroke).toBe('red');
+      expect(customLayer['attributes'].strokeWidth).toBe(1.5);
+      expect(customLayer['attributes'].opacity).toBe(0.9);
     });
 
     test('attr設定がstyleよりも優先される', () => {
       const layer = new GraticuleLayer({
-        style: { stroke: 'blue' },
-        attr: { stroke: 'green' }
+        attributes: { stroke: 'green' }
       });
 
-      expect(layer['style'].stroke).toBe('green');
+      expect(layer['attributes'].stroke).toBe('green');
     });
 
     test('一意のIDが自動生成される', () => {
@@ -230,7 +229,7 @@ describe('GraticuleLayer', () => {
   describe('style application', () => {
     test('基本スタイルが正しく適用される', () => {
       const styledLayer = new GraticuleLayer({
-        style: {
+        attributes: {
           fill: 'rgba(255,0,0,0.1)',
           stroke: '#ff0000',
           strokeWidth: 1.5,
@@ -238,28 +237,28 @@ describe('GraticuleLayer', () => {
         }
       });
 
-      expect(styledLayer['style'].fill).toBe('rgba(255,0,0,0.1)');
-      expect(styledLayer['style'].stroke).toBe('#ff0000');
-      expect(styledLayer['style'].strokeWidth).toBe(1.5);
-      expect(styledLayer['style'].opacity).toBe(0.8);
+      expect(styledLayer['attributes'].fill).toBe('rgba(255,0,0,0.1)');
+      expect(styledLayer['attributes'].stroke).toBe('#ff0000');
+      expect(styledLayer['attributes'].strokeWidth).toBe(1.5);
+      expect(styledLayer['attributes'].opacity).toBe(0.8);
     });
 
     test('動的スタイル関数が設定できる', () => {
       const dynamicLayer = new GraticuleLayer({
-        style: {
+        attributes: {
           strokeWidth: (d, i) => (i || 0) === 0 ? 1 : 0.5,
           opacity: () => 0.6
         }
       });
 
-      expect(typeof dynamicLayer['style'].strokeWidth).toBe('function');
-      expect(typeof dynamicLayer['style'].opacity).toBe('function');
+      expect(typeof dynamicLayer['attributes'].strokeWidth).toBe('function');
+      expect(typeof dynamicLayer['attributes'].opacity).toBe('function');
 
       // 関数の実行テスト
-      const strokeResult = (dynamicLayer['style'].strokeWidth as Function)({}, 0);
+      const strokeResult = (dynamicLayer['attributes'].strokeWidth as Function)({}, 0);
       expect(strokeResult).toBe(1);
 
-      const opacityResult = (dynamicLayer['style'].opacity as Function)();
+      const opacityResult = (dynamicLayer['attributes'].opacity as Function)();
       expect(opacityResult).toBe(0.6);
     });
   });
@@ -276,12 +275,12 @@ describe('GraticuleLayer', () => {
 
     test('カスタムクラス名が適用される', () => {
       const layerWithClass = new GraticuleLayer({
-        style: {
+        attributes: {
           className: 'custom-graticule'
         }
       });
 
-      expect(layerWithClass['style'].className).toBe('custom-graticule');
+      expect(layerWithClass['attributes'].className).toBe('custom-graticule');
     });
   });
 
@@ -356,15 +355,15 @@ describe('GraticuleLayer', () => {
     test('高密度経緯線設定', () => {
       const denseLayer = new GraticuleLayer({
         step: [1, 1],
-        style: {
+        attributes: {
           strokeWidth: 0.25,
           opacity: 0.3
         }
       });
 
       expect(denseLayer['step']).toEqual([1, 1]);
-      expect(denseLayer['style'].strokeWidth).toBe(0.25);
-      expect(denseLayer['style'].opacity).toBe(0.3);
+      expect(denseLayer['attributes'].strokeWidth).toBe(0.25);
+      expect(denseLayer['attributes'].opacity).toBe(0.3);
     });
   });
 });

@@ -1,6 +1,6 @@
 import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
-import { ThematikaOptions, LayerStyle, ILayer } from './types';
+import { ThematikaOptions, LayerAttributes, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
 
 /**

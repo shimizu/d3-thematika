@@ -1,13 +1,13 @@
 import { Selection, select } from 'd3-selection';
-import { ILayer, LayerStyle } from '../types';
+import { ILayer, LayerAttributes, LayerCssStyles } from '../types';
 
 /**
- * スタイル属性のマッピング定義
+ * SVG属性のマッピング定義
  */
-interface StylePropertyMapping {
-  key: keyof LayerStyle;
+interface AttributeMapping {
+  key: keyof LayerAttributes;
   method: 'attr' | 'style';
-  attr?: string;
+  attrName?: string;
 }
 
 /**
@@ -21,37 +21,41 @@ export abstract class BaseLayer implements ILayer {
   public visible: boolean = true;
   /** レイヤーの描画順序 */
   public zIndex: number = 0;
-  /** レイヤーのスタイル設定 */
-  protected style: LayerStyle;
+  /** レイヤーのSVG属性設定 */
+  protected attributes: LayerAttributes;
+  /** レイヤーのCSS style属性設定（将来的な拡張用） */
+  protected cssStyles?: LayerCssStyles;
   /** レイヤーのSVGグループ要素 */
   protected element?: SVGGElement;
 
-  /** 共通のスタイル属性マッピング */
-  protected static readonly STYLE_PROPERTIES: StylePropertyMapping[] = [
+  /** 共通のSVG属性マッピング */
+  protected static readonly ATTRIBUTE_MAPPINGS: AttributeMapping[] = [
     { key: 'fill', method: 'attr' },
-    { key: 'fillOpacity', method: 'attr', attr: 'fill-opacity' },
+    { key: 'fillOpacity', method: 'attr', attrName: 'fill-opacity' },
     { key: 'stroke', method: 'attr' },
-    { key: 'strokeWidth', method: 'attr', attr: 'stroke-width' },
-    { key: 'strokeDasharray', method: 'attr', attr: 'stroke-dasharray' },
+    { key: 'strokeWidth', method: 'attr', attrName: 'stroke-width' },
+    { key: 'strokeDasharray', method: 'attr', attrName: 'stroke-dasharray' },
     { key: 'opacity', method: 'attr' },
     { key: 'filter', method: 'attr' },
-    { key: 'clipPath', method: 'attr', attr: 'clip-path' }
+    { key: 'clipPath', method: 'attr', attrName: 'clip-path' }
   ];
 
   /**
    * 基底レイヤーを初期化します
    * @param id - レイヤーの一意識別子
-   * @param style - レイヤーのスタイル設定
+   * @param attributes - レイヤーのSVG属性設定
+   * @param cssStyles - レイヤーのCSS style属性設定（オプション）
    */
-  constructor(id: string, style: LayerStyle = {}) {
+  constructor(id: string, attributes: LayerAttributes = {}, cssStyles?: LayerCssStyles) {
     this.id = id;
-    this.style = {
+    this.attributes = {
       fill: '#cccccc',
       stroke: '#333333',
       strokeWidth: 0.5,
       opacity: 1,
-      ...style
+      ...attributes
     };
+    this.cssStyles = cssStyles;
   }
 
   /**
@@ -137,42 +141,42 @@ export abstract class BaseLayer implements ILayer {
   }
 
   /**
-   * 単一要素にスタイル属性を適用します
+   * 単一要素にSVG属性を適用します
    * @param element - 対象要素
-   * @param data - データ（関数型スタイル用）
-   * @param index - インデックス（関数型スタイル用）
+   * @param data - データ（関数型属性用）
+   * @param index - インデックス（関数型属性用）
    * @protected
    */
-  protected applyStylesToElement(
+  protected applyAttributesToElement(
     element: Selection<any, any, any, any>, 
     data?: any, 
     index?: number
   ): void {
-    BaseLayer.STYLE_PROPERTIES.forEach(({ key, method, attr }) => {
+    BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
 
-      const value = this.style[key];
-      const attrName = attr || key;
+      const value = this.attributes[key];
+      const finalAttrName = attrName || key;
       
       if (value !== undefined) {
         const finalValue = typeof value === 'function' ? value(data || {}, index || 0) : value;
-        element[method](attrName, finalValue);
+        element[method](finalAttrName, finalValue);
       }
     });
   }
 
   /**
-   * 複数要素にスタイル属性を適用します（GeojsonLayer用）
+   * 複数要素にSVG属性を適用します（GeojsonLayer用）
    * @param elements - 対象要素群
    * @param layerGroup - レイヤーグループ
    * @protected
    */
-  protected applyStylesToElements(
+  protected applyAttributesToElements(
     elements: Selection<any, any, any, any>, 
     layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
-    BaseLayer.STYLE_PROPERTIES.forEach(({ key, method, attr }) => {
-      const value = this.style[key];
-      const attrName = attr || key;
+    BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
+      const value = this.attributes[key];
+      const finalAttrName = attrName || key;
 
 
       
@@ -180,14 +184,14 @@ export abstract class BaseLayer implements ILayer {
       if (key === 'clipPath') {
         if (value !== undefined) {
           const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
-          layerGroup[method](attrName, finalValue);
+          layerGroup[method](finalAttrName, finalValue);
         }
       } else if (typeof value === 'function') {
         // 関数型の場合は個別の要素に適用
-        elements[method](attrName, (d: any, i: number) => value(d, i));
+        elements[method](finalAttrName, (d: any, i: number) => value(d, i));
       } else if (value !== undefined) {
         // 非関数型の場合はレイヤーグループに適用
-        layerGroup[method](attrName, value);
+        layerGroup[method](finalAttrName, value);
       }
     });
   }

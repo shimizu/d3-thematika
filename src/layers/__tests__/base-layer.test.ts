@@ -1,5 +1,5 @@
 import { BaseLayer } from '../base-layer';
-import { LayerStyle } from '../../types';
+import { LayerAttributes } from '../../types';
 import { Selection } from 'd3-selection';
 
 // テスト用のBaseLayerの具象クラス
@@ -43,8 +43,8 @@ describe('BaseLayer', () => {
 
     test('カスタムスタイルがマージされる', () => {
       const customLayer = new TestLayer('custom', { fill: 'blue' });
-      expect(customLayer['style'].fill).toBe('blue');
-      expect(customLayer['style'].stroke).toBe('#333333'); // デフォルト値
+      expect(customLayer['attributes'].fill).toBe('blue');
+      expect(customLayer['attributes'].stroke).toBe('#333333'); // デフォルト値
     });
   });
 
@@ -100,15 +100,15 @@ describe('BaseLayer', () => {
     });
   });
 
-  describe('STYLE_PROPERTIES', () => {
-    test('スタイル属性マッピングが定義されている', () => {
-      const styleProperties = (BaseLayer as any).STYLE_PROPERTIES;
+  describe('ATTRIBUTE_MAPPINGS', () => {
+    test('属性マッピングが定義されている', () => {
+      const attributeMappings = (BaseLayer as any).ATTRIBUTE_MAPPINGS;
       
-      expect(Array.isArray(styleProperties)).toBe(true);
-      expect(styleProperties.length).toBeGreaterThan(0);
+      expect(Array.isArray(attributeMappings)).toBe(true);
+      expect(attributeMappings.length).toBeGreaterThan(0);
       
-      // 基本的なスタイル属性が含まれているかチェック
-      const keys = styleProperties.map((prop: any) => prop.key);
+      // 基本的な属性が含まれているかチェック
+      const keys = attributeMappings.map((mapping: any) => mapping.key);
       expect(keys).toContain('fill');
       expect(keys).toContain('stroke');
       expect(keys).toContain('strokeWidth');

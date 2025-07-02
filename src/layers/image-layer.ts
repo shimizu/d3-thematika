@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { GeoProjection, geoPath, geoEquirectangular } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle } from '../types';
+import { LayerAttributes } from '../types';
 
 /**
  * 画像レイヤーのオプション
@@ -11,8 +11,8 @@ export interface ImageLayerOptions {
   src: string;
   /** 画像の地理的境界 [west, south, east, north] */
   bounds: [number, number, number, number];
-  /** スタイル設定 */
-  style?: LayerStyle;
+  /** 属性設定 */
+  attributes?: LayerAttributes;
   /** bboxの四隅にマーカーを表示するかどうか */
   showBboxMarkers?: boolean;
   /** 高度な再投影を使用するかどうか（デフォルト: true） */
@@ -41,7 +41,7 @@ export class ImageLayer extends BaseLayer {
    * @param options - レイヤーのオプション
    */
   constructor(id: string, options: ImageLayerOptions) {
-    super(id, options.style);
+    super(id, options.attributes);
     this.src = options.src;
     this.bounds = options.bounds;
     this.showBboxMarkers = options.showBboxMarkers ?? false;
@@ -92,7 +92,7 @@ export class ImageLayer extends BaseLayer {
     }
 
     const g = container.append('g')
-      .attr('class', `image-layer ${this.style.className || ''}`)
+      .attr('class', `image-layer ${this.attributes.className || ''}`)
       .attr('id', `layer-${this.id}`);
     
     if (!this.visible) {
@@ -239,7 +239,7 @@ export class ImageLayer extends BaseLayer {
     }
 
     if (this.imageElement) {
-      this.applyStylesToElement(this.imageElement);
+      this.applyAttributesToElement(this.imageElement);
     }
   }
 
@@ -269,7 +269,7 @@ export class ImageLayer extends BaseLayer {
       .attr('preserveAspectRatio', 'none');
 
     if (this.imageElement) {
-      this.applyStylesToElement(this.imageElement);
+      this.applyAttributesToElement(this.imageElement);
     }
   }
 
@@ -486,7 +486,7 @@ export class ImageLayer extends BaseLayer {
         .attr('preserveAspectRatio', 'none');
 
       if (this.imageElement) {
-        this.applyStylesToElement(this.imageElement);
+        this.applyAttributesToElement(this.imageElement);
       }
 
       // bbox マーカーを表示（オプション）

@@ -1,16 +1,14 @@
 import { Selection, select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, IGeojsonLayer } from '../types';
+import { LayerAttributes, IGeojsonLayer } from '../types';
 
 /**
  * OutlineLayerの初期化オプション
  */
 export interface OutlineLayerOptions {
-  /** レイヤーのスタイル設定 */
-  style?: LayerStyle;
-  /** レイヤーの属性設定（styleのエイリアス） */
-  attr?: LayerStyle;
+  /** レイヤーの属性設定 */
+  attributes?: LayerAttributes;
   /** クリップパスを作成するかどうか */
   createClipPath?: boolean;
   /** クリップパスのID（指定しない場合は自動生成） */
@@ -37,8 +35,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: OutlineLayerOptions = {}) {
     // 一意のIDを自動生成
-    // style または attr のどちらかを使用（attr が優先）
-    const defaultStyle: LayerStyle = {
+    const defaultAttributes: LayerAttributes = {
       fill: 'none',
       stroke: '#333333',
       strokeWidth: 1,
@@ -46,7 +43,7 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
     };
     
     super(`outline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
-          { ...defaultStyle, ...(options.attr || options.style) });
+          { ...defaultAttributes, ...options.attributes });
     
     this.createClipPath = options.createClipPath ?? false;
     this.clipPathId = options.clipPathId || `outline-clip-${this.id}`;
@@ -123,12 +120,12 @@ export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
       .attr('d', this.path)
       .attr('class', () => {
         const baseClass = 'thematika-outline';
-        const customClass = this.style.className || '';
+        const customClass = this.attributes.className || '';
         return [baseClass, customClass].filter(Boolean).join(' ');
       });
 
-    // スタイル属性を適用（共通メソッドを使用）
-    this.applyStylesToElement(outlinePath, sphereGeometry, 0);
+    // 属性を適用（共通メソッドを使用）
+    this.applyAttributesToElement(outlinePath, sphereGeometry, 0);
   }
 
   /**

@@ -132,7 +132,7 @@ describe('PointTextLayer', () => {
         fontFamily: 'Arial',
         fontSize: 14,
         fontWeight: 'bold',
-        style: { fill: '#ff0000' }
+        attributes: { fill: '#ff0000' }
       });
 
       expect(layer.id).toMatch(/^point-text-/);
@@ -155,8 +155,7 @@ describe('PointTextLayer', () => {
     it('attr設定がstyleよりも優先される', () => {
       const layer = new PointTextLayer({
         data: testDataFeatureCollection,
-        style: { fill: '#ff0000' },
-        attr: { fill: '#0000ff' }
+        attributes: { fill: '#0000ff' }
       });
 
       expect(layer.id).toMatch(/^point-text-/);
@@ -238,7 +237,7 @@ describe('PointTextLayer', () => {
     it('投影法設定後にテキスト要素にクラスが適用される', () => {
       const layer = new PointTextLayer({ 
         data: testDataFeatureCollection,
-        style: { className: 'custom-text' }
+        attributes: { className: 'custom-text' }
       });
       
       const projection = mockProjection;
@@ -416,7 +415,7 @@ describe('PointTextLayer', () => {
         dy: -5,
         fontSize: 14,
         fontWeight: 'bold',
-        style: { fill: '#333', stroke: '#fff', strokeWidth: 1 }
+        attributes: { fill: '#333', stroke: '#fff', strokeWidth: 1 }
       });
       
       const projection = mockProjection;
@@ -433,7 +432,7 @@ describe('PointTextLayer', () => {
         rotate: 30,
         fontFamily: 'Arial',
         fontSize: 16,
-        style: { fill: '#ff0000' }
+        attributes: { fill: '#ff0000' }
       });
       
       const projection = mockProjection;
@@ -450,7 +449,7 @@ describe('PointTextLayer', () => {
         dy: (feature) => feature.properties?.population ? -20 : -10,
         fontSize: (feature) => feature.properties?.population > 10000000 ? 18 : 12,
         fontWeight: (feature) => feature.properties?.population > 10000000 ? 'bold' : 'normal',
-        style: { fill: '#0066cc' }
+        attributes: { fill: '#0066cc' }
       });
       
       const projection = mockProjection;

@@ -1,4 +1,4 @@
-import { LayerStyle, ILayer, IGeojsonLayer } from '../types';
+import { LayerAttributes, ILayer, IGeojsonLayer } from '../types';
 import { GeoProjection } from 'd3-geo';
 import { Selection } from 'd3-selection';
 

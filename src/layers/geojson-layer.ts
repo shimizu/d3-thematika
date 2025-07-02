@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerStyle, IGeojsonLayer } from '../types';
+import { LayerAttributes, IGeojsonLayer } from '../types';
 
 /**
  * GeojsonLayerの初期化オプション
@@ -9,10 +9,8 @@ import { LayerStyle, IGeojsonLayer } from '../types';
 export interface GeojsonLayerOptions {
   /** GeoJSONデータ */
   data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  /** レイヤーのスタイル設定 */
-  style?: LayerStyle;
-  /** レイヤーの属性設定（styleのエイリアス） */
-  attr?: LayerStyle;
+  /** レイヤーのSVG属性設定 */
+  attributes?: LayerAttributes;
 }
 
 /**
@@ -32,8 +30,7 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: GeojsonLayerOptions) {
     // 一意のIDを自動生成
-    // style または attr のどちらかを使用（attr が優先）
-    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || options.style);
+    super(`geojson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attributes || {});
     
     // データの正規化
     this.data = Array.isArray(options.data)
@@ -96,13 +93,13 @@ export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
       .attr('d', this.path)
       .attr('class', d => {
         const baseClass = 'thematika-feature';
-        const customClass = this.style.className || '';
+        const customClass = this.attributes.className || '';
         const featureClass = (d.properties?.class as string) || '';
         return [baseClass, customClass, featureClass].filter(Boolean).join(' ');
       })
 
-    // スタイル属性を適用（共通メソッドを使用）
-    this.applyStylesToElements(paths, this.layerGroup);
+    // SVG属性を適用（共通メソッドを使用）
+    this.applyAttributesToElements(paths, this.layerGroup);
   }
 
 
