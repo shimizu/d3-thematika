@@ -1,11 +1,11 @@
 import { Selection, select } from 'd3-selection';
-import { ILayer, LayerAttributes, LayerCssStyles } from '../types';
+import { ILayer, LayerAttr, LayerStyle } from '../types';
 
 /**
  * SVG属性のマッピング定義
  */
 interface AttributeMapping {
-  key: keyof LayerAttributes;
+  key: keyof LayerAttr;
   method: 'attr' | 'style';
   attrName?: string;
 }
@@ -21,10 +21,10 @@ export abstract class BaseLayer implements ILayer {
   public visible: boolean = true;
   /** レイヤーの描画順序 */
   public zIndex: number = 0;
-  /** レイヤーのSVG属性設定 */
-  protected attributes: LayerAttributes;
-  /** レイヤーのCSS style属性設定（将来的な拡張用） */
-  protected cssStyles?: LayerCssStyles;
+  /** レイヤーのSVG属性設定（d3命名規則） */
+  protected attr: LayerAttr;
+  /** レイヤーのCSS style属性設定（d3命名規則） */
+  protected style?: LayerStyle;
   /** レイヤーのSVGグループ要素 */
   protected element?: SVGGElement;
 
@@ -43,19 +43,19 @@ export abstract class BaseLayer implements ILayer {
   /**
    * 基底レイヤーを初期化します
    * @param id - レイヤーの一意識別子
-   * @param attributes - レイヤーのSVG属性設定
-   * @param cssStyles - レイヤーのCSS style属性設定（オプション）
+   * @param attr - レイヤーのSVG属性設定
+   * @param style - レイヤーのCSS style属性設定（オプション）
    */
-  constructor(id: string, attributes: LayerAttributes = {}, cssStyles?: LayerCssStyles) {
+  constructor(id: string, attr: LayerAttr = {}, style?: LayerStyle) {
     this.id = id;
-    this.attributes = {
+    this.attr = {
       fill: '#cccccc',
       stroke: '#333333',
       strokeWidth: 0.5,
       opacity: 1,
-      ...attributes
+      ...attr
     };
-    this.cssStyles = cssStyles;
+    this.style = style;
   }
 
   /**
@@ -154,7 +154,7 @@ export abstract class BaseLayer implements ILayer {
   ): void {
     BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
 
-      const value = this.attributes[key];
+      const value = this.attr[key];
       const finalAttrName = attrName || key;
       
       if (value !== undefined) {
@@ -175,7 +175,7 @@ export abstract class BaseLayer implements ILayer {
     layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
     BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
-      const value = this.attributes[key];
+      const value = this.attr[key];
       const finalAttrName = attrName || key;
 
 

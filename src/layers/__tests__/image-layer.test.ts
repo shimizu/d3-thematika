@@ -76,7 +76,7 @@ describe('ImageLayer', () => {
   const defaultOptions: ImageLayerOptions = {
     src: './test-image.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176],
-    attributes: { opacity: 0.7 }
+    attr: { opacity: 0.7 }
   };
 
   beforeEach(() => {
@@ -390,7 +390,7 @@ describe('ImageLayer', () => {
     test('透明度が適用される', async () => {
       const layerWithOpacity = new ImageLayer('opacity-test', {
         ...defaultOptions,
-        attributes: { opacity: 0.5 }
+        attr: { opacity: 0.5 }
       });
       layerWithOpacity.setProjection(mockProjection);
       
@@ -399,13 +399,13 @@ describe('ImageLayer', () => {
       
       // レイヤーがレンダリングされ、スタイルが設定されていることを確認
       expect(layerWithOpacity.isRendered()).toBe(true);
-      expect(layerWithOpacity['attributes'].opacity).toBe(0.5);
+      expect(layerWithOpacity['attr'].opacity).toBe(0.5);
     });
 
     test('フィルターが適用される', async () => {
       const layerWithFilter = new ImageLayer('filter-test', {
         ...defaultOptions,
-        attributes: { filter: 'url(#shadow)' }
+        attr: { filter: 'url(#shadow)' }
       });
       layerWithFilter.setProjection(mockProjection);
       
@@ -414,7 +414,7 @@ describe('ImageLayer', () => {
       
       // レイヤーがレンダリングされ、スタイルが設定されていることを確認
       expect(layerWithFilter.isRendered()).toBe(true);
-      expect(layerWithFilter['attributes'].filter).toBe('url(#shadow)');
+      expect(layerWithFilter['attr'].filter).toBe('url(#shadow)');
     });
   });
 });

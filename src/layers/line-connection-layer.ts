@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttributes, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
+import { LayerAttr, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
 import * as GeoJSON from 'geojson';
 
 /**
@@ -11,7 +11,7 @@ export interface LineConnectionLayerOptions {
   /** GeoJSONデータ（LineString/MultiLineString） */
   data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
   /** レイヤーの属性設定 */
-  attributes?: LayerAttributes;
+  attr?: LayerAttr;
   /** ライン描画タイプ（デフォルト: 'straight'） */
   lineType?: 'straight' | 'arc';
   /** アーク描画時の高さ（デフォルト: 0.3） */
@@ -62,7 +62,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    */
   constructor(options: LineConnectionLayerOptions) {
     // 一意のIDを自動生成
-    super(`line-connection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attributes);
+    super(`line-connection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr);
     
     // データをFeatureCollectionに正規化
     if (Array.isArray(options.data)) {
@@ -205,7 +205,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
         .attr('orient', 'auto-start-reverse')
         .append('path')
         .attr('d', 'M 0 0 L 10 5 L 0 10 z')
-        .style('fill', (typeof this.attributes.stroke === 'function' ? '#333' : this.attributes.stroke) || '#333');
+        .style('fill', (typeof this.attr.stroke === 'function' ? '#333' : this.attr.stroke) || '#333');
     }
 
     // 終了点用の矢印マーカー
@@ -220,7 +220,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
         .attr('orient', 'auto')
         .append('path')
         .attr('d', 'M 0 0 L 10 5 L 0 10 z')
-        .style('fill', (typeof this.attributes.stroke === 'function' ? '#333' : this.attributes.stroke) || '#333');
+        .style('fill', (typeof this.attr.stroke === 'function' ? '#333' : this.attr.stroke) || '#333');
     }
   }
 
@@ -288,7 +288,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
         .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
         .attr('class', () => {
           const baseClass = 'thematika-connection-line';
-          const customClass = this.attributes.className || '';
+          const customClass = this.attr.className || '';
           const dataClass = feature.properties?.class || '';
           const segmentClass = `segment-${i}`;
           const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';

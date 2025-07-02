@@ -22,9 +22,9 @@ export interface ThematikaOptions {
 
 
 /**
- * レイヤーのSVG属性設定
+ * レイヤーのSVG属性設定（d3命名規則に合わせてattrを使用）
  */
-export interface LayerAttributes {
+export interface LayerAttr {
   /** 塗りつぶし色 */
   fill?: string | ((feature: GeoJSON.Feature, index?: number) => string);
   /** 塗りつぶしの透明度（0-1） */
@@ -46,9 +46,9 @@ export interface LayerAttributes {
 }
 
 /**
- * レイヤーのCSS style属性設定（将来的な拡張用）
+ * レイヤーのCSS style属性設定（d3命名規則に合わせてstyleを使用）
  */
-export interface LayerCssStyles {
+export interface LayerStyle {
   [property: string]: string | number | ((feature: GeoJSON.Feature, index?: number) => string | number);
 }
 

@@ -2,7 +2,7 @@ import { Selection } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { ScaleOrdinal, ScaleSequential, ScaleLinear, ScaleThreshold } from 'd3-scale';
 import { BaseLayer } from './base-layer';
-import { LayerAttributes } from '../types';
+import { LayerAttr } from '../types';
 
 /**
  * 凡例の位置設定
@@ -97,7 +97,7 @@ export interface LegendLayerOptions {
   /** 凡例の高さ */
   height?: number;
   /** レイヤーの属性設定 */
-  attributes?: LayerAttributes;
+  attr?: LayerAttr;
   /** 凡例の視覚表現タイプ */
   symbolType?: LegendSymbolType;
   /** シンボルのサイズ設定 */
@@ -168,7 +168,7 @@ export class LegendLayer extends BaseLayer {
    */
   constructor(options: LegendLayerOptions) {
     // 一意のIDを自動生成
-    super(`legend-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attributes || {});
+    super(`legend-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, options.attr || {});
     
     this.scale = options.scale;
     this.position = options.position;

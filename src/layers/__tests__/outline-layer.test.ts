@@ -1,5 +1,5 @@
 import { OutlineLayer } from '../outline-layer';
-import { LayerAttributes } from '../../types';
+import { LayerAttr } from '../../types';
 
 describe('OutlineLayer', () => {
   let outlineLayer: OutlineLayer;
@@ -9,7 +9,7 @@ describe('OutlineLayer', () => {
 
   beforeEach(() => {
     outlineLayer = new OutlineLayer({
-      attributes: {
+      attr: {
         fill: 'none',
         stroke: '#333333',
         strokeWidth: 2
@@ -50,17 +50,17 @@ describe('OutlineLayer', () => {
       const defaultLayer = new OutlineLayer();
       
       expect(defaultLayer['createClipPath']).toBe(false);
-      expect(defaultLayer['attributes'].fill).toBe('none');
-      expect(defaultLayer['attributes'].stroke).toBe('#333333');
-      expect(defaultLayer['attributes'].strokeWidth).toBe(1);
-      expect(defaultLayer['attributes'].opacity).toBe(1);
+      expect(defaultLayer['attr'].fill).toBe('none');
+      expect(defaultLayer['attr'].stroke).toBe('#333333');
+      expect(defaultLayer['attr'].strokeWidth).toBe(1);
+      expect(defaultLayer['attr'].opacity).toBe(1);
     });
 
     test('カスタム設定が正しく適用される', () => {
       const customOptions = {
         createClipPath: true,
         clipPathId: 'custom-clip',
-        attributes: {
+        attr: {
           fill: 'blue',
           stroke: 'red',
           strokeWidth: 3
@@ -71,17 +71,17 @@ describe('OutlineLayer', () => {
 
       expect(customLayer['createClipPath']).toBe(true);
       expect(customLayer['clipPathId']).toBe('custom-clip');
-      expect(customLayer['attributes'].fill).toBe('blue');
-      expect(customLayer['attributes'].stroke).toBe('red');
-      expect(customLayer['attributes'].strokeWidth).toBe(3);
+      expect(customLayer['attr'].fill).toBe('blue');
+      expect(customLayer['attr'].stroke).toBe('red');
+      expect(customLayer['attr'].strokeWidth).toBe(3);
     });
 
     test('attr設定がstyleよりも優先される', () => {
       const layer = new OutlineLayer({
-        attributes: { stroke: 'green' }
+        attr: { stroke: 'green' }
       });
 
-      expect(layer['attributes'].stroke).toBe('green');
+      expect(layer['attr'].stroke).toBe('green');
     });
 
     test('clipPathIdが自動生成される', () => {
@@ -189,7 +189,7 @@ describe('OutlineLayer', () => {
   describe('style application', () => {
     test('基本スタイルが正しく適用される', () => {
       const styledLayer = new OutlineLayer({
-        attributes: {
+        attr: {
           fill: 'rgba(255,0,0,0.5)',
           stroke: '#ff0000',
           strokeWidth: 3,
@@ -197,28 +197,28 @@ describe('OutlineLayer', () => {
         }
       });
 
-      expect(styledLayer['attributes'].fill).toBe('rgba(255,0,0,0.5)');
-      expect(styledLayer['attributes'].stroke).toBe('#ff0000');
-      expect(styledLayer['attributes'].strokeWidth).toBe(3);
-      expect(styledLayer['attributes'].opacity).toBe(0.8);
+      expect(styledLayer['attr'].fill).toBe('rgba(255,0,0,0.5)');
+      expect(styledLayer['attr'].stroke).toBe('#ff0000');
+      expect(styledLayer['attr'].strokeWidth).toBe(3);
+      expect(styledLayer['attr'].opacity).toBe(0.8);
     });
 
     test('動的スタイル関数が設定できる', () => {
       const dynamicLayer = new OutlineLayer({
-        attributes: {
+        attr: {
           strokeWidth: (d, i) => (i || 0) === 0 ? 2 : 1,
           opacity: () => 0.7
         }
       });
 
-      expect(typeof dynamicLayer['attributes'].strokeWidth).toBe('function');
-      expect(typeof dynamicLayer['attributes'].opacity).toBe('function');
+      expect(typeof dynamicLayer['attr'].strokeWidth).toBe('function');
+      expect(typeof dynamicLayer['attr'].opacity).toBe('function');
 
       // 関数の実行テスト
-      const strokeResult = (dynamicLayer['attributes'].strokeWidth as Function)({}, 0);
+      const strokeResult = (dynamicLayer['attr'].strokeWidth as Function)({}, 0);
       expect(strokeResult).toBe(2);
 
-      const opacityResult = (dynamicLayer['attributes'].opacity as Function)();
+      const opacityResult = (dynamicLayer['attr'].opacity as Function)();
       expect(opacityResult).toBe(0.7);
     });
   });
@@ -236,12 +236,12 @@ describe('OutlineLayer', () => {
 
     test('カスタムクラス名が適用される', () => {
       const layerWithClass = new OutlineLayer({
-        attributes: {
+        attr: {
           className: 'custom-outline'
         }
       });
 
-      expect(layerWithClass['attributes'].className).toBe('custom-outline');
+      expect(layerWithClass['attr'].className).toBe('custom-outline');
     });
   });
 

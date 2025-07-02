@@ -1,14 +1,14 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection, geoGraticule } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttributes, IGeojsonLayer } from '../types';
+import { LayerAttr, IGeojsonLayer } from '../types';
 
 /**
  * GraticuleLayerの初期化オプション
  */
 export interface GraticuleLayerOptions {
   /** レイヤーのSVG属性設定 */
-  attributes?: LayerAttributes;
+  attr?: LayerAttr;
   /** 経緯線の間隔 [経度間隔, 緯度間隔] (度) */
   step?: [number, number];
   /** 経緯線の範囲 [[西端, 南端], [東端, 北端]] (度) */
@@ -35,7 +35,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
    */
   constructor(options: GraticuleLayerOptions = {}) {
     // 一意のIDを自動生成
-    const defaultAttributes: LayerAttributes = {
+    const defaultAttr: LayerAttr = {
       fill: 'none',
       stroke: '#cccccc',
       strokeWidth: 0.5,
@@ -43,7 +43,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
     };
     
     super(`graticule-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, 
-          { ...defaultAttributes, ...(options.attributes || {}) });
+          { ...defaultAttr, ...(options.attr || {}) });
     
     this.step = options.step || [10, 10];
     this.extent = options.extent;
@@ -100,7 +100,7 @@ export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
       .attr('d', this.path)
       .attr('class', () => {
         const baseClass = 'thematika-graticule';
-        const customClass = this.attributes.className || '';
+        const customClass = this.attr.className || '';
         return [baseClass, customClass].filter(Boolean).join(' ');
       });
 

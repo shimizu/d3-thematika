@@ -1,5 +1,5 @@
 import { BaseLayer } from '../base-layer';
-import { LayerAttributes } from '../../types';
+import { LayerAttr } from '../../types';
 import { Selection } from 'd3-selection';
 
 // テスト用のBaseLayerの具象クラス
@@ -43,8 +43,8 @@ describe('BaseLayer', () => {
 
     test('カスタムスタイルがマージされる', () => {
       const customLayer = new TestLayer('custom', { fill: 'blue' });
-      expect(customLayer['attributes'].fill).toBe('blue');
-      expect(customLayer['attributes'].stroke).toBe('#333333'); // デフォルト値
+      expect(customLayer['attr'].fill).toBe('blue');
+      expect(customLayer['attr'].stroke).toBe('#333333'); // デフォルト値
     });
   });
 

@@ -133,7 +133,7 @@ describe('LineConnectionLayer', () => {
         startArrow: true,
         endArrow: true,
         arrowSize: 12,
-        attributes: { stroke: '#ff0000', strokeWidth: 2 }
+        attr: { stroke: '#ff0000', strokeWidth: 2 }
       });
 
       expect(layer.id).toMatch(/^line-connection-/);
@@ -162,7 +162,7 @@ describe('LineConnectionLayer', () => {
     it('attr設定がstyleよりも優先される', () => {
       const layer = new LineConnectionLayer({
         data: testDataFeature,
-        attributes: { stroke: '#0000ff' }
+        attr: { stroke: '#0000ff' }
       });
 
       expect(layer.id).toMatch(/^line-connection-/);
@@ -364,7 +364,7 @@ describe('LineConnectionLayer', () => {
     it('投影法設定後にライン要素にクラスが適用される', () => {
       const layer = new LineConnectionLayer({ 
         data: testDataFeature,
-        attributes: { className: 'custom-line' }
+        attr: { className: 'custom-line' }
       });
       
       const projection = geoMercator();
@@ -403,7 +403,7 @@ describe('LineConnectionLayer', () => {
       const layer = new LineConnectionLayer({ 
         data: testDataFeature,
         lineType: 'straight',
-        attributes: { stroke: '#333', strokeWidth: 2 }
+        attr: { stroke: '#333', strokeWidth: 2 }
       });
       
       const projection = geoMercator();
@@ -420,7 +420,7 @@ describe('LineConnectionLayer', () => {
         arcHeight: 0.3,
         startArrow: true,
         endArrow: true,
-        attributes: { stroke: '#ff0000', strokeWidth: 2 }
+        attr: { stroke: '#ff0000', strokeWidth: 2 }
       });
       
       const projection = geoMercator();
@@ -435,7 +435,7 @@ describe('LineConnectionLayer', () => {
         data: testDataFeatureArray,
         lineType: 'arc',
         arcHeight: 0.5,
-        attributes: { stroke: '#00ff00', strokeWidth: 3 }
+        attr: { stroke: '#00ff00', strokeWidth: 3 }
       });
       
       const projection = geoMercator();

@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { GeoProjection, geoPath, geoEquirectangular } from 'd3-geo';
 import { BaseLayer } from './base-layer';
-import { LayerAttributes } from '../types';
+import { LayerAttr } from '../types';
 
 /**
  * 画像レイヤーのオプション
@@ -12,7 +12,7 @@ export interface ImageLayerOptions {
   /** 画像の地理的境界 [west, south, east, north] */
   bounds: [number, number, number, number];
   /** 属性設定 */
-  attributes?: LayerAttributes;
+  attr?: LayerAttr;
   /** bboxの四隅にマーカーを表示するかどうか */
   showBboxMarkers?: boolean;
   /** 高度な再投影を使用するかどうか（デフォルト: true） */
@@ -41,7 +41,7 @@ export class ImageLayer extends BaseLayer {
    * @param options - レイヤーのオプション
    */
   constructor(id: string, options: ImageLayerOptions) {
-    super(id, options.attributes);
+    super(id, options.attr);
     this.src = options.src;
     this.bounds = options.bounds;
     this.showBboxMarkers = options.showBboxMarkers ?? false;
@@ -92,7 +92,7 @@ export class ImageLayer extends BaseLayer {
     }
 
     const g = container.append('g')
-      .attr('class', `image-layer ${this.attributes.className || ''}`)
+      .attr('class', `image-layer ${this.attr.className || ''}`)
       .attr('id', `layer-${this.id}`);
     
     if (!this.visible) {

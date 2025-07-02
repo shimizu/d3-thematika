@@ -32,8 +32,8 @@ export { Map } from './thematika';
 // 型定義
 export type { 
   ThematikaOptions, 
-  LayerAttributes, 
-  LayerCssStyles,
+  LayerAttr, 
+  LayerStyle,
   ILayer,
   ILineConnectionLayer,
   ArcControlPointType,
