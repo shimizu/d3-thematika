@@ -119,30 +119,6 @@ npm run build
 - `thematika.esm.js` - ES Modules版  
 - `thematika.cjs.js` - CommonJS版
 
-## API
-
-### Map(options)
-
-地図インスタンスを作成します。
-
-#### options
-
-- `container` (string): マップを描画するDOM要素のセレクタ
-- `width` (number): マップの幅
-- `height` (number): マップの高さ
-- `projection` (string): 投影法の種類
-
-### addLayer(name, config)
-
-レイヤーを追加します。
-
-#### config
-
-- `data` (GeoJSON): 地理データ
-- `style` (object): スタイル設定
-  - `fill` (string): 塗りつぶし色
-  - `stroke` (string): 境界線の色
-  - `strokeWidth` (number): 境界線の幅
 
 ## ライセンス
 
