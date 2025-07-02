@@ -100,19 +100,4 @@ describe('BaseLayer', () => {
     });
   });
 
-  describe('ATTRIBUTE_MAPPINGS', () => {
-    test('属性マッピングが定義されている', () => {
-      const attributeMappings = (BaseLayer as any).ATTRIBUTE_MAPPINGS;
-      
-      expect(Array.isArray(attributeMappings)).toBe(true);
-      expect(attributeMappings.length).toBeGreaterThan(0);
-      
-      // 基本的な属性が含まれているかチェック
-      const keys = attributeMappings.map((mapping: any) => mapping.key);
-      expect(keys).toContain('fill');
-      expect(keys).toContain('stroke');
-      expect(keys).toContain('strokeWidth');
-      expect(keys).toContain('opacity');
-    });
-  });
 });

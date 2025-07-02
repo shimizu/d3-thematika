@@ -1,14 +1,6 @@
 import { Selection, select } from 'd3-selection';
 import { ILayer, LayerAttr, LayerStyle } from '../types';
 
-/**
- * SVG属性のマッピング定義
- */
-interface AttributeMapping {
-  key: keyof LayerAttr;
-  method: 'attr' | 'style';
-  attrName?: string;
-}
 
 /**
  * 全レイヤーの基底となる抽象クラス
@@ -28,17 +20,6 @@ export abstract class BaseLayer implements ILayer {
   /** レイヤーのSVGグループ要素 */
   protected element?: SVGGElement;
 
-  /** 共通のSVG属性マッピング */
-  protected static readonly ATTRIBUTE_MAPPINGS: AttributeMapping[] = [
-    { key: 'fill', method: 'attr' },
-    { key: 'fillOpacity', method: 'attr', attrName: 'fill-opacity' },
-    { key: 'stroke', method: 'attr' },
-    { key: 'strokeWidth', method: 'attr', attrName: 'stroke-width' },
-    { key: 'strokeDasharray', method: 'attr', attrName: 'stroke-dasharray' },
-    { key: 'opacity', method: 'attr' },
-    { key: 'filter', method: 'attr' },
-    { key: 'clipPath', method: 'attr', attrName: 'clip-path' }
-  ];
 
   /**
    * 基底レイヤーを初期化します
@@ -152,13 +133,10 @@ export abstract class BaseLayer implements ILayer {
     data?: any, 
     index?: number
   ): void {
-    BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
-      const value = this.attr[key];
-      const finalAttrName = attrName || key;
-      
+    Object.entries(this.attr).forEach(([property, value]) => {
       if (value !== undefined) {
         const finalValue = typeof value === 'function' ? value(data || {}, index || 0) : value;
-        element[method](finalAttrName, finalValue);
+        element.attr(property, finalValue);
       }
     });
   }
@@ -202,7 +180,7 @@ export abstract class BaseLayer implements ILayer {
   }
 
   /**
-   * 複数要素にSVG属性を適用します（GeojsonLayer用）
+   * 複数要素にSVG属性を適用します
    * @param elements - 対象要素群
    * @param layerGroup - レイヤーグループ
    * @protected
@@ -211,28 +189,22 @@ export abstract class BaseLayer implements ILayer {
     elements: Selection<any, any, any, any>, 
     layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
-    BaseLayer.ATTRIBUTE_MAPPINGS.forEach(({ key, method, attrName }) => {
-      const value = this.attr[key];
-      const finalAttrName = attrName || key;
-      
-      // clipPathは常にレイヤーグループに適用
-      if (key === 'clipPath') {
-        if (value !== undefined) {
-          const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
-          layerGroup[method](finalAttrName, finalValue);
+    Object.entries(this.attr).forEach(([property, value]) => {
+      if (value !== undefined) {
+
+        if (typeof value === 'function') {
+          // 関数型の場合は個別の要素に適用
+          elements.attr(property, (d: any, i: number) => value(d, i));
+        } else {
+          // 非関数型の場合はレイヤーグループに適用
+          layerGroup.attr(property, value);
         }
-      } else if (typeof value === 'function') {
-        // 関数型の場合は個別の要素に適用
-        elements[method](finalAttrName, (d: any, i: number) => value(d, i));
-      } else if (value !== undefined) {
-        // 非関数型の場合はレイヤーグループに適用
-        layerGroup[method](finalAttrName, value);
       }
     });
   }
 
   /**
-   * 複数要素にCSS style属性を適用します（GeojsonLayer用）
+   * 複数要素にCSS style属性を適用します
    * @param elements - 対象要素群
    * @param layerGroup - レイヤーグループ
    * @protected
