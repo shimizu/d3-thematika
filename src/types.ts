@@ -121,4 +121,60 @@ export interface PointSpikeLayerOptions {
   direction?: 'up' | 'down' | 'left' | 'right';
 }
 
+/**
+ * タイル座標の型定義
+ */
+export interface TileCoordinate {
+  /** タイルのX座標 */
+  x: number;
+  /** タイルのY座標 */
+  y: number;
+  /** ズームレベル */
+  z: number;
+}
+
+/**
+ * タイルの地理的境界の型定義
+ */
+export interface TileBounds {
+  /** 西端の経度 */
+  west: number;
+  /** 南端の緯度 */
+  south: number;
+  /** 東端の経度 */
+  east: number;
+  /** 北端の緯度 */
+  north: number;
+  /** bounds配列形式 [west, south, east, north] */
+  bounds: [number, number, number, number];
+}
+
+/**
+ * タイルURL情報の型定義
+ */
+export interface TileUrlInfo {
+  /** タイル座標 */
+  coordinate: TileCoordinate;
+  /** タイルのURL */
+  url: string;
+  /** タイルの地理的境界 */
+  bounds: TileBounds;
+}
+
+/**
+ * タイル生成オプションの型定義
+ */
+export interface TileGenerationOptions {
+  /** URLテンプレート（例: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'） */
+  urlTemplate: string;
+  /** 最小ズームレベル（デフォルト: 0） */
+  minZoom?: number;
+  /** 最大ズームレベル（デフォルト: 18） */
+  maxZoom?: number;
+  /** タイルサイズ（ピクセル、デフォルト: 256） */
+  tileSize?: number;
+  /** 境界をタイル境界にクランプするかどうか（デフォルト: true） */
+  clampToBounds?: boolean;
+}
+
 
