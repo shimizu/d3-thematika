@@ -338,7 +338,7 @@ map.addLayer('cog', imageLayer);
                 document.getElementById('load-cog').textContent = '読み込み中...';
                 
                 const cogResult = await Thematika.readCOG(url, {
-                    image: imageIndex,
+                    imageIndex: imageIndex,
                     bbox: [west, south, east, north],
                     sizeLimit: {
                         maxWidth: maxSize,

@@ -252,7 +252,7 @@ export interface ReadCOGOptions {
   resampleMethod?: 'nearest' | 'bilinear';
   
   /** 画像インデックス（デフォルト: 0） */
-  image?: number;
+  imageIndex?: number;
   
   /** 読み込むバンド（デフォルト: [0, 1, 2]でRGB） */
   samples?: number[];
@@ -308,7 +308,7 @@ export async function readCOG(url: string, options: ReadCOGOptions = {}): Promis
   // デフォルト値を設定
   const {
     resampleMethod = 'nearest',
-    image: imageIndex = 0,
+    imageIndex = 0,
     samples = [0, 1, 2],
     pool,
     sizeLimit = {
