@@ -77,7 +77,7 @@
         #map {
             width: 100%;
             height: 100%;            
-            aspect-ratio: 5 / 3;
+            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
         }
     </style>
@@ -199,7 +199,7 @@ map.addLayer('world_new', worldLayer);
             const geojson = await d3.json('./geojson/world.geojson');
 
             // 投影法を地図データに合わせて設定
-            currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
+            currentProjection.fitExtent([[10,0], [width-10, height]], geojson);
 
             // 地図を作成
             const map = new Thematika.Map({

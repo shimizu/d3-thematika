@@ -84,7 +84,7 @@
         #map {
             width: 100%;
             height: 100%;            
-            aspect-ratio: 5 / 3;
+            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
         }
     </style>
@@ -234,7 +234,7 @@ map.addLayer('size-legend', sizeLegend);
         
         // 現在のスケール設定
         let currentScaleType = 'ordinal';
-        let currentPosition = { top: 20, left: 20 };
+        let currentPosition = { top: 350, left: 60 };
         let currentOrientation = 'vertical';
         let currentSymbolType = 'auto';
         let showBackground = true;
@@ -249,11 +249,11 @@ map.addLayer('size-legend', sizeLegend);
         const scaleData = {
             ordinal: {
                 scale: d3.scaleOrdinal()
-                    .domain(['先進国', '新興国', '発展途上国'])
+                    .domain(['Aグループ', 'Bグループ', 'Cグループ'])
                     .range(['#2E86AB', '#A23B72', '#F18F01']),
                 title: '経済発展レベル',
                 colorFunction: (d, i) => {
-                    const types = ['先進国', '新興国', '発展途上国'];
+                    const types = ['Aグループ', 'Bグループ', 'Cグループ'];
                     return scaleData.ordinal.scale(types[i % 3]);
                 }
             },
