@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PointSpikeLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PointSpikeLayer デモ</h1>
+        <p class="description">
+            PointSpikeLayerを使用してGeoJSONデータをスパイク形状で地図上に表示します。
+            世界の首都データを表示し、スパイクの長さや方向を制御できます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: examples/geojson/world-capitals.geojson（世界の首都データ）</li>
+                <li>レイヤー: GeojsonLayer（国境線）、PointSpikeLayer（スパイク）、OutlineLayer（投影法境界）、GraticuleLayer（経緯線）</li>
+                <li>機能: 投影法切り替え、スパイク長さ調整、方向変更</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="equirectangular" selected>Equirectangular</option>
+                    <option value="mercator">Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="orthographic">Orthographic</option>
+                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="spike-length">スパイク長さ: <span id="spike-length-value">50</span></label>
+                <input type="range" id="spike-length" min="10" max="200" value="50">
+            </div>
+            
+            <div class="control-group">
+                <label for="spike-direction">スパイク方向:</label>
+                <select id="spike-direction">
+                    <option value="up" selected>上</option>
+                    <option value="down">下</option>
+                    <option value="left">左</option>
+                    <option value="right">右</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// PointSpikeLayerの使用例
+
+const worldData = await d3.json("./geojson/world.geojson");
+const capitalsData = await d3.json("./geojson/world-capitals.geojson");
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoEquirectangular()
+    .fitExtent([[10, 60], [width-10, height-20]], worldData);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// PointSpikeLayerインスタンスを作成
+const spikeLayer = new Thematika.PointSpikeLayer({
+    data: capitalsData,
+    length: (d) => Math.sqrt(d.properties.population || 1000000) / 500,
+    direction: 'up',
+    attr: {
+        "fill": '#ff6b6b',
+        "fill-opacity": 0.7,
+        "stroke": '#d63031',
+        "stroke-width": 1
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('world', worldLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('spikes', spikeLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script >
+        
+        //プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        
+        async function draw() {
+            const id = "#map"
+
+            // 既存のマップを削除
+            d3.select(id).selectAll('*').remove();
+
+            const width = document.querySelector(id).clientWidth ;
+            const height = document.querySelector(id).clientHeight;
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const worldData = await d3.json('./geojson/world.geojson');
+            const capitalsData = await d3.json('./geojson/world-capitals.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 60], [width-10, height-20]], worldData);
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: worldData,                
+                attr: { 
+                    "fill": '#e8f4f8',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 0.8,
+                    "opacity": 0.9
+                }
+            });
+
+            // UIの状態を取得
+            const spikeLength = parseInt(document.getElementById('spike-length').value);
+            const spikeDirection = document.getElementById('spike-direction').value;
+
+            // PointSpikeLayerインスタンスを作成
+            const spikeLayer = new Thematika.PointSpikeLayer({
+                data: capitalsData,
+                length: (d) => {
+                    const pop = d.properties.population || 1000000;
+                    return Math.sqrt(pop) / 1000 * spikeLength / 50;
+                },
+                direction: spikeDirection,
+                attr: {
+                    "fill": '#ff6b6b',
+                    "fill-opacity": 0.7,
+                    "stroke": '#d63031',
+                    "stroke-width": 1
+                }
+            });
+
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#000',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '1,2',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('spikes', spikeLayer);
+
+        }
+
+        // 投影法変更イベントリスナー
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionType = e.target.value;
+            
+            switch (projectionType) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            
+            draw();
+        });
+        
+        // スパイク長さ変更イベントリスナー
+        document.getElementById('spike-length').addEventListener('input', (e) => {
+            document.getElementById('spike-length-value').textContent = e.target.value;
+            draw();
+        });
+        
+        // スパイク方向変更イベントリスナー
+        document.getElementById('spike-direction').addEventListener('change', draw);
+        
+        draw()
+
+
+
+
+    </script>
+</body>
+</html>

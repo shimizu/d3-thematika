@@ -42,6 +42,7 @@ export type {
 export type { ImageLayerOptions } from './layers/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
 export type { PointCircleLayerOptions } from './layers/point-circle-layer';
+export type { PointSpikeLayerOptions } from './types';
 export type { PointTextLayerOptions } from './layers/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line-connection-layer';
 export type { LineTextLayerOptions } from './layers/line-text-layer';
@@ -57,6 +58,7 @@ export { GraticuleLayer } from './layers/graticule-layer';
 export { ImageLayer } from './layers/image-layer';
 export { LegendLayer } from './layers/legend-layer';
 export { PointCircleLayer } from './layers/point-circle-layer';
+export { PointSpikeLayer } from './layers/point-spike-layer';
 export { PointTextLayer } from './layers/point-text-layer';
 export { LineConnectionLayer } from './layers/line-connection-layer';
 export { LineTextLayer } from './layers/line-text-layer';
