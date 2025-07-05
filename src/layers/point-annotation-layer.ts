@@ -47,6 +47,8 @@ export interface SubjectOptions {
   stroke?: StyleValue<string>;
   /** 境界線の太さ */
   strokeWidth?: StyleValue<number>;
+  /** 境界線のダッシュ配列 */
+  strokeDasharray?: StyleValue<string>;
   /** その他の基本設定（後方互換性のため） */
   radius?: number;
 }
@@ -456,16 +458,17 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
     const fill = this.resolveStyleValue(this.subjectOptions.fill, feature, index, '#e74c3c');
     const stroke = this.resolveStyleValue(this.subjectOptions.stroke, feature, index, 'white');
     const strokeWidth = this.resolveStyleValue(this.subjectOptions.strokeWidth, feature, index, 1);
+    const strokeDasharray = this.resolveStyleValue(this.subjectOptions.strokeDasharray, feature, index, 'none');
 
     switch (subjectType) {
       case 'point':
-        this.drawPointSubject(group, data, { fill, stroke, strokeWidth });
+        this.drawPointSubject(group, data, { fill, stroke, strokeWidth, strokeDasharray });
         break;
       case 'circle':
-        this.drawCircleSubject(group, data, { fill, stroke, strokeWidth });
+        this.drawCircleSubject(group, data, { fill, stroke, strokeWidth, strokeDasharray });
         break;
       case 'rect':
-        this.drawRectSubject(group, data, { fill, stroke, strokeWidth });
+        this.drawRectSubject(group, data, { fill, stroke, strokeWidth, strokeDasharray });
         break;
     }
   }
@@ -477,7 +480,7 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
   private drawPointSubject(
     group: Selection<SVGGElement, unknown, HTMLElement, any>,
     data: AnnotationData,
-    styles: { fill: string; stroke: string; strokeWidth: number }
+    styles: { fill: string; stroke: string; strokeWidth: number; strokeDasharray: string }
   ): void {
     const radius = this.resolveStyleValue(this.subjectOptions.r, data.feature, data.index, 3);
     
@@ -486,7 +489,8 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .attr('r', radius)
       .attr('fill', styles.fill)
       .attr('stroke', styles.stroke)
-      .attr('stroke-width', styles.strokeWidth);
+      .attr('stroke-width', styles.strokeWidth)
+      .attr('stroke-dasharray', styles.strokeDasharray);
   }
 
   /**
@@ -496,7 +500,7 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
   private drawCircleSubject(
     group: Selection<SVGGElement, unknown, HTMLElement, any>,
     data: AnnotationData,
-    styles: { fill: string; stroke: string; strokeWidth: number }
+    styles: { fill: string; stroke: string; strokeWidth: number; strokeDasharray: string }
   ): void {
     const radius = this.resolveStyleValue(
       this.subjectOptions.r,
@@ -510,7 +514,8 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .attr('r', radius)
       .attr('fill', styles.fill)
       .attr('stroke', styles.stroke)
-      .attr('stroke-width', styles.strokeWidth);
+      .attr('stroke-width', styles.strokeWidth)
+      .attr('stroke-dasharray', styles.strokeDasharray);
   }
 
   /**
@@ -520,7 +525,7 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
   private drawRectSubject(
     group: Selection<SVGGElement, unknown, HTMLElement, any>,
     data: AnnotationData,
-    styles: { fill: string; stroke: string; strokeWidth: number }
+    styles: { fill: string; stroke: string; strokeWidth: number; strokeDasharray: string }
   ): void {
     const width = this.resolveStyleValue(this.subjectOptions.width, data.feature, data.index, 16);
     const height = this.resolveStyleValue(this.subjectOptions.height, data.feature, data.index, 16);
@@ -533,7 +538,8 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .attr('height', height)
       .attr('fill', styles.fill)
       .attr('stroke', styles.stroke)
-      .attr('stroke-width', styles.strokeWidth);
+      .attr('stroke-width', styles.strokeWidth)
+      .attr('stroke-dasharray', styles.strokeDasharray);
   }
 
   /**
@@ -602,7 +608,7 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .style('font-size', this.noteOptions.fontSize || '12px')
       .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
       .style('fill', this.noteOptions.textColor || 'black')
-      .text(data.text);
+      .html(data.text);
   }
 
 
@@ -620,7 +626,7 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
       .style('font-weight', 'bold')
       .style('fill', this.noteOptions.textColor || 'white')
-      .text(data.text.substring(0, 3)); // バッジは短いテキストのみ
+      .html(data.text.substring(0, 3)); // バッジは短いテキストのみ
   }
 
 
@@ -659,14 +665,14 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
         .attr('x', data.dx)
         .attr('dy', 0)
         .style('font-weight', 'bold')
-        .text(data.title);
+        .html(data.title);
 
       textElement.append('tspan')
         .attr('x', data.dx)
         .attr('dy', '1.2em')
-        .text(data.text);
+        .html(data.text);
     } else {
-      textElement.text(data.text);
+      textElement.html(data.text);
     }
 
     // 背景サイズ調整

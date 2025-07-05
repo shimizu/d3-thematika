@@ -18,6 +18,7 @@ interface PointAnnotationLayerArgs {
   subjectFill: string;
   subjectStroke: string;
   subjectStrokeWidth: number;
+  subjectStrokeDasharray: string;
   connectorStroke: string;
   connectorStrokeWidth: number;
   noteBackgroundColor: string;
@@ -99,6 +100,12 @@ const meta: Meta<PointAnnotationLayerArgs> = {
       control: { type: 'range', min: 0, max: 5, step: 0.5 },
       description: 'サブジェクトの境界線太さ',
       defaultValue: 1
+    },
+    subjectStrokeDasharray: {
+      control: { type: 'select' },
+      options: ['none', '2,2', '4,4', '8,4', '2,4,2', '4,2,1,2'],
+      description: 'サブジェクトの境界線ダッシュパターン',
+      defaultValue: 'none'
     },
     connectorStroke: {
       control: { type: 'color' },
@@ -255,6 +262,7 @@ const render = (args: PointAnnotationLayerArgs) => {
         fill: args.subjectFill,
         stroke: args.subjectStroke,
         strokeWidth: args.subjectStrokeWidth,
+        strokeDasharray: args.subjectStrokeDasharray,
         // 後方互換性のため
         radius: args.subjectRadius
       },
@@ -294,6 +302,7 @@ export const Default: Story = {
     subjectFill: '#e74c3c',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 1,
+    subjectStrokeDasharray: 'none',
     connectorStroke: '#666666',
     connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
@@ -318,6 +327,7 @@ export const CalloutElbow: Story = {
     subjectFill: '#3498db',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 1.5,
+    subjectStrokeDasharray: '4,4',
     connectorStroke: '#2980b9',
     connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#ecf0f1',
@@ -342,6 +352,7 @@ export const CalloutCurve: Story = {
     subjectFill: '#9b59b6',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 2,
+    subjectStrokeDasharray: 'none',
     connectorStroke: '#8e44ad',
     connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#f8f9fa',
@@ -366,6 +377,7 @@ export const Label: Story = {
     subjectFill: '#f39c12',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 1,
+    subjectStrokeDasharray: 'none',
     connectorStroke: '#e67e22',
     connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
@@ -390,6 +402,7 @@ export const Badge: Story = {
     subjectFill: '#e74c3c',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 2,
+    subjectStrokeDasharray: 'none',
     connectorStroke: '#c0392b',
     connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
@@ -414,6 +427,7 @@ export const CalloutCircle: Story = {
     subjectFill: 'none',
     subjectStroke: '#27ae60',
     subjectStrokeWidth: 2,
+    subjectStrokeDasharray: '8,4',
     connectorStroke: '#27ae60',
     connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#d5f4e6',
@@ -438,6 +452,7 @@ export const CalloutRect: Story = {
     subjectFill: 'none',
     subjectStroke: '#e67e22',
     subjectStrokeWidth: 2,
+    subjectStrokeDasharray: '2,4,2',
     connectorStroke: '#e67e22',
     connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#fdeaa7',
@@ -462,6 +477,7 @@ export const PolygonAnnotations: Story = {
     subjectFill: '#16a085',
     subjectStroke: '#ffffff',
     subjectStrokeWidth: 1,
+    subjectStrokeDasharray: 'none',
     connectorStroke: '#1abc9c',
     connectorStrokeWidth: 1,
     noteBackgroundColor: '#e8f8f5',
@@ -486,6 +502,7 @@ export const SubjectTypeDemo: Story = {
     subjectFill: '#ff6b6b',
     subjectStroke: '#2c3e50',
     subjectStrokeWidth: 2,
+    subjectStrokeDasharray: '4,2,1,2',
     connectorStroke: '#34495e',
     connectorStrokeWidth: 2,
     noteBackgroundColor: '#fff3cd',

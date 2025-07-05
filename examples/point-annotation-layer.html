@@ -139,32 +139,40 @@
             
             <div class="control-group">
                 <label for="subject-radius">サブジェクト半径: <span id="subject-radius-value">3</span></label>
-                <input type="range" id="subject-radius" min="1" max="20" step="1" value="3">
+                <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
             </div>
             
             <div class="control-group">
                 <label for="subject-width">サブジェクト幅: <span id="subject-width-value">16</span></label>
-                <input type="range" id="subject-width" min="4" max="40" step="2" value="16">
+                <input type="range" id="subject-width" min="1" max="400" step="1" value="16">
             </div>
             
             <div class="control-group">
                 <label for="subject-height">サブジェクト高さ: <span id="subject-height-value">16</span></label>
-                <input type="range" id="subject-height" min="4" max="40" step="2" value="16">
+                <input type="range" id="subject-height" min="1" max="400" step="1" value="16">
             </div>
             
-            <div class="control-group">
-                <label for="subject-fill">サブジェクト塗りつぶし色:</label>
-                <input type="color" id="subject-fill" value="#e74c3c">
-            </div>
             
             <div class="control-group">
                 <label for="subject-stroke">サブジェクト境界線色:</label>
-                <input type="color" id="subject-stroke" value="#ffffff">
+                <input type="color" id="subject-stroke" value="#000000">
             </div>
             
             <div class="control-group">
                 <label for="subject-stroke-width">サブジェクト境界線太さ: <span id="subject-stroke-width-value">1</span></label>
                 <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-stroke-dasharray">サブジェクト境界線ダッシュパターン:</label>
+                <select id="subject-stroke-dasharray">
+                    <option value="none" selected>なし (実線)</option>
+                    <option value="2,2">短い点線 (2,2)</option>
+                    <option value="4,4">点線 (4,4)</option>
+                    <option value="8,4">長い点線 (8,4)</option>
+                    <option value="2,4,2">ドット・ダッシュ (2,4,2)</option>
+                    <option value="4,2,1,2">複合パターン (4,2,1,2)</option>
+                </select>
             </div>
             
             <div class="control-group">
@@ -224,7 +232,8 @@ const annotationLayer = new Thematika.PointAnnotationLayer({
         height: 16,         // 高さ（rect用）
         fill: '#e74c3c',    // 塗りつぶし色
         stroke: 'white',    // 境界線色
-        strokeWidth: 1      // 境界線太さ
+        strokeWidth: 1,     // 境界線太さ
+        strokeDasharray: 'none'  // 境界線ダッシュパターン
     },
     connectorOptions: {
         stroke: '#666666',
@@ -258,9 +267,10 @@ map.addLayer('annotations', annotationLayer);
         let subjectRadius = 3;
         let subjectWidth = 16;
         let subjectHeight = 16;
-        let subjectFill = '#e74c3c';
-        let subjectStroke = '#ffffff';
+        let subjectFill = 'none';
+        let subjectStroke = '#000000';
         let subjectStrokeWidth = 1;
+        let subjectStrokeDasharray = 'none';
         let noteBackground = '#ffffff';
 
         // 主要都市データ
@@ -348,6 +358,7 @@ map.addLayer('annotations', annotationLayer);
                         fill: subjectFill,
                         stroke: subjectStroke,
                         strokeWidth: subjectStrokeWidth,
+                        strokeDasharray: subjectStrokeDasharray,
                         // 後方互換性のため
                         radius: subjectRadius
                     },
@@ -423,10 +434,7 @@ map.addLayer('annotations', annotationLayer);
             draw();
         });
 
-        document.getElementById('subject-fill').addEventListener('change', function() {
-            subjectFill = this.value;
-            draw();
-        });
+
 
         document.getElementById('subject-stroke').addEventListener('change', function() {
             subjectStroke = this.value;
@@ -436,6 +444,11 @@ map.addLayer('annotations', annotationLayer);
         document.getElementById('subject-stroke-width').addEventListener('input', function() {
             subjectStrokeWidth = parseFloat(this.value);
             document.getElementById('subject-stroke-width-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-stroke-dasharray').addEventListener('change', function() {
+            subjectStrokeDasharray = this.value;
             draw();
         });
 
