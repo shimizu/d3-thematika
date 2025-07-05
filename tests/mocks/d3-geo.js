@@ -7,12 +7,15 @@ module.exports = {
     translate: jest.fn().mockReturnThis(),
     center: jest.fn().mockReturnThis()
   })),
-  geoMercator: jest.fn(() => ({
-    fitExtent: jest.fn().mockReturnThis(),
-    scale: jest.fn().mockReturnThis(),
-    translate: jest.fn().mockReturnThis(),
-    center: jest.fn().mockReturnThis()
-  })),
+  geoMercator: jest.fn(() => {
+    const mockProjection = jest.fn((coord) => [100, 200]);
+    mockProjection.fitExtent = jest.fn().mockReturnValue(mockProjection);
+    mockProjection.scale = jest.fn().mockReturnValue(mockProjection);
+    mockProjection.translate = jest.fn().mockReturnValue(mockProjection);
+    mockProjection.center = jest.fn().mockReturnValue(mockProjection);
+    mockProjection.invert = jest.fn((pixel) => [139.6917, 35.6895]);
+    return mockProjection;
+  }),
   geoEqualEarth: jest.fn(() => ({
     fitExtent: jest.fn().mockReturnThis(),
     scale: jest.fn().mockReturnThis(),
