@@ -4,6 +4,15 @@ import { BaseLayer } from './base-layer';
 import { LayerAttr, LayerStyle } from '../types';
 
 /**
+ * 投影法の状態を保存するインターface
+ */
+interface ProjectionState {
+  scale: number;
+  translate: [number, number];
+  center: [number, number];
+}
+
+/**
  * 画像レイヤーのオプション
  */
 export interface ImageLayerOptions {
@@ -67,14 +76,27 @@ export class ImageLayer extends BaseLayer {
       selection.selectAll('.bbox-marker-label').remove();
       
       this.loadImage(this.src).then(img => {
-        // Equirectangular投影法の場合は高速描画
-        if (this.projection && this.isEquirectangularProjection(this.projection)) {
+        // 投影法の判定
+        const isWebMercatorCompatible = this.projection && this.isWebMercatorCompatible(this.projection);
+        const isEquirectangular = this.projection && this.isEquirectangularProjection(this.projection);
+        
+        console.log('=== setProjection - 投影法判定結果 ===');
+        console.log('  isWebMercatorCompatible:', isWebMercatorCompatible);
+        console.log('  isEquirectangular:', isEquirectangular);
+        console.log('  useAdvancedReprojection:', this.useAdvancedReprojection);
+        console.log('  Current projection:', this.projection?.toString());
+        
+        if (isWebMercatorCompatible) {
+          console.log('→ setProjection実行パス: renderSimpleImage (Web Mercator互換)');
+          this.renderSimpleImage(img);
+        } else if (isEquirectangular) {
+          console.log('→ setProjection実行パス: renderSimpleImage (Equirectangular高速描画)');
           this.renderSimpleImage(img);
         } else if (this.useAdvancedReprojection) {
-          // その他の投影法では高度な再投影を実行
+          console.log('→ setProjection実行パス: renderAdvancedReprojection (他の投影法)');
           this.renderAdvancedReprojection(img);
         } else {
-          // フォールバック: 単純な画像配置
+          console.log('→ setProjection実行パス: renderSimpleImage (フォールバック)');
           this.renderSimpleImage(img);
         }
       }).catch(error => {
@@ -119,13 +141,21 @@ export class ImageLayer extends BaseLayer {
       
       // 投影法の判定
       const isWebMercatorCompatible = this.projection && this.isWebMercatorCompatible(this.projection);
-      console.log('isWebMercatorCompatible:', isWebMercatorCompatible);
+      const isEquirectangular = this.projection && this.isEquirectangularProjection(this.projection);
+      
+      console.log('投影法判定結果:');
+      console.log('  isWebMercatorCompatible:', isWebMercatorCompatible);
+      console.log('  isEquirectangular:', isEquirectangular);
+      console.log('  useAdvancedReprojection:', this.useAdvancedReprojection);
       
       if (isWebMercatorCompatible) {
         console.log('→ 実行パス: renderSimpleImage (Web Mercator互換)');
         await this.renderSimpleImage(img);
+      } else if (isEquirectangular) {
+        console.log('→ 実行パス: renderSimpleImage (Equirectangular高速描画)');
+        await this.renderSimpleImage(img);
       } else if (this.useAdvancedReprojection) {
-        console.log('→ 実行パス: renderAdvancedReprojection');
+        console.log('→ 実行パス: renderAdvancedReprojection (他の投影法)');
         await this.renderAdvancedReprojection(img);
       } else {
         console.log('→ 実行パス: renderSimpleImage (フォールバック)');
@@ -176,11 +206,12 @@ export class ImageLayer extends BaseLayer {
     // D3の投影法の判定は複数の方法を組み合わせる
     const projString = projection.toString ? projection.toString() : '';
     
-    // 1. 文字列による判定
-    if (projString.includes('mercator') || 
-        projString.includes('Mercator') ||
-        projString.includes('equirectangular') || 
-        projString.includes('Equirectangular')) {
+    console.log('=== Web Mercator compatibility check ===');
+    console.log('Projection toString:', projString);
+    
+    // 1. 文字列による判定（Mercatorのみ）
+    if (projString.includes('mercator') || projString.includes('Mercator')) {
+      console.log('→ Detected as Mercator projection by string match');
       return true;
     }
     
@@ -194,17 +225,85 @@ export class ImageLayer extends BaseLayer {
       const scale = projection.scale();
       const translate = projection.translate();
       
-      // d3.geoMercator()のデフォルト値やWeb Mercatorタイルと互換性があるかチェック
-      // 通常のMercator投影法の場合、タイル座標系と互換性がある
       console.log('Projection details for compatibility check:', {
         scale: scale,
         translate: translate
       });
       
-      return true; // Mercator系の投影法として扱う
+      // より厳密な判定：タイル座標系と互換性があるかチェック
+      // Web Mercatorタイルシステムで使用される投影法のみを対象とする
+      
+      // 簡易的な判定：投影法の名前や特徴でMercatorを判定
+      // ただし、Equirectangularは除外する
+      if (!projString.includes('equirectangular') && 
+          !projString.includes('Equirectangular') &&
+          !projString.includes('naturalEarth') &&
+          !projString.includes('orthographic')) {
+        console.log('→ Detected as Mercator-compatible by feature analysis');
+        return true;
+      }
     }
     
+    console.log('→ Not Web Mercator compatible');
     return false;
+  }
+
+  /**
+   * 投影法の現在の状態を保存します
+   * @param projection - 投影法
+   * @returns 保存された状態
+   */
+  private saveProjectionState(projection: GeoProjection): ProjectionState {
+    return {
+      scale: projection.scale(),
+      translate: projection.translate(),
+      center: projection.center()
+    };
+  }
+
+  /**
+   * 投影法の状態を復元します
+   * @param projection - 投影法
+   * @param state - 復元する状態
+   */
+  private restoreProjectionState(projection: GeoProjection, state: ProjectionState): void {
+    projection.scale(state.scale);
+    projection.translate(state.translate);
+    projection.center(state.center);
+  }
+
+  /**
+   * 画像専用の投影法を作成します
+   * @param baseProjection - ベースとなる投影法
+   * @returns 画像用に最適化された投影法
+   */
+  private createImageProjection(baseProjection: GeoProjection): GeoProjection {
+    // 投影法の種類を判定
+    const projString = baseProjection.toString ? baseProjection.toString() : '';
+    
+    console.log('=== Creating image-specific projection ===');
+    console.log('Base projection:', projString);
+    
+    // Equirectangular投影法の場合は画像に最適化
+    if (this.isEquirectangularProjection(baseProjection)) {
+      const [west, south, east, north] = this.bounds;
+      
+      // 画像の地理的範囲に基づいたEquirectangular投影法を作成
+      const imageProjection = geoEquirectangular()
+        .center([(west + east) / 2, (south + north) / 2])
+        .scale(1)
+        .translate([0, 0]);
+        
+      console.log('→ Created optimized Equirectangular projection for image');
+      console.log('→ Image center:', [(west + east) / 2, (south + north) / 2]);
+      
+      return imageProjection;
+    }
+    
+    // その他の投影法の場合はベース投影法のコピーを作成
+    // 注意: D3投影法の完全なコピーは困難なため、状態の保存/復元を使用
+    console.log('→ Using base projection with state management');
+    return baseProjection;
   }
 
   /**
@@ -216,11 +315,48 @@ export class ImageLayer extends BaseLayer {
 
     const [west, south, east, north] = this.bounds;
     
+    // 投影法の現在の状態を保存
+    const originalState = this.saveProjectionState(this.projection);
+    console.log('=== renderSimpleImage with projection state management ===');
+    console.log('Original projection state:', originalState);
+    
+    // Equirectangular投影法の場合は画像専用投影法を使用
+    let workingProjection = this.projection;
+    let useImageProjection = false;
+    
+    if (this.isEquirectangularProjection(this.projection)) {
+      // 画像の地理的範囲に基づいて最適化されたEquirectangular投影法を作成
+      workingProjection = this.createImageProjection(this.projection);
+      useImageProjection = true;
+      
+      // 画像用投影法のスケールと平行移動を計算
+      // 画像が画面内に適切に配置されるように調整
+      const imageWidth = east - west;
+      const imageHeight = north - south;
+      
+      // スケールを適切に設定（画像の地理的範囲に基づく）
+      const scale = Math.min(
+        (originalState.translate[0] * 2) / imageWidth,
+        (originalState.translate[1] * 2) / imageHeight
+      ) * 0.8; // 余白を考慮
+      
+      workingProjection
+        .scale(scale)
+        .translate(originalState.translate)
+        .center([(west + east) / 2, (south + north) / 2]);
+        
+      console.log('→ Using optimized image projection');
+      console.log('→ Image projection scale:', scale);
+      console.log('→ Image projection center:', [(west + east) / 2, (south + north) / 2]);
+    } else {
+      console.log('→ Using original projection as-is');
+    }
+    
     // bboxの各角を投影法で座標変換してログ出力
-    const topLeft = this.projection([west, north]);
-    const topRight = this.projection([east, north]);
-    const bottomLeft = this.projection([west, south]);
-    const bottomRight = this.projection([east, south]);
+    const topLeft = workingProjection([west, north]);
+    const topRight = workingProjection([east, north]);
+    const bottomLeft = workingProjection([west, south]);
+    const bottomRight = workingProjection([east, south]);
     
     console.log('=== ImageLayer bbox projection ===');
     console.log('Original bbox coordinates:');
@@ -230,6 +366,13 @@ export class ImageLayer extends BaseLayer {
     console.log('  North (top):', north);
     console.log('Original bbox:', { west, south, east, north });
     console.log('Image size:', { width: img.width, height: img.height });
+    console.log('');
+    console.log('Working projection details:');
+    if (workingProjection && typeof workingProjection.scale === 'function') {
+      console.log('  Working projection scale:', workingProjection.scale());
+      console.log('  Working projection translate:', workingProjection.translate());
+      console.log('  Working projection center:', workingProjection.center());
+    }
     console.log('');
     console.log('Input coordinates for projection:');
     console.log('  Top-left input: [', west, ',', north, ']');
@@ -254,16 +397,42 @@ export class ImageLayer extends BaseLayer {
       console.log('  Translate:', this.projection.translate());
     }
     
-    if (!topLeft || !bottomRight) {
+    // 最終座標の初期化（元の投影座標をデフォルトとして使用）
+    let finalTopLeft = topLeft;
+    let finalTopRight = topRight;
+    let finalBottomLeft = bottomLeft;
+    let finalBottomRight = bottomRight;
+    
+    if (useImageProjection && !this.isEquirectangularProjection(this.projection)) {
+      // 画像投影法の座標を地理座標に逆変換し、元の投影法で再変換
+      console.log('→ Converting coordinates to original projection space');
+      
+      if (workingProjection.invert && topLeft && bottomRight) {
+        const geoTopLeft = workingProjection.invert(topLeft);
+        const geoBottomRight = workingProjection.invert(bottomRight);
+        
+        if (geoTopLeft && geoBottomRight) {
+          finalTopLeft = this.projection(geoTopLeft);
+          finalBottomRight = this.projection(geoBottomRight);
+          
+          console.log('→ Converted coordinates:', {
+            topLeft: finalTopLeft,
+            bottomRight: finalBottomRight
+          });
+        }
+      }
+    }
+    
+    // 投影後の位置とサイズを計算（最終座標を使用）
+    if (!finalTopLeft || !finalBottomRight) {
       console.warn('ImageLayer: 境界が投影範囲外です');
       return;
     }
     
-    // 投影後の位置とサイズを計算
-    const projectedX = topLeft[0];
-    const projectedY = topLeft[1];
-    const projectedWidth = Math.abs(bottomRight[0] - topLeft[0]);
-    const projectedHeight = Math.abs(bottomRight[1] - topLeft[1]);
+    const projectedX = finalTopLeft[0];
+    const projectedY = finalTopLeft[1];
+    const projectedWidth = Math.abs(finalBottomRight[0] - finalTopLeft[0]);
+    const projectedHeight = Math.abs(finalBottomRight[1] - finalTopLeft[1]);
     
     console.log('Projected position (top-left):', { x: projectedX, y: projectedY });
     console.log('Projected size:', { width: projectedWidth, height: projectedHeight });
@@ -305,7 +474,7 @@ export class ImageLayer extends BaseLayer {
 
     // bbox の四隅にcircleを表示（オプション）
     if (this.showBboxMarkers) {
-      this.addBboxMarkers(selection, [topLeft, topRight, bottomLeft, bottomRight]);
+      this.addBboxMarkers(selection, [finalTopLeft, finalTopRight, finalBottomLeft, finalBottomRight]);
     }
 
     console.log('applyAllStylesToElement実行前のhref:', this.imageElement.attr('href'));
@@ -313,6 +482,12 @@ export class ImageLayer extends BaseLayer {
     if (this.imageElement) {
       this.applyAllStylesToElement(this.imageElement, this.getLayerGroup()!);
       console.log('applyAllStylesToElement実行後のhref:', this.imageElement.attr('href'));
+    }
+    
+    // Equirectangular以外の投影法の場合、元の投影法状態を復元
+    if (!this.isEquirectangularProjection(this.projection)) {
+      this.restoreProjectionState(this.projection, originalState);
+      console.log('→ Restored original projection state');
     }
     
     console.log('=== DOM要素作成完了 ===');
@@ -634,40 +809,46 @@ export class ImageLayer extends BaseLayer {
       return [projected[0] - minX, projected[1] - minY];
     };
 
-    // 球体マスクを描画（手動で境界を計算）
+    // 画像境界に特化したマスクを描画
     maskCtx.beginPath();
     
-    // 投影範囲の境界を計算
+    // 画像の境界を計算（画像の地理的範囲に基づく）
     const boundaryPoints: [number, number][] = [];
-    const steps = 100;
+    const steps = 50;
     
+    console.log('=== Advanced reprojection mask creation ===');
+    console.log('Image bounds:', { west, south, east, north });
+    
+    // 画像境界の周囲を描画（時計回り）
     // 上辺（北端）
     for (let i = 0; i <= steps; i++) {
-      const lng = -180 + (360 * i / steps);
-      const point = offsetProjection([lng, 90]);
+      const lng = west + (east - west) * i / steps;
+      const point = offsetProjection([lng, north]);
       if (point) boundaryPoints.push(point);
     }
     
     // 右辺（東端）
     for (let i = 0; i <= steps; i++) {
-      const lat = 90 - (180 * i / steps);
-      const point = offsetProjection([180, lat]);
+      const lat = north - (north - south) * i / steps;
+      const point = offsetProjection([east, lat]);
       if (point) boundaryPoints.push(point);
     }
     
     // 下辺（南端）
     for (let i = 0; i <= steps; i++) {
-      const lng = 180 - (360 * i / steps);
-      const point = offsetProjection([lng, -90]);
+      const lng = east - (east - west) * i / steps;
+      const point = offsetProjection([lng, south]);
       if (point) boundaryPoints.push(point);
     }
     
     // 左辺（西端）
     for (let i = 0; i <= steps; i++) {
-      const lat = -90 + (180 * i / steps);
-      const point = offsetProjection([-180, lat]);
+      const lat = south + (north - south) * i / steps;
+      const point = offsetProjection([west, lat]);
       if (point) boundaryPoints.push(point);
     }
+    
+    console.log('Generated boundary points:', boundaryPoints.length);
     
     // パスを描画
     if (boundaryPoints.length > 0) {
@@ -681,10 +862,27 @@ export class ImageLayer extends BaseLayer {
     
     const maskData = maskCtx.getImageData(0, 0, width, height);
     const dstImageData = dstCtx.createImageData(width, height);
+    
+    console.log('=== Pixel transformation started ===');
+    console.log('Output canvas size:', { width, height });
+    console.log('Source image size:', { width: img.width, height: img.height });
+    
+    let processedPixels = 0;
+    let successfulTransforms = 0;
+    const totalPixels = width * height;
+    const progressInterval = Math.floor(totalPixels / 10);
 
     // 各ピクセルを変換
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
+        processedPixels++;
+        
+        // プログレス表示（10%ごと）
+        if (processedPixels % progressInterval === 0) {
+          const progress = Math.floor((processedPixels / totalPixels) * 100);
+          console.log(`Transformation progress: ${progress}% (${processedPixels}/${totalPixels})`);
+        }
+        
         // マスクチェック（マスクが有効な場合のみ）
         if (this.useMask) {
           const maskIndex = (row * width + col) * 4;
@@ -712,9 +910,15 @@ export class ImageLayer extends BaseLayer {
           dstImageData.data[dstIndex + 1] = pixel[1];
           dstImageData.data[dstIndex + 2] = pixel[2];
           dstImageData.data[dstIndex + 3] = pixel[3];
+          
+          successfulTransforms++;
         }
       }
     }
+    
+    console.log('=== Pixel transformation completed ===');
+    console.log('Successful transforms:', successfulTransforms, '/', totalPixels);
+    console.log('Success rate:', Math.round((successfulTransforms / totalPixels) * 100), '%');
 
     dstCtx.putImageData(dstImageData, 0, 0);
     
