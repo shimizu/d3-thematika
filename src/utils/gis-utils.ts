@@ -328,15 +328,34 @@ export async function readCOG(url: string, options: ReadCOGOptions = {}): Promis
   try {
     // GeoTIFFファイルを読み込み
     const tiff = await fromUrl(url);
+    
+    // 利用可能な画像数を確認
+    const imageCount = await tiff.getImageCount();
+    
+    // インデックスが範囲外の場合はエラー
+    if (imageIndex >= imageCount) {
+      throw new Error(`画像インデックス ${imageIndex} は範囲外です。利用可能なインデックス: 0-${imageCount - 1}`);
+    }
+    
     const image = await tiff.getImage(imageIndex);
 
     // 元画像のサイズを取得
     const originalWidth = image.getWidth();
     const originalHeight = image.getHeight();
 
-    // 地理的境界を取得
-    const imgBbox = image.getBoundingBox();
-    let bounds: [number, number, number, number] = [imgBbox[0], imgBbox[1], imgBbox[2], imgBbox[3]];
+    // 地理的境界を取得（オーバービュー画像の場合はメイン画像から取得）
+    let imgBbox: number[];
+    let bounds: [number, number, number, number];
+    
+    try {
+      imgBbox = image.getBoundingBox();
+      bounds = [imgBbox[0], imgBbox[1], imgBbox[2], imgBbox[3]];
+    } catch (error) {
+      // オーバービュー画像に地理情報がない場合、メイン画像（インデックス0）から取得
+      const mainImage = await tiff.getImage(0);
+      imgBbox = mainImage.getBoundingBox();
+      bounds = [imgBbox[0], imgBbox[1], imgBbox[2], imgBbox[3]];
+    }
 
     // 出力サイズを決定
     let targetWidth = outputWidth ?? originalWidth;
@@ -427,8 +446,38 @@ export async function readCOG(url: string, options: ReadCOGOptions = {}): Promis
       readOptions.resampleMethod = resampleMethod;
     }
 
-    const rasters = await image.readRGB(readOptions);
-    const { width, height } = rasters;
+    let rasters;
+    let width, height;
+    
+    try {
+      rasters = await image.readRGB(readOptions);
+      width = rasters.width;
+      height = rasters.height;
+    } catch (error) {
+      // readRGBが失敗した場合、readRastersで代替
+      rasters = await image.readRasters(readOptions);
+      width = rasters.width;
+      height = rasters.height;
+      
+      // RGBデータでない場合は最初の3つのバンドを使用
+      if (Array.isArray(rasters)) {
+        // 複数バンドの場合、最初の3バンドを結合
+        const bandCount = Math.min(3, rasters.length);
+        const pixelCount = width * height;
+        const combinedData = new Uint8Array(pixelCount * 3);
+        
+        for (let i = 0; i < pixelCount; i++) {
+          for (let band = 0; band < bandCount; band++) {
+            combinedData[i * 3 + band] = rasters[band][i] || 0;
+          }
+          // 足りないバンドは0で埋める
+          for (let band = bandCount; band < 3; band++) {
+            combinedData[i * 3 + band] = 0;
+          }
+        }
+        rasters = combinedData;
+      }
+    }
 
     // Canvasに描画してData URIに変換
     const canvas = document.createElement('canvas');
@@ -446,13 +495,25 @@ export async function readCOG(url: string, options: ReadCOGOptions = {}): Promis
 
     // RGBデータをImageDataに変換
     const rastersArray = rasters as any as number[];
-    for (let i = 0; i < rastersArray.length / 3; i++) {
-      const idx = i * 4;
+    const pixelCount = width * height;
+    
+    for (let i = 0; i < pixelCount; i++) {
+      const canvasIdx = i * 4;
       const srcIdx = i * 3;
-      data[idx] = rastersArray[srcIdx];       // R
-      data[idx + 1] = rastersArray[srcIdx + 1]; // G
-      data[idx + 2] = rastersArray[srcIdx + 2]; // B
-      data[idx + 3] = 255;                 // A
+      
+      // データが存在することを確認
+      if (srcIdx + 2 < rastersArray.length) {
+        data[canvasIdx] = rastersArray[srcIdx] || 0;       // R
+        data[canvasIdx + 1] = rastersArray[srcIdx + 1] || 0; // G
+        data[canvasIdx + 2] = rastersArray[srcIdx + 2] || 0; // B
+      } else {
+        // データが不足している場合はグレースケールまたは黒で埋める
+        const value = rastersArray[i] || 0;
+        data[canvasIdx] = value;     // R
+        data[canvasIdx + 1] = value; // G
+        data[canvasIdx + 2] = value; // B
+      }
+      data[canvasIdx + 3] = 255; // A
     }
 
     ctx.putImageData(imageData, 0, 0);

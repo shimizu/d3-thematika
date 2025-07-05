@@ -155,6 +155,14 @@
             </div>
             
             <div class="control-group">
+                <label for="image-index">画像インデックス:</label>
+                <select id="image-index">
+                    <option value="0" selected>0（最高解像度）</option>
+                </select>
+                <button id="check-images" type="button">画像数確認</button>
+            </div>
+            
+            <div class="control-group">
                 <label>
                     <input type="checkbox" id="show-graticule" checked>
                     経緯線を表示
@@ -178,6 +186,7 @@
 const cogResult = await Thematika.readCOG(
     'https://storage.googleapis.com/g3-open-resource/d3-thematika/cog/NE1_HR_SR_OB_DRv6_COG.tif',
     {
+        image: 0,  // 画像インデックス（0=最高解像度）
         bbox: [-82, -56, -34, 13],  // [west, south, east, north]
         sizeLimit: {
             maxWidth: 512,
@@ -315,6 +324,7 @@ map.addLayer('cog', imageLayer);
             const maxSize = parseInt(document.getElementById('max-size').value);
             const onExceed = document.getElementById('on-exceed').value;
             const resampleMethod = document.getElementById('resample-method').value;
+            const imageIndex = parseInt(document.getElementById('image-index').value);
             
             // AOIを取得
             const west = parseFloat(document.getElementById('aoi-west').value);
@@ -328,6 +338,7 @@ map.addLayer('cog', imageLayer);
                 document.getElementById('load-cog').textContent = '読み込み中...';
                 
                 const cogResult = await Thematika.readCOG(url, {
+                    image: imageIndex,
                     bbox: [west, south, east, north],
                     sizeLimit: {
                         maxWidth: maxSize,
@@ -336,8 +347,6 @@ map.addLayer('cog', imageLayer);
                     },
                     resampleMethod: resampleMethod
                 });
-                
-                console.log('COG読み込み成功:', cogResult);
                 
                 // 地図を再描画
                 await draw(cogResult);
@@ -351,8 +360,45 @@ map.addLayer('cog', imageLayer);
             }
         }
         
+        // 画像数確認関数
+        async function checkImages() {
+            const url = document.getElementById('cog-url').value;
+            
+            try {
+                document.getElementById('check-images').disabled = true;
+                document.getElementById('check-images').textContent = '確認中...';
+                
+                // 一時的にreadCOGを使わずに直接geotiff.jsでチェック
+                const tiff = await GeoTIFF.fromUrl(url);
+                const imageCount = await tiff.getImageCount();
+                
+                
+                // 選択肢を更新
+                const select = document.getElementById('image-index');
+                select.innerHTML = '';
+                
+                for (let i = 0; i < imageCount; i++) {
+                    const option = document.createElement('option');
+                    option.value = i.toString();
+                    option.textContent = i === 0 ? `${i}（最高解像度）` : `${i}（オーバービュー）`;
+                    if (i === 0) option.selected = true; // デフォルトは0に変更
+                    select.appendChild(option);
+                }
+                
+                alert(`利用可能な画像数: ${imageCount}\\n画像インデックス: 0-${imageCount - 1}`);
+                
+            } catch (error) {
+                console.error('画像数確認エラー:', error);
+                alert(`エラー: ${error.message}`);
+            } finally {
+                document.getElementById('check-images').disabled = false;
+                document.getElementById('check-images').textContent = '画像数確認';
+            }
+        }
+        
         // イベントリスナー
         document.getElementById('load-cog').addEventListener('click', loadCOG);
+        document.getElementById('check-images').addEventListener('click', checkImages);
         
         document.getElementById('projection-select').addEventListener('change', (e) => {
             const projectionName = e.target.value;
