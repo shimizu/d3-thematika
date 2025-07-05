@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PointAnnotationLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PointAnnotationLayer デモ</h1>
+        <p class="description">
+            PointAnnotationLayerを使用してGeoJSONポイントデータにアノテーション（注釈）を表示します。
+            様々なアノテーションタイプと設定オプションを試すことができます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: 主要都市のサンプルデータ（東京、ニューヨーク、パリ、ロンドン、北京、モスクワ）</li>
+                <li>レイヤー: PointAnnotationLayer（アノテーション）、GraticuleLayer（経緯線）</li>
+                <li>機能: アノテーションタイプ切り替え、位置調整、スタイルカスタマイズ</li>
+            </ul>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="annotation-type">アノテーションタイプ:</label>
+                <select id="annotation-type">
+                    <option value="callout" selected>Callout</option>
+                    <option value="calloutElbow">Callout Elbow</option>
+                    <option value="calloutCurve">Callout Curve</option>
+                    <option value="label">Label</option>
+                    <option value="badge">Badge</option>
+                    <option value="calloutCircle">Callout Circle</option>
+                    <option value="calloutRect">Callout Rect</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="show-title">タイトル表示:</label>
+                <input type="checkbox" id="show-title">
+            </div>
+            
+            <div class="control-group">
+                <label for="offset-x">X軸オフセット: <span id="offset-x-value">30</span></label>
+                <input type="range" id="offset-x" min="-100" max="100" step="5" value="30">
+            </div>
+            
+            <div class="control-group">
+                <label for="offset-y">Y軸オフセット: <span id="offset-y-value">-20</span></label>
+                <input type="range" id="offset-y" min="-100" max="100" step="5" value="-20">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-radius">サブジェクト半径: <span id="subject-radius-value">3</span></label>
+                <input type="range" id="subject-radius" min="1" max="15" step="1" value="3">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-color">サブジェクト色:</label>
+                <input type="color" id="subject-color" value="#e74c3c">
+            </div>
+            
+            <div class="control-group">
+                <label for="note-background">ノート背景色:</label>
+                <input type="color" id="note-background" value="#ffffff">
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// PointAnnotationLayerの使用例
+
+// 主要都市データ
+const citiesData = {
+    type: 'FeatureCollection',
+    features: [
+        {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [139.6917, 35.6895] },
+            properties: { name: 'Tokyo', country: 'Japan', population: 37833000 }
+        },
+        {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [-74.0060, 40.7128] },
+            properties: { name: 'New York', country: 'USA', population: 20140470 }
+        }
+        // ... 他の都市
+    ]
+};
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoNaturalEarth1()
+    .fitExtent([[10, 10], [width-10, height-10]], citiesData);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// PointAnnotationLayerインスタンスを作成
+const annotationLayer = new Thematika.PointAnnotationLayer({
+    data: citiesData,
+    annotationType: 'callout',
+    textAccessor: 'name',
+    titleAccessor: 'country',
+    offsetAccessor: (feature, index) => [30, -20],
+    subjectOptions: {
+        radius: 3,
+        fill: '#e74c3c',
+        stroke: 'white',
+        strokeWidth: 1
+    },
+    connectorOptions: {
+        stroke: '#666666',
+        strokeWidth: 1
+    },
+    noteOptions: {
+        backgroundColor: '#ffffff',
+        fontSize: '12px',
+        textColor: '#000000',
+        borderColor: '#cccccc',
+        padding: 4
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('annotations', annotationLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        let map = null;
+        let annotationLayer = null;
+        let annotationType = 'callout';
+        let showTitle = false;
+        let offsetX = 30;
+        let offsetY = -20;
+        let subjectRadius = 3;
+        let subjectColor = '#e74c3c';
+        let noteBackground = '#ffffff';
+
+        // 主要都市データ
+        const citiesData = {
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [139.6917, 35.6895] },
+                    properties: { name: 'Tokyo', country: 'Japan', population: 37833000 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [-74.0060, 40.7128] },
+                    properties: { name: 'New York', country: 'USA', population: 20140470 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [2.3522, 48.8566] },
+                    properties: { name: 'Paris', country: 'France', population: 11174000 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [-0.1276, 51.5074] },
+                    properties: { name: 'London', country: 'UK', population: 9648110 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [116.4074, 39.9042] },
+                    properties: { name: 'Beijing', country: 'China', population: 21893095 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [37.6173, 55.7558] },
+                    properties: { name: 'Moscow', country: 'Russia', population: 12641000 }
+                }
+            ]
+        };
+
+        async function draw() {
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], citiesData);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [20, 20],
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#eee',
+                        "stroke-width": 0.5,
+                        "opacity": 0.5
+                    }
+                });
+
+                // PointAnnotationLayerを作成
+                annotationLayer = new Thematika.PointAnnotationLayer({
+                    data: citiesData,
+                    annotationType: annotationType,
+                    textAccessor: 'name',
+                    titleAccessor: showTitle ? 'country' : undefined,
+                    offsetAccessor: (feature, index) => [offsetX, offsetY],
+                    subjectOptions: {
+                        radius: subjectRadius,
+                        fill: subjectColor,
+                        stroke: 'white',
+                        strokeWidth: 1,
+                        width: subjectRadius * 2,
+                        height: subjectRadius * 2
+                    },
+                    connectorOptions: {
+                        stroke: '#666666',
+                        strokeWidth: 1
+                    },
+                    noteOptions: {
+                        backgroundColor: noteBackground,
+                        fontSize: '12px',
+                        textColor: '#000000',
+                        borderColor: '#cccccc',
+                        borderWidth: 1,
+                        padding: 4
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('annotations', annotationLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        // 初期描画
+        draw();
+
+        // UI イベントリスナー
+        document.getElementById('annotation-type').addEventListener('change', function() {
+            annotationType = this.value;
+            draw();
+        });
+
+        document.getElementById('show-title').addEventListener('change', function() {
+            showTitle = this.checked;
+            draw();
+        });
+
+        document.getElementById('offset-x').addEventListener('input', function() {
+            offsetX = parseInt(this.value);
+            document.getElementById('offset-x-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('offset-y').addEventListener('input', function() {
+            offsetY = parseInt(this.value);
+            document.getElementById('offset-y-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-radius').addEventListener('input', function() {
+            subjectRadius = parseInt(this.value);
+            document.getElementById('subject-radius-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-color').addEventListener('change', function() {
+            subjectColor = this.value;
+            draw();
+        });
+
+        document.getElementById('note-background').addEventListener('change', function() {
+            noteBackground = this.value;
+            draw();
+        });
+
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+    </script>
+</body>
+</html>
