@@ -101,7 +101,8 @@
 
     <script >
         
-        
+        const effect = Thematika.FilterPresets.standardDropShadow()
+
         async function draw() {
             const id = "#map"
 
@@ -109,7 +110,7 @@
             const width = document.querySelector(id).clientWidth ;
             const height = document.querySelector(id).clientHeight;
 
-            const projection = d3.geoEquirectangular();
+            const projection = d3.geoOrthographic();
     
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
             const geojson = await d3.json('./geojson/world.geojson');
@@ -122,15 +123,36 @@
                 container: '#map',
                 width: width,
                 height: height,
-                projection: projection
+                projection: projection,
+                defs:[effect],
             });
 
+            map.svg
+                .append('defs')
+                .html(`
+<radialGradient id="globeLight" cx="30%" cy="30%" r="70%">
+    <!-- 光が当たる中心は明るく、外側は暗く -->
+    <stop offset="0%" stop-color="#e6f3ff" stop-opacity="0.8"/>
+    <stop offset="100%" stop-color="#6f7b7b" stop-opacity="1"/>
+</radialGradient>
+
+<filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+    <!-- 元グラフィックのアルファをぼかす -->
+    <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+    <!-- 影を少し下にオフセット -->
+    <feOffset in="blur" dx="0" dy="8" result="offsetBlur"/>
+    <!-- 元グラフィックと影を合成 -->
+    <feMerge>
+        <feMergeNode in="offsetBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+</filter>
+                `)
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
                     "fill":(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
-                    "filter": "#2c3e50", 
                     "stroke": '#1a3d1f',
                     "stroke-width": 0.8,
                     "opacity": (d,i) => 0.9,
@@ -139,13 +161,17 @@
 
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
             const outlineLayer = new Thematika.OutlineLayer({
-                createClipPath: true,
+                createClipPath: false,
                 clipPathId: 'earth-outline-clip',
                 attr: {
-                    "fill": 'none',
+                    "fill": 'url(#globeLight)',
+                    "filter": 'url(#dropShadow)',
                     "stroke": '#2c3e50',
                     "stroke-width": 2,
                     "opacity": 0.8
+                },
+                style:{
+                    "mix-blend-mode": "multiply",
                 }
             });
 
