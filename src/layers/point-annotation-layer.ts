@@ -20,6 +20,76 @@ export type TextAccessor = string | ((feature: GeoJSON.Feature, index: number) =
 export type OffsetAccessor = ((feature: GeoJSON.Feature, index: number) => [number, number]);
 
 /**
+ * サブジェクトタイプの定義
+ */
+export type SubjectType = 'point' | 'circle' | 'rect';
+
+/**
+ * スタイル値の型定義（固定値またはコールバック関数）
+ */
+export type StyleValue<T> = T | ((feature: GeoJSON.Feature, index: number) => T);
+
+/**
+ * サブジェクトオプションの型定義
+ */
+export interface SubjectOptions {
+  /** サブジェクトタイプ */
+  type?: SubjectType;
+  /** 半径（circle用） */
+  r?: StyleValue<number>;
+  /** 幅（rect用） */
+  width?: StyleValue<number>;
+  /** 高さ（rect用） */
+  height?: StyleValue<number>;
+  /** 塗りつぶし色 */
+  fill?: StyleValue<string>;
+  /** 境界線色 */
+  stroke?: StyleValue<string>;
+  /** 境界線の太さ */
+  strokeWidth?: StyleValue<number>;
+  /** その他の基本設定（後方互換性のため） */
+  radius?: number;
+}
+
+/**
+ * コネクターオプションの型定義
+ */
+export interface ConnectorOptions {
+  /** 線の色 */
+  stroke?: StyleValue<string>;
+  /** 線の太さ */
+  strokeWidth?: StyleValue<number>;
+  /** 線のダッシュ配列 */
+  strokeDasharray?: StyleValue<string>;
+}
+
+/**
+ * ノートオプションの型定義
+ */
+export interface NoteOptions {
+  /** 背景色 */
+  backgroundColor?: string;
+  /** 境界線色 */
+  borderColor?: string;
+  /** 境界線の太さ */
+  borderWidth?: number;
+  /** 境界線の角丸 */
+  borderRadius?: number;
+  /** パディング */
+  padding?: number;
+  /** フォントサイズ */
+  fontSize?: string;
+  /** フォントファミリー */
+  fontFamily?: string;
+  /** テキスト色 */
+  textColor?: string;
+  /** テキストの折り返し */
+  wrap?: number;
+  /** テキストの配置 */
+  align?: string;
+}
+
+/**
  * PointAnnotationLayerの初期化オプション
  */
 export interface PointAnnotationLayerOptions {
@@ -34,11 +104,11 @@ export interface PointAnnotationLayerOptions {
   /** オフセット位置のアクセサー */
   offsetAccessor?: OffsetAccessor;
   /** サブジェクト（対象）の設定 */
-  subjectOptions?: any;
+  subjectOptions?: SubjectOptions;
   /** コネクター（引き出し線）の設定 */
-  connectorOptions?: any;
+  connectorOptions?: ConnectorOptions;
   /** ノート（テキスト部分）の設定 */
-  noteOptions?: any;
+  noteOptions?: NoteOptions;
   /** レイヤーの属性設定 */
   attr?: LayerAttr;
   /** レイヤーのCSS style属性設定 */
@@ -79,11 +149,11 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
   /** オフセットアクセサー */
   private offsetAccessor?: OffsetAccessor;
   /** サブジェクト設定 */
-  private subjectOptions: any;
+  private subjectOptions: SubjectOptions;
   /** コネクター設定 */
-  private connectorOptions: any;
+  private connectorOptions: ConnectorOptions;
   /** ノート設定 */
-  private noteOptions: any;
+  private noteOptions: NoteOptions;
 
   /**
    * PointAnnotationLayerを初期化します
@@ -216,6 +286,50 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
   }
 
   /**
+   * スタイル値を解決します（固定値またはコールバック関数）
+   * @param styleValue - スタイル値
+   * @param feature - GeoJSONフィーチャー
+   * @param index - インデックス
+   * @param defaultValue - デフォルト値
+   * @private
+   */
+  private resolveStyleValue<T>(
+    styleValue: StyleValue<T> | undefined,
+    feature: GeoJSON.Feature,
+    index: number,
+    defaultValue: T
+  ): T {
+    if (styleValue === undefined) return defaultValue;
+    if (typeof styleValue === 'function') {
+      return (styleValue as (feature: GeoJSON.Feature, index: number) => T)(feature, index);
+    }
+    return styleValue as T;
+  }
+
+  /**
+   * サブジェクトタイプを取得します
+   * @private
+   */
+  private getSubjectType(): SubjectType {
+    // subjectOptionsで明示的に指定されている場合はそれを使用
+    if (this.subjectOptions.type) {
+      return this.subjectOptions.type;
+    }
+
+    // アノテーションタイプに基づいてデフォルトを決定
+    switch (this.annotationType) {
+      case 'calloutCircle':
+        return 'circle';
+      case 'calloutRect':
+        return 'rect';
+      case 'badge':
+        return 'circle';
+      default:
+        return 'point';
+    }
+  }
+
+  /**
    * アノテーションデータを準備します
    * @private
    */
@@ -295,119 +409,189 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .attr('class', 'annotation thematika-point-annotation')
       .attr('transform', `translate(${data.x}, ${data.y})`);
 
+    // サブジェクトを描画
+    this.drawSubject(annotationGroup, data);
+
+    // アノテーションタイプに応じてコネクターとノートを描画
     switch (this.annotationType) {
       case 'callout':
-        this.drawCallout(annotationGroup, data);
+        this.drawConnector(annotationGroup, data, 'line');
+        this.drawNote(annotationGroup, data);
         break;
       case 'calloutElbow':
-        this.drawCalloutElbow(annotationGroup, data);
+        this.drawConnector(annotationGroup, data, 'elbow');
+        this.drawNote(annotationGroup, data);
         break;
       case 'calloutCurve':
-        this.drawCalloutCurve(annotationGroup, data);
+        this.drawConnector(annotationGroup, data, 'curve');
+        this.drawNote(annotationGroup, data);
         break;
       case 'label':
         this.drawLabel(annotationGroup, data);
         break;
       case 'badge':
-        this.drawBadge(annotationGroup, data);
+        this.drawBadgeText(annotationGroup, data);
         break;
       case 'calloutCircle':
-        this.drawCalloutCircle(annotationGroup, data);
-        break;
       case 'calloutRect':
-        this.drawCalloutRect(annotationGroup, data);
+        this.drawConnector(annotationGroup, data, 'line');
+        this.drawNote(annotationGroup, data);
         break;
       default:
-        this.drawCallout(annotationGroup, data);
+        this.drawConnector(annotationGroup, data, 'line');
+        this.drawNote(annotationGroup, data);
     }
   }
 
   /**
-   * シンプルなコールアウトを描画
+   * サブジェクト（対象ポイント）を描画します
    * @private
    */
-  private drawCallout(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    // サブジェクト（対象ポイント）
-    group.append('circle')
-      .attr('class', 'annotation-subject')
-      .attr('r', this.subjectOptions.radius || 3)
-      .attr('fill', this.subjectOptions.fill || 'red')
-      .attr('stroke', this.subjectOptions.stroke || 'white')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 1);
+  private drawSubject(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
+    const subjectType = this.getSubjectType();
+    const feature = data.feature;
+    const index = data.index;
 
-    // コネクター（引き出し線）
-    group.append('line')
-      .attr('class', 'annotation-connector')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', data.dx)
-      .attr('y2', data.dy)
-      .attr('stroke', this.connectorOptions.stroke || '#666')
-      .attr('stroke-width', this.connectorOptions.strokeWidth || 1)
-      .attr('stroke-dasharray', this.connectorOptions.strokeDasharray || 'none');
+    // スタイル値を解決
+    const fill = this.resolveStyleValue(this.subjectOptions.fill, feature, index, '#e74c3c');
+    const stroke = this.resolveStyleValue(this.subjectOptions.stroke, feature, index, 'white');
+    const strokeWidth = this.resolveStyleValue(this.subjectOptions.strokeWidth, feature, index, 1);
 
-    // ノート（テキスト背景）
-    const textPadding = this.noteOptions.padding || 4;
-    const textBackground = group.append('rect')
-      .attr('class', 'annotation-note-bg')
-      .attr('fill', this.noteOptions.backgroundColor || 'white')
-      .attr('stroke', this.noteOptions.borderColor || '#ccc')
-      .attr('stroke-width', this.noteOptions.borderWidth || 1)
-      .attr('rx', this.noteOptions.borderRadius || 2);
-
-    // ノート（テキスト）
-    const textElement = group.append('text')
-      .attr('class', 'annotation-note-text')
-      .attr('x', data.dx)
-      .attr('y', data.dy)
-      .attr('text-anchor', this.getTextAnchor(data.dx))
-      .attr('dominant-baseline', this.getBaseline(data.dy))
-      .style('font-size', this.noteOptions.fontSize || '12px')
-      .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
-      .style('fill', this.noteOptions.textColor || 'black');
-
-    // タイトルがある場合
-    if (data.title) {
-      textElement.append('tspan')
-        .attr('x', data.dx)
-        .attr('dy', 0)
-        .style('font-weight', 'bold')
-        .text(data.title);
-
-      textElement.append('tspan')
-        .attr('x', data.dx)
-        .attr('dy', '1.2em')
-        .text(data.text);
-    } else {
-      textElement.text(data.text);
+    switch (subjectType) {
+      case 'point':
+        this.drawPointSubject(group, data, { fill, stroke, strokeWidth });
+        break;
+      case 'circle':
+        this.drawCircleSubject(group, data, { fill, stroke, strokeWidth });
+        break;
+      case 'rect':
+        this.drawRectSubject(group, data, { fill, stroke, strokeWidth });
+        break;
     }
-
-    // テキストのバウンディングボックスを取得して背景を調整
-    setTimeout(() => {
-      const bbox = textElement.node()?.getBBox();
-      if (bbox) {
-        textBackground
-          .attr('x', bbox.x - textPadding)
-          .attr('y', bbox.y - textPadding)
-          .attr('width', bbox.width + textPadding * 2)
-          .attr('height', bbox.height + textPadding * 2);
-      }
-    }, 0);
   }
 
   /**
-   * ラベル形式を描画（引き出し線なし）
+   * ポイント型サブジェクトを描画
+   * @private
+   */
+  private drawPointSubject(
+    group: Selection<SVGGElement, unknown, HTMLElement, any>,
+    data: AnnotationData,
+    styles: { fill: string; stroke: string; strokeWidth: number }
+  ): void {
+    const radius = this.resolveStyleValue(this.subjectOptions.r, data.feature, data.index, 3);
+    
+    group.append('circle')
+      .attr('class', 'annotation-subject')
+      .attr('r', radius)
+      .attr('fill', styles.fill)
+      .attr('stroke', styles.stroke)
+      .attr('stroke-width', styles.strokeWidth);
+  }
+
+  /**
+   * 円形サブジェクトを描画
+   * @private
+   */
+  private drawCircleSubject(
+    group: Selection<SVGGElement, unknown, HTMLElement, any>,
+    data: AnnotationData,
+    styles: { fill: string; stroke: string; strokeWidth: number }
+  ): void {
+    const radius = this.resolveStyleValue(
+      this.subjectOptions.r,
+      data.feature,
+      data.index,
+      this.subjectOptions.radius || 8  // 後方互換性
+    );
+
+    group.append('circle')
+      .attr('class', 'annotation-subject')
+      .attr('r', radius)
+      .attr('fill', styles.fill)
+      .attr('stroke', styles.stroke)
+      .attr('stroke-width', styles.strokeWidth);
+  }
+
+  /**
+   * 矩形サブジェクトを描画
+   * @private
+   */
+  private drawRectSubject(
+    group: Selection<SVGGElement, unknown, HTMLElement, any>,
+    data: AnnotationData,
+    styles: { fill: string; stroke: string; strokeWidth: number }
+  ): void {
+    const width = this.resolveStyleValue(this.subjectOptions.width, data.feature, data.index, 16);
+    const height = this.resolveStyleValue(this.subjectOptions.height, data.feature, data.index, 16);
+
+    group.append('rect')
+      .attr('class', 'annotation-subject')
+      .attr('x', -width / 2)
+      .attr('y', -height / 2)
+      .attr('width', width)
+      .attr('height', height)
+      .attr('fill', styles.fill)
+      .attr('stroke', styles.stroke)
+      .attr('stroke-width', styles.strokeWidth);
+  }
+
+  /**
+   * コネクター（引き出し線）を描画します
+   * @private
+   */
+  private drawConnector(
+    group: Selection<SVGGElement, unknown, HTMLElement, any>,
+    data: AnnotationData,
+    type: 'line' | 'elbow' | 'curve'
+  ): void {
+    const stroke = this.resolveStyleValue(this.connectorOptions.stroke, data.feature, data.index, '#666');
+    const strokeWidth = this.resolveStyleValue(this.connectorOptions.strokeWidth, data.feature, data.index, 1);
+    const strokeDasharray = this.resolveStyleValue(this.connectorOptions.strokeDasharray, data.feature, data.index, 'none');
+
+    switch (type) {
+      case 'line':
+        group.append('line')
+          .attr('class', 'annotation-connector')
+          .attr('x1', 0)
+          .attr('y1', 0)
+          .attr('x2', data.dx)
+          .attr('y2', data.dy)
+          .attr('stroke', stroke)
+          .attr('stroke-width', strokeWidth)
+          .attr('stroke-dasharray', strokeDasharray);
+        break;
+      case 'elbow':
+        const elbowPath = `M 0,0 L ${data.dx > 0 ? data.dx : data.dx},${data.dy > 0 ? 0 : data.dy} L ${data.dx},${data.dy}`;
+        group.append('path')
+          .attr('class', 'annotation-connector')
+          .attr('d', elbowPath)
+          .attr('fill', 'none')
+          .attr('stroke', stroke)
+          .attr('stroke-width', strokeWidth)
+          .attr('stroke-dasharray', strokeDasharray);
+        break;
+      case 'curve':
+        const cpX = data.dx * 0.5;
+        const cpY = 0;
+        const curvePath = `M 0,0 Q ${cpX},${cpY} ${data.dx},${data.dy}`;
+        group.append('path')
+          .attr('class', 'annotation-connector')
+          .attr('d', curvePath)
+          .attr('fill', 'none')
+          .attr('stroke', stroke)
+          .attr('stroke-width', strokeWidth)
+          .attr('stroke-dasharray', strokeDasharray);
+        break;
+    }
+  }
+
+
+  /**
+   * ラベル形式を描画（引き出し線なし、テキストのみ）
    * @private
    */
   private drawLabel(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    // サブジェクト（対象ポイント）
-    group.append('circle')
-      .attr('class', 'annotation-subject')
-      .attr('r', this.subjectOptions.radius || 2)
-      .attr('fill', this.subjectOptions.fill || 'red')
-      .attr('stroke', this.subjectOptions.stroke || 'white')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 1);
-
     // ノート（テキスト）- 中央揃え
     const textElement = group.append('text')
       .attr('class', 'annotation-note-text')
@@ -421,22 +605,13 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .text(data.text);
   }
 
+
   /**
-   * バッジ形式を描画
+   * バッジテキストを描画（サブジェクト上に短いテキストを表示）
    * @private
    */
-  private drawBadge(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    const radius = this.subjectOptions.radius || 10;
-
-    // バッジ背景
-    group.append('circle')
-      .attr('class', 'annotation-badge-bg')
-      .attr('r', radius)
-      .attr('fill', this.subjectOptions.fill || '#ff6b6b')
-      .attr('stroke', this.subjectOptions.stroke || 'white')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 2);
-
-    // バッジテキスト
+  private drawBadgeText(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
+    // バッジテキスト（サブジェクト上に表示）
     group.append('text')
       .attr('class', 'annotation-badge-text')
       .attr('text-anchor', 'middle')
@@ -448,119 +623,9 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
       .text(data.text.substring(0, 3)); // バッジは短いテキストのみ
   }
 
-  /**
-   * エルボー（肘型）コネクターのコールアウトを描画
-   * @private
-   */
-  private drawCalloutElbow(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    // サブジェクト
-    group.append('circle')
-      .attr('class', 'annotation-subject')
-      .attr('r', this.subjectOptions.radius || 3)
-      .attr('fill', this.subjectOptions.fill || 'red')
-      .attr('stroke', this.subjectOptions.stroke || 'white')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 1);
 
-    // エルボー型コネクター
-    const path = `M 0,0 L ${data.dx > 0 ? data.dx : data.dx},${data.dy > 0 ? 0 : data.dy} L ${data.dx},${data.dy}`;
-    group.append('path')
-      .attr('class', 'annotation-connector')
-      .attr('d', path)
-      .attr('fill', 'none')
-      .attr('stroke', this.connectorOptions.stroke || '#666')
-      .attr('stroke-width', this.connectorOptions.strokeWidth || 1);
 
-    // ノート
-    this.drawNote(group, data);
-  }
 
-  /**
-   * カーブコネクターのコールアウトを描画
-   * @private
-   */
-  private drawCalloutCurve(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    // サブジェクト
-    group.append('circle')
-      .attr('class', 'annotation-subject')
-      .attr('r', this.subjectOptions.radius || 3)
-      .attr('fill', this.subjectOptions.fill || 'red')
-      .attr('stroke', this.subjectOptions.stroke || 'white')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 1);
-
-    // カーブコネクター（二次ベジェ曲線）
-    const cpX = data.dx * 0.5;
-    const cpY = 0;
-    const path = `M 0,0 Q ${cpX},${cpY} ${data.dx},${data.dy}`;
-    group.append('path')
-      .attr('class', 'annotation-connector')
-      .attr('d', path)
-      .attr('fill', 'none')
-      .attr('stroke', this.connectorOptions.stroke || '#666')
-      .attr('stroke-width', this.connectorOptions.strokeWidth || 1);
-
-    // ノート
-    this.drawNote(group, data);
-  }
-
-  /**
-   * 円形サブジェクトのコールアウトを描画
-   * @private
-   */
-  private drawCalloutCircle(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    // 円形サブジェクト
-    group.append('circle')
-      .attr('class', 'annotation-subject')
-      .attr('r', this.subjectOptions.radius || 8)
-      .attr('fill', this.subjectOptions.fill || 'none')
-      .attr('stroke', this.subjectOptions.stroke || 'red')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 2);
-
-    // コネクター
-    group.append('line')
-      .attr('class', 'annotation-connector')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', data.dx)
-      .attr('y2', data.dy)
-      .attr('stroke', this.connectorOptions.stroke || '#666')
-      .attr('stroke-width', this.connectorOptions.strokeWidth || 1);
-
-    // ノート
-    this.drawNote(group, data);
-  }
-
-  /**
-   * 矩形サブジェクトのコールアウトを描画
-   * @private
-   */
-  private drawCalloutRect(group: Selection<SVGGElement, unknown, HTMLElement, any>, data: AnnotationData): void {
-    const width = this.subjectOptions.width || 16;
-    const height = this.subjectOptions.height || 16;
-
-    // 矩形サブジェクト
-    group.append('rect')
-      .attr('class', 'annotation-subject')
-      .attr('x', -width / 2)
-      .attr('y', -height / 2)
-      .attr('width', width)
-      .attr('height', height)
-      .attr('fill', this.subjectOptions.fill || 'none')
-      .attr('stroke', this.subjectOptions.stroke || 'red')
-      .attr('stroke-width', this.subjectOptions.strokeWidth || 2);
-
-    // コネクター
-    group.append('line')
-      .attr('class', 'annotation-connector')
-      .attr('x1', 0)
-      .attr('y1', 0)
-      .attr('x2', data.dx)
-      .attr('y2', data.dy)
-      .attr('stroke', this.connectorOptions.stroke || '#666')
-      .attr('stroke-width', this.connectorOptions.strokeWidth || 1);
-
-    // ノート
-    this.drawNote(group, data);
-  }
 
   /**
    * ノート（テキスト部分）を描画

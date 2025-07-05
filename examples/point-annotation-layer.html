@@ -129,13 +129,42 @@
             </div>
             
             <div class="control-group">
-                <label for="subject-radius">サブジェクト半径: <span id="subject-radius-value">3</span></label>
-                <input type="range" id="subject-radius" min="1" max="15" step="1" value="3">
+                <label for="subject-type">サブジェクトタイプ:</label>
+                <select id="subject-type">
+                    <option value="point" selected>Point</option>
+                    <option value="circle">Circle</option>
+                    <option value="rect">Rectangle</option>
+                </select>
             </div>
             
             <div class="control-group">
-                <label for="subject-color">サブジェクト色:</label>
-                <input type="color" id="subject-color" value="#e74c3c">
+                <label for="subject-radius">サブジェクト半径: <span id="subject-radius-value">3</span></label>
+                <input type="range" id="subject-radius" min="1" max="20" step="1" value="3">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-width">サブジェクト幅: <span id="subject-width-value">16</span></label>
+                <input type="range" id="subject-width" min="4" max="40" step="2" value="16">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-height">サブジェクト高さ: <span id="subject-height-value">16</span></label>
+                <input type="range" id="subject-height" min="4" max="40" step="2" value="16">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-fill">サブジェクト塗りつぶし色:</label>
+                <input type="color" id="subject-fill" value="#e74c3c">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-stroke">サブジェクト境界線色:</label>
+                <input type="color" id="subject-stroke" value="#ffffff">
+            </div>
+            
+            <div class="control-group">
+                <label for="subject-stroke-width">サブジェクト境界線太さ: <span id="subject-stroke-width-value">1</span></label>
+                <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
             </div>
             
             <div class="control-group">
@@ -189,10 +218,13 @@ const annotationLayer = new Thematika.PointAnnotationLayer({
     titleAccessor: 'country',
     offsetAccessor: (feature, index) => [30, -20],
     subjectOptions: {
-        radius: 3,
-        fill: '#e74c3c',
-        stroke: 'white',
-        strokeWidth: 1
+        type: 'point',      // 'point' | 'circle' | 'rect'
+        r: 3,               // 半径（point/circle用）
+        width: 16,          // 幅（rect用）
+        height: 16,         // 高さ（rect用）
+        fill: '#e74c3c',    // 塗りつぶし色
+        stroke: 'white',    // 境界線色
+        strokeWidth: 1      // 境界線太さ
     },
     connectorOptions: {
         stroke: '#666666',
@@ -222,8 +254,13 @@ map.addLayer('annotations', annotationLayer);
         let showTitle = false;
         let offsetX = 30;
         let offsetY = -20;
+        let subjectType = 'point';
         let subjectRadius = 3;
-        let subjectColor = '#e74c3c';
+        let subjectWidth = 16;
+        let subjectHeight = 16;
+        let subjectFill = '#e74c3c';
+        let subjectStroke = '#ffffff';
+        let subjectStrokeWidth = 1;
         let noteBackground = '#ffffff';
 
         // 主要都市データ
@@ -304,12 +341,15 @@ map.addLayer('annotations', annotationLayer);
                     titleAccessor: showTitle ? 'country' : undefined,
                     offsetAccessor: (feature, index) => [offsetX, offsetY],
                     subjectOptions: {
-                        radius: subjectRadius,
-                        fill: subjectColor,
-                        stroke: 'white',
-                        strokeWidth: 1,
-                        width: subjectRadius * 2,
-                        height: subjectRadius * 2
+                        type: subjectType,
+                        r: subjectRadius,
+                        width: subjectWidth,
+                        height: subjectHeight,
+                        fill: subjectFill,
+                        stroke: subjectStroke,
+                        strokeWidth: subjectStrokeWidth,
+                        // 後方互換性のため
+                        radius: subjectRadius
                     },
                     connectorOptions: {
                         stroke: '#666666',
@@ -366,8 +406,36 @@ map.addLayer('annotations', annotationLayer);
             draw();
         });
 
-        document.getElementById('subject-color').addEventListener('change', function() {
-            subjectColor = this.value;
+        document.getElementById('subject-type').addEventListener('change', function() {
+            subjectType = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-width').addEventListener('input', function() {
+            subjectWidth = parseInt(this.value);
+            document.getElementById('subject-width-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-height').addEventListener('input', function() {
+            subjectHeight = parseInt(this.value);
+            document.getElementById('subject-height-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-fill').addEventListener('change', function() {
+            subjectFill = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-stroke').addEventListener('change', function() {
+            subjectStroke = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-stroke-width').addEventListener('input', function() {
+            subjectStrokeWidth = parseFloat(this.value);
+            document.getElementById('subject-stroke-width-value').textContent = this.value;
             draw();
         });
 

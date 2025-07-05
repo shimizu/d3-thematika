@@ -46,7 +46,7 @@ export type {
 export type { ImageLayerOptions } from './layers/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
 export type { PointCircleLayerOptions } from './layers/point-circle-layer';
-export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetAccessor } from './layers/point-annotation-layer';
+export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetAccessor, SubjectType, StyleValue, SubjectOptions, ConnectorOptions, NoteOptions } from './layers/point-annotation-layer';
 export type { PointSpikeLayerOptions } from './types';
 export type { PointTextLayerOptions } from './layers/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line-connection-layer';

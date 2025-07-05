@@ -11,9 +11,15 @@ interface PointAnnotationLayerArgs {
   useTitle: boolean;
   offsetX: number;
   offsetY: number;
+  subjectType: 'point' | 'circle' | 'rect';
   subjectRadius: number;
+  subjectWidth: number;
+  subjectHeight: number;
   subjectFill: string;
+  subjectStroke: string;
+  subjectStrokeWidth: number;
   connectorStroke: string;
+  connectorStrokeWidth: number;
   noteBackgroundColor: string;
   noteFontSize: string;
   noteTextColor: string;
@@ -58,20 +64,51 @@ const meta: Meta<PointAnnotationLayerArgs> = {
       description: 'Y軸オフセット',
       defaultValue: -20
     },
+    subjectType: {
+      control: { type: 'select' },
+      options: ['point', 'circle', 'rect'],
+      description: 'サブジェクトの形状タイプ',
+      defaultValue: 'point'
+    },
     subjectRadius: {
-      control: { type: 'range', min: 1, max: 15, step: 1 },
-      description: 'サブジェクト（対象点）の半径',
+      control: { type: 'range', min: 1, max: 20, step: 1 },
+      description: 'サブジェクトの半径（point/circle用）',
       defaultValue: 3
+    },
+    subjectWidth: {
+      control: { type: 'range', min: 4, max: 40, step: 2 },
+      description: 'サブジェクトの幅（rect用）',
+      defaultValue: 16
+    },
+    subjectHeight: {
+      control: { type: 'range', min: 4, max: 40, step: 2 },
+      description: 'サブジェクトの高さ（rect用）',
+      defaultValue: 16
     },
     subjectFill: {
       control: { type: 'color' },
       description: 'サブジェクトの塗りつぶし色',
       defaultValue: '#e74c3c'
     },
+    subjectStroke: {
+      control: { type: 'color' },
+      description: 'サブジェクトの境界線色',
+      defaultValue: '#ffffff'
+    },
+    subjectStrokeWidth: {
+      control: { type: 'range', min: 0, max: 5, step: 0.5 },
+      description: 'サブジェクトの境界線太さ',
+      defaultValue: 1
+    },
     connectorStroke: {
       control: { type: 'color' },
       description: 'コネクター（引き出し線）の色',
       defaultValue: '#666666'
+    },
+    connectorStrokeWidth: {
+      control: { type: 'range', min: 0.5, max: 5, step: 0.5 },
+      description: 'コネクター（引き出し線）の太さ',
+      defaultValue: 1
     },
     noteBackgroundColor: {
       control: { type: 'color' },
@@ -211,14 +248,19 @@ const render = (args: PointAnnotationLayerArgs) => {
       titleAccessor: titleAccessor,
       offsetAccessor: (feature, index) => [args.offsetX, args.offsetY],
       subjectOptions: {
-        radius: args.subjectRadius,
+        type: args.subjectType,
+        r: args.subjectRadius,
+        width: args.subjectWidth,
+        height: args.subjectHeight,
         fill: args.subjectFill,
-        stroke: 'white',
-        strokeWidth: 1
+        stroke: args.subjectStroke,
+        strokeWidth: args.subjectStrokeWidth,
+        // 後方互換性のため
+        radius: args.subjectRadius
       },
       connectorOptions: {
         stroke: args.connectorStroke,
-        strokeWidth: 1
+        strokeWidth: args.connectorStrokeWidth
       },
       noteOptions: {
         backgroundColor: args.noteBackgroundColor,
@@ -245,9 +287,15 @@ export const Default: Story = {
     useTitle: false,
     offsetX: 30,
     offsetY: -20,
+    subjectType: 'point',
     subjectRadius: 3,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#e74c3c',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 1,
     connectorStroke: '#666666',
+    connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
     noteFontSize: '12px',
     noteTextColor: '#000000',
@@ -263,9 +311,15 @@ export const CalloutElbow: Story = {
     useTitle: true,
     offsetX: 50,
     offsetY: -30,
-    subjectRadius: 4,
+    subjectType: 'circle',
+    subjectRadius: 6,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#3498db',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 1.5,
     connectorStroke: '#2980b9',
+    connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#ecf0f1',
     noteFontSize: '12px',
     noteTextColor: '#2c3e50',
@@ -281,9 +335,15 @@ export const CalloutCurve: Story = {
     useTitle: false,
     offsetX: 40,
     offsetY: 25,
-    subjectRadius: 3,
+    subjectType: 'point',
+    subjectRadius: 4,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#9b59b6',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 2,
     connectorStroke: '#8e44ad',
+    connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#f8f9fa',
     noteFontSize: '14px',
     noteTextColor: '#6c757d',
@@ -299,9 +359,15 @@ export const Label: Story = {
     useTitle: false,
     offsetX: 0,
     offsetY: -15,
+    subjectType: 'point',
     subjectRadius: 2,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#f39c12',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 1,
     connectorStroke: '#e67e22',
+    connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
     noteFontSize: '11px',
     noteTextColor: '#000000',
@@ -317,9 +383,15 @@ export const Badge: Story = {
     useTitle: false,
     offsetX: 0,
     offsetY: 0,
-    subjectRadius: 10,
+    subjectType: 'circle',
+    subjectRadius: 12,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#e74c3c',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 2,
     connectorStroke: '#c0392b',
+    connectorStrokeWidth: 1,
     noteBackgroundColor: '#ffffff',
     noteFontSize: '10px',
     noteTextColor: '#ffffff',
@@ -335,9 +407,15 @@ export const CalloutCircle: Story = {
     useTitle: false,
     offsetX: -40,
     offsetY: 30,
-    subjectRadius: 8,
+    subjectType: 'circle',
+    subjectRadius: 10,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: 'none',
+    subjectStroke: '#27ae60',
+    subjectStrokeWidth: 2,
     connectorStroke: '#27ae60',
+    connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#d5f4e6',
     noteFontSize: '12px',
     noteTextColor: '#1e8449',
@@ -353,9 +431,15 @@ export const CalloutRect: Story = {
     useTitle: true,
     offsetX: -50,
     offsetY: -25,
+    subjectType: 'rect',
     subjectRadius: 6,
+    subjectWidth: 20,
+    subjectHeight: 14,
     subjectFill: 'none',
+    subjectStroke: '#e67e22',
+    subjectStrokeWidth: 2,
     connectorStroke: '#e67e22',
+    connectorStrokeWidth: 1.5,
     noteBackgroundColor: '#fdeaa7',
     noteFontSize: '13px',
     noteTextColor: '#d35400',
@@ -371,13 +455,43 @@ export const PolygonAnnotations: Story = {
     useTitle: false,
     offsetX: 35,
     offsetY: -15,
-    subjectRadius: 4,
+    subjectType: 'circle',
+    subjectRadius: 5,
+    subjectWidth: 16,
+    subjectHeight: 16,
     subjectFill: '#16a085',
+    subjectStroke: '#ffffff',
+    subjectStrokeWidth: 1,
     connectorStroke: '#1abc9c',
+    connectorStrokeWidth: 1,
     noteBackgroundColor: '#e8f8f5',
     noteFontSize: '12px',
     noteTextColor: '#117a65',
     dataSource: 'polygons'
+  },
+  render
+};
+
+export const SubjectTypeDemo: Story = {
+  args: {
+    annotationType: 'callout',
+    textProperty: 'name',
+    useTitle: true,
+    offsetX: 45,
+    offsetY: -30,
+    subjectType: 'rect',
+    subjectRadius: 8,
+    subjectWidth: 24,
+    subjectHeight: 18,
+    subjectFill: '#ff6b6b',
+    subjectStroke: '#2c3e50',
+    subjectStrokeWidth: 2,
+    connectorStroke: '#34495e',
+    connectorStrokeWidth: 2,
+    noteBackgroundColor: '#fff3cd',
+    noteFontSize: '13px',
+    noteTextColor: '#856404',
+    dataSource: 'cities'
   },
   render
 };
