@@ -179,6 +179,11 @@
                 <label for="note-background">ノート背景色:</label>
                 <input type="color" id="note-background" value="#ffffff">
             </div>
+            
+            <div class="control-group">
+                <label for="note-padding">ノートパディング: <span id="note-padding-value">4</span></label>
+                <input type="range" id="note-padding" min="0" max="20" step="1" value="4">
+            </div>
         </div>
 
         <div id="map"></div>
@@ -244,7 +249,8 @@ const annotationLayer = new Thematika.PointAnnotationLayer({
         fontSize: '12px',
         textColor: '#000000',
         borderColor: '#cccccc',
-        padding: 4
+        borderWidth: 1,
+        padding: 4              // パディング設定
     }
 });
 
@@ -272,6 +278,7 @@ map.addLayer('annotations', annotationLayer);
         let subjectStrokeWidth = 1;
         let subjectStrokeDasharray = 'none';
         let noteBackground = '#ffffff';
+        let notePadding = 4;
 
         // 主要都市データ
         const citiesData = {
@@ -372,7 +379,7 @@ map.addLayer('annotations', annotationLayer);
                         textColor: '#000000',
                         borderColor: '#cccccc',
                         borderWidth: 1,
-                        padding: 4
+                        padding: notePadding
                     }
                 });
 
@@ -454,6 +461,12 @@ map.addLayer('annotations', annotationLayer);
 
         document.getElementById('note-background').addEventListener('change', function() {
             noteBackground = this.value;
+            draw();
+        });
+
+        document.getElementById('note-padding').addEventListener('input', function() {
+            notePadding = parseInt(this.value);
+            document.getElementById('note-padding-value').textContent = this.value;
             draw();
         });
 

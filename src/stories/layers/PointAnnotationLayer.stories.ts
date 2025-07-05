@@ -24,6 +24,7 @@ interface PointAnnotationLayerArgs {
   noteBackgroundColor: string;
   noteFontSize: string;
   noteTextColor: string;
+  notePadding: number;
   dataSource: 'cities' | 'polygons';
 }
 
@@ -132,6 +133,11 @@ const meta: Meta<PointAnnotationLayerArgs> = {
       control: { type: 'color' },
       description: 'ノートテキスト色',
       defaultValue: '#000000'
+    },
+    notePadding: {
+      control: { type: 'range', min: 0, max: 20, step: 1 },
+      description: 'ノートの内側余白（パディング）',
+      defaultValue: 4
     },
     dataSource: {
       control: { type: 'select' },
@@ -276,7 +282,7 @@ const render = (args: PointAnnotationLayerArgs) => {
         textColor: args.noteTextColor,
         borderColor: '#cccccc',
         borderWidth: 1,
-        padding: 4
+        padding: args.notePadding
       }
     });
     
@@ -308,6 +314,7 @@ export const Default: Story = {
     noteBackgroundColor: '#ffffff',
     noteFontSize: '12px',
     noteTextColor: '#000000',
+    notePadding: 4,
     dataSource: 'cities'
   },
   render
@@ -333,6 +340,7 @@ export const CalloutElbow: Story = {
     noteBackgroundColor: '#ecf0f1',
     noteFontSize: '12px',
     noteTextColor: '#2c3e50',
+    notePadding: 6,
     dataSource: 'cities'
   },
   render
@@ -358,6 +366,7 @@ export const CalloutCurve: Story = {
     noteBackgroundColor: '#f8f9fa',
     noteFontSize: '14px',
     noteTextColor: '#6c757d',
+    notePadding: 5,
     dataSource: 'cities'
   },
   render
@@ -383,6 +392,7 @@ export const Label: Story = {
     noteBackgroundColor: '#ffffff',
     noteFontSize: '11px',
     noteTextColor: '#000000',
+    notePadding: 3,
     dataSource: 'cities'
   },
   render
@@ -408,6 +418,7 @@ export const Badge: Story = {
     noteBackgroundColor: '#ffffff',
     noteFontSize: '10px',
     noteTextColor: '#ffffff',
+    notePadding: 2,
     dataSource: 'cities'
   },
   render
@@ -433,6 +444,7 @@ export const CalloutCircle: Story = {
     noteBackgroundColor: '#d5f4e6',
     noteFontSize: '12px',
     noteTextColor: '#1e8449',
+    notePadding: 5,
     dataSource: 'cities'
   },
   render
@@ -458,6 +470,7 @@ export const CalloutRect: Story = {
     noteBackgroundColor: '#fdeaa7',
     noteFontSize: '13px',
     noteTextColor: '#d35400',
+    notePadding: 6,
     dataSource: 'cities'
   },
   render
@@ -483,6 +496,7 @@ export const PolygonAnnotations: Story = {
     noteBackgroundColor: '#e8f8f5',
     noteFontSize: '12px',
     noteTextColor: '#117a65',
+    notePadding: 4,
     dataSource: 'polygons'
   },
   render
@@ -508,6 +522,7 @@ export const SubjectTypeDemo: Story = {
     noteBackgroundColor: '#fff3cd',
     noteFontSize: '13px',
     noteTextColor: '#856404',
+    notePadding: 8,
     dataSource: 'cities'
   },
   render
