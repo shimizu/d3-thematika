@@ -44,6 +44,7 @@ export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, Le
 export type { PointCircleLayerOptions } from './layers/point-circle-layer';
 export type { PointTextLayerOptions } from './layers/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line-connection-layer';
+export type { LineTextLayerOptions } from './layers/line-text-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
@@ -58,6 +59,7 @@ export { LegendLayer } from './layers/legend-layer';
 export { PointCircleLayer } from './layers/point-circle-layer';
 export { PointTextLayer } from './layers/point-text-layer';
 export { LineConnectionLayer } from './layers/line-connection-layer';
+export { LineTextLayer } from './layers/line-text-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';
