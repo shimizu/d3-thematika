@@ -1,0 +1,17 @@
+{
+  "name": "d3-thematika-scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts for d3-thematika development",
+  "scripts": {
+    "thumbnails": "node generate-thumbnails.js",
+    "thumbnails:force": "node generate-thumbnails.js --force",
+    "build-demo": "node build-demo.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
