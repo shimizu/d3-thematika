@@ -139,6 +139,42 @@ describe('LineConnectionLayer', () => {
       expect(layer.id).toMatch(/^line-connection-/);
     });
 
+    it('スムージング設定が適用される', () => {
+      const layer = new LineConnectionLayer({
+        data: testDataFeature,
+        lineType: 'smooth',
+        smoothType: 'curveBasis',
+        attr: { stroke: '#0000ff', strokeWidth: 2 }
+      });
+
+      expect(layer.id).toMatch(/^line-connection-/);
+    });
+
+    it('各種カーブタイプが設定できる', () => {
+      const curveTypes = [
+        'curveBasis',
+        'curveCardinal',
+        'curveCatmullRom',
+        'curveLinear',
+        'curveMonotoneX',
+        'curveMonotoneY',
+        'curveNatural',
+        'curveStep',
+        'curveStepAfter',
+        'curveStepBefore'
+      ] as const;
+
+      curveTypes.forEach(curveType => {
+        const layer = new LineConnectionLayer({
+          data: testDataFeature,
+          lineType: 'smooth',
+          smoothType: curveType
+        });
+
+        expect(layer.id).toMatch(/^line-connection-/);
+      });
+    });
+
     it('アーク制御設定のデフォルト値が適用される', () => {
       const layer = new LineConnectionLayer({
         data: testDataFeature,
@@ -443,6 +479,40 @@ describe('LineConnectionLayer', () => {
       layer.render(container);
       
       expect(layer.isRendered()).toBe(true);
+    });
+
+    it('スムージングワークフローが正常に動作する', () => {
+      const layer = new LineConnectionLayer({ 
+        data: testDataFeature,
+        lineType: 'smooth',
+        smoothType: 'curveBasis',
+        attr: { stroke: '#purple', strokeWidth: 2 }
+      });
+      
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      
+      expect(layer.isRendered()).toBe(true);
+    });
+
+    it('異なるカーブタイプでのスムージングが動作する', () => {
+      const curveTypes = ['curveBasis', 'curveCardinal', 'curveNatural'] as const;
+
+      curveTypes.forEach(curveType => {
+        const layer = new LineConnectionLayer({ 
+          data: testDataFeature,
+          lineType: 'smooth',
+          smoothType: curveType,
+          attr: { stroke: '#blue', strokeWidth: 1 }
+        });
+        
+        const projection = geoMercator();
+        layer.setProjection(projection);
+        layer.render(container);
+        
+        expect(layer.isRendered()).toBe(true);
+      });
     });
   });
 });

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineTextLayer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LineTextLayer デモ</h1>
+        <p class="description">
+            LineTextLayerを使用してLineString上にテキストを配置します。
+            ラインの方向に沿ったテキストの自動回転、位置指定、フォント設定などの機能を確認できます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: LineString形式のGeoJSONデータ（サンプル路線データ）</li>
+                <li>レイヤー: LineTextLayer（ライン上テキスト）、LineConnectionLayer（ライン）、OutlineLayer（投影法境界）</li>
+                <li>機能: テキスト位置、配置方向、フォント設定の変更</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="position-select">テキスト位置:</label>
+                <select id="position-select">
+                    <option value="start">開始点</option>
+                    <option value="middle" selected>中点</option>
+                    <option value="end">終了点</option>
+                    <option value="0.25">25%地点</option>
+                    <option value="0.75">75%地点</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="placement-select">配置方向:</label>
+                <select id="placement-select">
+                    <option value="along" selected>ライン沿い</option>
+                    <option value="horizontal">水平</option>
+                    <option value="perpendicular">垂直</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="font-size-range">フォントサイズ: <span id="font-size-value">16</span>px</label>
+                <input type="range" id="font-size-range" min="10" max="30" value="16">
+            </div>
+
+            <div class="control-group">
+                <label for="font-weight-select">フォント太さ:</label>
+                <select id="font-weight-select">
+                    <option value="normal" selected>Normal</option>
+                    <option value="bold">Bold</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="multiple-text" checked>
+                    複数位置にテキスト表示
+                </label>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// LineTextLayerの使用例
+
+// LineString形式のサンプルデータを作成
+const lineData = {
+    type: 'FeatureCollection',
+    features: [
+        {
+            type: 'Feature',
+            properties: { text: '東京→大阪' },
+            geometry: {
+                type: 'LineString',
+                coordinates: [[139.6917, 35.6895], [135.5023, 34.6937]]
+            }
+        }
+    ]
+};
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoMercator().fitExtent([[10, 10], [790, 590]], lineData)
+});
+
+// LineConnectionLayerでラインを描画
+const lineLayer = new Thematika.LineConnectionLayer({
+    data: lineData,
+    attr: {
+        stroke: '#333',
+        'stroke-width': 2
+    }
+});
+
+// LineTextLayerでライン上にテキストを配置
+const textLayer = new Thematika.LineTextLayer({
+    data: lineData,
+    position: 'middle',          // 中点に配置
+    placement: 'along',          // ライン沿いに配置
+    attr: {
+        fill: '#d32f2f',
+        'font-size': '16px',
+        'font-weight': 'bold'
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('line', lineLayer);
+map.addLayer('text', textLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // サンプルデータ（日本の主要都市間ルート）
+        function createSampleData() {
+            return {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: { text: '東京→大阪' },
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [[139.6917, 35.6895], [135.5023, 34.6937]]
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        properties: { text: '大阪→福岡' },
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [[135.5023, 34.6937], [130.4017, 33.5904]]
+                        }
+                    },
+                    {
+                        type: 'Feature',
+                        properties: { text: '東京→札幌' },
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: [[139.6917, 35.6895], [141.3469, 43.0642]]
+                        }
+                    }
+                ]
+            };
+        }
+        
+        function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
+            
+            const id = "#map";
+            const width = document.querySelector(id).clientWidth;
+            const height = document.querySelector(id).clientHeight;
+
+            // サンプルデータを取得
+            const lineData = createSampleData();
+            
+            // UIから設定を取得
+            const position = document.getElementById('position-select').value;
+            const placement = document.getElementById('placement-select').value;
+            const fontSize = document.getElementById('font-size-range').value;
+            const fontWeight = document.getElementById('font-weight-select').value;
+            const multipleText = document.getElementById('multiple-text').checked;
+
+            // 投影法を設定
+            const projection = d3.geoMercator()
+                .fitExtent([[20, 20], [width-20, height-20]], lineData);
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: projection,
+                backgroundColor: '#f0f8ff'
+            });
+
+            // LineConnectionLayerでラインを描画
+            const lineLayer = new Thematika.LineConnectionLayer({
+                data: lineData,
+                attr: {
+                    stroke: '#2196f3',
+                    'stroke-width': 3,
+                    opacity: 0.7
+                }
+            });
+
+            // LineTextLayerでテキストを配置
+            const textOptions = {
+                data: lineData,
+                position: isNaN(position) ? position : parseFloat(position),
+                placement: placement,
+                attr: {
+                    fill: '#d32f2f',
+                    'font-size': fontSize + 'px',
+                    'font-weight': fontWeight
+                }
+            };
+            
+            // 複数位置にテキスト表示する場合
+            if (multipleText) {
+                textOptions.multiplePositions = [0.2, 0.5, 0.8];
+            }
+
+            const textLayer = new Thematika.LineTextLayer(textOptions);
+
+            // レイヤーを地図に追加
+            map.addLayer('line', lineLayer);
+            map.addLayer('text', textLayer);
+        }
+
+        // イベントリスナーを設定
+        document.getElementById('position-select').addEventListener('change', draw);
+        document.getElementById('placement-select').addEventListener('change', draw);
+        document.getElementById('font-size-range').addEventListener('input', function() {
+            document.getElementById('font-size-value').textContent = this.value;
+            draw();
+        });
+        document.getElementById('font-weight-select').addEventListener('change', draw);
+        document.getElementById('multiple-text').addEventListener('change', draw);
+
+        // 初回描画
+        draw();
+
+
+
+
+    </script>
+</body>
+</html>

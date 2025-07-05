@@ -105,4 +105,20 @@ export interface ILineConnectionLayer extends ILayer {
   setProjection(projection: GeoProjection): void;
 }
 
+/**
+ * PointSpikeLayerの初期化オプション
+ */
+export interface PointSpikeLayerOptions {
+  /** GeoJSONデータ */
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
+  /** レイヤーの属性設定 */
+  attr?: LayerAttr;
+  /** レイヤーのCSS style属性設定 */
+  style?: LayerStyle;
+  /** スパイクの長さ（固定値または関数） */
+  length?: number | ((feature: GeoJSON.Feature, index: number) => number);
+  /** スパイクの方向 */
+  direction?: 'up' | 'down' | 'left' | 'right';
+}
+
 

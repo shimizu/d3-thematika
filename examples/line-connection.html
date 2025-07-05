@@ -87,7 +87,7 @@
         <h1>LineConnectionLayer デモ</h1>
         <p class="description">
             LineConnectionLayerを使用して複数点間を結ぶラインを地図上に表示します。
-            LineString/MultiLineString形式のGeoJSONデータをサポートし、直線またはアークで描画できます。
+            LineString/MultiLineString形式のGeoJSONデータをサポートし、直線・アーク・スムージングで描画できます。
         </p>
 
         <div class="note">
@@ -95,7 +95,7 @@
             <ul>
                 <li>世界地図: examples/geojson/world.geojson（背景用）</li>
                 <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
-                <li>機能: ライン描画タイプ切り替え（直線/アーク）、矢印表示、投影法切り替え</li>
+                <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示、投影法切り替え</li>
             </ul>
         </div>
 
@@ -117,13 +117,30 @@
                 <select id="line-type">
                     <option value="straight">直線</option>
                     <option value="arc" selected>アーク</option>
+                    <option value="smooth">スムージング</option>
                 </select>
             </div>
             
-            <div class="control-group">
+            <div class="control-group" id="arc-height-group">
                 <label for="arc-height">アークの高さ:</label>
                 <input type="range" id="arc-height" min="0" max="1" step="0.1" value="0.3">
                 <span id="arc-height-value">0.3</span>
+            </div>
+            
+            <div class="control-group" id="smooth-type-group" style="display: none;">
+                <label for="smooth-type">スムージングタイプ:</label>
+                <select id="smooth-type">
+                    <option value="curveBasis" selected>Basis</option>
+                    <option value="curveCardinal">Cardinal</option>
+                    <option value="curveCatmullRom">Catmull-Rom</option>
+                    <option value="curveLinear">Linear</option>
+                    <option value="curveMonotoneX">Monotone X</option>
+                    <option value="curveMonotoneY">Monotone Y</option>
+                    <option value="curveNatural">Natural</option>
+                    <option value="curveStep">Step</option>
+                    <option value="curveStepAfter">Step After</option>
+                    <option value="curveStepBefore">Step Before</option>
+                </select>
             </div>
             
             <div class="control-group">
@@ -189,8 +206,9 @@ const multiLineStringData = {
 // LineConnectionLayerインスタンスを作成
 const connectionLayer = new Thematika.LineConnectionLayer({
     data: lineStringData,  // またはmultiLineStringData
-    lineType: 'arc',       // 'straight' または 'arc'
-    arcHeight: 0.3,        // アークの高さ
+    lineType: 'smooth',    // 'straight', 'arc', または 'smooth'
+    smoothType: 'curveBasis', // スムージング時のカーブタイプ
+    arcHeight: 0.3,        // アークの高さ（arcタイプの場合）
     startArrow: false,     // 開始点の矢印
     endArrow: true,        // 終了点の矢印
     arrowSize: 12,         // 矢印のサイズ
@@ -352,14 +370,14 @@ map.addLayer('connections', connectionLayer);
             // LineConnectionLayerの設定を取得
             const lineType = document.getElementById('line-type').value;
             const arcHeight = parseFloat(document.getElementById('arc-height').value);
+            const smoothType = document.getElementById('smooth-type').value;
             const startArrow = document.getElementById('start-arrow').checked;
             const endArrow = document.getElementById('end-arrow').checked;
             
             // LineConnectionLayerインスタンスを作成（世界一周ルート）
-            const worldTourLayer = new Thematika.LineConnectionLayer({
+            const worldTourLayerOptions = {
                 data: worldTour,
                 lineType: lineType,
-                arcHeight: arcHeight,
                 startArrow: startArrow,
                 endArrow: endArrow,
                 arrowSize: 10,
@@ -368,13 +386,21 @@ map.addLayer('connections', connectionLayer);
                     "stroke-width": 3,
                     "opacity": 0.8
                 }
-            });
+            };
+            
+            // ライン描画タイプに応じてオプションを追加
+            if (lineType === 'arc') {
+                worldTourLayerOptions.arcHeight = arcHeight;
+            } else if (lineType === 'smooth') {
+                worldTourLayerOptions.smoothType = smoothType;
+            }
+            
+            const worldTourLayer = new Thematika.LineConnectionLayer(worldTourLayerOptions);
             
             // LineConnectionLayerインスタンスを作成（貿易ルート）
-            const tradeRoutesLayer = new Thematika.LineConnectionLayer({
+            const tradeRoutesLayerOptions = {
                 data: tradeRoutes,
                 lineType: lineType,
-                arcHeight: arcHeight,
                 startArrow: false,
                 endArrow: true,
                 arrowSize: 8,
@@ -384,7 +410,16 @@ map.addLayer('connections', connectionLayer);
                     "opacity": 0.7,
                     "stroke-dasharray": '5,3'
                 }
-            });
+            };
+            
+            // ライン描画タイプに応じてオプションを追加
+            if (lineType === 'arc') {
+                tradeRoutesLayerOptions.arcHeight = arcHeight;
+            } else if (lineType === 'smooth') {
+                tradeRoutesLayerOptions.smoothType = smoothType;
+            }
+            
+            const tradeRoutesLayer = new Thematika.LineConnectionLayer(tradeRoutesLayerOptions);
             
             // レイヤーを地図に追加
             map.addLayer('graticule', graticuleLayer);
@@ -430,13 +465,42 @@ map.addLayer('connections', connectionLayer);
         });
         
         // LineConnectionLayer固有のコントロール
-        document.getElementById('line-type').addEventListener('change', draw);
+        document.getElementById('line-type').addEventListener('change', (e) => {
+            const lineType = e.target.value;
+            
+            // UI要素の表示/非表示を切り替え
+            const arcGroup = document.getElementById('arc-height-group');
+            const smoothGroup = document.getElementById('smooth-type-group');
+            
+            if (lineType === 'arc') {
+                arcGroup.style.display = 'block';
+                smoothGroup.style.display = 'none';
+            } else if (lineType === 'smooth') {
+                arcGroup.style.display = 'none';
+                smoothGroup.style.display = 'block';
+            } else {
+                arcGroup.style.display = 'none';
+                smoothGroup.style.display = 'none';
+            }
+            
+            draw();
+        });
+        
         document.getElementById('arc-height').addEventListener('input', (e) => {
             document.getElementById('arc-height-value').textContent = e.target.value;
             draw();
         });
+        
+        document.getElementById('smooth-type').addEventListener('change', draw);
         document.getElementById('start-arrow').addEventListener('change', draw);
         document.getElementById('end-arrow').addEventListener('change', draw);
+        
+        // 初期表示時のUI状態を設定
+        const initialLineType = document.getElementById('line-type').value;
+        if (initialLineType === 'arc') {
+            document.getElementById('arc-height-group').style.display = 'block';
+            document.getElementById('smooth-type-group').style.display = 'none';
+        }
     </script>
 </body>
 </html>

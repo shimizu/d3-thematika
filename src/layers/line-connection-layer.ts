@@ -1,5 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
+import { path as d3Path } from 'd3-path';
+import { line, curveBasis, curveCardinal, curveCatmullRom, curveLinear, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepAfter, curveStepBefore } from 'd3-shape';
 import { BaseLayer } from './base-layer';
 import { LayerAttr, LayerStyle, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
 import * as GeoJSON from 'geojson';
@@ -15,7 +17,7 @@ export interface LineConnectionLayerOptions {
   /** レイヤーのCSS style属性設定 */
   style?: LayerStyle;
   /** ライン描画タイプ（デフォルト: 'straight'） */
-  lineType?: 'straight' | 'arc';
+  lineType?: 'straight' | 'arc' | 'smooth';
   /** アーク描画時の高さ（デフォルト: 0.3） */
   arcHeight?: number;
   /** アーク制御点の位置（デフォルト: 'center'） */
@@ -28,6 +30,8 @@ export interface LineConnectionLayerOptions {
   endArrow?: boolean;
   /** 矢印のサイズ（デフォルト: 10） */
   arrowSize?: number;
+  /** スムージング時のカーブタイプ（デフォルト: 'curveBasis'） */
+  smoothType?: 'curveBasis' | 'curveCardinal' | 'curveCatmullRom' | 'curveLinear' | 'curveMonotoneX' | 'curveMonotoneY' | 'curveNatural' | 'curveStep' | 'curveStepAfter' | 'curveStepBefore';
 }
 
 /**
@@ -42,7 +46,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   /** レイヤーグループ */
   private layerGroup?: Selection<SVGGElement, unknown, HTMLElement, any>;
   /** ライン描画タイプ */
-  private lineType: 'straight' | 'arc';
+  private lineType: 'straight' | 'arc' | 'smooth';
   /** アーク描画時の高さ */
   private arcHeight: number;
   /** アーク制御点の位置 */
@@ -55,6 +59,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private endArrow: boolean;
   /** 矢印のサイズ */
   private arrowSize: number;
+  /** スムージング時のカーブタイプ */
+  private smoothType: 'curveBasis' | 'curveCardinal' | 'curveCatmullRom' | 'curveLinear' | 'curveMonotoneX' | 'curveMonotoneY' | 'curveNatural' | 'curveStep' | 'curveStepAfter' | 'curveStepBefore';
   /** 投影法 */
   private projection?: GeoProjection;
 
@@ -88,6 +94,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     this.startArrow = options.startArrow || false;
     this.endArrow = options.endArrow || false;
     this.arrowSize = options.arrowSize || 10;
+    this.smoothType = options.smoothType || 'curveBasis';
   }
 
   /**
@@ -273,42 +280,47 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     featureIndex: number,
     lineIndex?: number
   ): void {
-    // 連続する2点ごとにセグメントを作成
-    for (let i = 0; i < coordinates.length - 1; i++) {
-      const segmentData = {
-        start: coordinates[i],
-        end: coordinates[i + 1],
-        feature: feature,
-        segmentIndex: i,
-        isFirst: i === 0,
-        isLast: i === coordinates.length - 2
-      };
+    if (this.lineType === 'smooth') {
+      // スムージングの場合は全体を一つのパスとして描画
+      this.renderSmoothLineString(container, coordinates, feature, featureIndex, lineIndex);
+    } else {
+      // 直線・アークの場合は従来通りセグメントごとに描画
+      for (let i = 0; i < coordinates.length - 1; i++) {
+        const segmentData = {
+          start: coordinates[i],
+          end: coordinates[i + 1],
+          feature: feature,
+          segmentIndex: i,
+          isFirst: i === 0,
+          isLast: i === coordinates.length - 2
+        };
 
-      const path = container
-        .append('path')
-        .datum(segmentData)
-        .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
-        .attr('class', () => {
-          const baseClass = 'thematika-connection-line';
-          const customClass = this.attr.className || '';
-          const dataClass = feature.properties?.class || '';
-          const segmentClass = `segment-${i}`;
-          const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
-          return [baseClass, customClass, dataClass, segmentClass, lineClass].filter(Boolean).join(' ');
-        })
-        .style('fill', 'none')
+        const path = container
+          .append('path')
+          .datum(segmentData)
+          .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
+          .attr('class', () => {
+            const baseClass = 'thematika-connection-line';
+            const customClass = this.attr.className || '';
+            const dataClass = feature.properties?.class || '';
+            const segmentClass = `segment-${i}`;
+            const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
+            return [baseClass, customClass, dataClass, segmentClass, lineClass].filter(Boolean).join(' ');
+          })
+          .style('fill', 'none')
 
-      // 矢印マーカーを適用
-      const markerId = `arrow-${this.id}`;
-      if (this.startArrow && segmentData.isFirst) {
-        path.attr('marker-start', `url(#${markerId}-start)`);
+        // 矢印マーカーを適用
+        const markerId = `arrow-${this.id}`;
+        if (this.startArrow && segmentData.isFirst) {
+          path.attr('marker-start', `url(#${markerId}-start)`);
+        }
+        if (this.endArrow && segmentData.isLast) {
+          path.attr('marker-end', `url(#${markerId}-end)`);
+        }
+
+        // 属性とスタイルを適用
+        super.applyAllStylesToElement(path, this.layerGroup!);
       }
-      if (this.endArrow && segmentData.isLast) {
-        path.attr('marker-end', `url(#${markerId}-end)`);
-      }
-
-      // 属性とスタイルを適用
-      super.applyAllStylesToElement(path, this.layerGroup!);
     }
   }
 
@@ -330,8 +342,13 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
 
     if (this.lineType === 'straight') {
       return `M${startPoint[0]},${startPoint[1]}L${endPoint[0]},${endPoint[1]}`;
-    } else {
+    } else if (this.lineType === 'arc') {
       return this.generateArcPath(start, end, startPoint, endPoint);
+    } else if (this.lineType === 'smooth') {
+      // スムージングの場合は単一セグメントでは意味がないので直線として処理
+      return `M${startPoint[0]},${startPoint[1]}L${endPoint[0]},${endPoint[1]}`;
+    } else {
+      return `M${startPoint[0]},${startPoint[1]}L${endPoint[0]},${endPoint[1]}`;
     }
   }
 
@@ -457,6 +474,114 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   }
 
   /**
+   * スムージングでLineStringを描画します
+   * @private
+   */
+  private renderSmoothLineString(
+    container: Selection<SVGGElement, unknown, HTMLElement, any>,
+    coordinates: GeoJSON.Position[],
+    feature: GeoJSON.Feature,
+    featureIndex: number,
+    lineIndex?: number
+  ): void {
+    if (!this.projection) return;
+
+    // スムージングパスを生成
+    const smoothPath = this.geoSmoothPath(coordinates);
+
+    if (!smoothPath) return;
+
+    const lineData = {
+      coordinates: coordinates,
+      feature: feature,
+      featureIndex: featureIndex,
+      lineIndex: lineIndex
+    };
+
+    const path = container
+      .append('path')
+      .datum(lineData)
+      .attr('d', smoothPath)
+      .attr('class', () => {
+        const baseClass = 'thematika-connection-line';
+        const customClass = this.attr.className || '';
+        const dataClass = feature.properties?.class || '';
+        const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
+        return [baseClass, customClass, dataClass, lineClass].filter(Boolean).join(' ');
+      })
+      .style('fill', 'none');
+
+    // 矢印マーカーを適用
+    const markerId = `arrow-${this.id}`;
+    if (this.startArrow) {
+      path.attr('marker-start', `url(#${markerId}-start)`);
+    }
+    if (this.endArrow) {
+      path.attr('marker-end', `url(#${markerId}-end)`);
+    }
+
+    // 属性とスタイルを適用
+    super.applyAllStylesToElement(path, this.layerGroup!);
+  }
+
+  /**
+   * 地理座標系でスムージングパスを生成します
+   * @private
+   */
+  private geoSmoothPath(coordinates: GeoJSON.Position[]): string {
+    if (!this.projection) return '';
+
+    // 地理座標をピクセル座標に変換
+    const pixelCoordinates = coordinates
+      .map(coord => this.projection!([coord[0], coord[1]]))
+      .filter(coord => coord !== null) as [number, number][];
+
+    if (pixelCoordinates.length < 2) return '';
+
+    // カーブタイプに応じたカーブ関数を取得
+    const curveFunction = this.getCurveFunction();
+
+    // D3のlineジェネレーターを使用してスムージングパスを生成
+    const lineGenerator = line<[number, number]>()
+      .x(d => d[0])
+      .y(d => d[1])
+      .curve(curveFunction);
+
+    return lineGenerator(pixelCoordinates) || '';
+  }
+
+  /**
+   * 設定されたカーブタイプに応じたカーブ関数を取得します
+   * @private
+   */
+  private getCurveFunction(): any {
+    switch (this.smoothType) {
+      case 'curveBasis':
+        return curveBasis;
+      case 'curveCardinal':
+        return curveCardinal;
+      case 'curveCatmullRom':
+        return curveCatmullRom;
+      case 'curveLinear':
+        return curveLinear;
+      case 'curveMonotoneX':
+        return curveMonotoneX;
+      case 'curveMonotoneY':
+        return curveMonotoneY;
+      case 'curveNatural':
+        return curveNatural;
+      case 'curveStep':
+        return curveStep;
+      case 'curveStepAfter':
+        return curveStepAfter;
+      case 'curveStepBefore':
+        return curveStepBefore;
+      default:
+        return curveBasis;
+    }
+  }
+
+  /**
    * ラインにイベントリスナーを追加します
    * @param eventType - イベントタイプ
    * @param handler - イベントハンドラー
@@ -465,15 +590,26 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     if (this.layerGroup) {
       this.layerGroup.selectAll('path')
         .on(eventType, function(event, d: any) {
-          // セグメントデータにfeature情報を含めて返す
-          handler(event, {
-            feature: d.feature,
-            segmentIndex: d.segmentIndex,
-            start: d.start,
-            end: d.end,
-            isFirst: d.isFirst,
-            isLast: d.isLast
-          });
+          // データの構造に応じて適切な情報を返す
+          if (d.coordinates) {
+            // スムージングの場合
+            handler(event, {
+              feature: d.feature,
+              coordinates: d.coordinates,
+              featureIndex: d.featureIndex,
+              lineIndex: d.lineIndex
+            });
+          } else {
+            // セグメントの場合
+            handler(event, {
+              feature: d.feature,
+              segmentIndex: d.segmentIndex,
+              start: d.start,
+              end: d.end,
+              isFirst: d.isFirst,
+              isLast: d.isLast
+            });
+          }
         });
     }
   }

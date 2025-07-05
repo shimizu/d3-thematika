@@ -27,11 +27,12 @@ export default {
       sourcemap: true,
       globals: {
         'd3-geo': 'd3',
-        'd3-selection': 'd3'
+        'd3-selection': 'd3',
+        '@turf/turf': 'turf'
       }
     }
   ],
-  external: ['d3-geo', 'd3-selection'],
+  external: ['d3-geo', 'd3-selection', '@turf/turf'],
   plugins: [
     resolve({
       browser: true

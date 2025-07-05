@@ -43,7 +43,9 @@ module.exports = {
     '^d3-geo$': '<rootDir>/tests/mocks/d3-geo.js',
     '^d3-drag$': '<rootDir>/tests/mocks/d3-drag.js',
     '^d3-scale$': '<rootDir>/tests/mocks/d3-scale.js',
-    '^d3-scale-chromatic$': '<rootDir>/tests/mocks/d3-scale-chromatic.js'
+    '^d3-scale-chromatic$': '<rootDir>/tests/mocks/d3-scale-chromatic.js',
+    '^d3-shape$': '<rootDir>/tests/mocks/d3-shape.js',
+    '^d3-path$': '<rootDir>/tests/mocks/d3-path.js'
   },
   
   // セットアップファイル
