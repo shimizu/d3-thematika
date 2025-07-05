@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/html';
 import { Map } from '../../thematika';
 import { ImageLayer } from '../../layers/image-layer';
 import { GraticuleLayer } from '../../layers/graticule-layer';
-import { readCOG } from '../../utils/gis-utils';
+import { readCOG } from '../../utils/cog-utils';
 import { createMapContainer } from '../utils/story-helpers';
 import * as d3 from 'd3-geo';
 

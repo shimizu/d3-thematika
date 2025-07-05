@@ -18,6 +18,12 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/index.ts' // エントリーポイントは除外
   ],
+
+  // テスト対象から除外するパターン
+  testPathIgnorePatterns: [
+    '<rootDir>/node_modules/',
+    '<rootDir>/dist/'
+  ],
   
   // カバレッジレポート形式
   coverageReporters: [
@@ -45,7 +51,9 @@ module.exports = {
     '^d3-scale$': '<rootDir>/tests/mocks/d3-scale.js',
     '^d3-scale-chromatic$': '<rootDir>/tests/mocks/d3-scale-chromatic.js',
     '^d3-shape$': '<rootDir>/tests/mocks/d3-shape.js',
-    '^d3-path$': '<rootDir>/tests/mocks/d3-path.js'
+    '^d3-path$': '<rootDir>/tests/mocks/d3-path.js',
+    '^.*/vendor/textures\\.esm\\.js$': '<rootDir>/tests/mocks/textures.js',
+    '^geotiff$': '<rootDir>/tests/mocks/geotiff.js'
   },
   
   // セットアップファイル

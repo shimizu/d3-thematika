@@ -103,10 +103,10 @@ beforeEach(() => {
   jest.clearAllMocks();
   
   // SVGモックのリセット
-  if ((global as any).document.createElement.mockClear) {
+  if ((global as any).document && (global as any).document.createElement && (global as any).document.createElement.mockClear) {
     (global as any).document.createElement.mockClear();
   }
-  if ((global as any).document.createElementNS.mockClear) {
+  if ((global as any).document && (global as any).document.createElementNS && (global as any).document.createElementNS.mockClear) {
     (global as any).document.createElementNS.mockClear();
   }
 });
