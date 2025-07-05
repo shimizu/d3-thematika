@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COG Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>COG (Cloud Optimized GeoTIFF) Layer デモ</h1>
+        <p class="description">
+            readCOG関数を使用してCloud Optimized GeoTIFFファイルを読み込み、ImageLayerで表示します。
+            サイズ制限機能やリサンプリング機能も確認できます。
+        </p>
+
+        <div class="note">
+            <strong>使用データ:</strong> 
+            <ul>
+                <li>データ: サンプルCOGファイル（URL指定）</li>
+                <li>レイヤー: ImageLayer（COG画像）、GraticuleLayer（経緯線）</li>
+                <li>機能: COG読み込み、サイズ制限、リサンプリング</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="equirectangular" selected>Equirectangular</option>
+                    <option value="mercator">Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="cog-url">COG URL:</label>
+                <input type="text" id="cog-url" style="width: 400px;" value="https://storage.googleapis.com/g3-open-resource/d3-thematika/cog/NE1_HR_SR_OB_DRv6_COG.tif">
+                <button id="load-cog">読み込み</button>
+            </div>
+            
+            <div class="control-group">
+                <label>AOI (南アメリカ):</label>
+                <div style="margin-left: 20px;">
+                    <label>西端: <input type="number" id="aoi-west" value="-82" step="0.1" style="width: 80px;"></label>
+                    <label>東端: <input type="number" id="aoi-east" value="-34" step="0.1" style="width: 80px;"></label>
+                    <label>南端: <input type="number" id="aoi-south" value="-56" step="0.1" style="width: 80px;"></label>
+                    <label>北端: <input type="number" id="aoi-north" value="13" step="0.1" style="width: 80px;"></label>
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <label for="max-size">最大サイズ制限:</label>
+                <select id="max-size">
+                    <option value="256">256×256</option>
+                    <option value="512" selected>512×512</option>
+                    <option value="1024">1024×1024</option>
+                    <option value="2048">2048×2048</option>
+                    <option value="4096">4096×4096</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="on-exceed">制限超過時の処理:</label>
+                <select id="on-exceed">
+                    <option value="resample" selected>自動リサンプリング</option>
+                    <option value="error">エラー</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label for="resample-method">リサンプリング方法:</label>
+                <select id="resample-method">
+                    <option value="nearest">Nearest</option>
+                    <option value="bilinear" selected>Bilinear</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>
+                    <input type="checkbox" id="show-graticule" checked>
+                    経緯線を表示
+                </label>
+            </div>
+            
+            <div class="control-group" id="cog-info" style="display: none;">
+                <strong>読み込み結果:</strong>
+                <div id="cog-details"></div>
+            </div>
+
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <!-- サンプルコード -->
+            <pre>// COG読み込みとImageLayerの使用例
+
+// COGファイルを読み込み（南アメリカのAOI指定）
+const cogResult = await Thematika.readCOG(
+    'https://storage.googleapis.com/g3-open-resource/d3-thematika/cog/NE1_HR_SR_OB_DRv6_COG.tif',
+    {
+        bbox: [-82, -56, -34, 13],  // [west, south, east, north]
+        sizeLimit: {
+            maxWidth: 512,
+            maxHeight: 512,
+            onExceed: 'resample'
+        },
+        resampleMethod: 'bilinear'
+    }
+);
+
+console.log('読み込み結果:', {
+    width: cogResult.width,
+    height: cogResult.height,
+    originalWidth: cogResult.originalWidth,
+    originalHeight: cogResult.originalHeight,
+    wasResampled: cogResult.wasResampled,
+    bounds: cogResult.bounds
+});
+
+// 地図を作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoMercator()
+});
+
+// ImageLayerでCOGを表示
+const imageLayer = new Thematika.ImageLayer('cog-image', {
+    src: cogResult.dataUri,
+    bounds: cogResult.bounds,
+    attr: {
+        opacity: 0.8
+    }
+});
+
+// GraticuleLayerを追加
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [10, 10],
+    attr: {
+        stroke: '#000',
+        'stroke-width': 0.5,
+        'stroke-dasharray': '2,2',
+        opacity: 0.5
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('cog', imageLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        let currentMap = null;
+        
+        async function draw(cogResult = null) {
+            const id = "#map";
+            
+            // 既存の地図をクリア
+            d3.select(id).selectAll('*').remove();
+            
+            const width = document.querySelector(id).clientWidth;
+            const height = document.querySelector(id).clientHeight;
+            
+            // 投影法を設定
+            if (cogResult && cogResult.bounds) {
+                const [west, south, east, north] = cogResult.bounds;
+                const geoBounds = {
+                    type: 'LineString',
+                    coordinates: [[west, south], [east, north]]
+                };
+                currentProjection.fitExtent([[50, 50], [width-50, height-50]], geoBounds);
+            } else {
+                currentProjection
+                    .scale(130)
+                    .translate([width/2, height/2]);
+            }
+            
+            // 地図を作成
+            currentMap = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+            
+            // 経緯線レイヤーを追加
+            if (document.getElementById('show-graticule').checked) {
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [10, 10],
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#000',
+                        "stroke-width": 0.5,
+                        "stroke-dasharray": '2,2',
+                        "opacity": 0.5
+                    }
+                });
+                currentMap.addLayer('graticule', graticuleLayer);
+            }
+            
+            // COG画像を表示
+            if (cogResult) {
+                const imageLayer = new Thematika.ImageLayer('cog-image', {
+                    src: cogResult.dataUri,
+                    bounds: cogResult.bounds,
+                    attr: {
+                        opacity: 0.9
+                    }
+                });
+                currentMap.addLayer('cog', imageLayer);
+                
+                // 情報を表示
+                document.getElementById('cog-info').style.display = 'block';
+                document.getElementById('cog-details').innerHTML = `
+                    <ul>
+                        <li>元のサイズ: ${cogResult.originalWidth} × ${cogResult.originalHeight}</li>
+                        <li>表示サイズ: ${cogResult.width} × ${cogResult.height}</li>
+                        <li>リサンプリング: ${cogResult.wasResampled ? 'あり' : 'なし'}</li>
+                        <li>境界: [${cogResult.bounds.map(v => v.toFixed(2)).join(', ')}]</li>
+                    </ul>
+                `;
+            }
+        }
+        
+        // COG読み込み関数
+        async function loadCOG() {
+            const url = document.getElementById('cog-url').value;
+            const maxSize = parseInt(document.getElementById('max-size').value);
+            const onExceed = document.getElementById('on-exceed').value;
+            const resampleMethod = document.getElementById('resample-method').value;
+            
+            // AOIを取得
+            const west = parseFloat(document.getElementById('aoi-west').value);
+            const east = parseFloat(document.getElementById('aoi-east').value);
+            const south = parseFloat(document.getElementById('aoi-south').value);
+            const north = parseFloat(document.getElementById('aoi-north').value);
+            
+            try {
+                // 読み込み中表示
+                document.getElementById('load-cog').disabled = true;
+                document.getElementById('load-cog').textContent = '読み込み中...';
+                
+                const cogResult = await Thematika.readCOG(url, {
+                    bbox: [west, south, east, north],
+                    sizeLimit: {
+                        maxWidth: maxSize,
+                        maxHeight: maxSize,
+                        onExceed: onExceed
+                    },
+                    resampleMethod: resampleMethod
+                });
+                
+                console.log('COG読み込み成功:', cogResult);
+                
+                // 地図を再描画
+                await draw(cogResult);
+                
+            } catch (error) {
+                console.error('COG読み込みエラー:', error);
+                alert(`エラー: ${error.message}`);
+            } finally {
+                document.getElementById('load-cog').disabled = false;
+                document.getElementById('load-cog').textContent = '読み込み';
+            }
+        }
+        
+        // イベントリスナー
+        document.getElementById('load-cog').addEventListener('click', loadCOG);
+        
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch(projectionName) {
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                default:
+                    currentProjection = d3.geoEquirectangular();
+            }
+            draw();
+        });
+        
+        document.getElementById('show-graticule').addEventListener('change', () => {
+            draw();
+        });
+        
+        // 初期描画
+        draw();
+    </script>
+</body>
+</html>

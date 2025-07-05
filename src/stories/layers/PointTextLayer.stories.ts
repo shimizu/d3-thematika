@@ -306,11 +306,11 @@ function createPointTextStory(args: PointTextLayerArgs) {
     dy: args.dy,
     rotate: args.rotate,
     lengthAdjust: args.lengthAdjust,
-    alignmentBaseline: args.alignmentBaseline,
+    alignmentBaseline: args.alignmentBaseline as "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit",
     textAnchor: args.textAnchor,
     fontFamily: args.fontFamily,
     fontSize: args.fontSize,
-    fontWeight: args.fontWeight,
+    fontWeight: args.fontWeight as "normal" | "bold" | "bolder" | "lighter" | "100" | "200" | "300" | "400" | "500" | "600" | "700" | "800" | "900" | "inherit",
     attr: {
       fill: args.fill,
       stroke: args.stroke,
