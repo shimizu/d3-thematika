@@ -21,11 +21,12 @@ const config: StorybookConfig = {
       build: {
         ...config.build,
         rollupOptions: {
-          external: ['d3-geo', 'd3-selection'],
+          external: ['d3-geo', 'd3-selection', 'geotiff'],
           output: {
             globals: {
               'd3-geo': 'd3',
-              'd3-selection': 'd3'
+              'd3-selection': 'd3',
+              'geotiff': 'GeoTIFF'
             }
           }
         }
