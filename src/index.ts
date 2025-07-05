@@ -37,7 +37,11 @@ export type {
   ILayer,
   ILineConnectionLayer,
   ArcControlPointType,
-  ArcOffsetType
+  ArcOffsetType,
+  TileCoordinate,
+  TileBounds,
+  TileUrlInfo,
+  TileGenerationOptions
 } from './types';
 export type { ImageLayerOptions } from './layers/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
@@ -68,3 +72,5 @@ export * from './utils/effect-utils';
 export * from './utils/texture-utils';
 export * from './utils/test-utils';
 export * from './utils/gis-utils';
+export * from './utils/cog-utils';
+export * from './utils/tile-utils';

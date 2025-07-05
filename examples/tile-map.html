@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TileMap - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 5 / 3;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TileMap デモ</h1>
+        <p class="description">
+            ImageLayerとtile-utilsを組み合わせてタイル地図を表示します。
+            OpenStreetMap Japanのタイルデータを動的に読み込み、様々な地域とズームレベルで表示できます。
+        </p>
+
+        <div class="note">
+            <strong>使用技術:</strong> 
+            <ul>
+                <li>タイルソース: OpenStreetMap Japan (https://tile.openstreetmap.jp/)</li>
+                <li>レイヤー: ImageLayer（各タイル画像）、OutlineLayer（投影境界）</li>
+                <li>ユーティリティ: tile-utils（タイル座標計算、URL生成）</li>
+                <li>機能: 地域選択、ズームレベル調整、タイル情報表示</li>
+            </ul>
+        </div>
+
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="region-select">表示地域:</label>
+                <select id="region-select">
+                    <option value="tokyo" selected>東京</option>
+                    <option value="osaka">大阪</option>
+                    <option value="fukuoka">福岡</option>
+                    <option value="japan">日本全域</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="zoom-select">ズームレベル: <span id="zoom-value">10</span></label>
+                <input type="range" id="zoom-select" min="5" max="15" value="10">
+            </div>
+
+            <div class="control-group">
+                <label for="projection-select">投影法:</label>
+                <select id="projection-select">
+                    <option value="mercator" selected>Mercator</option>
+                    <option value="naturalEarth1">Natural Earth</option>
+                    <option value="equirectangular">Equirectangular</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <input type="checkbox" id="show-bbox-markers">
+                <label for="show-bbox-markers">タイル境界マーカーを表示</label>
+            </div>
+
+            <div class="control-group">
+                <label>タイル情報:</label>
+                <div id="tile-info" style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-top: 5px;">
+                    タイルを読み込み中...
+                </div>
+            </div>
+        </div>
+
+        <div id="map"></div>
+
+        <div class="code-example">
+            <pre>// TileMapの使用例（ImageLayer + tile-utils）
+
+// 地域の境界を定義
+const regions = {
+    tokyo: [139.4, 35.5, 139.9, 35.8],
+    osaka: [135.3, 34.5, 135.7, 34.8],
+    fukuoka: [130.2, 33.4, 130.6, 33.8],
+    japan: [129.0, 30.0, 146.0, 46.0]
+};
+
+// タイルUtilsを使用してタイル座標を計算
+const bounds = regions.tokyo;
+const zoom = 10;
+const tiles = Thematika.generateTileUrls(bounds, zoom, {
+    urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+});
+
+// 地図の作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoMercator().fitExtent([[10, 10], [790, 590]], {
+        type: 'Polygon',
+        coordinates: [[
+            [bounds[0], bounds[1]], [bounds[2], bounds[1]],
+            [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
+        ]]
+    })
+});
+
+// 各タイルをImageLayerとして追加
+tiles.forEach((tile, index) => {
+    const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
+        src: tile.url,
+        bounds: tile.bounds.bounds,
+        showBboxMarkers: false
+    });
+    map.addLayer(`tile-${index}`, imageLayer);
+});
+
+// アウトライン追加
+const outlineLayer = new Thematika.OutlineLayer({
+    attr: { stroke: '#333', 'stroke-width': 2, fill: 'none' }
+});
+map.addLayer('outline', outlineLayer);
+        </div>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // 地域の境界を定義
+        const regions = {
+            tokyo: [139.4, 35.5, 139.9, 35.8],
+            osaka: [135.3, 34.5, 135.7, 34.8], 
+            fukuoka: [130.2, 33.4, 130.6, 33.8],
+            japan: [129.0, 30.0, 146.0, 46.0]
+        };
+
+        // 現在の設定
+        let currentRegion = 'tokyo';
+        let currentZoom = 10;
+        let currentProjectionType = 'mercator';
+        let showBboxMarkers = false;
+
+        // 投影法を取得
+        function getProjection(type) {
+            switch (type) {
+                case 'mercator':
+                    return d3.geoMercator();
+                case 'naturalEarth1':
+                    return d3.geoNaturalEarth1();
+                case 'equirectangular':
+                    return d3.geoEquirectangular();
+                default:
+                    return d3.geoMercator();
+            }
+        }
+
+        // タイル情報を更新
+        function updateTileInfo(tiles, bounds, zoom) {
+            const infoDiv = document.getElementById('tile-info');
+            const tileCount = tiles.length;
+            const resolution = Thematika.getResolution(zoom, (bounds[1] + bounds[3]) / 2);
+            
+            infoDiv.innerHTML = `
+                <strong>タイル情報:</strong><br>
+                ・タイル数: ${tileCount}個<br>
+                ・ズームレベル: ${zoom}<br>
+                ・範囲: ${bounds[0].toFixed(3)}, ${bounds[1].toFixed(3)} - ${bounds[2].toFixed(3)}, ${bounds[3].toFixed(3)}<br>
+                ・解像度: ${resolution.toFixed(2)} m/pixel<br>
+                ・URLテンプレート: https://c.tile.openstreetmap.org/{z}/{x}/{y}.png
+            `;
+        }
+
+        // メイン描画関数
+        async function draw() {
+            const id = "#map";
+
+            // 既存の地図を削除
+            d3.select(id).selectAll('*').remove();
+
+            const width = document.querySelector(id).clientWidth;
+            const height = document.querySelector(id).clientHeight;
+
+            // 現在の地域の境界を取得
+            const bounds = regions[currentRegion];
+            
+            // タイルデータを生成
+            const tiles = Thematika.generateTileUrls(bounds, currentZoom, {
+                urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                clampToBounds: true
+            });
+
+            // タイル情報を更新
+            updateTileInfo(tiles, bounds, currentZoom);
+
+            // 投影法を設定
+            const projection = getProjection(currentProjectionType);
+            
+            // タイル表示用に適切なスケールを設定
+            if (currentProjectionType === 'mercator') {
+                // Web Mercatorタイル用の設定
+                const centerLon = (bounds[0] + bounds[2]) / 2;
+                const centerLat = (bounds[1] + bounds[3]) / 2;
+                
+                // ズームレベルに基づいてスケールを計算
+                const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);
+                
+                projection
+                    .scale(scale)
+                    .center([centerLon, centerLat])
+                    .translate([width / 2, height / 2]);
+            } else {
+                // 他の投影法の場合は既存のfitExtentを使用
+                const boundsGeoJSON = {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [bounds[0], bounds[1]], [bounds[2], bounds[1]],
+                        [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
+                    ]]
+                };
+                projection.fitExtent([[10, 10], [width - 10, height - 10]], boundsGeoJSON);
+            }
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: id,
+                width: width,
+                height: height,
+                projection: projection
+            });
+
+            // 各タイルをImageLayerとして追加
+            tiles.forEach((tile, index) => {
+                console.log(`=== Tile ${index} ===`);
+                console.log('Tile data:', tile);
+                console.log('Tile URL:', tile.url);
+                console.log('Tile bounds:', tile.bounds.bounds);
+                console.log('Current projection:', currentProjectionType);
+                
+                const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
+                    src: tile.url,
+                    bounds: tile.bounds.bounds,
+                    showBboxMarkers: showBboxMarkers,
+                    // useAdvancedReprojectionのデフォルト値（true）を使用
+                    attr: { opacity: 1 }
+                });
+                map.addLayer(`tile-${index}`, imageLayer);
+            });
+
+            // アウトライン（投影法境界）を追加
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    fill: 'none',
+                    stroke: '#333',
+                    'stroke-width': 2,
+                    opacity: 0.8
+                }
+            });
+            map.addLayer('outline', outlineLayer);
+
+            console.log(`描画完了: ${currentRegion}, ズーム${currentZoom}, タイル数${tiles.length}`);
+        }
+
+        // イベントリスナーを設定
+        function setupEventListeners() {
+            // 地域選択
+            document.getElementById('region-select').addEventListener('change', function(e) {
+                currentRegion = e.target.value;
+                draw();
+            });
+
+            // ズームレベル
+            document.getElementById('zoom-select').addEventListener('input', function(e) {
+                currentZoom = parseInt(e.target.value);
+                document.getElementById('zoom-value').textContent = currentZoom;
+                draw();
+            });
+
+            // 投影法
+            document.getElementById('projection-select').addEventListener('change', function(e) {
+                currentProjectionType = e.target.value;
+                draw();
+            });
+
+            // bbox マーカー
+            document.getElementById('show-bbox-markers').addEventListener('change', function(e) {
+                showBboxMarkers = e.target.checked;
+                draw();
+            });
+        }
+
+        // 初期化
+        setupEventListeners();
+        draw();
+    </script>
+</body>
+</html>

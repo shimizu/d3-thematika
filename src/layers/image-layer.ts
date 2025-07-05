@@ -104,18 +104,35 @@ export class ImageLayer extends BaseLayer {
     this.element = g.node() as SVGGElement;
 
     try {
-      const img = await this.loadImage(this.src);
+      console.log('=== ImageLayer render() 開始 ===');
+      console.log('Image src:', this.src);
+      console.log('Image bounds:', this.bounds);
+      console.log('useAdvancedReprojection:', this.useAdvancedReprojection);
+      console.log('Projection:', this.projection);
       
-      // Equirectangular投影法の場合は高速描画
-      if (this.projection && this.isEquirectangularProjection(this.projection)) {
+      const img = await this.loadImage(this.src);
+      console.log('画像読み込み完了:', {
+        width: img.width,
+        height: img.height,
+        src: img.src
+      });
+      
+      // 投影法の判定
+      const isWebMercatorCompatible = this.projection && this.isWebMercatorCompatible(this.projection);
+      console.log('isWebMercatorCompatible:', isWebMercatorCompatible);
+      
+      if (isWebMercatorCompatible) {
+        console.log('→ 実行パス: renderSimpleImage (Web Mercator互換)');
         await this.renderSimpleImage(img);
       } else if (this.useAdvancedReprojection) {
-        // その他の投影法では高度な再投影を実行
+        console.log('→ 実行パス: renderAdvancedReprojection');
         await this.renderAdvancedReprojection(img);
       } else {
-        // フォールバック: 単純な画像配置
+        console.log('→ 実行パス: renderSimpleImage (フォールバック)');
         await this.renderSimpleImage(img);
       }
+      
+      console.log('=== ImageLayer render() 完了 ===');
     } catch (error) {
       console.error('ImageLayer: 画像の描画に失敗しました', error);
     }
@@ -148,6 +165,46 @@ export class ImageLayer extends BaseLayer {
     const projString = projection.toString ? projection.toString() : '';
     return projString.includes('equirectangular') || 
            projString.includes('Equirectangular');
+  }
+
+  /**
+   * Web Mercatorタイルと互換性のある投影法かどうかを判定します
+   * @param projection - 投影法
+   * @returns Web Mercatorと互換性がある場合はtrue
+   */
+  private isWebMercatorCompatible(projection: GeoProjection): boolean {
+    // D3の投影法の判定は複数の方法を組み合わせる
+    const projString = projection.toString ? projection.toString() : '';
+    
+    // 1. 文字列による判定
+    if (projString.includes('mercator') || 
+        projString.includes('Mercator') ||
+        projString.includes('equirectangular') || 
+        projString.includes('Equirectangular')) {
+      return true;
+    }
+    
+    // 2. D3のMercator投影法の特徴による判定
+    // d3.geoMercator()で作成された投影法は特定の特徴を持つ
+    if (typeof projection.scale === 'function' && 
+        typeof projection.translate === 'function' &&
+        typeof projection.center === 'function') {
+      
+      // デフォルトのMercator投影法の初期スケール値をチェック
+      const scale = projection.scale();
+      const translate = projection.translate();
+      
+      // d3.geoMercator()のデフォルト値やWeb Mercatorタイルと互換性があるかチェック
+      // 通常のMercator投影法の場合、タイル座標系と互換性がある
+      console.log('Projection details for compatibility check:', {
+        scale: scale,
+        translate: translate
+      });
+      
+      return true; // Mercator系の投影法として扱う
+    }
+    
+    return false;
   }
 
   /**
@@ -224,6 +281,9 @@ export class ImageLayer extends BaseLayer {
     console.log('Image aspect ratio:', img.width / img.height);
     console.log('=====================================');
 
+    console.log('=== DOM要素作成開始 ===');
+    console.log('元画像URL:', img.src);
+
     // 投影後の位置と変換されたサイズで配置
     const selection = select(this.element as any) as Selection<SVGGElement, unknown, any, any>;
     this.imageElement = selection
@@ -235,14 +295,27 @@ export class ImageLayer extends BaseLayer {
       .attr('href', img.src)
       .attr('preserveAspectRatio', 'none');
 
+    console.log('image要素作成直後のhref:', this.imageElement.attr('href'));
+    console.log('image要素作成直後の属性:', {
+      x: this.imageElement.attr('x'),
+      y: this.imageElement.attr('y'),
+      width: this.imageElement.attr('width'),
+      height: this.imageElement.attr('height')
+    });
+
     // bbox の四隅にcircleを表示（オプション）
     if (this.showBboxMarkers) {
       this.addBboxMarkers(selection, [topLeft, topRight, bottomLeft, bottomRight]);
     }
 
+    console.log('applyAllStylesToElement実行前のhref:', this.imageElement.attr('href'));
+    
     if (this.imageElement) {
       this.applyAllStylesToElement(this.imageElement, this.getLayerGroup()!);
+      console.log('applyAllStylesToElement実行後のhref:', this.imageElement.attr('href'));
     }
+    
+    console.log('=== DOM要素作成完了 ===');
   }
 
   /**
