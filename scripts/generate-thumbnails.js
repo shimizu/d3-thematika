@@ -1,7 +1,12 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const path = require('path');
-const config = require('./thumbnail-config');
+import puppeteer from 'puppeteer';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import config from './thumbnail-config.js';
+
+// ESMでは__dirnameが使えないため、代替実装
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 class ThumbnailGenerator {
   constructor() {
@@ -266,7 +271,7 @@ class ThumbnailGenerator {
 }
 
 // 実行
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const generator = new ThumbnailGenerator();
   generator.generate().catch(error => {
     console.error('💥 予期しないエラーが発生しました:', error);
@@ -274,4 +279,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = ThumbnailGenerator;
+export default ThumbnailGenerator;

@@ -1,6 +1,7 @@
 {
   "name": "d3-thematika-scripts",
   "version": "1.0.0",
+  "type": "module",
   "description": "Utility scripts for d3-thematika development",
   "scripts": {
     "thumbnails": "node generate-thumbnails.js",

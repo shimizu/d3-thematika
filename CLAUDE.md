@@ -32,6 +32,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - プラットフォーム: Linux (WSL2)
 - 作業ディレクトリ: /home/shimizu/_make_libs/d3-thematika
+- Node.js: v16以上必須（ESMサポートのため）
+
+### コーディング規約
+
+- **モジュール形式**: 全てのJavaScriptコードはESM（ECMAScript Modules）形式を使用
+- **scripts/配下**: ESM形式（`import`/`export`）を使用、CommonJS（`require`/`module.exports`）は使用禁止
+- **インポート**: 常に`import`文を使用
+- **エクスポート**: `export`または`export default`を使用
 
 ## Git/GitHub設定
 

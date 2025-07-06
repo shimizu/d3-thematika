@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   // 対象デモページリスト
   pages: [
     'biutiful-map.html',
