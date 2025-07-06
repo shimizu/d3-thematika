@@ -1,14 +1,28 @@
 module.exports = {
-  // 対象デモページリスト（テスト用に1つのみ）
+  // 対象デモページリスト
   pages: [
-    'geojson-layer.html'
+    'biutiful-map.html',
+    'clip-polygon.html',
+    'cog-layer.html',
+    'geojson-layer.html',
+    'gis-utils.html',
+    'image-layer.html',
+    'legend-layer-layer.html',
+    'line-connection.html',
+    'line-text-layer.html',
+    'playground.html',
+    'point-annotation-layer.html',
+    'point-circle-layer.html',
+    'point-spike.html',
+    'point-text-layer.html',
+    'tile-map.html'
   ],
 
   // スクリーンショット設定
   screenshot: {
-    width: 800,
-    height: 600,
-    deviceScaleFactor: 2, // Retina対応で高品質
+    width: 400,
+    height: 300,
+    deviceScaleFactor: 1, // サムネイル用に標準解像度
     format: 'png',
     // PNGではqualityは使用不可、JPEGのみサポート
     // #map要素のみを撮影する設定

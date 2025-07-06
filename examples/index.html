@@ -42,17 +42,29 @@
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            padding: 20px;
+            padding: 0;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             text-decoration: none;
             color: inherit;
             display: block;
+            overflow: hidden;
         }
         
         .example-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.15);
             text-decoration: none;
+        }
+        
+        .example-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .example-content {
+            padding: 20px;
         }
         
         .example-title {
@@ -118,72 +130,93 @@
         <div class="category-header">基本レイヤー</div>
         <div class="examples-grid">
             <a href="geojson-layer.html" class="example-card">
-                <div class="example-title">GeoJSONレイヤー</div>
-                <div class="example-description">GeoJSONデータを表示する基本的なレイヤー。様々なスタイルオプションと動的スタイル関数の使用例。</div>
-                <div class="example-tags">
-                    <span class="tag">GeoJSON</span>
-                    <span class="tag">基本</span>
-                    <span class="tag">スタイル</span>
+                <img src="thumbnails/geojson-layer.png" alt="GeoJSONレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">GeoJSONレイヤー</div>
+                    <div class="example-description">GeoJSONデータを表示する基本的なレイヤー。様々なスタイルオプションと動的スタイル関数の使用例。</div>
+                    <div class="example-tags">
+                        <span class="tag">GeoJSON</span>
+                        <span class="tag">基本</span>
+                        <span class="tag">スタイル</span>
+                    </div>
                 </div>
             </a>
             
             <a href="point-circle-layer.html" class="example-card">
-                <div class="example-title">ポイント円レイヤー</div>
-                <div class="example-description">GeoJSONのフィーチャを円で表示するレイヤー。サイズや色を動的に変更できます。</div>
-                <div class="example-tags">
-                    <span class="tag">ポイント</span>
-                    <span class="tag">円</span>
-                    <span class="tag">動的サイズ</span>
+                <img src="thumbnails/point-circle-layer.png" alt="ポイント円レイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ポイント円レイヤー</div>
+                    <div class="example-description">GeoJSONのフィーチャを円で表示するレイヤー。サイズや色を動的に変更できます。</div>
+                    <div class="example-tags">
+                        <span class="tag">ポイント</span>
+                        <span class="tag">円</span>
+                        <span class="tag">動的サイズ</span>
+                    </div>
                 </div>
             </a>
             
             <a href="image-layer.html" class="example-card">
-                <div class="example-title">画像レイヤー</div>
-                <div class="example-description">画像データを地図投影に合わせて表示するレイヤー。衛星画像や地形データの表示に最適。</div>
-                <div class="example-tags">
-                    <span class="tag">画像</span>
-                    <span class="tag">投影変換</span>
-                    <span class="tag">境界ボックス</span>
+                <img src="thumbnails/image-layer.png" alt="画像レイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">画像レイヤー</div>
+                    <div class="example-description">画像データを地図投影に合わせて表示するレイヤー。衛星画像や地形データの表示に最適。</div>
+                    <div class="example-tags">
+                        <span class="tag">画像</span>
+                        <span class="tag">投影変換</span>
+                        <span class="tag">境界ボックス</span>
+                    </div>
                 </div>
             </a>
             
             <a href="point-text-layer.html" class="example-card">
-                <div class="example-title">ポイントテキストレイヤー</div>
-                <div class="example-description">GeoJSONのフィーチャにテキストラベルを表示するレイヤー。地名やラベルの表示に使用。</div>
-                <div class="example-tags">
-                    <span class="tag">テキスト</span>
-                    <span class="tag">ラベル</span>
-                    <span class="tag">フォント</span>
+                <img src="thumbnails/point-text-layer.png" alt="ポイントテキストレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ポイントテキストレイヤー</div>
+                    <div class="example-description">GeoJSONのフィーチャにテキストラベルを表示するレイヤー。地名やラベルの表示に使用。</div>
+                    <div class="example-tags">
+                        <span class="tag">テキスト</span>
+                        <span class="tag">ラベル</span>
+                        <span class="tag">フォント</span>
+                    </div>
                 </div>
             </a>
             
             <a href="point-annotation-layer.html" class="example-card">
-                <div class="example-title">ポイントアノテーションレイヤー</div>
-                <div class="example-description">GeoJSONポイントに詳細なアノテーション（注釈）を表示。サブジェクト形状、引き出し線、テキストボックスを柔軟にカスタマイズ可能。</div>
-                <div class="example-tags">
-                    <span class="tag">アノテーション</span>
-                    <span class="tag">コールアウト</span>
-                    <span class="tag">カスタマイズ</span>
+                <img src="thumbnails/point-annotation-layer.png" alt="ポイントアノテーションレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ポイントアノテーションレイヤー</div>
+                    <div class="example-description">GeoJSONポイントに詳細なアノテーション（注釈）を表示。サブジェクト形状、引き出し線、テキストボックスを柔軟にカスタマイズ可能。</div>
+                    <div class="example-tags">
+                        <span class="tag">アノテーション</span>
+                        <span class="tag">コールアウト</span>
+                        <span class="tag">カスタマイズ</span>
+                    </div>
                 </div>
             </a>
             
             <a href="point-spike.html" class="example-card">
-                <div class="example-title">ポイントスパイクレイヤー</div>
-                <div class="example-description">3Dスパイク（棒グラフ）でデータを可視化するレイヤー。人口や統計データの視覚的な表現に最適。</div>
-                <div class="example-tags">
-                    <span class="tag">3D</span>
-                    <span class="tag">スパイク</span>
-                    <span class="tag">統計</span>
+                <img src="thumbnails/point-spike.png" alt="ポイントスパイクレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ポイントスパイクレイヤー</div>
+                    <div class="example-description">3Dスパイク（棒グラフ）でデータを可視化するレイヤー。人口や統計データの視覚的な表現に最適。</div>
+                    <div class="example-tags">
+                        <span class="tag">3D</span>
+                        <span class="tag">スパイク</span>
+                        <span class="tag">統計</span>
+                    </div>
                 </div>
             </a>
             
             <a href="legend-layer-layer.html" class="example-card">
-                <div class="example-title">凡例レイヤー</div>
-                <div class="example-description">地図の凡例を自動生成するレイヤー。D3スケールと連携して様々な凡例タイプに対応。</div>
-                <div class="example-tags">
-                    <span class="tag">凡例</span>
-                    <span class="tag">スケール</span>
-                    <span class="tag">自動生成</span>
+                <img src="thumbnails/legend-layer-layer.png" alt="凡例レイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">凡例レイヤー</div>
+                    <div class="example-description">地図の凡例を自動生成するレイヤー。D3スケールと連携して様々な凡例タイプに対応。</div>
+                    <div class="example-tags">
+                        <span class="tag">凡例</span>
+                        <span class="tag">スケール</span>
+                        <span class="tag">自動生成</span>
+                    </div>
                 </div>
             </a>
         </div>
@@ -191,22 +224,28 @@
         <div class="category-header">ライン接続レイヤー</div>
         <div class="examples-grid">
             <a href="line-connection.html" class="example-card">
-                <div class="example-title">ライン接続レイヤー</div>
-                <div class="example-description">頂点を直線・弧またはスムージングしてで結ぶレイヤー。都市間の接続や移動経路の可視化に使用。</div>
-                <div class="example-tags">
-                    <span class="tag">線</span>
-                    <span class="tag">接続</span>
-                    <span class="tag">弧</span>
+                <img src="thumbnails/line-connection.png" alt="ライン接続レイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ライン接続レイヤー</div>
+                    <div class="example-description">頂点を直線・弧またはスムージングしてで結ぶレイヤー。都市間の接続や移動経路の可視化に使用。</div>
+                    <div class="example-tags">
+                        <span class="tag">線</span>
+                        <span class="tag">接続</span>
+                        <span class="tag">弧</span>
+                    </div>
                 </div>
             </a>
             
             <a href="line-text-layer.html" class="example-card">
-                <div class="example-title">ラインテキストレイヤー</div>
-                <div class="example-description">LineString上にテキストを配置するレイヤー。ライン方向への自動回転、位置指定、複数配置に対応。</div>
-                <div class="example-tags">
-                    <span class="tag">テキスト</span>
-                    <span class="tag">ライン</span>
-                    <span class="tag">回転</span>
+                <img src="thumbnails/line-text-layer.png" alt="ラインテキストレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">ラインテキストレイヤー</div>
+                    <div class="example-description">LineString上にテキストを配置するレイヤー。ライン方向への自動回転、位置指定、複数配置に対応。</div>
+                    <div class="example-tags">
+                        <span class="tag">テキスト</span>
+                        <span class="tag">ライン</span>
+                        <span class="tag">回転</span>
+                    </div>
                 </div>
             </a>
             
@@ -215,12 +254,15 @@
         <div class="category-header">統合デモ</div>
         <div class="examples-grid">
             <a href="biutiful-map.html" class="example-card">
-                <div class="example-title">美しい主題図</div>
-                <div class="example-description">複数のレイヤーを組み合わせた美しい主題図のサンプル。完成度の高いマップ作成の参考例。</div>
-                <div class="example-tags">
-                    <span class="tag">統合</span>
-                    <span class="tag">デモ</span>
-                    <span class="tag">美しい</span>
+                <img src="thumbnails/biutiful-map.png" alt="美しい主題図" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">美しい主題図</div>
+                    <div class="example-description">複数のレイヤーを組み合わせた美しい主題図のサンプル。完成度の高いマップ作成の参考例。</div>
+                    <div class="example-tags">
+                        <span class="tag">統合</span>
+                        <span class="tag">デモ</span>
+                        <span class="tag">美しい</span>
+                    </div>
                 </div>
             </a>
         </div>
@@ -228,52 +270,67 @@
         <div class="category-header">エフェクト・ユーティリティ</div>
         <div class="examples-grid">
             <a href="clip-polygon.html" class="example-card">
-                <div class="example-title">クリップポリゴン</div>
-                <div class="example-description">ポリゴンの形状でマップをクリップする機能のデモ。特定の領域のみを表示したい場合に使用。</div>
-                <div class="example-tags">
-                    <span class="tag">クリップ</span>
-                    <span class="tag">マスク</span>
-                    <span class="tag">領域制限</span>
+                <img src="thumbnails/clip-polygon.png" alt="クリップポリゴン" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">クリップポリゴン</div>
+                    <div class="example-description">ポリゴンの形状でマップをクリップする機能のデモ。特定の領域のみを表示したい場合に使用。</div>
+                    <div class="example-tags">
+                        <span class="tag">クリップ</span>
+                        <span class="tag">マスク</span>
+                        <span class="tag">領域制限</span>
+                    </div>
                 </div>
             </a>
             
             <a href="gis-utils.html" class="example-card">
-                <div class="example-title">GISユーティリティ</div>
-                <div class="example-description">地理空間データ処理のユーティリティ関数の使用例。座標変換や距離計算など。</div>
-                <div class="example-tags">
-                    <span class="tag">GIS</span>
-                    <span class="tag">ユーティリティ</span>
-                    <span class="tag">計算</span>
+                <img src="thumbnails/gis-utils.png" alt="GISユーティリティ" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">GISユーティリティ</div>
+                    <div class="example-description">地理空間データ処理のユーティリティ関数の使用例。座標変換や距離計算など。</div>
+                    <div class="example-tags">
+                        <span class="tag">GIS</span>
+                        <span class="tag">ユーティリティ</span>
+                        <span class="tag">計算</span>
+                    </div>
                 </div>
             </a>
             
             <a href="cog-layer.html" class="example-card">
-                <div class="example-title">COGレイヤー</div>
-                <div class="example-description">Cloud Optimized GeoTIFF (COG) データの表示と処理のデモ。大容量地理空間ラスターデータの効率的な読み込み。</div>
-                <div class="example-tags">
-                    <span class="tag">COG</span>
-                    <span class="tag">GeoTIFF</span>
-                    <span class="tag">ラスター</span>
+                <img src="thumbnails/cog-layer.png" alt="COGレイヤー" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">COGレイヤー</div>
+                    <div class="example-description">Cloud Optimized GeoTIFF (COG) データの表示と処理のデモ。大容量地理空間ラスターデータの効率的な読み込み。</div>
+                    <div class="example-tags">
+                        <span class="tag">COG</span>
+                        <span class="tag">GeoTIFF</span>
+                        <span class="tag">ラスター</span>
+                    </div>
                 </div>
             </a>
             
             <a href="tile-map.html" class="example-card">
-                <div class="example-title">タイル地図</div>
-                <div class="example-description">タイル地図システムのデモ。Web地図タイルの表示とタイル座標計算ユーティリティの使用例。</div>
-                <div class="example-tags">
-                    <span class="tag">タイル</span>
-                    <span class="tag">地図</span>
-                    <span class="tag">座標計算</span>
+                <img src="thumbnails/tile-map.png" alt="タイル地図" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">タイル地図</div>
+                    <div class="example-description">タイル地図システムのデモ。Web地図タイルの表示とタイル座標計算ユーティリティの使用例。</div>
+                    <div class="example-tags">
+                        <span class="tag">タイル</span>
+                        <span class="tag">地図</span>
+                        <span class="tag">座標計算</span>
+                    </div>
                 </div>
             </a>
             
             <a href="playground.html" class="example-card">
-                <div class="example-title">プレイグラウンド</div>
-                <div class="example-description">複数の機能を組み合わせた実験的なデモ。新しいアイデアやテスト用。</div>
-                <div class="example-tags">
-                    <span class="tag">実験</span>
-                    <span class="tag">複合</span>
-                    <span class="tag">テスト</span>
+                <img src="thumbnails/playground.png" alt="プレイグラウンド" class="example-thumbnail">
+                <div class="example-content">
+                    <div class="example-title">プレイグラウンド</div>
+                    <div class="example-description">複数の機能を組み合わせた実験的なデモ。新しいアイデアやテスト用。</div>
+                    <div class="example-tags">
+                        <span class="tag">実験</span>
+                        <span class="tag">複合</span>
+                        <span class="tag">テスト</span>
+                    </div>
                 </div>
             </a>
         </div>
