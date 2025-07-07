@@ -196,7 +196,7 @@ map.addLayer('world_new', worldLayer);
             const height = document.querySelector(id).clientHeight;
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-            const geojson = await d3.json('./geojson/world.geojson');
+            const geojson = await d3.json('./geojson/takasaki/bulding_single.geojson');
 
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[10,0], [width-10, height]], geojson);
