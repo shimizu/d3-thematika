@@ -20,8 +20,8 @@ export default {
 
   // スクリーンショット設定
   screenshot: {
-    width: 400,
-    height: 300,
+    width: 640,        // 16:9のアスペクト比
+    height: 360,       // 640÷16×9=360
     deviceScaleFactor: 1, // サムネイル用に標準解像度
     format: 'png',
     // PNGではqualityは使用不可、JPEGのみサポート
@@ -54,7 +54,7 @@ export default {
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
       '--disable-gpu',
-      '--window-size=1200,800'
+      '--window-size=1920,1080'  // 16:9のフルHDサイズ
     ]
   },
 
