@@ -648,93 +648,92 @@ map.addLayer('world', worldLayer);</pre>
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
 
+
+            const woodtype = Thematika.createCustomFilter('woodtype', `
+       <!-- COLOR -->
+          <feFlood flood-color="#73DCFF" flood-opacity="0.75" result="COLOR-blu" />
+          <feFlood flood-color="#9673FF" flood-opacity="0.4" result="COLOR-red" />
+          <!-- COLOR END -->
+
+          <!-- Texture -->
+          <feTurbulence baseFrequency=".05" type="fractalNoise" numOctaves="3" seed="0" result="Texture_10" />
+          <feColorMatrix type="matrix"
+          values="0 0 0 0 0,
+          0 0 0 0 0,
+          0 0 0 0 0,
+          0 0 0 -2.1 1.1" in="Texture_10"  result="Texture_20" />
+
+          <feColorMatrix result="Texture_30" type="matrix"
+          values="0 0 0 0 0,
+          0 0 0 0 0,
+          0 0 0 0 0,
+          0 0 0 -1.7 1.8" in="Texture_10" />
+          <!-- Texture -->
+
+          <!-- FILL -->
+          <feOffset dx="-1" dy="2" in="SourceAlpha" result="FILL_10"/>
+          <feDisplacementMap scale="17" in="FILL_10" in2="Texture_10" result="FILL_20" />
+          <feComposite operator="in" in="Texture_30" in2 = "FILL_20" result="FILL_40"/>
+          <feComposite operator="in" in="COLOR-blu" in2="FILL_40" result="FILL_50" />
+          <!-- FILL END-->
+
+          <!-- OUTLINE -->
+          <feMorphology operator="dilate" radius="3" in="SourceAlpha" result="OUTLINE_10" />
+          <feComposite operator="out" in="OUTLINE_10" in2 = "SourceAlpha" result="OUTLINE_20" />
+          <feDisplacementMap scale="7" in="OUTLINE_20" in2="Texture_10" result="OUTLINE_30" />
+          <feComposite operator="arithmetic" k2="-1" k3="1" in="Texture_20" in2="OUTLINE_30" result="OUTLINE_40" />
+          <!-- OUTLINE END-->
+
+          <!-- BEVEL OUTLINE -->
+          <feConvolveMatrix order="8,8" divisor="1"
+            kernelMatrix="1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 1 " in="SourceAlpha" result="BEVEL_10" />
+          <feMorphology operator="dilate" radius="2" in="BEVEL_10" result="BEVEL_20" />
+          <feComposite operator="out" in="BEVEL_20" in2="BEVEL_10" result="BEVEL_30"/>
+          <feDisplacementMap scale="7" in="BEVEL_30" in2="Texture_10" result="BEVEL_40" />
+          <feComposite operator="arithmetic" k2="-1" k3="1" in="Texture_20" in2="BEVEL_40" result="BEVEL_50" />
+          <feOffset dx="-7" dy="-7" in="BEVEL_50" result="BEVEL_60"/>
+          <feComposite operator="out" in="BEVEL_60" in2 = "OUTLINE_10" result="BEVEL_70" />
+          <!-- BEVEL OUTLINE END -->
+
+          <!-- BEVEL FILL -->
+          <feOffset dx="-9" dy="-9" in="BEVEL_10" result="BEVEL-FILL_10"/>
+          <feComposite operator="out" in="BEVEL-FILL_10" in2 = "OUTLINE_10" result="BEVEL-FILL_20" />
+          <feDisplacementMap scale="17" in="BEVEL-FILL_20" in2="Texture_10" result="BEVEL-FILL_30" />
+          <feComposite operator="in" in="COLOR-red" in2="BEVEL-FILL_30" result="BEVEL-FILL_50" /> <!-- -->
+          <!-- BEVEL FILL END-->
+
+          <feMerge  result="merge2">
+           <feMergeNode in="BEVEL-FILL_50" />
+           <feMergeNode in="BEVEL_70" />
+           <feMergeNode in="FILL_50" />
+            <feMergeNode in="OUTLINE_40" />
+          </feMerge>
+            
+            `);
+
             // 地図を作成
             map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor: '#dafaff',
+                defs:[woodtype]
             });
 
-            // グラデーション定義
-            const svg = d3.select("#map svg");
-            const defs = svg.append("defs");
-            
-            // 国ごとのグラデーション
-            const gradient1 = defs.append("linearGradient")
-                .attr("id", "country-gradient-1")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", "0%").attr("y1", "0%")
-                .attr("x2", "100%").attr("y2", "100%");
-            
-            gradient1.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", "#6366f1");
-            
-            gradient1.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", "#8b5cf6");
-            
-            const gradient2 = defs.append("linearGradient")
-                .attr("id", "country-gradient-2")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", "0%").attr("y1", "0%")
-                .attr("x2", "100%").attr("y2", "100%");
-            
-            gradient2.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", "#ec4899");
-            
-            gradient2.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", "#f97316");
-
-            // ドロップシャドウフィルター
-            const filter = defs.append("filter")
-                .attr("id", "drop-shadow")
-                .attr("height", "130%");
-            
-            filter.append("feGaussianBlur")
-                .attr("in", "SourceAlpha")
-                .attr("stdDeviation", 3);
-            
-            filter.append("feOffset")
-                .attr("dx", 0)
-                .attr("dy", 2)
-                .attr("result", "offsetblur");
-            
-            const feMerge = filter.append("feMerge");
-            feMerge.append("feMergeNode");
-            feMerge.append("feMergeNode")
-                .attr("in", "SourceGraphic");
 
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill": (d, i) => i % 2 === 0 ? "url(#country-gradient-1)" : "url(#country-gradient-2)",
-                    "filter": "url(#drop-shadow)",
+                    "fill": (d, i) => i % 2 === 0 ? "#8b5cf6" : "#ec4899",
+                    "filter": "url(#woodtype)",
                     "stroke": '#ffffff',
                     "stroke-width": 0.5,
                     "opacity": 0.8,
                     "cursor": "pointer"
                 },
-                on: {
-                    "mouseover": function(event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr("opacity", 1)
-                            .attr("stroke-width", 2);
-                    },
-                    "mouseout": function(event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr("opacity", 0.8)
-                            .attr("stroke-width", 0.5);
-                    }
-                }
+
             });
 
             // OutlineLayerインスタンスを作成

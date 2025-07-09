@@ -51,7 +51,8 @@ export default {
       port: 3000,
       headers: {
         'Access-Control-Allow-Origin': '*'
-      }
+      },
+      cleanUrls: false,
     }),
     !production && livereload('examples')
   ].filter(Boolean)

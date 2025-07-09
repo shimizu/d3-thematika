@@ -306,7 +306,7 @@ export const FilterPresets = {
  */
 export function createCustomFilter(id: string, filterContent: string) {
   return (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
-    const filterContainer = defs.append('g');
+    const filterContainer = defs.append('defs');
     filterContainer.html(`<filter id="${id}">${filterContent}</filter>`);
   };
 }
