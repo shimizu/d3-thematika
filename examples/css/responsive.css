@@ -62,9 +62,6 @@
         padding: 1.5rem;
     }
     
-    #map {
-        height: 400px;
-    }
     
     .section-title {
         font-size: 1.8rem;
@@ -133,9 +130,6 @@
         font-size: 0.9rem;
     }
     
-    #map {
-        height: 300px;
-    }
     
     .section-title {
         font-size: 1.5rem;
@@ -198,9 +192,6 @@
         padding: 0.75rem;
     }
     
-    #map {
-        height: 250px;
-    }
     
     .info-box {
         padding: 0.5rem;
@@ -230,9 +221,6 @@
         margin-bottom: 2rem;
     }
     
-    #map {
-        height: 350px;
-    }
 }
 
 /* 印刷対応 */
