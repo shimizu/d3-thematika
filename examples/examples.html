@@ -5,39 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>d3-thematika | Examples Gallery</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --dark-lighter: #1e293b;
-            --dark-light: #334155;
-            --gray: #64748b;
-            --gray-light: #94a3b8;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            --gradient-reverse: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--dark);
-            color: var(--white);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* ヒーローセクション */
+        /* Examples Gallery特有のヒーローセクション */
         .hero {
             position: relative;
             padding: 8rem 2rem 4rem;
@@ -97,24 +69,7 @@
             }
         }
 
-        /* メインコンテナ */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
         /* カテゴリーヘッダー */
-        .category-section {
-            margin-bottom: 4rem;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .category-header {
             display: flex;
             align-items: center;
@@ -282,39 +237,6 @@
             50% { transform: scale(1.05); }
         }
 
-        /* フッター */
-        .footer {
-            margin-top: 6rem;
-            padding: 3rem 0;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-content {
-            color: var(--gray-light);
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .footer-link {
-            color: var(--primary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .footer-link:hover {
-            color: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
         /* 統計セクション */
         .stats-section {
             display: grid;
@@ -345,7 +267,22 @@
             font-size: 1rem;
         }
 
-        /* レスポンシブ */
+        /* ローディングアニメーション */
+        .loading-shimmer {
+            background: linear-gradient(90deg, 
+                var(--dark-lighter) 0%, 
+                var(--dark-light) 50%, 
+                var(--dark-lighter) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* examples.html専用レスポンシブ */
         @media (max-width: 768px) {
             .hero {
                 padding: 4rem 1rem 2rem;
@@ -360,40 +297,6 @@
                 grid-template-columns: repeat(2, 1fr);
                 padding: 2rem;
             }
-        }
-
-        /* スクロールバー */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--dark-light);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray);
-        }
-
-        /* ローディングアニメーション */
-        .loading-shimmer {
-            background: linear-gradient(90deg, 
-                var(--dark-lighter) 0%, 
-                var(--dark-light) 50%, 
-                var(--dark-lighter) 100%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
         }
     </style>
 </head>

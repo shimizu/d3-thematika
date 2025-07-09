@@ -6,116 +6,93 @@
     <title>ClipPolygon Effect - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* clip-polygon.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>ClipPolygon Effect デモ</h1>
-        <p class="description">
-            createClipPolygon関数を使用してGeoJSONポリゴンでクリップパスを作成し、
-            レイヤーに適用する例を示します。日本の範囲で世界地図をクリップします。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                <li>クリップデータ: examples/geojson/japan/pref.geojson（日本の都道府県データ）</li>
-                <li>エフェクト: createClipPolygonで日本の範囲でクリップ</li>
-                <li>機能: クリップパスのON/OFF切り替え</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">ClipPolygon Effect</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="clip-toggle" checked>
-                    日本の範囲でクリップ
-                </label>
+        <section>
+            <h2 class="section-title">ClipPolygon Effect デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗾 クリップポリゴン機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>クリップデータ: examples/geojson/japan/pref.geojson（日本の都道府県データ）</li>
+                    <li>エフェクト: createClipPolygonで日本の範囲でクリップ</li>
+                    <li>機能: クリップパスのON/OFF切り替え</li>
+                </ul>
             </div>
 
-        </div>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label>クリップ設定</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="clip-toggle" checked>
+                        <label for="clip-toggle">日本の範囲でクリップ</label>
+                    </div>
+                </div>
+            </div>
 
-        <div id="map"></div>
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
 
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// createClipPolygonの使用例
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>createClipPolygonの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">
+// createClipPolygonの使用例
 
 // アフリカ大陸outlineデータを読み込み
 const aflicaClipGeoJSON = await d3.json('./geojson/aflica.geojson');
@@ -158,7 +135,9 @@ map.addLayer('raster', imageLayer);
 
 
 
-        </div>
+                </pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
@@ -243,6 +222,37 @@ map.addLayer('raster', imageLayer);
 
         draw()
 
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
 
         // クリップトグルのイベントハンドラ
         document.getElementById('clip-toggle').addEventListener('change', (e) => {

@@ -6,155 +6,106 @@
     <title>GIS Utilities - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* gis-utils.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
-        }
-        .info-panel {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            padding: 15px;
-            margin: 20px 0;
-        }
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        .info-item {
-            padding: 10px;
-            background-color: white;
-            border-radius: 4px;
-            border: 1px solid #e9ecef;
-        }
-        .info-label {
-            font-weight: bold;
-            color: #495057;
-            margin-bottom: 5px;
-        }
-        .info-value {
-            font-family: monospace;
-            font-size: 0.9em;
-            color: #6c757d;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>GIS Utilities デモ</h1>
-        <p class="description">
-            GIS関連ユーティリティ関数（getBbox、getCentroid等）の使用例を示します。
-            日本のデータを例に、境界ボックスや中心点の計算結果を可視化します。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                <li>GIS関数: getBbox（境界ボックス）、getCentroid（中心点）、getBboxCenter（BBox中心）、expandBbox（BBox拡張）</li>
-                <li>可視化: 選択した国の境界ボックスと中心点を表示</li>
-            </ul>
-        </div>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="country-select">国を選択:</label>
-                <select id="country-select">
-                    <option value="Japan" selected>日本</option>
-                    <option value="United States of America">アメリカ</option>
-                    <option value="China">中国</option>
-                    <option value="Brazil">ブラジル</option>
-                    <option value="Australia">オーストラリア</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label for="padding-slider">BBox拡張パディング: <span id="padding-value">0.2</span></label>
-                <input type="range" id="padding-slider" min="0" max="0.5" step="0.05" value="0.2">
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
             </div>
         </div>
+    </nav>
 
-        <div id="map"></div>
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">GIS Utilities</li>
+            </ol>
+        </nav>
 
-        <div class="info-panel">
-            <h3>計算結果</h3>
-            <div id="info-content" class="info-grid">
-                <!-- 計算結果がここに表示されます -->
+        <section>
+            <h2 class="section-title">GIS Utilities デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗺 GIS関連ユーティリティ機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>GIS関数: getBbox（境界ボックス）、getCentroid（中心点）、getBboxCenter（BBox中心）、expandBbox（BBox拡張）</li>
+                    <li>可視化: 選択した国の境界ボックスと中心点を表示</li>
+                </ul>
             </div>
-        </div>
 
-        <div class="code-example">
-            <pre>// GIS Utilities の使用例
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="country-select">国を選択</label>
+                    <select id="country-select">
+                        <option value="Japan" selected>日本</option>
+                        <option value="United States of America">アメリカ</option>
+                        <option value="China">中国</option>
+                        <option value="Brazil">ブラジル</option>
+                        <option value="Australia">オーストラリア</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="padding-slider">BBox拡張パディング: <span id="padding-value">0.2</span></label>
+                    <input type="range" id="padding-slider" min="0" max="0.5" step="0.05" value="0.2">
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+
+            <!-- 計算結果パネル -->
+            <div class="info-box">
+                <h3>計算結果</h3>
+                <div id="info-content" class="info-grid">
+                    <!-- 計算結果がここに表示されます -->
+                </div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>GIS Utilities の使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// GIS Utilities の使用例
 // 日本のデータを取得
 const japan = worldData.features.find(f => f.properties.name === 'Japan');
 
@@ -179,13 +130,46 @@ const dimensions = Thematika.getBboxDimensions(bbox);
 
 const isValid = Thematika.isValidGeoJSON(japan);
 // true</pre>
-        </div>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         let worldData = null;
         let map = null;
         let selectedCountryName = 'Japan';

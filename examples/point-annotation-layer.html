@@ -3,194 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PointAnnotationLayer - d3-thematika</title>
+    <title>Point Annotation Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* point-annotation-layer.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
+        }
+        
+        .control-item .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .control-item .slider-wrapper input[type="range"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .control-item .slider-wrapper .value-display {
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .control-item input[type="color"] {
+            width: 60px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>PointAnnotationLayer デモ</h1>
-        <p class="description">
-            PointAnnotationLayerを使用してGeoJSONポイントデータにアノテーション（注釈）を表示します。
-            様々なアノテーションタイプと設定オプションを試すことができます。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>データ: 主要都市のサンプルデータ（東京、ニューヨーク、パリ、ロンドン、北京、モスクワ）</li>
-                <li>レイヤー: PointAnnotationLayer（アノテーション）、GraticuleLayer（経緯線）</li>
-                <li>機能: アノテーションタイプ切り替え、位置調整、スタイルカスタマイズ</li>
-            </ul>
-        </div>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="annotation-type">アノテーションタイプ:</label>
-                <select id="annotation-type">
-                    <option value="callout" selected>Callout</option>
-                    <option value="calloutElbow">Callout Elbow</option>
-                    <option value="calloutCurve">Callout Curve</option>
-                    <option value="label">Label</option>
-                    <option value="badge">Badge</option>
-                    <option value="calloutCircle">Callout Circle</option>
-                    <option value="calloutRect">Callout Rect</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="show-title">タイトル表示:</label>
-                <input type="checkbox" id="show-title">
-            </div>
-            
-            <div class="control-group">
-                <label for="offset-x">X軸オフセット: <span id="offset-x-value">30</span></label>
-                <input type="range" id="offset-x" min="-100" max="100" step="5" value="30">
-            </div>
-            
-            <div class="control-group">
-                <label for="offset-y">Y軸オフセット: <span id="offset-y-value">-20</span></label>
-                <input type="range" id="offset-y" min="-100" max="100" step="5" value="-20">
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-type">サブジェクトタイプ:</label>
-                <select id="subject-type">
-                    <option value="point" selected>Point</option>
-                    <option value="circle">Circle</option>
-                    <option value="rect">Rectangle</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-radius">サブジェクト半径: <span id="subject-radius-value">3</span></label>
-                <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-width">サブジェクト幅: <span id="subject-width-value">16</span></label>
-                <input type="range" id="subject-width" min="1" max="400" step="1" value="16">
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-height">サブジェクト高さ: <span id="subject-height-value">16</span></label>
-                <input type="range" id="subject-height" min="1" max="400" step="1" value="16">
-            </div>
-            
-            
-            <div class="control-group">
-                <label for="subject-stroke">サブジェクト境界線色:</label>
-                <input type="color" id="subject-stroke" value="#000000">
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-stroke-width">サブジェクト境界線太さ: <span id="subject-stroke-width-value">1</span></label>
-                <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
-            </div>
-            
-            <div class="control-group">
-                <label for="subject-stroke-dasharray">サブジェクト境界線ダッシュパターン:</label>
-                <select id="subject-stroke-dasharray">
-                    <option value="none" selected>なし (実線)</option>
-                    <option value="2,2">短い点線 (2,2)</option>
-                    <option value="4,4">点線 (4,4)</option>
-                    <option value="8,4">長い点線 (8,4)</option>
-                    <option value="2,4,2">ドット・ダッシュ (2,4,2)</option>
-                    <option value="4,2,1,2">複合パターン (4,2,1,2)</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="note-background">ノート背景色:</label>
-                <input type="color" id="note-background" value="#ffffff">
-            </div>
-            
-            <div class="control-group">
-                <label for="note-padding">ノートパディング: <span id="note-padding-value">4</span></label>
-                <input type="range" id="note-padding" min="0" max="20" step="1" value="4">
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
             </div>
         </div>
+    </nav>
 
-        <div id="map"></div>
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Annotation Layer</li>
+            </ol>
+        </nav>
 
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// PointAnnotationLayerの使用例
+        <section>
+            <h2 class="section-title">Point Annotation Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📝 PointAnnotationLayer機能</h3>
+                <ul>
+                    <li>データ: 主要都市のサンプルデータ（東京、ニューヨーク、パリ、ロンドン、北京、モスクワ）</li>
+                    <li>レイヤー: PointAnnotationLayer（アノテーション）、GraticuleLayer（経緯線）</li>
+                    <li>機能: アノテーションタイプ切り替え、位置調整、スタイルカスタマイズ</li>
+                    <li>特徴: 複数のアノテーションタイプ、オフセット調整、サブジェクト設定</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="annotation-type">アノテーションタイプ</label>
+                    <select id="annotation-type">
+                        <option value="callout" selected>Callout</option>
+                        <option value="calloutElbow">Callout Elbow</option>
+                        <option value="calloutCurve">Callout Curve</option>
+                        <option value="label">Label</option>
+                        <option value="badge">Badge</option>
+                        <option value="calloutCircle">Callout Circle</option>
+                        <option value="calloutRect">Callout Rect</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-type">サブジェクトタイプ</label>
+                    <select id="subject-type">
+                        <option value="point" selected>Point</option>
+                        <option value="circle">Circle</option>
+                        <option value="rect">Rectangle</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>X軸オフセット</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="offset-x" min="-100" max="100" step="5" value="30">
+                        <span class="value-display" id="offset-x-value">30</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>Y軸オフセット</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="offset-y" min="-100" max="100" step="5" value="-20">
+                        <span class="value-display" id="offset-y-value">-20</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト半径</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
+                        <span class="value-display" id="subject-radius-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト幅</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="subject-width" min="1" max="400" step="1" value="16">
+                        <span class="value-display" id="subject-width-value">16</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト高さ</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="subject-height" min="1" max="400" step="1" value="16">
+                        <span class="value-display" id="subject-height-value">16</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-stroke">サブジェクト境界線色</label>
+                    <input type="color" id="subject-stroke" value="#000000">
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト境界線太さ</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
+                        <span class="value-display" id="subject-stroke-width-value">1</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-stroke-dasharray">サブジェクト境界線ダッシュパターン</label>
+                    <select id="subject-stroke-dasharray">
+                        <option value="none" selected>なし (実線)</option>
+                        <option value="2,2">短い点線 (2,2)</option>
+                        <option value="4,4">点線 (4,4)</option>
+                        <option value="8,4">長い点線 (8,4)</option>
+                        <option value="2,4,2">ドット・ダッシュ (2,4,2)</option>
+                        <option value="4,2,1,2">複合パターン (4,2,1,2)</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="note-background">ノート背景色</label>
+                    <input type="color" id="note-background" value="#ffffff">
+                </div>
+                
+                <div class="control-item">
+                    <label>ノートパディング</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="note-padding" min="0" max="20" step="1" value="4">
+                        <span class="value-display" id="note-padding-value">4</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-title">
+                        <label for="show-title">タイトル表示</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointAnnotationLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointAnnotationLayerの使用例
 
 // 主要都市データ
 const citiesData = {
@@ -255,14 +282,47 @@ const annotationLayer = new Thematika.PointAnnotationLayer({
 });
 
 // レイヤーを地図に追加
-map.addLayer('annotations', annotationLayer);
-        </div>
+map.addLayer('annotations', annotationLayer);</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         let map = null;
         let annotationLayer = null;
         let annotationType = 'callout';

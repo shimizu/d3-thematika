@@ -3,151 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImageLayer - d3-thematika</title>
+    <title>Image Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* image-layer.html固有のスタイル */
         #map {
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>ImageLayer デモ</h1>
-        <p class="description">
-            ImageLayerを使用して地図上にラスター画像を表示します。
-            Equirectangular投影法の場合は高速に描画し、その他の投影法では画像を変換して表示します。
-        </p>
-
-        <div class="note">
-            <strong>テスト画像:</strong> 
-            <ul>
-                <li>画像: examples/img/africa_img.png</li>
-                <li>範囲: 西経25.86°〜東経66.43°、南緯38.48°〜北緯41.48°（アフリカ地域）</li>
-                <li>Equirectangular以外の投影法では、画像サイズは1000×1000ピクセル以下に制限されます。</li>
-                <li>投影法を変更して変換処理の動作を確認できます。</li>
-            </ul>
-        </div>
-
-        <div class="controls">
-            <div class="control-group">
-                <label for="projection-select">投影法:</label>
-                <select id="projection-select">
-                    <option value="equirectangular" selected>Equirectangular (高速)</option>
-                    <option value="mercator">Mercator</option>
-                    <option value="naturalEarth1">Natural Earth</option>
-                    <option value="orthographic">Orthographic</option>
-                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="bbox-markers-checkbox">
-                    Bboxマーカー表示
-                </label>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
             </div>
         </div>
+    </nav>
 
-        <div class="map-container">
-            <div id="map"></div>
-        </div>
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Image Layer</li>
+            </ol>
+        </nav>
 
-        <div class="code-example">
-            <pre>// ImageLayerの使用例（アフリカ画像）
+        <section>
+            <h2 class="section-title">Image Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗺 ImageLayer機能</h3>
+                <ul>
+                    <li>画像: examples/img/africa_img.png（アフリカ地域）</li>
+                    <li>範囲: 西経25.86°〜東経66.43°、南緯38.48°〜北緯41.48°</li>
+                    <li>機能: 投影法による画像変換、境界ボックスマーカー、透明度制御</li>
+                    <li>注意: Equirectangular以外では画像サイズが1000×1000ピクセル以下に制限</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular (高速)</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="bbox-markers-checkbox">
+                        <label for="bbox-markers-checkbox">Bboxマーカー表示</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>ImageLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// ImageLayerの使用例（アフリカ画像）
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 400,
-    projection: d3.geoEquirectangular()
+    projection: d3.geoEquirectangular(),
+    backgroundColor: "#e6f3ff"
+});
+
+// 背景レイヤー（世界地図）
+const backgroundLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        "fill": '#ffffff',
+        "stroke": '#ff0000',
+        "stroke-width": 2
+    }
 });
 
 // ラスター画像レイヤーの追加
 const imageLayer = new Thematika.ImageLayer('raster', {
     src: './img/africa_img.png',
     bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
-    style: { "opacity": 0.7 }
+    style: { 
+        "opacity": 0.7 
+    },
+    showBboxMarkers: false // 境界ボックスマーカーの表示
+});
+
+// 経緯線レイヤー
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [15, 15],
+    attr: {
+        "stroke": '#999999',
+        "stroke-width": 0.5,
+        "stroke-dasharray": '2,2'
+    }
 });
 
 // 投影法を設定
 imageLayer.setProjection(map.getProjection());
+
+// レイヤーを地図に追加
+map.addLayer('countries', backgroundLayer);
+map.addLayer('graticule', graticuleLayer);
 map.addLayer('raster', imageLayer);</pre>
-        </div>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
-    <script type="module">
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
 
         // 地図の初期化
         let currentProjection = d3.geoEquirectangular();
@@ -159,6 +197,11 @@ map.addLayer('raster', imageLayer);</pre>
         async function draw() {
             // 既存の地図を削除
             d3.select('#map').selectAll('*').remove();
+
+            // 地図の寸法を取得
+            const mapElement = document.querySelector('#map');
+            const width = mapElement.clientWidth;
+            const height = mapElement.clientHeight;
 
             // 世界地図データを読み込み（初回のみ）
             if (!worldData) {
@@ -173,15 +216,15 @@ map.addLayer('raster', imageLayer);</pre>
             console.log('GeoJSON data loaded:', geojson);
 
             // 投影法を地図データに合わせて設定
-            currentProjection.fitExtent([[10, 10], [790, 390]], aoi);
+            currentProjection.fitExtent([[10, 10], [width-10, height-10]], aoi);
 
             // 地図を作成
             map = new Thematika.Map({
                 container: '#map',
-                width: 800,
-                height: 400,
+                width: width,
+                height: height,
                 projection: currentProjection,
-                backgroundColor:"#e6f3ff"
+                backgroundColor: "#e6f3ff"
             });
 
             // 背景レイヤー（国境）
@@ -200,14 +243,12 @@ map.addLayer('raster', imageLayer);</pre>
                 src: './img/africa_img.png',
                 bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
                 style: { 
-                    "opacity": 0.7  // todo:画像の不透明度
+                    "opacity": 0.7  // 画像の不透明度
                 },
                 showBboxMarkers: showBboxMarkers
             });
 
             imageLayer.setProjection(currentProjection);
-            
-
 
             // 経緯線レイヤー
             graticuleLayer = new Thematika.GraticuleLayer({
@@ -222,10 +263,7 @@ map.addLayer('raster', imageLayer);</pre>
             map.addLayer('countries', backgroundLayer);
             map.addLayer('graticule', graticuleLayer);
             map.addLayer('raster', imageLayer);
-
         }
-
-        draw();
 
         // コントロールのイベントハンドラ
         document.getElementById('projection-select').addEventListener('change', (e) => {
@@ -263,6 +301,9 @@ map.addLayer('raster', imageLayer);</pre>
                 draw();
             }, 250);
         });
+
+        // 初期化
+        draw();
     </script>
 </body>
 </html>

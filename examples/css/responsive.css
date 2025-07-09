@@ -1,0 +1,278 @@
+/* ==================================================
+   d3-thematika共通スタイル - レスポンシブ対応
+   ================================================== */
+
+/* タブレット対応 */
+@media (max-width: 1024px) {
+    .nav-links {
+        gap: 1.5rem;
+    }
+    
+    .main-container {
+        padding: 1.5rem;
+        padding-top: 90px;
+    }
+    
+    .controls-panel {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+}
+
+/* モバイル対応 */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 1rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .nav-brand {
+        font-size: 1.1rem;
+    }
+
+    .nav-brand svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    .main-container {
+        padding: 1rem;
+        padding-top: 80px;
+    }
+
+    .hero h1 {
+        font-size: 3rem;
+    }
+    
+    .hero .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .controls-panel {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    #map {
+        height: 400px;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+        margin: 2rem 0 1.5rem;
+    }
+    
+    .info-box {
+        padding: 1rem;
+        margin: 1.5rem 0;
+    }
+    
+    .code-block {
+        padding: 1.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .breadcrumb {
+        padding: 0.5rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .breadcrumb-item {
+        font-size: 0.8rem;
+    }
+    
+    .hero {
+        padding-top: 60px;
+    }
+    
+    .hero-content {
+        padding: 0 1rem;
+    }
+}
+
+/* 小型モバイル対応 */
+@media (max-width: 480px) {
+    .navbar {
+        padding: 0.75rem;
+    }
+    
+    .nav-links {
+        gap: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .nav-brand {
+        font-size: 1rem;
+    }
+    
+    .main-container {
+        padding: 0.75rem;
+        padding-top: 70px;
+    }
+    
+    .controls-panel {
+        padding: 1rem;
+    }
+    
+    .control-item select,
+    .control-item input[type="range"] {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    #map {
+        height: 300px;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero .subtitle {
+        font-size: 1rem;
+    }
+    
+    .info-box {
+        padding: 0.75rem;
+    }
+    
+    .code-header {
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .code-block {
+        padding: 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .copy-button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* 超小型デバイス対応 */
+@media (max-width: 360px) {
+    .nav-links {
+        gap: 0.5rem;
+    }
+    
+    .nav-link {
+        font-size: 0.75rem;
+    }
+    
+    .main-container {
+        padding: 0.5rem;
+        padding-top: 65px;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+    }
+    
+    .hero h1 {
+        font-size: 2rem;
+    }
+    
+    .controls-panel {
+        padding: 0.75rem;
+    }
+    
+    #map {
+        height: 250px;
+    }
+    
+    .info-box {
+        padding: 0.5rem;
+    }
+    
+    .code-header {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .code-block {
+        padding: 0.75rem;
+    }
+}
+
+/* 横向き対応 */
+@media (max-height: 600px) and (orientation: landscape) {
+    .hero {
+        min-height: 80vh;
+    }
+    
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero .subtitle {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    #map {
+        height: 350px;
+    }
+}
+
+/* 印刷対応 */
+@media print {
+    .navbar {
+        position: static;
+        background: white;
+        color: black;
+        box-shadow: none;
+        border-bottom: 1px solid #ccc;
+    }
+    
+    .nav-brand,
+    .nav-link {
+        color: black !important;
+    }
+    
+    .main-container {
+        padding-top: 0;
+    }
+    
+    .hero::before {
+        display: none;
+    }
+    
+    .section-title {
+        color: black !important;
+        -webkit-text-fill-color: black !important;
+    }
+    
+    .controls-panel {
+        display: none;
+    }
+    
+    .code-block {
+        background: #f5f5f5;
+        color: black;
+    }
+    
+    .copy-button {
+        display: none;
+    }
+}

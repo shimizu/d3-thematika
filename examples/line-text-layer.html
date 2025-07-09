@@ -3,152 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LineTextLayer - d3-thematika</title>
+    <title>Line Text Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <script src="https://unpkg.com/@turf/turf@7/turf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* line-text-layer.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
+        }
+        
+        .control-item .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .control-item .slider-wrapper input[type="range"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .control-item .slider-wrapper .value-display {
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LineTextLayer デモ</h1>
-        <p class="description">
-            LineTextLayerを使用してLineString上にテキストを配置します。
-            ラインの方向に沿ったテキストの自動回転、位置指定、フォント設定などの機能を確認できます。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>データ: LineString形式のGeoJSONデータ（サンプル路線データ）</li>
-                <li>レイヤー: LineTextLayer（ライン上テキスト）、LineConnectionLayer（ライン）、OutlineLayer（投影法境界）</li>
-                <li>機能: テキスト位置、配置方向、フォント設定の変更</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Line Text Layer</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="position-select">テキスト位置:</label>
-                <select id="position-select">
-                    <option value="start">開始点</option>
-                    <option value="middle" selected>中点</option>
-                    <option value="end">終了点</option>
-                    <option value="0.25">25%地点</option>
-                    <option value="0.75">75%地点</option>
-                </select>
+        <section>
+            <h2 class="section-title">Line Text Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📝 LineTextLayer機能</h3>
+                <ul>
+                    <li>データ: LineString形式のGeoJSONデータ（サンプル路線データ）</li>
+                    <li>レイヤー: LineTextLayer（ライン上テキスト）、LineConnectionLayer（ライン）</li>
+                    <li>機能: テキスト位置、配置方向、フォント設定の変更</li>
+                    <li>特徴: ラインの方向に沿ったテキストの自動回転、位置指定、複数位置表示</li>
+                </ul>
             </div>
 
-            <div class="control-group">
-                <label for="placement-select">配置方向:</label>
-                <select id="placement-select">
-                    <option value="along" selected>ライン沿い</option>
-                    <option value="horizontal">水平</option>
-                    <option value="perpendicular">垂直</option>
-                </select>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="position-select">テキスト位置</label>
+                    <select id="position-select">
+                        <option value="start">開始点</option>
+                        <option value="middle" selected>中点</option>
+                        <option value="end">終了点</option>
+                        <option value="0.25">25%地点</option>
+                        <option value="0.75">75%地点</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="placement-select">配置方向</label>
+                    <select id="placement-select">
+                        <option value="along" selected>ライン沿い</option>
+                        <option value="horizontal">水平</option>
+                        <option value="perpendicular">垂直</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>フォントサイズ</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="font-size-range" min="10" max="30" value="16">
+                        <span class="value-display" id="font-size-value">16</span>px
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label for="font-weight-select">フォント太さ</label>
+                    <select id="font-weight-select">
+                        <option value="normal" selected>Normal</option>
+                        <option value="bold">Bold</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="multiple-text" checked>
+                        <label for="multiple-text">複数位置にテキスト表示</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label for="font-size-range">フォントサイズ: <span id="font-size-value">16</span>px</label>
-                <input type="range" id="font-size-range" min="10" max="30" value="16">
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
             </div>
+        </section>
 
-            <div class="control-group">
-                <label for="font-weight-select">フォント太さ:</label>
-                <select id="font-weight-select">
-                    <option value="normal" selected>Normal</option>
-                    <option value="bold">Bold</option>
-                </select>
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LineTextLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
-
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="multiple-text" checked>
-                    複数位置にテキスト表示
-                </label>
-            </div>
-
-        </div>
-
-        <div id="map"></div>
-
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// LineTextLayerの使用例
+            <div class="code-block">
+                <pre id="sample-code">// LineTextLayerの使用例
 
 // LineString形式のサンプルデータを作成
 const lineData = {
@@ -193,16 +191,61 @@ const textLayer = new Thematika.LineTextLayer({
     }
 });
 
+// 複数位置にテキスト表示する場合
+const multiTextLayer = new Thematika.LineTextLayer({
+    data: lineData,
+    multiplePositions: [0.2, 0.5, 0.8],  // 20%, 50%, 80%位置
+    placement: 'along',
+    attr: {
+        fill: '#d32f2f',
+        'font-size': '14px',
+        'font-weight': 'normal'
+    }
+});
+
 // レイヤーを地図に追加
 map.addLayer('line', lineLayer);
-map.addLayer('text', textLayer);
-        </div>
+map.addLayer('text', textLayer);</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         // サンプルデータ（日本の主要都市間ルート）
         function createSampleData() {
             return {
@@ -313,10 +356,6 @@ map.addLayer('text', textLayer);
 
         // 初回描画
         draw();
-
-
-
-
     </script>
 </body>
 </html>

@@ -5,40 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>d3-thematika | Next-Generation Map Visualization Library</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --dark-lighter: #1e293b;
-            --dark-light: #334155;
-            --gray: #64748b;
-            --gray-light: #94a3b8;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            --gradient-reverse: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--dark);
-            color: var(--white);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* ナビゲーションバー */
+        /* index.html固有のナビゲーションスタイル */
         .navbar {
             position: fixed;
             top: 0;
@@ -162,6 +134,9 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+
         }
 
         .hero-badge {
@@ -276,32 +251,6 @@
             right: 0;
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-title {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .section-subtitle {
-            font-size: 1.25rem;
-            color: var(--gray-light);
-            max-width: 600px;
-            margin: 0 auto;
         }
 
         .features-grid {
@@ -443,56 +392,7 @@
             overflow: hidden;
         }
 
-        /* コードサンプル */
-        .code-section {
-            padding: 6rem 2rem;
-            background: var(--dark-lighter);
-        }
-
-        .code-container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
-        .code-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .code-tab {
-            padding: 0.75rem 1.5rem;
-            background: var(--dark);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 0.5rem;
-            color: var(--gray-light);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .code-tab.active {
-            background: var(--gradient);
-            color: var(--white);
-            border-color: transparent;
-        }
-
-        .code-content {
-            background: #0d1117;
-            border-radius: 1rem;
-            padding: 2rem;
-            overflow-x: auto;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .code-content pre {
-            margin: 0;
-            color: #e6edf3;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        /* CTA セクション */
+        /* CTAセクション */
         .cta-section {
             padding: 8rem 2rem;
             background: var(--dark);
@@ -576,7 +476,28 @@
             color: var(--primary);
         }
 
-        /* レスポンシブ */
+        /* パーティクルアニメーション（index.html固有） */
+        .globe-container {
+            position: absolute;
+            top: 50%;
+            right: -10%;
+            transform: translateY(-50%);
+            width: 600px;
+            height: 600px;
+            opacity: 0.1;
+        }
+
+        /* 回転アニメーション（index.html固有） */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* index.html固有のレスポンシブスタイル */
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -618,36 +539,6 @@
                 flex-direction: column;
                 text-align: center;
             }
-        }
-
-        /* スクロールバー */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--dark-light);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray);
-        }
-
-        /* アニメーショングローブ */
-        .globe-container {
-            position: absolute;
-            top: 50%;
-            right: -10%;
-            transform: translateY(-50%);
-            width: 600px;
-            height: 600px;
-            opacity: 0.1;
         }
     </style>
 </head>
@@ -775,28 +666,7 @@
         </div>
     </section>
 
-    <!-- デモセクション -->
-    <section class="demo-section" id="demo">
-        <div class="demo-container">
-            <div class="demo-content">
-                <h2>インタラクティブなデモ</h2>
-                <p>
-                    d3-thematikaの強力な機能を体験してください。
-                    マウスオーバーで国の情報を表示し、投影法をリアルタイムで切り替えることができます。
-                </p>
-                <ul class="demo-features">
-                    <li>動的な投影法の切り替え</li>
-                    <li>ホバーエフェクトとツールチップ</li>
-                    <li>グラデーション塗りつぶし</li>
-                    <li>スムーズなアニメーション</li>
-                </ul>
-                <a href="examples.html" class="btn-primary">More Examples</a>
-            </div>
-            <div class="demo-preview">
-                <div id="demo-map"></div>
-            </div>
-        </div>
-    </section>
+
 
     <!-- コードサンプルセクション -->
     <section class="code-section">

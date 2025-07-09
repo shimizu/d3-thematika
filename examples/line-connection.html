@@ -3,167 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LineConnectionLayer - d3-thematika</title>
+    <title>Line Connection Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* line-connection.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 5 / 3;
             background-color: #e6f3ff;
+        }
+        
+        .control-item .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .control-item .slider-wrapper input[type="range"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .control-item .slider-wrapper .value-display {
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LineConnectionLayer デモ</h1>
-        <p class="description">
-            LineConnectionLayerを使用して複数点間を結ぶラインを地図上に表示します。
-            LineString/MultiLineString形式のGeoJSONデータをサポートし、直線・アーク・スムージングで描画できます。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>世界地図: examples/geojson/world.geojson（背景用）</li>
-                <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
-                <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示、投影法切り替え</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Line Connection Layer</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="projection-select">投影法:</label>
-                <select id="projection-select">
-                    <option value="equirectangular" selected>Equirectangular</option>
-                    <option value="mercator">Mercator</option>
-                    <option value="naturalEarth1">Natural Earth</option>
-                    <option value="orthographic">Orthographic</option>
-                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="line-type">ライン描画タイプ:</label>
-                <select id="line-type">
-                    <option value="straight">直線</option>
-                    <option value="arc" selected>アーク</option>
-                    <option value="smooth">スムージング</option>
-                </select>
-            </div>
+        <section>
+            <h2 class="section-title">Line Connection Layer デモ</h2>
             
-            <div class="control-group" id="arc-height-group">
-                <label for="arc-height">アークの高さ:</label>
-                <input type="range" id="arc-height" min="0" max="1" step="0.1" value="0.3">
-                <span id="arc-height-value">0.3</span>
-            </div>
-            
-            <div class="control-group" id="smooth-type-group" style="display: none;">
-                <label for="smooth-type">スムージングタイプ:</label>
-                <select id="smooth-type">
-                    <option value="curveBasis" selected>Basis</option>
-                    <option value="curveCardinal">Cardinal</option>
-                    <option value="curveCatmullRom">Catmull-Rom</option>
-                    <option value="curveLinear">Linear</option>
-                    <option value="curveMonotoneX">Monotone X</option>
-                    <option value="curveMonotoneY">Monotone Y</option>
-                    <option value="curveNatural">Natural</option>
-                    <option value="curveStep">Step</option>
-                    <option value="curveStepAfter">Step After</option>
-                    <option value="curveStepBefore">Step Before</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="start-arrow">
-                    開始点に矢印を表示
-                </label>
-            </div>
-            
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="end-arrow" checked>
-                    終了点に矢印を表示
-                </label>
+            <div class="info-box">
+                <h3>🔗 LineConnectionLayer機能</h3>
+                <ul>
+                    <li>世界地図: examples/geojson/world.geojson（背景用）</li>
+                    <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
+                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示、投影法切り替え</li>
+                    <li>データ例: 世界一周ルート（赤線）、貿易ルート（色分け破線）</li>
+                </ul>
             </div>
 
-        </div>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular">Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1" selected>Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
 
-        <div id="map"></div>
+                <div class="control-item">
+                    <label for="line-type">ライン描画タイプ</label>
+                    <select id="line-type">
+                        <option value="straight">直線</option>
+                        <option value="arc" selected>アーク</option>
+                        <option value="smooth">スムージング</option>
+                    </select>
+                </div>
+                
+                <div class="control-item" id="arc-height-group">
+                    <label>アークの高さ</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="arc-height" min="0" max="1" step="0.1" value="0.3">
+                        <span class="value-display" id="arc-height-value">0.3</span>
+                    </div>
+                </div>
+                
+                <div class="control-item" id="smooth-type-group" style="display: none;">
+                    <label for="smooth-type">スムージングタイプ</label>
+                    <select id="smooth-type">
+                        <option value="curveBasis" selected>Basis</option>
+                        <option value="curveCardinal">Cardinal</option>
+                        <option value="curveCatmullRom">Catmull-Rom</option>
+                        <option value="curveLinear">Linear</option>
+                        <option value="curveMonotoneX">Monotone X</option>
+                        <option value="curveMonotoneY">Monotone Y</option>
+                        <option value="curveNatural">Natural</option>
+                        <option value="curveStep">Step</option>
+                        <option value="curveStepAfter">Step After</option>
+                        <option value="curveStepBefore">Step Before</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>矢印オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="start-arrow">
+                        <label for="start-arrow">開始点に矢印を表示</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="end-arrow" checked>
+                        <label for="end-arrow">終了点に矢印を表示</label>
+                    </div>
+                </div>
+            </div>
 
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// LineConnectionLayerの使用例（GeoJSON形式）
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LineConnectionLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// LineConnectionLayerの使用例（GeoJSON形式）
 
 // LineString形式のデータ（複数点を結ぶ1本のライン）
 const lineStringData = {
@@ -206,7 +200,7 @@ const multiLineStringData = {
 // LineConnectionLayerインスタンスを作成
 const connectionLayer = new Thematika.LineConnectionLayer({
     data: lineStringData,  // またはmultiLineStringData
-    lineType: 'smooth',    // 'straight', 'arc', または 'smooth'
+    lineType: 'arc',       // 'straight', 'arc', または 'smooth'
     smoothType: 'curveBasis', // スムージング時のカーブタイプ
     arcHeight: 0.3,        // アークの高さ（arcタイプの場合）
     startArrow: false,     // 開始点の矢印
@@ -219,14 +213,63 @@ const connectionLayer = new Thematika.LineConnectionLayer({
     }
 });
 
+// 複数色のライン（関数による動的色指定）
+const tradeRoutes = new Thematika.LineConnectionLayer({
+    data: multiLineStringData,
+    lineType: 'smooth',
+    smoothType: 'curveBasis',
+    endArrow: true,
+    arrowSize: 8,
+    attr: {
+        "stroke": (d, i) => ['#4ecdc4', '#45b7d1', '#96ceb4'][i % 3],
+        "stroke-width": 2,
+        "opacity": 0.7,
+        "stroke-dasharray": '5,3'
+    }
+});
+
 map.addLayer('connections', connectionLayer);
-        </div>
+map.addLayer('trade-routes', tradeRoutes);</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         // プロジェクション
         let currentProjection = d3.geoNaturalEarth1();
         
@@ -438,9 +481,6 @@ map.addLayer('connections', connectionLayer);
             });
         }
         
-        // 初回描画
-        draw();
-        
         // コントロールのイベントリスナー
         document.getElementById('projection-select').addEventListener('change', (e) => {
             const projectionName = e.target.value;
@@ -501,6 +541,9 @@ map.addLayer('connections', connectionLayer);
             document.getElementById('arc-height-group').style.display = 'block';
             document.getElementById('smooth-type-group').style.display = 'none';
         }
+        
+        // 初回描画
+        draw();
     </script>
 </body>
 </html>

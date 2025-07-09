@@ -3,187 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LegendLayer - d3-thematika</title>
+    <title>Legend Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group label span {
-            font-weight: bold;
-            color: #007acc;
-            min-width: 40px;
-            display: inline-block;
-            text-align: right;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* legend-layer-layer.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
+        }
+        
+        .control-item .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .control-item .slider-wrapper input[type="range"] {
+            flex: 1;
+            max-width: 300px;
+        }
+        
+        .control-item .slider-wrapper .value-display {
+            min-width: 60px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>LegendLayer デモ</h1>
-        <p class="description">
-            LegendLayerを使用してD3スケールに基づく凡例を地図上に表示します。
-            序数、連続、閾値スケールに対応した自動凡例生成機能、スライダーによる位置調整、
-            凡例のドラッグ移動機能を確認できます。
-        </p>
-
-        <div class="note">
-            <strong>機能:</strong> 
-            <ul>
-                <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）</li>
-                <li>機能: スケール型切り替え、X/Y座標による位置調整、シンボルタイプ選択</li>
-                <li>サイズスケール: チェックボックスで有効化（circle/cell/lineタイプで使用可能）</li>
-                <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
-                <li>外観: 背景ボックスの表示/非表示切り替え（opacityで制御、要素は常に存在）</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Legend Layer</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="scale-type-select">スケール型:</label>
-                <select id="scale-type-select">
-                    <option value="ordinal" selected>序数スケール (Ordinal)</option>
-                    <option value="linear">連続スケール (Linear)</option>
-                    <option value="threshold">閾値スケール (Threshold)</option>
-                    <option value="sequential">連続色スケール (Sequential)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="symbol-type-select">シンボルタイプ:</label>
-                <select id="symbol-type-select">
-                    <option value="auto" selected>自動選択</option>
-                    <option value="cell">セル (Cell)</option>
-                    <option value="circle">円 (Circle)</option>
-                    <option value="line">線 (Line)</option>
-                    <option value="gradient">グラデーション (Gradient)</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="enable-size-scale-checkbox">
-                    サイズスケールを有効化
-                </label>
-            </div>
-
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="overlapping-checkbox">
-                    重ね表示モード（サイズスケール時）
-                </label>
-            </div>
-
-            <div class="control-group">
-                <label for="legend-x-slider">X座標: <span id="legend-x-value">20</span></label>
-                <input type="range" id="legend-x-slider" min="0" max="800" value="20" style="width: 300px;">
-            </div>
+        <section>
+            <h2 class="section-title">Legend Layer デモ</h2>
             
-            <div class="control-group">
-                <label for="legend-y-slider">Y座標: <span id="legend-y-value">20</span></label>
-                <input type="range" id="legend-y-slider" min="0" max="600" value="20" style="width: 300px;">
+            <div class="info-box">
+                <h3>📊 LegendLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）、OutlineLayer（アウトライン）</li>
+                    <li>機能: D3スケールに基づく自動凡例生成、位置調整、シンボルタイプ選択</li>
+                    <li>サイズスケール: チェックボックスで有効化（circle/cell/lineタイプで使用可能）</li>
+                    <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
+                </ul>
             </div>
 
-            <div class="control-group">
-                <label for="legend-orientation-select">配置方向:</label>
-                <select id="legend-orientation-select">
-                    <option value="vertical" selected>縦方向</option>
-                    <option value="horizontal">横方向</option>
-                </select>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="scale-type-select">スケール型</label>
+                    <select id="scale-type-select">
+                        <option value="ordinal" selected>序数スケール (Ordinal)</option>
+                        <option value="linear">連続スケール (Linear)</option>
+                        <option value="threshold">閾値スケール (Threshold)</option>
+                        <option value="sequential">連続色スケール (Sequential)</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="symbol-type-select">シンボルタイプ</label>
+                    <select id="symbol-type-select">
+                        <option value="auto" selected>自動選択</option>
+                        <option value="cell">セル (Cell)</option>
+                        <option value="circle">円 (Circle)</option>
+                        <option value="line">線 (Line)</option>
+                        <option value="gradient">グラデーション (Gradient)</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="legend-orientation-select">配置方向</label>
+                    <select id="legend-orientation-select">
+                        <option value="vertical" selected>縦方向</option>
+                        <option value="horizontal">横方向</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>X座標</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="legend-x-slider" min="0" max="800" value="20">
+                        <span class="value-display" id="legend-x-value">20</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>Y座標</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="legend-y-slider" min="0" max="600" value="20">
+                        <span class="value-display" id="legend-y-value">20</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>アイテム間隔</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="item-spacing-slider" min="-10" max="200" value="20">
+                        <span class="value-display" id="item-spacing-value">20</span>px
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enable-size-scale-checkbox">
+                        <label for="enable-size-scale-checkbox">サイズスケールを有効化</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="overlapping-checkbox">
+                        <label for="overlapping-checkbox">重ね表示モード（サイズスケール時）</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-background-checkbox" checked>
+                        <label for="show-background-checkbox">背景ボックスを表示</label>
+                    </div>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="show-background-checkbox" checked>
-                    背景ボックスを表示
-                </label>
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
             </div>
+        </section>
 
-            <div class="control-group">
-                <label for="item-spacing-slider">アイテム間隔: <span id="item-spacing-value">20</span>px</label>
-                <input type="range" id="item-spacing-slider" min="-10" max="200" value="20" style="width: 300px;">
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LegendLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
-
-        </div>
-
-        <div id="map"></div>
-
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// LegendLayerの使用例
+            <div class="code-block">
+                <pre id="sample-code">// LegendLayerの使用例
 
 // 序数スケールの例
 const colorScale = d3.scaleOrdinal()
@@ -221,17 +209,63 @@ const sizeLegend = new Thematika.LegendLayer({
     title: '人口密度'
 });
 
+// 連続スケールの例
+const temperatureScale = d3.scaleLinear()
+    .domain([0, 100])
+    .range(['#ffffff', '#ff0000']);
+
+const tempLegend = new Thematika.LegendLayer({
+    scale: temperatureScale,
+    symbolType: 'gradient',
+    position: { top: 50, left: 600 },
+    title: '気温 (°C)',
+    orientation: 'horizontal'
+});
+
 // 地図に追加
 map.addLayer('legend', legendLayer);
 map.addLayer('size-legend', sizeLegend);
-        </div>
+map.addLayer('temp-legend', tempLegend);</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
-    <script >
-        
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         // 現在のスケール設定
         let currentScaleType = 'ordinal';
         let currentPosition = { top: 350, left: 60 };
@@ -302,10 +336,12 @@ map.addLayer('size-legend', sizeLegend);
         };
         
         async function draw() {
-            const id = "#map"
+            const id = "#map";
+            
+            // 既存の地図を削除
+            d3.select(id).selectAll('*').remove();
 
-
-            const width = document.querySelector(id).clientWidth ;
+            const width = document.querySelector(id).clientWidth;
             const height = document.querySelector(id).clientHeight;
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
@@ -374,15 +410,16 @@ map.addLayer('size-legend', sizeLegend);
             map.addLayer('outline', outlineLayer);
             map.addLayer('world', worldLayer);
             map.addLayer('legend', legendLayer);
-            
         }
 
-        draw()
-
-
-        
         // 初回ロード時にスライダーの最大値を設定
-        setTimeout(updateSliderMaxValues, 100);
+        function updateSliderMaxValues() {
+            const width = document.querySelector('#map').clientWidth;
+            const height = document.querySelector('#map').clientHeight;
+            
+            document.getElementById('legend-x-slider').max = width;
+            document.getElementById('legend-y-slider').max = height;
+        }
 
         // コントロールのイベントハンドラ
         document.getElementById('scale-type-select').addEventListener('change', (e) => {
@@ -405,15 +442,6 @@ map.addLayer('size-legend', sizeLegend);
             currentPosition.top = value;
             draw();
         });
-        
-        // リサイズ時にスライダーの最大値を更新
-        function updateSliderMaxValues() {
-            const width = document.querySelector('#map').clientWidth;
-            const height = document.querySelector('#map').clientHeight;
-            
-            document.getElementById('legend-x-slider').max = width;
-            document.getElementById('legend-y-slider').max = height;
-        }
         
         document.getElementById('legend-orientation-select').addEventListener('change', (e) => {
             currentOrientation = e.target.value;
@@ -448,7 +476,11 @@ map.addLayer('size-legend', sizeLegend);
             draw();
         });
 
-
+        // 初期化
+        draw();
+        
+        // 初回ロード時にスライダーの最大値を設定
+        setTimeout(updateSliderMaxValues, 100);
     </script>
 </body>
 </html>

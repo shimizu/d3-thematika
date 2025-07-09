@@ -3,146 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TileMap - d3-thematika</title>
+    <title>Tile Map - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* tile-map.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
+        }
+        
+        .control-item .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .control-item .slider-wrapper input[type="range"] {
+            flex: 1;
+            max-width: 200px;
+        }
+        
+        .control-item .slider-wrapper .value-display {
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        #tile-info {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
+            font-family: 'Courier New', monospace;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>TileMap デモ</h1>
-        <p class="description">
-            ImageLayerとtile-utilsを組み合わせてタイル地図を表示します。
-            OpenStreetMap Japanのタイルデータを動的に読み込み、様々な地域とズームレベルで表示できます。
-        </p>
-
-        <div class="note">
-            <strong>使用技術:</strong> 
-            <ul>
-                <li>タイルソース: OpenStreetMap Japan (https://tile.openstreetmap.jp/)</li>
-                <li>レイヤー: ImageLayer（各タイル画像）、OutlineLayer（投影境界）</li>
-                <li>ユーティリティ: tile-utils（タイル座標計算、URL生成）</li>
-                <li>機能: 地域選択、ズームレベル調整、タイル情報表示</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Tile Map</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="region-select">表示地域:</label>
-                <select id="region-select">
-                    <option value="tokyo" selected>東京</option>
-                    <option value="osaka">大阪</option>
-                    <option value="fukuoka">福岡</option>
-                    <option value="japan">日本全域</option>
-                </select>
+        <section>
+            <h2 class="section-title">Tile Map デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗺️ TileMap機能</h3>
+                <ul>
+                    <li>データ: OpenStreetMapタイルサーバー（https://c.tile.openstreetmap.org/）</li>
+                    <li>レイヤー: ImageLayer（タイル画像）、OutlineLayer（投影境界）</li>
+                    <li>機能: 地域選択、ズームレベル調整、投影法切り替え、タイル境界表示</li>
+                    <li>特徴: tile-utilsによる動的タイル座標計算とURL生成</li>
+                </ul>
             </div>
 
-            <div class="control-group">
-                <label for="zoom-select">ズームレベル: <span id="zoom-value">10</span></label>
-                <input type="range" id="zoom-select" min="5" max="15" value="10">
-            </div>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="region-select">表示地域</label>
+                    <select id="region-select">
+                        <option value="tokyo" selected>東京</option>
+                        <option value="osaka">大阪</option>
+                        <option value="fukuoka">福岡</option>
+                        <option value="japan">日本全域</option>
+                    </select>
+                </div>
 
-            <div class="control-group">
-                <label for="projection-select">投影法:</label>
-                <select id="projection-select">
-                    <option value="mercator" selected>Mercator</option>
-                    <option value="naturalEarth1">Natural Earth</option>
-                    <option value="equirectangular">Equirectangular</option>
-                </select>
-            </div>
+                <div class="control-item">
+                    <label>ズームレベル</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="zoom-select" min="5" max="15" value="10">
+                        <span class="value-display" id="zoom-value">10</span>
+                    </div>
+                </div>
 
-            <div class="control-group">
-                <input type="checkbox" id="show-bbox-markers">
-                <label for="show-bbox-markers">タイル境界マーカーを表示</label>
-            </div>
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="mercator" selected>Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="equirectangular">Equirectangular</option>
+                    </select>
+                </div>
 
-            <div class="control-group">
-                <label>タイル情報:</label>
-                <div id="tile-info" style="background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-top: 5px;">
-                    タイルを読み込み中...
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-bbox-markers">
+                        <label for="show-bbox-markers">タイル境界マーカーを表示</label>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>タイル情報</label>
+                    <div id="tile-info">
+                        タイルを読み込み中...
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div id="map"></div>
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
 
-        <div class="code-example">
-            <pre>// TileMapの使用例（ImageLayer + tile-utils）
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>TileMapの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// TileMapの使用例（ImageLayer + tile-utils）
 
 // 地域の境界を定義
 const regions = {
@@ -187,14 +199,47 @@ tiles.forEach((tile, index) => {
 const outlineLayer = new Thematika.OutlineLayer({
     attr: { stroke: '#333', 'stroke-width': 2, fill: 'none' }
 });
-map.addLayer('outline', outlineLayer);
-        </div>
+map.addLayer('outline', outlineLayer);</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+        
         // 地域の境界を定義
         const regions = {
             tokyo: [139.4, 35.5, 139.9, 35.8],

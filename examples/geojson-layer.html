@@ -3,480 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>d3-thematika Example Template</title>
+    <title>GeoJSON Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --dark-lighter: #1e293b;
-            --dark-light: #334155;
-            --gray: #64748b;
-            --gray-light: #94a3b8;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--dark);
-            color: var(--white);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* ナビゲーションバー */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 1000;
-            padding: 1rem 2rem;
-            transition: all 0.3s ease;
-        }
-
-        .navbar.scrolled {
-            background: rgba(15, 23, 42, 0.98);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            color: var(--white);
-            font-weight: 600;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-
-        .nav-brand:hover {
-            color: var(--primary);
-        }
-
-        .nav-brand svg {
-            width: 24px;
-            height: 24px;
-            fill: currentColor;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .nav-link {
-            color: var(--gray-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-link:hover {
-            color: var(--white);
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--gradient);
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        .nav-link.active {
-            color: var(--primary);
-        }
-
-        /* ヒーローセクション */
-        .hero {
-            position: relative;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding-top: 80px;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
-            animation: pulse 20s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .hero h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
-            font-weight: 700;
-            margin-bottom: 1.5rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        .hero .subtitle {
-            font-size: clamp(1.2rem, 3vw, 1.5rem);
-            color: var(--gray-light);
-            margin-bottom: 3rem;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-        }
-
-        /* ブレッドクラム */
-        .breadcrumb {
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-        }
-
-        .breadcrumb-list {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            list-style: none;
-        }
-
-        .breadcrumb-item {
-            color: var(--gray-light);
-            font-size: 0.9rem;
-        }
-
-        .breadcrumb-item a {
-            color: var(--gray-light);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .breadcrumb-item a:hover {
-            color: var(--primary);
-        }
-
-        .breadcrumb-separator {
-            color: var(--gray);
-        }
-
-        .breadcrumb-current {
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* メインコンテナ */
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 2rem;
-            padding-top: 100px;
-        }
-
-        /* カードスタイル */
-        .card {
-            background: var(--dark-lighter);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border-color: var(--primary);
-        }
-
-        /* インフォボックス */
-        .info-box {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .info-box h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            font-size: 1.2rem;
-        }
-
-        .info-box ul {
-            list-style: none;
-            margin-top: 1rem;
-        }
-
-        .info-box li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .info-box li::before {
-            content: '▶';
-            position: absolute;
-            left: 0;
-            color: var(--secondary);
-            font-size: 0.8rem;
-        }
-
-        /* コントロールパネル */
-        .controls-panel {
-            background: var(--dark-lighter);
-            border-radius: 1rem;
-            padding: 2rem;
-            margin: 2rem 0;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .control-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .control-item label {
-            font-weight: 500;
-            color: var(--gray-light);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .control-item select {
-            background: var(--dark);
-            color: var(--white);
-            border: 1px solid var(--dark-light);
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .control-item select:hover {
-            border-color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .control-item select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-
-        /* マップコンテナ */
-        .map-wrapper {
-            position: relative;
-            border-radius: 1rem;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            margin: 2rem 0;
-            background: var(--dark-lighter);
-        }
-
+        /* geojson-layer.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 600px;
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        }
-
-        /* コードブロック */
-        .code-section {
-            margin: 3rem 0;
-        }
-
-        .code-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--dark-light);
-            padding: 1rem 1.5rem;
-            border-radius: 1rem 1rem 0 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: none;
-        }
-
-        .code-header h3 {
-            font-size: 1rem;
-            font-weight: 500;
-            color: var(--gray-light);
-        }
-
-        .copy-button {
-            background: var(--primary);
-            color: var(--white);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .copy-button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .code-block {
-            background: #0d1117;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: none;
-            border-radius: 0 0 1rem 1rem;
-            padding: 2rem;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .code-block pre {
-            margin: 0;
-            color: #e6edf3;
-        }
-
-        /* セクションタイトル */
-        .section-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin: 3rem 0 2rem;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* フローティングバッジ */
-        .badge {
-            display: inline-block;
-            background: var(--gradient);
-            color: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin: 0.5rem 0.5rem 0.5rem 0;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .navbar {
-                padding: 1rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-                font-size: 0.9rem;
-            }
-
-            .hero h1 {
-                font-size: 3rem;
-            }
-            
-            .controls-panel {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            #map {
-                height: 400px;
-            }
-
-            .main-container {
-                padding-top: 80px;
-            }
-        }
-
-        /* スクロールバー */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--dark);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--dark-light);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--gray);
         }
     </style>
 </head>
@@ -519,12 +56,11 @@
             <h2 class="section-title">GeoJSON Layer デモ</h2>
             
             <div class="info-box">
-                <h3>📊 使用データ & 機能</h3>
+                <h3>🌍 GeoJSONレイヤー機能</h3>
                 <ul>
-                    <li>GeoJSONフォーマットの世界地図データ</li>
-                    <li>複数の投影法による動的な地図変換</li>
-                    <li>レイヤーベースのデータ可視化システム</li>
-                    <li>リアルタイムプロジェクション切り替え</li>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: GeojsonLayer（世界地図）、GraticuleLayer（経緯線）、OutlineLayer（アウトライン）</li>
+                    <li>機能: 複数投影法の切り替え、カスタムフィルター効果、レイヤー合成</li>
                 </ul>
             </div>
 
@@ -573,15 +109,24 @@ const map = new Thematika.Map({
     projection: projection
 });
 
+// カスタムフィルター効果を作成
+const woodtype = Thematika.createCustomFilter('woodtype', `
+    <feFlood flood-color="#73DCFF" flood-opacity="0.75" result="COLOR-blu" />
+    <feFlood flood-color="#9673FF" flood-opacity="0.4" result="COLOR-red" />
+    <feTurbulence baseFrequency=".05" type="fractalNoise" numOctaves="3" seed="0" result="Texture_10" />
+    <!-- その他のフィルター効果... -->
+`);
+
 // GeojsonLayerインスタンスを作成
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
-        "fill": (d, i) => i % 2 === 0 ? "#1a3d1f" : '#e0f7fa', 
-        "filter": shadowFilter.url(), 
-        "stroke": '#1a3d1f',
-        "stroke-width": 0.8,
-        "opacity": (d, i) => 0.9,
+        "fill": (d, i) => i % 2 === 0 ? "#8b5cf6" : "#ec4899",
+        "filter": "url(#woodtype)",
+        "stroke": '#ffffff',
+        "stroke-width": 0.5,
+        "opacity": 0.8,
+        "cursor": "pointer"
     }
 });
 
@@ -591,9 +136,9 @@ const outlineLayer = new Thematika.OutlineLayer({
     clipPathId: 'earth-outline-clip',
     attr: {
         "fill": 'none',
-        "stroke": '#2c3e50',
-        "stroke-width": 2,
-        "opacity": 0.8
+        "stroke": '#6366f1',
+        "stroke-width": 3,
+        "opacity": 0.5
     }
 });
 
@@ -602,16 +147,17 @@ const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10], // 10度間隔
     attr: {
         "fill": 'none',
-        "stroke": '#ddd',
+        "stroke": 'rgba(255, 255, 255, 0.1)',
         "stroke-width": 0.5,
-        "opacity": 0.6
+        "stroke-dasharray": '2,3',
+        "opacity": 0.5
     }
 });
 
 // レイヤーインスタンスを地図に追加
 map.addLayer('graticule', graticuleLayer);
-map.addLayer('outline', outlineLayer);
-map.addLayer('world', worldLayer);</pre>
+map.addLayer('world', worldLayer);
+map.addLayer('outline', outlineLayer);</pre>
             </div>
         </section>
     </div>
@@ -629,6 +175,28 @@ map.addLayer('world', worldLayer);</pre>
                 navbar.classList.remove('scrolled');
             }
         });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
 
         // グローバル変数
         let map;
@@ -648,7 +216,7 @@ map.addLayer('world', worldLayer);</pre>
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
 
-
+            // カスタムフィルター効果を作成
             const woodtype = Thematika.createCustomFilter('woodtype', `
        <!-- COLOR -->
           <feFlood flood-color="#73DCFF" flood-opacity="0.75" result="COLOR-blu" />
@@ -721,7 +289,6 @@ map.addLayer('world', worldLayer);</pre>
                 defs:[woodtype]
             });
 
-
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
@@ -733,7 +300,6 @@ map.addLayer('world', worldLayer);</pre>
                     "opacity": 0.8,
                     "cursor": "pointer"
                 },
-
             });
 
             // OutlineLayerインスタンスを作成
@@ -791,28 +357,6 @@ map.addLayer('world', worldLayer);</pre>
             // 地図を再描画
             await draw();
         });
-
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
 
         // 初期描画
         draw();

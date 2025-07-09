@@ -7,180 +7,223 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <script src="https://cdn.jsdelivr.net/npm/geotiff"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* cog-layer.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background-color: #e6f3ff;
+        }
+        
+        .url-input {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 1rem;
+        }
+        
+        .button-primary {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .button-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+        
+        .aoi-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .aoi-input {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .aoi-input label {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+        }
+        
+        .aoi-input input {
+            background: var(--dark);
+            color: var(--white);
+            border: 1px solid var(--dark-light);
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .aoi-input input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>COG (Cloud Optimized GeoTIFF) Layer デモ</h1>
-        <p class="description">
-            readCOG関数を使用してCloud Optimized GeoTIFFファイルを読み込み、ImageLayerで表示します。
-            サイズ制限機能やリサンプリング機能も確認できます。
-        </p>
-
-        <div class="note">
-            <strong>使用データ:</strong> 
-            <ul>
-                <li>データ: サンプルCOGファイル（URL指定）</li>
-                <li>レイヤー: ImageLayer（COG画像）、GraticuleLayer（経緯線）</li>
-                <li>機能: COG読み込み、サイズ制限、リサンプリング</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">COG Layer</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="projection-select">投影法:</label>
-                <select id="projection-select">
-                    <option value="equirectangular" selected>Equirectangular</option>
-                    <option value="mercator">Mercator</option>
-                    <option value="naturalEarth1">Natural Earth</option>
-                </select>
-            </div>
-
-            <div class="control-group">
-                <label for="cog-url">COG URL:</label>
-                <input type="text" id="cog-url" style="width: 400px;" value="https://storage.googleapis.com/g3-open-resource/d3-thematika/cog/NE1_HR_SR_OB_DRv6_COG.tif">
-                <button id="load-cog">読み込み</button>
-            </div>
+        <section>
+            <h2 class="section-title">COG (Cloud Optimized GeoTIFF) Layer デモ</h2>
             
-            <div class="control-group">
-                <label>AOI (南アメリカ):</label>
-                <div style="margin-left: 20px;">
-                    <label>西端: <input type="number" id="aoi-west" value="-82" step="0.1" style="width: 80px;"></label>
-                    <label>東端: <input type="number" id="aoi-east" value="-34" step="0.1" style="width: 80px;"></label>
-                    <label>南端: <input type="number" id="aoi-south" value="-56" step="0.1" style="width: 80px;"></label>
-                    <label>北端: <input type="number" id="aoi-north" value="13" step="0.1" style="width: 80px;"></label>
+            <div class="info-box">
+                <h3>🗺 COGレイヤー機能</h3>
+                <ul>
+                    <li>データ: サンプルCOGファイル（URL指定）</li>
+                    <li>レイヤー: ImageLayer（COG画像）、GraticuleLayer（経緯線）</li>
+                    <li>機能: COG読み込み、サイズ制限、リサンプリング</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="cog-url">COG URL</label>
+                    <input type="text" id="cog-url" class="url-input" value="https://storage.googleapis.com/g3-open-resource/d3-thematika/cog/NE1_HR_SR_OB_DRv6_COG.tif">
+                    <button id="load-cog" class="button-primary">読み込み</button>
+                </div>
+                
+                <div class="control-item">
+                    <label>AOI (南アメリカ)</label>
+                    <div class="aoi-inputs">
+                        <div class="aoi-input">
+                            <label>西端</label>
+                            <input type="number" id="aoi-west" value="-82" step="0.1">
+                        </div>
+                        <div class="aoi-input">
+                            <label>東端</label>
+                            <input type="number" id="aoi-east" value="-34" step="0.1">
+                        </div>
+                        <div class="aoi-input">
+                            <label>南端</label>
+                            <input type="number" id="aoi-south" value="-56" step="0.1">
+                        </div>
+                        <div class="aoi-input">
+                            <label>北端</label>
+                            <input type="number" id="aoi-north" value="13" step="0.1">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="max-size">最大サイズ制限</label>
+                    <select id="max-size">
+                        <option value="256">256×256</option>
+                        <option value="512" selected>512×512</option>
+                        <option value="1024">1024×1024</option>
+                        <option value="2048">2048×2048</option>
+                        <option value="4096">4096×4096</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="on-exceed">制限超過時の処理</label>
+                    <select id="on-exceed">
+                        <option value="resample" selected>自動リサンプリング</option>
+                        <option value="error">エラー</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="resample-method">リサンプリング方法</label>
+                    <select id="resample-method">
+                        <option value="nearest">Nearest</option>
+                        <option value="bilinear" selected>Bilinear</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="image-index">画像インデックス</label>
+                    <select id="image-index">
+                        <option value="0" selected>0（最高解像度）</option>
+                    </select>
+                    <button id="check-images" type="button" class="button-primary">画像数確認</button>
+                </div>
+                
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-graticule" checked>
+                        <label for="show-graticule">経緯線を表示</label>
+                    </div>
+                </div>
+                
+                <div class="control-item" id="cog-info" style="display: none;">
+                    <label>読み込み結果</label>
+                    <div id="cog-details"></div>
                 </div>
             </div>
-            
-            <div class="control-group">
-                <label for="max-size">最大サイズ制限:</label>
-                <select id="max-size">
-                    <option value="256">256×256</option>
-                    <option value="512" selected>512×512</option>
-                    <option value="1024">1024×1024</option>
-                    <option value="2048">2048×2048</option>
-                    <option value="4096">4096×4096</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="on-exceed">制限超過時の処理:</label>
-                <select id="on-exceed">
-                    <option value="resample" selected>自動リサンプリング</option>
-                    <option value="error">エラー</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="resample-method">リサンプリング方法:</label>
-                <select id="resample-method">
-                    <option value="nearest">Nearest</option>
-                    <option value="bilinear" selected>Bilinear</option>
-                </select>
-            </div>
-            
-            <div class="control-group">
-                <label for="image-index">画像インデックス:</label>
-                <select id="image-index">
-                    <option value="0" selected>0（最高解像度）</option>
-                </select>
-                <button id="check-images" type="button">画像数確認</button>
-            </div>
-            
-            <div class="control-group">
-                <label>
-                    <input type="checkbox" id="show-graticule" checked>
-                    経緯線を表示
-                </label>
-            </div>
-            
-            <div class="control-group" id="cog-info" style="display: none;">
-                <strong>読み込み結果:</strong>
-                <div id="cog-details"></div>
-            </div>
 
-        </div>
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
+            </div>
+        </section>
 
-        <div id="map"></div>
-
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// COG読み込みとImageLayerの使用例
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>readCOGの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// COG読み込みとImageLayerの使用例
 
 // COGファイルを読み込み（南アメリカのAOI指定）
 const cogResult = await Thematika.readCOG(
@@ -237,13 +280,47 @@ const graticuleLayer = new Thematika.GraticuleLayer({
 // レイヤーを地図に追加
 map.addLayer('graticule', graticuleLayer);
 map.addLayer('cog', imageLayer);
-        </div>
+                </pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
         // プロジェクション
         let currentProjection = d3.geoEquirectangular();
         let currentMap = null;

@@ -6,155 +6,127 @@
     <title>Beautiful Thematic Map - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
+        /* biutiful-map.html固有のスタイル */
         #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
             background: radial-gradient(ellipse at center, #001122 0%, #000511 100%);
-            border-radius: 8px;
-        }
-        
-        .value-display {
-            display: inline-block;
-            min-width: 20px;
-            text-align: center;
-            font-weight: bold;
-            color: #333;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Beautiful Thematic Map</h1>
-        <p class="description">
-            d3-thematikaの全機能を駆使した美しい主題図のデモンストレーション。
-            複数レイヤー、SVGエフェクト、テクスチャ、インタラクティブ機能を組み合わせた高度な地図表現です。
-        </p>
-
-        <div class="note">
-            <strong>使用機能:</strong> 
-            <ul>
-                <li>レイヤー: GeojsonLayer（地形・都市）、PointCircleLayer（都市人口）、GraticuleLayer（経緯線）、OutlineLayer（境界）、LegendLayer（凡例）</li>
-                <li>エフェクト: SVGフィルター（ドロップシャドウ、グロー）、グラデーション、パターン</li>
-                <li>データ: 世界地図、都市人口データ（100万人以上）、アフリカ詳細データ</li>
-                <li>機能: インタラクティブ操作、スタイル切り替え、投影法変更</li>
-            </ul>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
         </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Beautiful Thematic Map</li>
+            </ol>
+        </nav>
 
-        <div class="controls">
-            <div class="control-group">
-                <label for="projection-select">投影法:</label>
-                <select id="projection-select">
-                    <option value="naturalEarth1" selected>Natural Earth</option>
-                    <option value="orthographic">Orthographic</option>
-                    <option value="equirectangular">Equirectangular</option>
-                    <option value="mercator">Mercator</option>
-                    <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
-                </select>
+        <section>
+            <h2 class="section-title">Beautiful Thematic Map</h2>
+            
+            <div class="info-box">
+                <h3>🎨 全機能デモンストレーション</h3>
+                <ul>
+                    <li>レイヤー: GeojsonLayer（地形・都市）、PointCircleLayer（都市人口）、GraticuleLayer（経緯線）、OutlineLayer（境界）</li>
+                    <li>エフェクト: SVGフィルター（ドロップシャドウ、グロー）、グラデーション、パターン</li>
+                    <li>データ: 世界地図、都市人口データ（100万人以上）</li>
+                    <li>機能: インタラクティブ操作、スタイル切り替え、投影法変更</li>
+                </ul>
             </div>
 
-            <div class="control-group">
-                <label for="theme-select">テーマ:</label>
-                <select id="theme-select">
-                    <option value="ocean" selected>Ocean Blue</option>
-                    <option value="earth">Earth Tones</option>
-                    <option value="vintage">Vintage</option>
-                    <option value="neon">Neon Glow</option>
-                </select>
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="naturalEarth1" selected>Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="equirectangular">Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="theme-select">テーマ</label>
+                    <select id="theme-select">
+                        <option value="ocean" selected>Ocean Blue</option>
+                        <option value="earth">Earth Tones</option>
+                        <option value="vintage">Vintage</option>
+                        <option value="neon">Neon Glow</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-cities" checked>
+                        <label for="show-cities">都市表示</label>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>経緯線</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-graticule" checked>
+                        <label for="show-graticule">経緯線表示</label>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label for="glow-intensity">グロー強度</label>
+                    <input type="range" id="glow-intensity" min="0" max="10" value="5" step="1">
+                    <span class="value-display" id="glow-value">5</span>
+                </div>
             </div>
 
-            <div class="control-group">
-                <label for="show-cities">都市表示:</label>
-                <input type="checkbox" id="show-cities" checked>
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div id="map"></div>
             </div>
+        </section>
 
-            <div class="control-group">
-                <label for="show-graticule">経緯線表示:</label>
-                <input type="checkbox" id="show-graticule" checked>
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>Beautiful Thematic Mapの作成例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
-
-            <div class="control-group">
-                <label for="glow-intensity">グロー強度:</label>
-                <input type="range" id="glow-intensity" min="0" max="10" value="5" step="1">
-                <span id="glow-value">5</span>
-            </div>
-
-        </div>
-
-        <div id="map"></div>
-
-        <div class="code-example">
-            <!-- サンプルコード -->
-            <pre>// Beautiful Thematic Mapの作成例
+            <div class="code-block">
+                <pre id="sample-code">// Beautiful Thematic Mapの作成例
 
 // データ読み込み
 const worldData = await d3.json('./geojson/world.geojson');
@@ -193,14 +165,25 @@ const citiesLayer = new Thematika.PointCircleLayer({
         "filter": 'url(#cityGlow)',
         "opacity": 0.8
     }
-});
-        </div>
+});</pre>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
     <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
         // グローバル状態
         let currentProjection = d3.geoNaturalEarth1();
         let currentTheme = 'ocean';
@@ -421,13 +404,6 @@ const citiesLayer = new Thematika.PointCircleLayer({
                                 // ツールチップ表示
                                 const tooltip = d3.select('body').append('div')
                                     .attr('class', 'tooltip')
-                                    .style('position', 'absolute')
-                                    .style('background', 'rgba(0,0,0,0.8)')
-                                    .style('color', 'white')
-                                    .style('padding', '8px')
-                                    .style('border-radius', '4px')
-                                    .style('pointer-events', 'none')
-                                    .style('font-size', '12px')
                                     .html(`<strong>${d.properties.name}</strong><br/>
                                            人口: ${d.properties.population.toLocaleString()}人<br/>
                                            標高: ${d.properties.elevation}m`)
@@ -529,9 +505,40 @@ const citiesLayer = new Thematika.PointCircleLayer({
             document.getElementById('glow-value').textContent = glowIntensity;
             draw();
         });
-        
-        // 初期読み込み
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // 初期描画
         draw();
+
+        // ウィンドウリサイズ対応
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 300);
+        });
     </script>
 </body>
 </html>
