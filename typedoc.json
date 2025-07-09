@@ -1,0 +1,16 @@
+// typedoc.json
+{
+  "entryPoints": [
+    "src/index.ts",          // ライブラリのエントリ
+    "src/types.ts",          // IGeojsonLayer などを定義しているファイル
+    "src/layers/**/*.{ts,js}"// レイヤーファイル群
+  ],
+  "out": "docs",            // 出力先ディレクトリ
+  "excludePrivate": true,                // private は除外（デフォルト）
+  "excludeProtected": false,             // protected は出力
+  "excludeInternal": true,               // @internal タグは除外
+  "excludeExternals": true,              // 外部モジュールは除外
+  "excludeNotDocumented": true,           // コメントのない要素は除外
+  "tsconfig": "tsconfig.json",
+  "exclude": ["node_modules"]
+}

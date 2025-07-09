@@ -34,7 +34,9 @@
     "d3-shape": "^3.2.0",
     "geotiff": "^2.1.4-beta.0",
     "rollup": "^4.44.2",
-    "textures": "^1.2.3"
+    "serve": "^14.2.4",
+    "textures": "^1.2.3",
+    "typedoc": "^0.28.7"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
