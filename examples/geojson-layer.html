@@ -78,7 +78,6 @@
             width: 100%;
             height: 100%;            
             aspect-ratio: 16 / 9;
-            background-color: #e6f3ff;
         }
     </style>
 </head>
@@ -87,7 +86,6 @@
         <h1>GeojsonLayer デモ</h1>
         <p class="description">
             GeojsonLayerを使用してGeoJSONデータを地図上に表示します。
-            世界地図データを表示し、アウトライン、経緯線、スタイリング機能を確認できます。
         </p>
 
         <div class="note">
@@ -122,14 +120,17 @@
             <!-- サンプルコード -->
             <pre>// GeojsonLayerの使用例
 
+// GeoJSONデータを読み込み。                
 const geojson =  await d3.json("./geojson/world.geojson");
 
 const width = 800;
 const height = 600;
 
+//投影法設定
 const projection = d3.geoEquirectangular()
     .fitExtent([[10, 0], [width-10, height]], geojson);
 
+// 地図初期化  
 const map = new Thematika.Map({
     container: '#map',
     width: width,
@@ -138,7 +139,7 @@ const map = new Thematika.Map({
 });
 
 // GeojsonLayerインスタンスを作成
-const worldLayer = new Thematika.GeojsonLayer({
+const geoJsonLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
         "fill":(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
@@ -150,33 +151,8 @@ const worldLayer = new Thematika.GeojsonLayer({
 });
 
 
-// OutlineLayerインスタンスを作成（クリップパス機能ON）
-const outlineLayer = new Thematika.OutlineLayer({
-    createClipPath: true,
-    clipPathId: 'earth-outline-clip',
-    attr: {
-        "fill": 'none',
-        "stroke": '#2c3e50',
-        "stroke-width": 2,
-        "opacity": 0.8
-    }
-});
-
-// GraticuleLayerインスタンスを作成
-const graticuleLayer = new Thematika.GraticuleLayer({
-    step: [10, 10], // 10度間隔
-    attr: {
-        "fill": 'none',
-        "stroke": '#ddd',
-        "stroke-width": 0.5,
-        "opacity": 0.6
-    }
-});
-
 // レイヤーインスタンスを地図に追加
-map.addLayer('graticule', graticuleLayer);
-map.addLayer('outline', outlineLayer);
-map.addLayer('world_new', worldLayer);
+map.addLayer('world_new', geoJsonLayer);
         </div>
     </div>
 
@@ -196,26 +172,26 @@ map.addLayer('world_new', worldLayer);
             const height = document.querySelector(id).clientHeight;
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-            const geojson = await d3.json('./geojson/takasaki/bulding_single.geojson');
+            const geojson = await d3.json('./geojson/world.geojson');
 
             // 投影法を地図データに合わせて設定
-            currentProjection.fitExtent([[10,0], [width-10, height]], geojson);
+            currentProjection.fitExtent([[20,40], [width-20, height-20]], geojson);
 
             // 地図を作成
             const map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor: '#e0f7fa',
             });
 
             // GeojsonLayerインスタンスを作成
-            const worldLayer = new Thematika.GeojsonLayer({
+            const geoJsonLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill":(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
-                    "filter": "#2c3e50", 
-                    "stroke": '#1a3d1f',
+                    "fill":"#de87ba", 
+                    "stroke": '#fcfcfc',
                     "stroke-width": 0.8,
                     "opacity": (d,i) => 0.9,
                 }
@@ -247,8 +223,8 @@ map.addLayer('world_new', worldLayer);
 
             // レイヤーインスタンスを地図に追加
             map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world_new', geoJsonLayer);
             map.addLayer('outline', outlineLayer);
-            map.addLayer('world_new', worldLayer);
 
         }
 

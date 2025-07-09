@@ -116,7 +116,9 @@
             const geojson = await d3.json('./geojson/world.geojson');
 
             // 投影法を地図データに合わせて設定
-            projection.fitExtent([[10, 60], [width-10, height-20]], geojson);
+            projection
+            .rotate([0, 0, 10])
+            .fitExtent([[10, 60], [width-10, height-20]], geojson);
 
             // 地図を作成
             const map = new Thematika.Map({

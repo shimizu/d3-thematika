@@ -254,6 +254,10 @@ map.addLayer('cityLabels', textLayer);
                     ]
                 };
 
+                // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+                const geojson = await d3.json('./geojson/world.geojson');
+
+
                 // 投影法を設定
                 const projection = d3.geoNaturalEarth1()
                     .scale(150)
@@ -267,31 +271,7 @@ map.addLayer('cityLabels', textLayer);
                     projection: projection
                 });
 
-                // 世界地図の背景レイヤー（軽量版）
-                const backgroundData = {
-                    type: "FeatureCollection",
-                    features: [
-                        {
-                            type: "Feature",
-                            geometry: {
-                                type: "Polygon",
-                                coordinates: [[
-                                    [-180, -90], [180, -90], [180, 90], [-180, 90], [-180, -90]
-                                ]]
-                            },
-                            properties: { name: "World" }
-                        }
-                    ]
-                };
-
-                const backgroundLayer = new Thematika.GeojsonLayer({
-                    data: backgroundData,
-                    attr: {
-                        "fill": '#e3f2fd',
-                        "stroke": '#1976d2',
-                        "stroke-width": 1
-                    }
-                });
+                
 
                 // 経緯線レイヤー
                 const graticuleLayer = new Thematika.GraticuleLayer({
@@ -304,10 +284,23 @@ map.addLayer('cityLabels', textLayer);
                     }
                 });
 
+                // OutlineLayerインスタンスを作成（クリップパス機能付き）
+                const outlineLayer = new Thematika.OutlineLayer({
+                    createClipPath: true,
+                    clipPathId: 'earth-outline-clip',
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
+
                 // PointTextLayerを作成
                 textLayer = new Thematika.PointTextLayer({
-                    data: cityData,
-                    textProperty: 'text',
+                    data: geojson,
+                    textProperty: 'NAME_JA',
                     dx: dxOffset,
                     dy: dyOffset,
                     rotate: rotation,
@@ -323,8 +316,8 @@ map.addLayer('cityLabels', textLayer);
                 });
 
                 // レイヤーを地図に追加
-                map.addLayer('background', backgroundLayer);
                 map.addLayer('graticule', graticuleLayer);
+                map.addLayer('outline', outlineLayer);
                 map.addLayer('cityLabels', textLayer);
 
             } catch (error) {

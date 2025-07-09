@@ -54,16 +54,19 @@ export class Map {
     this.initializeDefs(options.defs);
 
 
+
+    // メインのSVGグループを作成
+    this.svgGroup = this.svg.append('g')
+      .attr('class', 'thematika-main-group');
+
+
     //svg 背景rectを追加
-    this.svg.append('rect')
+    this.svgGroup.append('rect')
       .attr('width', '100%')
       .attr('height', '100%')
       .attr('fill', options.backgroundColor || '#ffffff')
       .attr('class', 'thematika-background'); 
 
-    // メインのSVGグループを作成
-    this.svgGroup = this.svg.append('g')
-      .attr('class', 'thematika-main-group');
 
     // 投影法を設定
     this.projection = options.projection;
