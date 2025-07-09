@@ -11,29 +11,14 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* line-text-layer.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
         }
         
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        /* line-text-layer.htmlでは共通クラスを使用 */
     </style>
 </head>
 <body>
@@ -108,7 +93,7 @@
 
                 <div class="control-item">
                     <label>フォントサイズ</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="font-size-range" min="10" max="30" value="16">
                         <span class="value-display" id="font-size-value">16</span>px
                     </div>

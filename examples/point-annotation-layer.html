@@ -10,36 +10,11 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* point-annotation-layer.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
-        }
-        
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .control-item input[type="color"] {
-            width: 60px;
-            height: 32px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -117,7 +92,7 @@
                 
                 <div class="control-item">
                     <label>X軸オフセット</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="offset-x" min="-100" max="100" step="5" value="30">
                         <span class="value-display" id="offset-x-value">30</span>
                     </div>
@@ -125,7 +100,7 @@
                 
                 <div class="control-item">
                     <label>Y軸オフセット</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="offset-y" min="-100" max="100" step="5" value="-20">
                         <span class="value-display" id="offset-y-value">-20</span>
                     </div>
@@ -133,7 +108,7 @@
                 
                 <div class="control-item">
                     <label>サブジェクト半径</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
                         <span class="value-display" id="subject-radius-value">3</span>
                     </div>
@@ -141,7 +116,7 @@
                 
                 <div class="control-item">
                     <label>サブジェクト幅</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="subject-width" min="1" max="400" step="1" value="16">
                         <span class="value-display" id="subject-width-value">16</span>
                     </div>
@@ -149,7 +124,7 @@
                 
                 <div class="control-item">
                     <label>サブジェクト高さ</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="subject-height" min="1" max="400" step="1" value="16">
                         <span class="value-display" id="subject-height-value">16</span>
                     </div>
@@ -157,12 +132,12 @@
                 
                 <div class="control-item">
                     <label for="subject-stroke">サブジェクト境界線色</label>
-                    <input type="color" id="subject-stroke" value="#000000">
+                    <input type="color" id="subject-stroke" value="#000000" class="color-picker">
                 </div>
                 
                 <div class="control-item">
                     <label>サブジェクト境界線太さ</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
                         <span class="value-display" id="subject-stroke-width-value">1</span>
                     </div>
@@ -182,12 +157,12 @@
                 
                 <div class="control-item">
                     <label for="note-background">ノート背景色</label>
-                    <input type="color" id="note-background" value="#ffffff">
+                    <input type="color" id="note-background" value="#ffffff" class="color-picker">
                 </div>
                 
                 <div class="control-item">
                     <label>ノートパディング</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="note-padding" min="0" max="20" step="1" value="4">
                         <span class="value-display" id="note-padding-value">4</span>
                     </div>
@@ -291,37 +266,8 @@ map.addLayer('annotations', annotationLayer);</pre>
     <script src="./thematika.umd.js"></script>
 
     <script>
-        // ナビゲーションバーのスクロール処理
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
+        // 共通機能の初期化
+        initializeCommonFeatures();
 
         let map = null;
         let annotationLayer = null;
@@ -531,13 +477,7 @@ map.addLayer('annotations', annotationLayer);</pre>
         });
 
         // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
-        });
+        setupResizeHandler(draw);
 
     </script>
 </body>

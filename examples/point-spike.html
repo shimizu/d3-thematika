@@ -10,29 +10,14 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* point-spike.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
         }
         
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        /* point-spike.htmlでは共通クラスを使用 */
     </style>
 </head>
 <body>
@@ -98,7 +83,7 @@
 
                 <div class="control-item">
                     <label>スパイク長さ</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="spike-length" min="10" max="200" value="50">
                         <span class="value-display" id="spike-length-value">50</span>
                     </div>

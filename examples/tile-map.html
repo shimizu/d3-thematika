@@ -10,40 +10,15 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* tile-map.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
         }
         
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+        /* tile-map.htmlでは共通クラスを使用 */
         
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        #tile-info {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 12px;
-            margin-top: 5px;
-            font-family: 'Courier New', monospace;
-        }
     </style>
 </head>
 <body>
@@ -108,7 +83,7 @@
 
                 <div class="control-item">
                     <label>ズームレベル</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="zoom-select" min="5" max="15" value="10">
                         <span class="value-display" id="zoom-value">10</span>
                     </div>
@@ -133,7 +108,7 @@
 
                 <div class="control-item">
                     <label>タイル情報</label>
-                    <div id="tile-info">
+                    <div id="tile-info" class="info-display">
                         タイルを読み込み中...
                     </div>
                 </div>
@@ -208,37 +183,8 @@ map.addLayer('outline', outlineLayer);</pre>
     <script src="./thematika.umd.js"></script>
 
     <script>
-        // ナビゲーションバーのスクロール処理
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
+        // 共通機能の初期化
+        initializeCommonFeatures();
         
         // 地域の境界を定義
         const regions = {

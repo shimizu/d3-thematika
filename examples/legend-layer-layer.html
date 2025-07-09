@@ -10,29 +10,14 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* legend-layer-layer.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
         }
         
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 300px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 60px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        /* legend-layer-layer.htmlでは共通クラスを使用 */
     </style>
 </head>
 <body>
@@ -117,7 +102,7 @@
 
                 <div class="control-item">
                     <label>X座標</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="legend-x-slider" min="0" max="800" value="20">
                         <span class="value-display" id="legend-x-value">20</span>
                     </div>
@@ -125,7 +110,7 @@
                 
                 <div class="control-item">
                     <label>Y座標</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="legend-y-slider" min="0" max="600" value="20">
                         <span class="value-display" id="legend-y-value">20</span>
                     </div>
@@ -133,7 +118,7 @@
 
                 <div class="control-item">
                     <label>アイテム間隔</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="item-spacing-slider" min="-10" max="200" value="20">
                         <span class="value-display" id="item-spacing-value">20</span>px
                     </div>

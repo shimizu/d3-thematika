@@ -10,36 +10,11 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* point-circle-layer.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
-        }
-        
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .control-item input[type="color"] {
-            width: 60px;
-            height: 32px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
         }
     </style>
 </head>
@@ -104,7 +79,7 @@
                 
                 <div class="control-item">
                     <label>半径</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="radius-slider" min="1" max="20" step="1" value="5">
                         <span class="value-display" id="radius-value">5</span>
                     </div>
@@ -112,7 +87,7 @@
                 
                 <div class="control-item">
                     <label for="fill-color">塗りつぶし色</label>
-                    <input type="color" id="fill-color" value="#ff6b6b">
+                    <input type="color" id="fill-color" value="#ff6b6b" class="color-picker">
                 </div>
             </div>
 
@@ -182,37 +157,8 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
     <script src="./thematika.umd.js"></script>
 
     <script>
-        // ナビゲーションバーのスクロール処理
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
+        // 共通機能の初期化
+        initializeCommonFeatures();
 
         let map = null;
         let circleLayer = null;
@@ -321,13 +267,7 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
         });
 
         // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
-        });
+        setupResizeHandler(draw);
 
     </script>
 </body>

@@ -10,29 +10,14 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
     <style>
         /* point-text-layer.html固有のスタイル */
         #map {
             background-color: #e6f3ff;
         }
         
-        .control-item .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .control-item .slider-wrapper input[type="range"] {
-            flex: 1;
-            max-width: 200px;
-        }
-        
-        .control-item .slider-wrapper .value-display {
-            min-width: 40px;
-            text-align: right;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        /* point-text-layer.htmlでは共通クラスを使用 */
     </style>
 </head>
 <body>
@@ -87,7 +72,7 @@
             <div class="controls-panel">
                 <div class="control-item">
                     <label>フォントサイズ</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="font-size" min="8" max="32" value="16" step="2">
                         <span class="value-display" id="font-size-value">16</span>px
                     </div>
@@ -95,7 +80,7 @@
 
                 <div class="control-item">
                     <label>X方向オフセット</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="dx-offset" min="-30" max="30" value="0" step="5">
                         <span class="value-display" id="dx-offset-value">0</span>
                     </div>
@@ -103,7 +88,7 @@
 
                 <div class="control-item">
                     <label>Y方向オフセット</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="dy-offset" min="-30" max="30" value="0" step="5">
                         <span class="value-display" id="dy-offset-value">0</span>
                     </div>
@@ -111,7 +96,7 @@
 
                 <div class="control-item">
                     <label>回転角度</label>
-                    <div class="slider-wrapper">
+                    <div class="slider-control">
                         <input type="range" id="rotation" min="0" max="360" value="0" step="15">
                         <span class="value-display" id="rotation-value">0</span>°
                     </div>

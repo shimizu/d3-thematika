@@ -209,6 +209,48 @@
     margin-bottom: 0.25rem;
 }
 
+/* 共通UIコンポーネント */
+.slider-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.slider-control input[type="range"] {
+    flex: 1;
+    max-width: 200px;
+}
+
+.slider-control .value-display {
+    min-width: 40px;
+    text-align: right;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.color-picker {
+    width: 60px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.info-display {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 12px;
+    margin-top: 5px;
+    font-family: 'Courier New', monospace;
+}
+
+.map-background-light {
+    background-color: #e6f3ff !important;
+}
+
 /* カードスタイル */
 .card {
     background: var(--dark-lighter);
