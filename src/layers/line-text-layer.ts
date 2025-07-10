@@ -49,6 +49,10 @@ export interface LineTextLayerOptions {
   showGuidePath?: boolean;
   /** ガイドパスのスタイル設定 */
   guidePathStyle?: LayerAttr;
+  
+  // textPath制御
+  /** パスに沿ってテキストを配置するかどうか（デフォルト: true） */
+  followPath?: boolean;
 }
 
 /**
@@ -96,6 +100,10 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
   private showGuidePath: boolean;
   /** ガイドパスのスタイル */
   private guidePathStyle: LayerAttr;
+  
+  // textPath制御
+  /** パスに沿ってテキストを配置するかどうか */
+  private followPath: boolean;
 
   /**
    * LineTextLayerを初期化します
@@ -163,6 +171,9 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
       strokeDasharray: '5,5',
       opacity: 0.7
     };
+    
+    // textPath制御の初期化
+    this.followPath = options.followPath !== undefined ? options.followPath : true;
   }
 
   /**
@@ -259,8 +270,12 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
       this.renderGuidePaths();
     }
     
-    // textPathを使用してテキストを描画
-    this.renderTextPath();
+    // フラグに応じてテキストを描画
+    if (this.followPath) {
+      this.renderTextPath();
+    } else {
+      this.renderSimpleText();
+    }
   }
 
   /**
@@ -493,6 +508,98 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
         guidePath.attr(key, value);
       }
     });
+  }
+
+  /**
+   * シンプルなテキスト（textPathを使わない）を描画します
+   * @private
+   */
+  private renderSimpleText(): void {
+    if (!this.layerGroup || !this.projection) return;
+    
+    // テキストグループを作成
+    const textGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'thematika-line-text-layer');
+
+    this.data.features.forEach((feature, featureIndex) => {
+      // テキスト内容を取得
+      let textContent = '';
+      if (feature.properties) {
+        textContent = feature.properties[this.textProperty] || feature.properties['name'] || '';
+      }
+      
+      if (!textContent) return; // テキストが空の場合はスキップ
+      
+      const geometry = feature.geometry;
+      
+      if (geometry.type === 'LineString') {
+        this.renderLineStringSimpleText(
+          textGroup,
+          geometry.coordinates as GeoJSON.Position[],
+          feature,
+          featureIndex,
+          textContent
+        );
+      } else if (geometry.type === 'MultiLineString') {
+        (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
+          this.renderLineStringSimpleText(
+            textGroup,
+            line,
+            feature,
+            featureIndex,
+            textContent,
+            lineIndex
+          );
+        });
+      }
+    });
+  }
+
+  /**
+   * LineString用のシンプルテキストを描画します
+   * @private
+   */
+  private renderLineStringSimpleText(
+    textGroup: Selection<SVGGElement, unknown, HTMLElement, any>,
+    coordinates: GeoJSON.Position[],
+    feature: GeoJSON.Feature,
+    featureIndex: number,
+    textContent: string,
+    lineIndex?: number
+  ): void {
+    if (!this.projection || coordinates.length < 2) return;
+
+    // ラインの中心点を計算
+    const centerIndex = Math.floor(coordinates.length / 2);
+    const centerCoord = coordinates[centerIndex];
+    const centerPoint = this.projection(centerCoord as [number, number]);
+    
+    if (!centerPoint) return;
+
+    // text要素を作成
+    const textElement = textGroup
+      .append('text')
+      .attr('x', centerPoint[0])
+      .attr('y', centerPoint[1])
+      .attr('font-family', this.fontFamilyFunction(feature, featureIndex))
+      .attr('font-size', this.fontSizeFunction(feature, featureIndex))
+      .attr('font-weight', this.fontWeightFunction(feature, featureIndex))
+      .attr('text-anchor', this.textAnchor)
+      .attr('alignment-baseline', 'middle')
+      .attr('class', () => {
+        const baseClass = 'thematika-line-text';
+        const customClass = this.attr.className || '';
+        const featureClass = (feature.properties?.class as string) || '';
+        const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
+        return [baseClass, customClass, featureClass, lineClass].filter(Boolean).join(' ');
+      })
+      .text(textContent);
+
+    // 属性とスタイルを適用
+    if (this.layerGroup) {
+      this.applyAllStylesToElements(textElement, this.layerGroup);
+    }
   }
 
   /**

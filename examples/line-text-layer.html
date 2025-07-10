@@ -115,23 +115,16 @@
                     </select>
                 </div>
                 
-                <div class="control-item">
-                    <label>矢印オプション</label>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="start-arrow">
-                        <label for="start-arrow">開始点に矢印を表示</label>
-                    </div>
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="end-arrow" checked>
-                        <label for="end-arrow">終了点に矢印を表示</label>
-                    </div>
-                </div>
                 
                 <div class="control-item">
                     <label>ラベル表示オプション</label>
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="show-labels" checked>
                         <label for="show-labels">ラベルを表示</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="follow-path" checked>
+                        <label for="follow-path">パスに沿ってラベルを配置</label>
                     </div>
                 </div>
             </div>
@@ -412,9 +405,10 @@ map.addLayer('line-texts', textLayer);</pre>
             const lineType = document.getElementById('line-type').value;
             const arcHeight = parseFloat(document.getElementById('arc-height').value);
             const smoothType = document.getElementById('smooth-type').value;
-            const startArrow = document.getElementById('start-arrow').checked;
-            const endArrow = document.getElementById('end-arrow').checked;
+            const startArrow = false;
+            const endArrow = true;
             const showLabels = document.getElementById('show-labels').checked;
+            const followPath = document.getElementById('follow-path').checked;
             
             // LineConnectionLayerインスタンスを作成（世界一周ルート）
             const worldTourLayerOptions = {
@@ -478,6 +472,7 @@ map.addLayer('line-texts', textLayer);</pre>
                     fontSize: 20,
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
+                    followPath: followPath,
                     attr: {
                         "fill": '#ff0000',
                        "stroke": '#000',
@@ -504,6 +499,7 @@ map.addLayer('line-texts', textLayer);</pre>
                     fontSize: 16,
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
+                    followPath: followPath,
                     attr: {
                         "fill": (d, i) => ['#2c3e50', '#1a237e', '#004d40'][i % 3],
                         "stroke": '#000',
@@ -597,9 +593,8 @@ map.addLayer('line-texts', textLayer);</pre>
         });
         
         document.getElementById('smooth-type').addEventListener('change', draw);
-        document.getElementById('start-arrow').addEventListener('change', draw);
-        document.getElementById('end-arrow').addEventListener('change', draw);
         document.getElementById('show-labels').addEventListener('change', draw);
+        document.getElementById('follow-path').addEventListener('change', draw);
         
         // 初期表示時のUI状態を設定
         const initialLineType = document.getElementById('line-type').value;
