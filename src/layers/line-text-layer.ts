@@ -53,6 +53,14 @@ export interface LineTextLayerOptions {
   // textPath制御
   /** パスに沿ってテキストを配置するかどうか（デフォルト: true） */
   followPath?: boolean;
+  /** テキストの向きを反転させるかどうか（デフォルト: false） */
+  flipText?: boolean;
+  
+  // オフセット設定
+  /** X方向のオフセット（デフォルト: 0） */
+  dx?: number | ((feature: GeoJSON.Feature, index: number) => number);
+  /** Y方向のオフセット（デフォルト: 0） */
+  dy?: number | ((feature: GeoJSON.Feature, index: number) => number);
 }
 
 /**
@@ -104,6 +112,14 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
   // textPath制御
   /** パスに沿ってテキストを配置するかどうか */
   private followPath: boolean;
+  /** テキストの向きを反転させるかどうか */
+  private flipText: boolean;
+  
+  // オフセット設定
+  /** X方向オフセット関数 */
+  private dxFunction: (feature: GeoJSON.Feature, index: number) => number;
+  /** Y方向オフセット関数 */
+  private dyFunction: (feature: GeoJSON.Feature, index: number) => number;
 
   /**
    * LineTextLayerを初期化します
@@ -174,6 +190,22 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
     
     // textPath制御の初期化
     this.followPath = options.followPath !== undefined ? options.followPath : true;
+    this.flipText = options.flipText || false;
+    
+    // オフセット設定の処理
+    if (typeof options.dx === 'function') {
+      this.dxFunction = options.dx;
+    } else {
+      const dx = options.dx || 0;
+      this.dxFunction = () => dx;
+    }
+    
+    if (typeof options.dy === 'function') {
+      this.dyFunction = options.dy;
+    } else {
+      const dy = options.dy || 0;
+      this.dyFunction = () => dy;
+    }
   }
 
   /**
@@ -348,9 +380,14 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
     const pathId = `line-text-path-${this.id}-${featureIndex}${lineIndex !== undefined ? `-${lineIndex}` : ''}`;
     
     // パス文字列を生成
-    const pathString = this.generateLineStringPath(coordinates);
+    let pathString = this.generateLineStringPath(coordinates);
     
     if (!pathString) return;
+
+    // テキスト反転が有効な場合、パスを逆順にする
+    if (this.flipText) {
+      pathString = this.reversePath(pathString);
+    }
 
     // path要素をdefsに追加
     defs.append('path')
@@ -580,8 +617,8 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
     // text要素を作成
     const textElement = textGroup
       .append('text')
-      .attr('x', centerPoint[0])
-      .attr('y', centerPoint[1])
+      .attr('x', centerPoint[0] + this.dxFunction(feature, featureIndex))
+      .attr('y', centerPoint[1] + this.dyFunction(feature, featureIndex))
       .attr('font-family', this.fontFamilyFunction(feature, featureIndex))
       .attr('font-size', this.fontSizeFunction(feature, featureIndex))
       .attr('font-weight', this.fontWeightFunction(feature, featureIndex))
@@ -849,6 +886,63 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
       }
       return pathString;
     }
+  }
+
+  /**
+   * SVGパス文字列を逆順にします
+   * @param pathString - 元のパス文字列
+   * @returns 逆順にされたパス文字列
+   * @private
+   */
+  private reversePath(pathString: string): string {
+    if (!pathString) return '';
+
+    // パスコマンドを解析して座標を抽出
+    const commands = pathString.match(/[MLQC][^MLQC]*/g);
+    if (!commands) return pathString;
+
+    const points: [number, number][] = [];
+    
+    // 各コマンドから座標を抽出
+    commands.forEach(command => {
+      const type = command[0];
+      const coords = command.slice(1).trim().split(/[\s,]+/).map(Number);
+      
+      if (type === 'M' || type === 'L') {
+        // MoveTo/LineTo: [x, y]
+        for (let i = 0; i < coords.length; i += 2) {
+          if (coords[i] !== undefined && coords[i + 1] !== undefined) {
+            points.push([coords[i], coords[i + 1]]);
+          }
+        }
+      } else if (type === 'Q') {
+        // QuadraticCurveTo: [cx, cy, x, y] - 終点のみを使用
+        for (let i = 2; i < coords.length; i += 4) {
+          if (coords[i] !== undefined && coords[i + 1] !== undefined) {
+            points.push([coords[i], coords[i + 1]]);
+          }
+        }
+      } else if (type === 'C') {
+        // CubicCurveTo: [cx1, cy1, cx2, cy2, x, y] - 終点のみを使用
+        for (let i = 4; i < coords.length; i += 6) {
+          if (coords[i] !== undefined && coords[i + 1] !== undefined) {
+            points.push([coords[i], coords[i + 1]]);
+          }
+        }
+      }
+    });
+
+    if (points.length < 2) return pathString;
+
+    // 座標を逆順にして新しいパスを生成
+    const reversedPoints = [...points].reverse();
+    let reversedPath = `M${reversedPoints[0][0]},${reversedPoints[0][1]}`;
+    
+    for (let i = 1; i < reversedPoints.length; i++) {
+      reversedPath += `L${reversedPoints[i][0]},${reversedPoints[i][1]}`;
+    }
+
+    return reversedPath;
   }
 
   /**

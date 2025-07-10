@@ -126,6 +126,24 @@
                         <input type="checkbox" id="follow-path" checked>
                         <label for="follow-path">パスに沿ってラベルを配置</label>
                     </div>
+                    <div class="checkbox-wrapper" id="flip-text-wrapper">
+                        <input type="checkbox" id="flip-text">
+                        <label for="flip-text">ラベルの読み方向を反転</label>
+                    </div>
+                </div>
+                
+                <div class="control-item" id="text-offset-group">
+                    <label>テキストオフセット</label>
+                    <div class="slider-control">
+                        <label style="min-width: 120px; white-space: nowrap;">X方向オフセット</label>
+                        <input type="range" id="dx-offset" min="-50" max="50" value="0" step="5">
+                        <span class="value-display" id="dx-offset-value">0</span>
+                    </div>
+                    <div class="slider-control">
+                        <label style="min-width: 120px; white-space: nowrap;">Y方向オフセット</label>
+                        <input type="range" id="dy-offset" min="-50" max="50" value="0" step="5">
+                        <span class="value-display" id="dy-offset-value">0</span>
+                    </div>
                 </div>
             </div>
 
@@ -409,6 +427,9 @@ map.addLayer('line-texts', textLayer);</pre>
             const endArrow = true;
             const showLabels = document.getElementById('show-labels').checked;
             const followPath = document.getElementById('follow-path').checked;
+            const flipText = document.getElementById('flip-text').checked;
+            const dxOffset = parseFloat(document.getElementById('dx-offset').value);
+            const dyOffset = parseFloat(document.getElementById('dy-offset').value);
             
             // LineConnectionLayerインスタンスを作成（世界一周ルート）
             const worldTourLayerOptions = {
@@ -441,7 +462,19 @@ map.addLayer('line-texts', textLayer);</pre>
                 endArrow: true,
                 arrowSize: 8,
                 attr: {
-                    "stroke": (d, i) => ['#4ecdc4', '#45b7d1', '#96ceb4'][i % 3],
+                    "stroke": (d, i) => {
+                        // iは常に0なので、segmentIndexまたはfeature基準で色分け
+                        console.log('i:', i, 'segmentIndex:', d.segmentIndex, 'feature:', d.feature?.properties?.class);
+                        
+                        // featureのclassプロパティ基準で色分け
+                        const featureClass = d.feature?.properties?.class;
+                        if (featureClass === 'asia-pacific') return '#4ecdc4';
+                        if (featureClass === 'europe-asia') return '#45b7d1';
+                        if (featureClass === 'america-oceania') return '#96ceb4';
+                        
+                        // fallback: segmentIndex基準
+                        return ['#4ecdc4', '#45b7d1', '#96ceb4'][d.segmentIndex % 3];
+                    },
                     "stroke-width": 2,
                     "opacity": 0.7,
                     "stroke-dasharray": '5,3'
@@ -473,6 +506,9 @@ map.addLayer('line-texts', textLayer);</pre>
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
                     followPath: followPath,
+                    flipText: flipText,
+                    dx: dxOffset,
+                    dy: dyOffset,
                     attr: {
                         "fill": '#ff0000',
                        "stroke": '#000',
@@ -500,6 +536,9 @@ map.addLayer('line-texts', textLayer);</pre>
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
                     followPath: followPath,
+                    flipText: flipText,
+                    dx: dxOffset,
+                    dy: dyOffset,
                     attr: {
                         "fill": (d, i) => ['#2c3e50', '#1a237e', '#004d40'][i % 3],
                         "stroke": '#000',
@@ -594,13 +633,56 @@ map.addLayer('line-texts', textLayer);</pre>
         
         document.getElementById('smooth-type').addEventListener('change', draw);
         document.getElementById('show-labels').addEventListener('change', draw);
-        document.getElementById('follow-path').addEventListener('change', draw);
+        document.getElementById('follow-path').addEventListener('change', (e) => {
+            const followPath = e.target.checked;
+            
+            // UI要素の表示/非表示を切り替え
+            const flipTextWrapper = document.getElementById('flip-text-wrapper');
+            const textOffsetGroup = document.getElementById('text-offset-group');
+            
+            if (followPath) {
+                // パス沿い配置の場合：読み方向反転を表示、オフセットを非表示
+                flipTextWrapper.style.display = 'block';
+                textOffsetGroup.style.display = 'none';
+            } else {
+                // 中心点配置の場合：読み方向反転を非表示、オフセットを表示
+                flipTextWrapper.style.display = 'none';
+                textOffsetGroup.style.display = 'block';
+            }
+            
+            draw();
+        });
+        document.getElementById('flip-text').addEventListener('change', draw);
+        
+        // オフセットコントロールのイベントリスナー
+        document.getElementById('dx-offset').addEventListener('input', (e) => {
+            document.getElementById('dx-offset-value').textContent = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('dy-offset').addEventListener('input', (e) => {
+            document.getElementById('dy-offset-value').textContent = e.target.value;
+            draw();
+        });
         
         // 初期表示時のUI状態を設定
         const initialLineType = document.getElementById('line-type').value;
         if (initialLineType === 'arc') {
             document.getElementById('arc-height-group').style.display = 'block';
             document.getElementById('smooth-type-group').style.display = 'none';
+        }
+        
+        // パス沿い配置の初期状態に応じてUI表示を設定
+        const initialFollowPath = document.getElementById('follow-path').checked;
+        const flipTextWrapper = document.getElementById('flip-text-wrapper');
+        const textOffsetGroup = document.getElementById('text-offset-group');
+        
+        if (initialFollowPath) {
+            flipTextWrapper.style.display = 'block';
+            textOffsetGroup.style.display = 'none';
+        } else {
+            flipTextWrapper.style.display = 'none';
+            textOffsetGroup.style.display = 'block';
         }
         
         // 初回描画

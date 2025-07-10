@@ -318,8 +318,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
           path.attr('marker-end', `url(#${markerId}-end)`);
         }
 
-        // 属性とスタイルを適用
-        super.applyAllStylesToElement(path, this.layerGroup!);
+        // 属性とスタイルを適用（複数要素用メソッドを使用）
+        super.applyAllStylesToElements(path, this.layerGroup!);
       }
     }
   }
@@ -520,8 +520,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
       path.attr('marker-end', `url(#${markerId}-end)`);
     }
 
-    // 属性とスタイルを適用
-    super.applyAllStylesToElement(path, this.layerGroup!);
+    // 属性とスタイルを適用（複数要素用メソッドを使用）
+    super.applyAllStylesToElements(path, this.layerGroup!);
   }
 
   /**
