@@ -1,10 +1,30 @@
-import { Selection } from 'd3-selection';
+import { Selection, select as d3Select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { path as d3Path } from 'd3-path';
 import { line, curveBasis, curveCardinal, curveCatmullRom, curveLinear, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepAfter, curveStepBefore } from 'd3-shape';
 import { BaseLayer } from './base-layer';
 import { LayerAttr, LayerStyle, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
 import * as GeoJSON from 'geojson';
+
+/**
+ * 統一されたラインデータ構造
+ */
+interface LineData {
+  /** フィーチャー情報 */
+  feature: GeoJSON.Feature;
+  /** フィーチャーのインデックス（全体通し番号） */
+  featureIndex: number;
+  /** ライン座標配列 */
+  coordinates: GeoJSON.Position[];
+  /** MultiLineString内のラインインデックス（LineStringの場合は未定義） */
+  lineIndex?: number;
+  /** 生成されたSVGパスデータ */
+  pathData: string;
+  /** 開始矢印が必要かどうか */
+  needsStartArrow: boolean;
+  /** 終了矢印が必要かどうか */
+  needsEndArrow: boolean;
+}
 
 /**
  * LineConnectionLayerの初期化オプション
@@ -234,7 +254,7 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   }
 
   /**
-   * ラインを描画します
+   * ライン描画を実行します（リファクタリング版：一括データバインディング）
    * @private
    */
   private renderLines(): void {
@@ -244,35 +264,109 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
       .append('g')
       .attr('class', 'thematika-line-connection-layer');
 
-    // 各フィーチャーを処理
+    // 全ラインデータを準備
+    const allLinesData = this.prepareAllLinesData();
+
+    if (allLinesData.length === 0) return;
+
+    // D3データバインディングで一括処理
+    const paths = lineGroup
+      .selectAll('.thematika-line-path')
+      .data(allLinesData)
+      .enter()
+      .append('path')
+      .attr('class', (d, i) => {
+        const baseClass = 'thematika-line-path thematika-connection-line';
+        const customClass = this.attr.className || '';
+        const featureClass = d.feature.properties?.class || '';
+        const lineClass = d.lineIndex !== undefined ? `line-${d.lineIndex}` : '';
+        const globalLineClass = `global-line-${i}`;
+        return [baseClass, customClass, featureClass, lineClass, globalLineClass].filter(Boolean).join(' ');
+      })
+      .attr('d', d => d.pathData)
+      .style('fill', 'none');
+
+    // 矢印マーカーを適用
+    this.applyArrowMarkers(paths);
+
+    // 属性とスタイルを一括適用
+    super.applyAllStylesToElements(paths, this.layerGroup!);
+  }
+
+  /**
+   * 全フィーチャーから統一されたラインデータを準備します
+   * @returns 統一されたラインデータの配列
+   * @private
+   */
+  private prepareAllLinesData(): LineData[] {
+    const allLinesData: LineData[] = [];
+
     this.data.features.forEach((feature, featureIndex) => {
       const geometry = feature.geometry;
       
       if (geometry.type === 'LineString') {
-        this.renderLineString(
-          lineGroup,
-          geometry.coordinates as GeoJSON.Position[],
-          feature,
-          featureIndex
-        );
-      } else if (geometry.type === 'MultiLineString') {
-        (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
-          this.renderLineString(
-            lineGroup,
-            line,
+        const coordinates = geometry.coordinates as GeoJSON.Position[];
+        const pathData = this.generateLinePath(coordinates);
+        
+        if (pathData) {
+          allLinesData.push({
             feature,
             featureIndex,
-            lineIndex
-          );
+            coordinates,
+            pathData,
+            needsStartArrow: this.startArrow,
+            needsEndArrow: this.endArrow
+          });
+        }
+      } else if (geometry.type === 'MultiLineString') {
+        (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
+          const pathData = this.generateLinePath(line);
+          
+          if (pathData) {
+            allLinesData.push({
+              feature,
+              featureIndex,
+              coordinates: line,
+              lineIndex,
+              pathData,
+              needsStartArrow: this.startArrow,
+              needsEndArrow: this.endArrow
+            });
+          }
         });
+      }
+    });
+
+    return allLinesData;
+  }
+
+  /**
+   * パス要素に矢印マーカーを適用します
+   * @param paths - パス要素のselection
+   * @private
+   */
+  private applyArrowMarkers(paths: Selection<SVGPathElement, LineData, SVGGElement, unknown>): void {
+    const markerId = `arrow-${this.id}`;
+    
+    paths.each(function(d) {
+      const path = d3Select(this);
+      
+      if (d.needsStartArrow) {
+        path.attr('marker-start', `url(#${markerId}-start)`);
+      }
+      
+      if (d.needsEndArrow) {
+        path.attr('marker-end', `url(#${markerId}-end)`);
       }
     });
   }
 
   /**
-   * LineStringをセグメントごとに描画します
+   * LineStringをセグメントごとに描画します（旧実装 - 非推奨）
+   * @deprecated 新しいrenderLines()メソッドで置き換えられました
    * @private
    */
+  /*
   private renderLineString(
     container: Selection<SVGGElement, unknown, HTMLElement, any>,
     coordinates: GeoJSON.Position[],
@@ -280,49 +374,9 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     featureIndex: number,
     lineIndex?: number
   ): void {
-    if (this.lineType === 'smooth') {
-      // スムージングの場合は全体を一つのパスとして描画
-      this.renderSmoothLineString(container, coordinates, feature, featureIndex, lineIndex);
-    } else {
-      // 直線・アークの場合は従来通りセグメントごとに描画
-      for (let i = 0; i < coordinates.length - 1; i++) {
-        const segmentData = {
-          start: coordinates[i],
-          end: coordinates[i + 1],
-          feature: feature,
-          segmentIndex: i,
-          isFirst: i === 0,
-          isLast: i === coordinates.length - 2
-        };
-
-        const path = container
-          .append('path')
-          .datum(segmentData)
-          .attr('d', d => this.generateSegmentPath(d.start as [number, number], d.end as [number, number]))
-          .attr('class', () => {
-            const baseClass = 'thematika-connection-line';
-            const customClass = this.attr.className || '';
-            const dataClass = feature.properties?.class || '';
-            const segmentClass = `segment-${i}`;
-            const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
-            return [baseClass, customClass, dataClass, segmentClass, lineClass].filter(Boolean).join(' ');
-          })
-          .style('fill', 'none')
-
-        // 矢印マーカーを適用
-        const markerId = `arrow-${this.id}`;
-        if (this.startArrow && segmentData.isFirst) {
-          path.attr('marker-start', `url(#${markerId}-start)`);
-        }
-        if (this.endArrow && segmentData.isLast) {
-          path.attr('marker-end', `url(#${markerId}-end)`);
-        }
-
-        // 属性とスタイルを適用（複数要素用メソッドを使用）
-        super.applyAllStylesToElements(path, this.layerGroup!);
-      }
-    }
+    // この実装は新しいrenderLines()メソッドで置き換えられました
   }
+  */
 
 
   /**
@@ -474,9 +528,11 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   }
 
   /**
-   * スムージングでLineStringを描画します
+   * スムージングでLineStringを描画します（旧実装 - 非推奨）
+   * @deprecated 新しいrenderLines()メソッドで置き換えられました
    * @private
    */
+  /*
   private renderSmoothLineString(
     container: Selection<SVGGElement, unknown, HTMLElement, any>,
     coordinates: GeoJSON.Position[],
@@ -484,45 +540,9 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     featureIndex: number,
     lineIndex?: number
   ): void {
-    if (!this.projection) return;
-
-    // スムージングパスを生成
-    const smoothPath = this.geoSmoothPath(coordinates);
-
-    if (!smoothPath) return;
-
-    const lineData = {
-      coordinates: coordinates,
-      feature: feature,
-      featureIndex: featureIndex,
-      lineIndex: lineIndex
-    };
-
-    const path = container
-      .append('path')
-      .datum(lineData)
-      .attr('d', smoothPath)
-      .attr('class', () => {
-        const baseClass = 'thematika-connection-line';
-        const customClass = this.attr.className || '';
-        const dataClass = feature.properties?.class || '';
-        const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
-        return [baseClass, customClass, dataClass, lineClass].filter(Boolean).join(' ');
-      })
-      .style('fill', 'none');
-
-    // 矢印マーカーを適用
-    const markerId = `arrow-${this.id}`;
-    if (this.startArrow) {
-      path.attr('marker-start', `url(#${markerId}-start)`);
-    }
-    if (this.endArrow) {
-      path.attr('marker-end', `url(#${markerId}-end)`);
-    }
-
-    // 属性とスタイルを適用（複数要素用メソッドを使用）
-    super.applyAllStylesToElements(path, this.layerGroup!);
+    // この実装は新しいrenderLines()メソッドで置き換えられました
   }
+  */
 
   /**
    * 地理座標系でスムージングパスを生成します
@@ -588,30 +608,107 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    */
   on(eventType: string, handler: (event: Event, data: any) => void): void {
     if (this.layerGroup) {
-      this.layerGroup.selectAll('path')
+      this.layerGroup.selectAll('.thematika-line-path')
         .on(eventType, function(event, d: any) {
-          // データの構造に応じて適切な情報を返す
-          if (d.coordinates) {
-            // スムージングの場合
-            handler(event, {
-              feature: d.feature,
-              coordinates: d.coordinates,
-              featureIndex: d.featureIndex,
-              lineIndex: d.lineIndex
-            });
-          } else {
-            // セグメントの場合
-            handler(event, {
-              feature: d.feature,
-              segmentIndex: d.segmentIndex,
-              start: d.start,
-              end: d.end,
-              isFirst: d.isFirst,
-              isLast: d.isLast
-            });
-          }
+          // 統一されたLineDataを直接渡す
+          handler(event, {
+            feature: d.feature,
+            featureIndex: d.featureIndex,
+            coordinates: d.coordinates,
+            lineIndex: d.lineIndex
+          });
         });
     }
+  }
+
+  /**
+   * ライン座標から統一されたパス文字列を生成します
+   * @param coordinates - ライン座標配列
+   * @returns SVGパス文字列
+   * @private
+   */
+  private generateLinePath(coordinates: GeoJSON.Position[]): string {
+    if (!this.projection || coordinates.length < 2) return '';
+
+    switch (this.lineType) {
+      case 'straight':
+        return this.generateStraightPath(coordinates);
+      case 'arc':
+        return this.generateArcLinePath(coordinates);
+      case 'smooth':
+        return this.generateSmoothPath(coordinates);
+      default:
+        return this.generateStraightPath(coordinates);
+    }
+  }
+
+  /**
+   * 直線パスを生成します
+   * @param coordinates - ライン座標配列
+   * @returns SVGパス文字列
+   * @private
+   */
+  private generateStraightPath(coordinates: GeoJSON.Position[]): string {
+    if (!this.projection) return '';
+
+    const projectedPoints = coordinates
+      .map(coord => this.projection!(coord as [number, number]))
+      .filter(point => point !== null) as [number, number][];
+
+    if (projectedPoints.length < 2) return '';
+
+    let pathString = `M${projectedPoints[0][0]},${projectedPoints[0][1]}`;
+    for (let i = 1; i < projectedPoints.length; i++) {
+      pathString += `L${projectedPoints[i][0]},${projectedPoints[i][1]}`;
+    }
+
+    return pathString;
+  }
+
+  /**
+   * アークパスを生成します（セグメント毎にアーク処理）
+   * @param coordinates - ライン座標配列
+   * @returns SVGパス文字列
+   * @private
+   */
+  private generateArcLinePath(coordinates: GeoJSON.Position[]): string {
+    if (!this.projection || coordinates.length < 2) return '';
+
+    let pathString = '';
+    for (let i = 0; i < coordinates.length - 1; i++) {
+      const segmentPath = this.generateSegmentPath(
+        coordinates[i] as [number, number],
+        coordinates[i + 1] as [number, number]
+      );
+      
+      if (i === 0) {
+        pathString = segmentPath;
+      } else {
+        // 既存のパスに継続して追加（Mコマンドを削除してQから開始）
+        const segmentWithoutMove = segmentPath.replace(/^M[^LQ]*/, '');
+        pathString += segmentWithoutMove;
+      }
+    }
+
+    return pathString;
+  }
+
+  /**
+   * スムースパスを生成します
+   * @param coordinates - ライン座標配列  
+   * @returns SVGパス文字列
+   * @private
+   */
+  private generateSmoothPath(coordinates: GeoJSON.Position[]): string {
+    return this.geoSmoothPath(coordinates);
+  }
+
+  /**
+   * GeoJSONデータを取得します
+   * @returns GeoJSONデータ
+   */
+  getData(): GeoJSON.FeatureCollection {
+    return this.data;
   }
 
 }
