@@ -26,6 +26,12 @@ interface LineTextLayerArgs {
   projection: string;
   dataType: 'rivers' | 'roads' | 'borders' | 'railways';
   showLines: boolean;
+  lineType: 'straight' | 'smooth';
+  smoothType: 'curveBasis' | 'curveCardinal' | 'curveCatmullRom' | 'curveLinear' | 'curveMonotoneX' | 'curveMonotoneY' | 'curveNatural' | 'curveStep' | 'curveStepAfter' | 'curveStepBefore';
+  showSmoothLine: boolean;
+  smoothLineStroke: string;
+  smoothLineStrokeWidth: number;
+  smoothLineOpacity: number;
 }
 
 const meta: Meta<LineTextLayerArgs> = {
@@ -141,6 +147,38 @@ const meta: Meta<LineTextLayerArgs> = {
       control: { type: 'boolean' },
       description: 'ライン自体も表示',
       defaultValue: true
+    },
+    lineType: {
+      control: { type: 'radio' },
+      options: ['straight', 'smooth'],
+      description: 'ライン描画タイプ',
+      defaultValue: 'straight'
+    },
+    smoothType: {
+      control: { type: 'select' },
+      options: ['curveBasis', 'curveCardinal', 'curveCatmullRom', 'curveLinear', 'curveMonotoneX', 'curveMonotoneY', 'curveNatural', 'curveStep', 'curveStepAfter', 'curveStepBefore'],
+      description: 'スムージングのカーブタイプ',
+      defaultValue: 'curveBasis'
+    },
+    showSmoothLine: {
+      control: { type: 'boolean' },
+      description: 'スムージングラインも表示',
+      defaultValue: false
+    },
+    smoothLineStroke: {
+      control: { type: 'color' },
+      description: 'スムージングライン色',
+      defaultValue: '#999999'
+    },
+    smoothLineStrokeWidth: {
+      control: { type: 'range', min: 0.5, max: 5, step: 0.5 },
+      description: 'スムージングライン幅',
+      defaultValue: 1
+    },
+    smoothLineOpacity: {
+      control: { type: 'range', min: 0, max: 1, step: 0.1 },
+      description: 'スムージングライン透明度',
+      defaultValue: 0.7
     }
   }
 };
@@ -428,6 +466,15 @@ function createLineTextStory(args: LineTextLayerArgs) {
     fontFamily: args.fontFamily,
     fontSize: args.fontSize,
     fontWeight: args.fontWeight as any,
+    lineType: args.lineType,
+    smoothType: args.smoothType,
+    showSmoothLine: args.showSmoothLine,
+    smoothLineStyle: {
+      fill: 'none',
+      stroke: args.smoothLineStroke,
+      strokeWidth: args.smoothLineStrokeWidth,
+      opacity: args.smoothLineOpacity
+    },
     attr: {
       fill: args.fill,
       stroke: args.stroke,
@@ -489,7 +536,13 @@ export const Rivers: Story = {
     strokeWidth: 1,
     projection: 'naturalEarth1',
     dataType: 'rivers',
-    showLines: true
+    showLines: true,
+    lineType: 'straight',
+    smoothType: 'curveBasis',
+    showSmoothLine: false,
+    smoothLineStroke: '#999999',
+    smoothLineStrokeWidth: 1,
+    smoothLineOpacity: 0.7
   },
   render: createLineTextStory,
 };
@@ -514,7 +567,13 @@ export const Railways: Story = {
     strokeWidth: 2,
     projection: 'naturalEarth1',
     dataType: 'railways',
-    showLines: true
+    showLines: true,
+    lineType: 'straight',
+    smoothType: 'curveBasis',
+    showSmoothLine: false,
+    smoothLineStroke: '#999999',
+    smoothLineStrokeWidth: 1,
+    smoothLineOpacity: 0.7
   },
   render: createLineTextStory,
 };
@@ -539,7 +598,13 @@ export const RoadsHorizontal: Story = {
     strokeWidth: 1.5,
     projection: 'mercator',
     dataType: 'roads',
-    showLines: true
+    showLines: true,
+    lineType: 'straight',
+    smoothType: 'curveBasis',
+    showSmoothLine: false,
+    smoothLineStroke: '#999999',
+    smoothLineStrokeWidth: 1,
+    smoothLineOpacity: 0.7
   },
   render: createLineTextStory,
 };
@@ -564,7 +629,44 @@ export const BordersPerpendicular: Story = {
     strokeWidth: 2,
     projection: 'orthographic',
     dataType: 'borders',
-    showLines: false
+    showLines: false,
+    lineType: 'straight',
+    smoothType: 'curveBasis',
+    showSmoothLine: false,
+    smoothLineStroke: '#999999',
+    smoothLineStrokeWidth: 1,
+    smoothLineOpacity: 0.7
+  },
+  render: createLineTextStory,
+};
+
+export const RiversSmooth: Story = {
+  args: {
+    textProperty: 'text',
+    position: 'middle',
+    placement: 'along',
+    usePercentage: true,
+    dx: 0,
+    dy: 0,
+    rotate: 0,
+    lengthAdjust: 'spacing',
+    alignmentBaseline: 'middle',
+    textAnchor: 'middle',
+    fontFamily: 'Arial, sans-serif',
+    fontSize: 13,
+    fontWeight: 'bold',
+    fill: '#2980b9',
+    stroke: '#ffffff',
+    strokeWidth: 2,
+    projection: 'naturalEarth1',
+    dataType: 'rivers',
+    showLines: false,
+    lineType: 'smooth',
+    smoothType: 'curveBasis',
+    showSmoothLine: true,
+    smoothLineStroke: '#3498db',
+    smoothLineStrokeWidth: 2.5,
+    smoothLineOpacity: 0.8
   },
   render: createLineTextStory,
 };
