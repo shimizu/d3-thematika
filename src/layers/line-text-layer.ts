@@ -6,6 +6,26 @@ import { LayerAttr, LayerStyle, IGeojsonLayer, ArcControlPointType, ArcOffsetTyp
 import * as GeoJSON from 'geojson';
 
 /**
+ * 統一されたラインテキストデータ構造
+ */
+interface LineTextData {
+  /** フィーチャー情報 */
+  feature: GeoJSON.Feature;
+  /** フィーチャーのインデックス（全体通し番号） */
+  featureIndex: number;
+  /** ライン座標配列 */
+  coordinates: GeoJSON.Position[];
+  /** MultiLineString内のラインインデックス（LineStringの場合は未定義） */
+  lineIndex?: number;
+  /** テキスト内容 */
+  textContent: string;
+  /** パス沿い配置の場合のパスデータ */
+  pathData?: string;
+  /** 中心点配置の場合の中心座標 */
+  centerPoint?: [number, number];
+}
+
+/**
  * LineTextLayerの初期化オプション
  */
 export interface LineTextLayerOptions {
@@ -302,28 +322,36 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
       this.renderGuidePaths();
     }
     
-    // フラグに応じてテキストを描画
+    // 統一されたデータ準備とレンダリング
+    this.renderUnifiedText();
+  }
+
+  /**
+   * 統一されたテキスト描画処理（リファクタリング版）
+   * @private
+   */
+  private renderUnifiedText(): void {
+    if (!this.layerGroup || !this.projection) return;
+
+    // 全ラインデータを準備
+    const allLinesData = this.prepareAllTextLinesData();
+
+    if (allLinesData.length === 0) return;
+
     if (this.followPath) {
-      this.renderTextPath();
+      this.renderTextPathUnified(allLinesData);
     } else {
-      this.renderSimpleText();
+      this.renderSimpleTextUnified(allLinesData);
     }
   }
 
   /**
-   * textPathを使用してテキストを描画します
+   * 全フィーチャーから統一されたラインテキストデータを準備します
+   * @returns 統一されたラインテキストデータの配列
    * @private
    */
-  private renderTextPath(): void {
-    if (!this.layerGroup || !this.projection) return;
-
-    // defs要素を作成（パス定義用）
-    const defs = this.layerGroup.append('defs');
-    
-    // テキストグループを作成
-    const textGroup = this.layerGroup
-      .append('g')
-      .attr('class', 'thematika-line-text-layer');
+  private prepareAllTextLinesData(): LineTextData[] {
+    const allLinesData: LineTextData[] = [];
 
     this.data.features.forEach((feature, featureIndex) => {
       // テキスト内容を取得
@@ -337,92 +365,162 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
       const geometry = feature.geometry;
       
       if (geometry.type === 'LineString') {
-        this.renderLineStringTextPath(
-          defs,
-          textGroup,
-          geometry.coordinates as GeoJSON.Position[],
-          feature,
-          featureIndex,
-          textContent
-        );
+        const coordinates = geometry.coordinates as GeoJSON.Position[];
+        const lineData = this.createLineTextData(feature, featureIndex, coordinates, textContent);
+        if (lineData) allLinesData.push(lineData);
       } else if (geometry.type === 'MultiLineString') {
         (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
-          this.renderLineStringTextPath(
-            defs,
-            textGroup,
-            line,
-            feature,
-            featureIndex,
-            textContent,
-            lineIndex
-          );
+          const lineData = this.createLineTextData(feature, featureIndex, line, textContent, lineIndex);
+          if (lineData) allLinesData.push(lineData);
         });
       }
     });
+
+    return allLinesData;
   }
 
   /**
-   * LineString用のtextPathを描画します
+   * 個別のラインテキストデータを作成します
    * @private
    */
-  private renderLineStringTextPath(
-    defs: Selection<SVGDefsElement, unknown, HTMLElement, any>,
-    textGroup: Selection<SVGGElement, unknown, HTMLElement, any>,
-    coordinates: GeoJSON.Position[],
-    feature: GeoJSON.Feature,
-    featureIndex: number,
-    textContent: string,
+  private createLineTextData(
+    feature: GeoJSON.Feature, 
+    featureIndex: number, 
+    coordinates: GeoJSON.Position[], 
+    textContent: string, 
     lineIndex?: number
-  ): void {
-    if (!this.projection || coordinates.length < 2) return;
+  ): LineTextData | null {
+    if (coordinates.length < 2) return null;
 
-    // 一意のpath IDを生成
-    const pathId = `line-text-path-${this.id}-${featureIndex}${lineIndex !== undefined ? `-${lineIndex}` : ''}`;
-    
-    // パス文字列を生成
-    let pathString = this.generateLineStringPath(coordinates);
-    
-    if (!pathString) return;
+    const lineData: LineTextData = {
+      feature,
+      featureIndex,
+      coordinates,
+      textContent,
+      lineIndex
+    };
 
-    // テキスト反転が有効な場合、パスを逆順にする
-    if (this.flipText) {
-      pathString = this.reversePath(pathString);
+    if (this.followPath) {
+      // パス沿い配置の場合：パスデータを生成
+      let pathString = this.generateLineStringPath(coordinates);
+      if (this.flipText && pathString) {
+        pathString = this.reversePath(pathString);
+      }
+      lineData.pathData = pathString;
+    } else {
+      // 中心点配置の場合：中心座標を計算
+      const centerIndex = Math.floor(coordinates.length / 2);
+      const centerCoord = coordinates[centerIndex];
+      const centerPoint = this.projection!(centerCoord as [number, number]);
+      if (centerPoint) {
+        lineData.centerPoint = centerPoint;
+      }
     }
 
-    // path要素をdefsに追加
-    defs.append('path')
-      .attr('id', pathId)
-      .attr('d', pathString)
-      .attr('fill', 'none')
-      .attr('stroke', 'none');
+    return lineData;
+  }
 
-    // text要素を作成
-    const textElement = textGroup
+  /**
+   * textPathを使用してテキストを描画します（リファクタリング版）
+   * @private
+   */
+  private renderTextPathUnified(allLinesData: LineTextData[]): void {
+    if (!this.layerGroup) return;
+
+    // defs要素を作成（パス定義用）
+    const defs = this.layerGroup.append('defs');
+    
+    // テキストグループを作成
+    const textGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'thematika-line-text-layer');
+
+    // パスを定義
+    allLinesData.forEach((d, i) => {
+      if (d.pathData) {
+        const pathId = `line-text-path-${this.id}-${d.featureIndex}${d.lineIndex !== undefined ? `-${d.lineIndex}` : ''}`;
+        defs.append('path')
+          .attr('id', pathId)
+          .attr('d', d.pathData)
+          .attr('fill', 'none')
+          .attr('stroke', 'none');
+      }
+    });
+
+    // D3データバインディングでテキスト要素を一括作成
+    const textElements = textGroup
+      .selectAll('.thematika-line-text')
+      .data(allLinesData.filter(d => d.pathData))
+      .enter()
       .append('text')
-      .attr('font-family', this.fontFamilyFunction(feature, featureIndex))
-      .attr('font-size', this.fontSizeFunction(feature, featureIndex))
-      .attr('font-weight', this.fontWeightFunction(feature, featureIndex))
-      .attr('class', () => {
+      .attr('font-family', (d, i) => this.fontFamilyFunction(d.feature, d.featureIndex))
+      .attr('font-size', (d, i) => this.fontSizeFunction(d.feature, d.featureIndex))
+      .attr('font-weight', (d, i) => this.fontWeightFunction(d.feature, d.featureIndex))
+      .attr('class', (d, i) => {
         const baseClass = 'thematika-line-text';
         const customClass = this.attr.className || '';
-        const featureClass = (feature.properties?.class as string) || '';
-        const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
-        return [baseClass, customClass, featureClass, lineClass].filter(Boolean).join(' ');
+        const featureClass = (d.feature.properties?.class as string) || '';
+        const lineClass = d.lineIndex !== undefined ? `line-${d.lineIndex}` : '';
+        const globalTextClass = `global-text-${i}`;
+        return [baseClass, customClass, featureClass, lineClass, globalTextClass].filter(Boolean).join(' ');
       });
 
-    // textPath要素を作成
-    textElement
+    // textPath要素を追加
+    textElements
       .append('textPath')
-      .attr('href', `#${pathId}`)
+      .attr('href', (d, i) => `#line-text-path-${this.id}-${d.featureIndex}${d.lineIndex !== undefined ? `-${d.lineIndex}` : ''}`)
       .attr('startOffset', this.startOffset)
       .attr('text-anchor', this.textAnchor)
-      .text(textContent);
+      .text((d, i) => d.textContent);
 
     // 属性とスタイルを適用
     if (this.layerGroup) {
-      this.applyAllStylesToElements(textElement, this.layerGroup);
+      this.applyAllStylesToElements(textElements, this.layerGroup);
     }
   }
+
+  /**
+   * シンプルテキストを描画します（リファクタリング版）
+   * @private
+   */
+  private renderSimpleTextUnified(allLinesData: LineTextData[]): void {
+    if (!this.layerGroup) return;
+    
+    // テキストグループを作成
+    const textGroup = this.layerGroup
+      .append('g')
+      .attr('class', 'thematika-line-text-layer');
+
+    // D3データバインディングでテキスト要素を一括作成
+    const textElements = textGroup
+      .selectAll('.thematika-line-text')
+      .data(allLinesData.filter(d => d.centerPoint))
+      .enter()
+      .append('text')
+      .attr('x', (d, i) => (d.centerPoint![0] + this.dxFunction(d.feature, d.featureIndex)))
+      .attr('y', (d, i) => (d.centerPoint![1] + this.dyFunction(d.feature, d.featureIndex)))
+      .attr('font-family', (d, i) => this.fontFamilyFunction(d.feature, d.featureIndex))
+      .attr('font-size', (d, i) => this.fontSizeFunction(d.feature, d.featureIndex))
+      .attr('font-weight', (d, i) => this.fontWeightFunction(d.feature, d.featureIndex))
+      .attr('text-anchor', this.textAnchor)
+      .attr('alignment-baseline', 'middle')
+      .attr('class', (d, i) => {
+        const baseClass = 'thematika-line-text';
+        const customClass = this.attr.className || '';
+        const featureClass = (d.feature.properties?.class as string) || '';
+        const lineClass = d.lineIndex !== undefined ? `line-${d.lineIndex}` : '';
+        const globalTextClass = `global-text-${i}`;
+        return [baseClass, customClass, featureClass, lineClass, globalTextClass].filter(Boolean).join(' ');
+      })
+      .text((d, i) => d.textContent);
+
+    // 属性とスタイルを適用
+    if (this.layerGroup) {
+      this.applyAllStylesToElements(textElements, this.layerGroup);
+    }
+  }
+
+
 
   /**
    * デバッグ用ガイドパスを描画します
@@ -547,108 +645,25 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
     });
   }
 
-  /**
-   * シンプルなテキスト（textPathを使わない）を描画します
-   * @private
-   */
-  private renderSimpleText(): void {
-    if (!this.layerGroup || !this.projection) return;
-    
-    // テキストグループを作成
-    const textGroup = this.layerGroup
-      .append('g')
-      .attr('class', 'thematika-line-text-layer');
 
-    this.data.features.forEach((feature, featureIndex) => {
-      // テキスト内容を取得
-      let textContent = '';
-      if (feature.properties) {
-        textContent = feature.properties[this.textProperty] || feature.properties['name'] || '';
-      }
-      
-      if (!textContent) return; // テキストが空の場合はスキップ
-      
-      const geometry = feature.geometry;
-      
-      if (geometry.type === 'LineString') {
-        this.renderLineStringSimpleText(
-          textGroup,
-          geometry.coordinates as GeoJSON.Position[],
-          feature,
-          featureIndex,
-          textContent
-        );
-      } else if (geometry.type === 'MultiLineString') {
-        (geometry.coordinates as GeoJSON.Position[][]).forEach((line, lineIndex) => {
-          this.renderLineStringSimpleText(
-            textGroup,
-            line,
-            feature,
-            featureIndex,
-            textContent,
-            lineIndex
-          );
-        });
-      }
-    });
-  }
 
   /**
-   * LineString用のシンプルテキストを描画します
-   * @private
-   */
-  private renderLineStringSimpleText(
-    textGroup: Selection<SVGGElement, unknown, HTMLElement, any>,
-    coordinates: GeoJSON.Position[],
-    feature: GeoJSON.Feature,
-    featureIndex: number,
-    textContent: string,
-    lineIndex?: number
-  ): void {
-    if (!this.projection || coordinates.length < 2) return;
-
-    // ラインの中心点を計算
-    const centerIndex = Math.floor(coordinates.length / 2);
-    const centerCoord = coordinates[centerIndex];
-    const centerPoint = this.projection(centerCoord as [number, number]);
-    
-    if (!centerPoint) return;
-
-    // text要素を作成
-    const textElement = textGroup
-      .append('text')
-      .attr('x', centerPoint[0] + this.dxFunction(feature, featureIndex))
-      .attr('y', centerPoint[1] + this.dyFunction(feature, featureIndex))
-      .attr('font-family', this.fontFamilyFunction(feature, featureIndex))
-      .attr('font-size', this.fontSizeFunction(feature, featureIndex))
-      .attr('font-weight', this.fontWeightFunction(feature, featureIndex))
-      .attr('text-anchor', this.textAnchor)
-      .attr('alignment-baseline', 'middle')
-      .attr('class', () => {
-        const baseClass = 'thematika-line-text';
-        const customClass = this.attr.className || '';
-        const featureClass = (feature.properties?.class as string) || '';
-        const lineClass = lineIndex !== undefined ? `line-${lineIndex}` : '';
-        return [baseClass, customClass, featureClass, lineClass].filter(Boolean).join(' ');
-      })
-      .text(textContent);
-
-    // 属性とスタイルを適用
-    if (this.layerGroup) {
-      this.applyAllStylesToElements(textElement, this.layerGroup);
-    }
-  }
-
-  /**
-   * フィーチャーにイベントリスナーを追加します
+   * テキストにイベントリスナーを追加します（LineConnectionLayerパターン準拠）
    * @param eventType - イベントタイプ
    * @param handler - イベントハンドラー
    */
-  on(eventType: string, handler: (event: Event, data: GeoJSON.Feature) => void): void {
+  on(eventType: string, handler: (event: Event, data: any) => void): void {
     if (this.layerGroup) {
-      this.layerGroup.selectAll('text')
-        .on(eventType, function(event, d) {
-          handler(event, d as GeoJSON.Feature);
+      this.layerGroup.selectAll('.thematika-line-text')
+        .on(eventType, function(event, d: any) {
+          // 統一されたLineTextDataを直接渡す
+          handler(event, {
+            feature: d.feature,
+            featureIndex: d.featureIndex,
+            coordinates: d.coordinates,
+            lineIndex: d.lineIndex,
+            textContent: d.textContent
+          });
         });
     }
   }

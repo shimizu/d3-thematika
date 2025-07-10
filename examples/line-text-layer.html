@@ -11,14 +11,6 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <script src="./js/common.js"></script>
-    <style>
-        /* line-text-layer.html固有のスタイル */
-        #map {
-            background-color: #e6f3ff;
-        }
-        
-        /* line-text-layer.htmlでは共通クラスを使用 */
-    </style>
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -61,11 +53,10 @@
             <div class="info-box">
                 <h3>📝 LineTextLayer機能</h3>
                 <ul>
-                    <li>背景地図: examples/geojson/world.geojson（世界地図）</li>
-                    <li>パス沿いテキスト: SVG textPathを使用したラベル表示</li>
-                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、ラベル表示切り替え</li>
-                    <li>データ例: 世界一周ルート、貿易ルートのラベル表示</li>
-                    <li>ガイドライン: LineConnectionLayerとの併用でパス可視化</li>
+                    <li>世界地図: examples/geojson/world.geojson（背景用）</li>
+                    <li>テキストライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
+                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、テキスト表示オプション</li>
+                    <li>データ例: ラインに沿ったテキスト表示、ガイドライン付きラベル</li>
                 </ul>
             </div>
 
@@ -115,7 +106,6 @@
                     </select>
                 </div>
                 
-                
                 <div class="control-item">
                     <label>ラベル表示オプション</label>
                     <div class="checkbox-wrapper">
@@ -164,79 +154,46 @@
             <div class="code-block">
                 <pre id="sample-code">// LineTextLayerの使用例（GeoJSON形式）
 
-// LineString形式のデータ（複数点を結ぶ1本のライン）
-const lineStringData = {
-    type: "Feature",
-    geometry: {
-        type: "LineString",
-        coordinates: [
-            [139.7, 35.6],  // 東京
-            [116.4, 39.9],  // 北京
-            [37.6, 55.7],   // モスクワ
-            [2.3, 48.8],    // パリ
-            [-0.1, 51.5],   // ロンドン
-            [-74.0, 40.7]   // ニューヨーク
-        ]
-    },
-    properties: { name: "世界一周ルート" }
-};
-
-// MultiLineString形式のデータ（複数のライン）
-const multiLineStringData = {
-    type: "FeatureCollection",
-    features: [
-        {
-            type: "Feature",
-            geometry: {
-                type: "LineString",
-                coordinates: [[139.7, 35.6], [151.2, -33.8], [72.8, 19.0]]
-            },
-            properties: { name: "アジア太平洋ルート" }
-        },
-        {
-            type: "Feature",
-            geometry: {
-                type: "LineString",
-                coordinates: [[-0.1, 51.5], [2.3, 48.8], [31.2, 30.0]]
-            },
-            properties: { name: "ヨーロッパ・アフリカルート" }
-        }
-    ]
-};
+const lineDemoData = await d3.json('./geojson/line/line-demo-data.geojson');
 
 // LineTextLayerインスタンスを作成
 const textLayer = new Thematika.LineTextLayer({
-    data: lineStringData,     // またはmultiLineStringData
+    data: lineDemoData,       // ラインデータ
     textProperty: 'name',     // テキスト取得元プロパティ
     lineType: 'arc',          // 'straight', 'arc', または 'smooth'
     arcHeight: 0.3,           // アークの高さ（arcタイプの場合）
     smoothType: 'curveBasis', // スムージング時のカーブタイプ
     startOffset: '50%',       // textPath上のテキスト位置
     textAnchor: 'middle',     // テキストアンカー
-    fontSize: 16,             // フォントサイズ
+    fontSize: 18,             // フォントサイズ
     fontWeight: 'bold',       // フォントウェイト
+    followPath: true,         // パス沿い配置
+    flipText: false,          // テキスト方向反転
+    dx: 0,                    // X方向オフセット
+    dy: 0,                    // Y方向オフセット
     attr: {
-        "fill": '#ff6b6b',
+        "fill": (d, i) => i % 2 === 0 ? "#2c3e50" : "#1a237e",
         "stroke": '#ffffff',
         "stroke-width": 3
     }
 });
 
-// LineConnectionLayerと併用でパス表示
-const connectionLayer = new Thematika.LineConnectionLayer({
-    data: lineStringData,
+// LineConnectionLayerと併用でガイドライン表示
+const guideLayer = new Thematika.LineConnectionLayer({
+    data: lineDemoData,
     lineType: 'arc',
     arcHeight: 0.3,
     endArrow: true,
     attr: {
-        "stroke": '#ff6b6b',
-        "stroke-width": 3,
-        "opacity": 0.8
+        "stroke": (d, i) => i % 2 === 0 ? "#ff6b6b" : "#45b7d1",
+        "stroke-width": 2,
+        "opacity": 0.7,
+        "stroke-dasharray": '5,3'
     }
 });
 
-// 地図に追加（ラインを先に、テキストを後に）
-map.addLayer('connections', connectionLayer);
+// 地図に追加（ガイドラインを先に、テキストを後に）
+map.addLayer('guide-lines', guideLayer);
 map.addLayer('line-texts', textLayer);</pre>
             </div>
         </section>
@@ -281,86 +238,6 @@ map.addLayer('line-texts', textLayer);</pre>
         // プロジェクション
         let currentProjection = d3.geoNaturalEarth1();
         
-        // サンプルデータ作成
-        function createSampleData() {
-            // 主要都市の座標
-            const cities = [
-                { name: "東京", coords: [139.7, 35.6] },
-                { name: "ロンドン", coords: [-0.1, 51.5] },
-                { name: "ニューヨーク", coords: [-74.0, 40.7] },
-                { name: "パリ", coords: [2.3, 48.8] },
-                { name: "シドニー", coords: [151.2, -33.8] },
-                { name: "リオデジャネイロ", coords: [-43.2, -22.9] },
-                { name: "カイロ", coords: [31.2, 30.0] },
-                { name: "モスクワ", coords: [37.6, 55.7] },
-                { name: "北京", coords: [116.4, 39.9] },
-                { name: "ムンバイ", coords: [72.8, 19.0] }
-            ];
-            
-            // LineString形式（複数都市を1本のラインで接続）
-            const worldTour = {
-                type: "Feature",
-                geometry: {
-                    type: "LineString",
-                    coordinates: [
-                        cities[0].coords,  // 東京
-                        cities[8].coords,  // 北京
-                        cities[7].coords,  // モスクワ
-                        cities[3].coords,  // パリ
-                        cities[1].coords,  // ロンドン
-                        cities[2].coords,  // ニューヨーク
-                        cities[5].coords,  // リオデジャネイロ
-                    ]
-                },
-                properties: { 
-                    name: "世界一周ルート",
-                    class: "world-tour"
-                }
-            };
-            
-            // MultiLineString形式（複数の独立したライン）
-            const tradeRoutes = {
-                type: "FeatureCollection",
-                features: [
-                    {
-                        type: "Feature",
-                        geometry: {
-                            type: "LineString",
-                            coordinates: [cities[0].coords, cities[4].coords, cities[9].coords]
-                        },
-                        properties: { 
-                            name: "アジア太平洋ルート",
-                            class: "asia-pacific"
-                        }
-                    },
-                    {
-                        type: "Feature",
-                        geometry: {
-                            type: "LineString",
-                            coordinates: [cities[1].coords, cities[3].coords, cities[6].coords, cities[9].coords]
-                        },
-                        properties: { 
-                            name: "ヨーロッパ・アジアルート",
-                            class: "europe-asia"
-                        }
-                    },
-                    {
-                        type: "Feature",
-                        geometry: {
-                            type: "LineString",
-                            coordinates: [cities[2].coords, cities[5].coords, cities[4].coords]
-                        },
-                        properties: { 
-                            name: "アメリカ・オセアニアルート",
-                            class: "america-oceania"
-                        }
-                    }
-                ]
-            };
-            
-            return { worldTour, tradeRoutes };
-        }
-        
         async function draw() {
             // 既存の地図を削除
             d3.select('#map').selectAll('*').remove();
@@ -380,17 +257,17 @@ map.addLayer('line-texts', textLayer);</pre>
                 width: width,
                 height: height,
                 projection: currentProjection,
-                backgroundColor: '#e6f3ff',
+                backgroundColor: '#0f172a'
             });
             
             // 背景の世界地図レイヤー
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
-                    "fill": '#ccc',
-                    "stroke": '#fff',
-                    "stroke-width": 0.5,
-                    "opacity": 0.8
+                    "fill": '#475569',
+                    "stroke": '#64748b',
+                    "stroke-width": 0.8,
+                    "opacity": 0.7
                 }
             });
             
@@ -398,8 +275,8 @@ map.addLayer('line-texts', textLayer);</pre>
             const outlineLayer = new Thematika.OutlineLayer({
                 attr: {
                     "fill": 'none',
-                    "stroke": '#333',
-                    "stroke-width": 1.5,
+                    "stroke": '#6366f1',
+                    "stroke-width": 2.5,
                     "opacity": 0.6
                 }
             });
@@ -409,71 +286,38 @@ map.addLayer('line-texts', textLayer);</pre>
                 step: [20, 20],
                 attr: {
                     "fill": 'none',
-                    "stroke": '#ddd',
-                    "stroke-width": 0.3,
-                    "stroke-dasharray": '2,2',
-                    "opacity": 0.5
+                    "stroke": '#ffffff',
+                    "stroke-width": 0.4,
+                    "stroke-dasharray": '1,3',
+                    "opacity": 0.3
                 }
             });
             
-            // サンプルデータを作成
-            const { worldTour, tradeRoutes } = createSampleData();
+
+            const lineDemoData = await d3.json('./geojson/line/line-demo-data.geojson');
             
-            // 設定を取得
+            // LineTextLayerの設定を取得
             const lineType = document.getElementById('line-type').value;
             const arcHeight = parseFloat(document.getElementById('arc-height').value);
             const smoothType = document.getElementById('smooth-type').value;
-            const startArrow = false;
-            const endArrow = true;
             const showLabels = document.getElementById('show-labels').checked;
             const followPath = document.getElementById('follow-path').checked;
             const flipText = document.getElementById('flip-text').checked;
             const dxOffset = parseFloat(document.getElementById('dx-offset').value);
             const dyOffset = parseFloat(document.getElementById('dy-offset').value);
             
-            // LineConnectionLayerインスタンスを作成（世界一周ルート）
-            const worldTourLayerOptions = {
-                data: worldTour,
-                lineType: lineType,
-                startArrow: startArrow,
-                endArrow: endArrow,
-                arrowSize: 10,
-                attr: {
-                    "stroke": '#ff6b6b',
-                    "stroke-width": 3,
-                    "opacity": 0.8
-                }
-            };
             
-            // ライン描画タイプに応じてオプションを追加
-            if (lineType === 'arc') {
-                worldTourLayerOptions.arcHeight = arcHeight;
-            } else if (lineType === 'smooth') {
-                worldTourLayerOptions.smoothType = smoothType;
-            }
             
-            const worldTourLayer = new Thematika.LineConnectionLayer(worldTourLayerOptions);
-            
-            // LineConnectionLayerインスタンスを作成（貿易ルート）
-            const tradeRoutesLayerOptions = {
-                data: tradeRoutes,
+            // LineConnectionLayerインスタンスを作成（ガイドライン用）
+            const guideLineLayerOptions = {
+                data: lineDemoData,
                 lineType: lineType,
                 startArrow: false,
                 endArrow: true,
                 arrowSize: 8,
                 attr: {
                     "stroke": (d, i) => {
-                        // iは常に0なので、segmentIndexまたはfeature基準で色分け
-                        console.log('i:', i, 'segmentIndex:', d.segmentIndex, 'feature:', d.feature?.properties?.class);
-                        
-                        // featureのclassプロパティ基準で色分け
-                        const featureClass = d.feature?.properties?.class;
-                        if (featureClass === 'asia-pacific') return '#4ecdc4';
-                        if (featureClass === 'europe-asia') return '#45b7d1';
-                        if (featureClass === 'america-oceania') return '#96ceb4';
-                        
-                        // fallback: segmentIndex基準
-                        return ['#4ecdc4', '#45b7d1', '#96ceb4'][d.segmentIndex % 3];
+                        return i % 2 === 0 ? "#ff6b6b" : "#45b7d1"; // 偶数インデックスは赤、奇数インデックスは青
                     },
                     "stroke-width": 2,
                     "opacity": 0.7,
@@ -483,26 +327,24 @@ map.addLayer('line-texts', textLayer);</pre>
             
             // ライン描画タイプに応じてオプションを追加
             if (lineType === 'arc') {
-                tradeRoutesLayerOptions.arcHeight = arcHeight;
+                guideLineLayerOptions.arcHeight = arcHeight;
             } else if (lineType === 'smooth') {
-                tradeRoutesLayerOptions.smoothType = smoothType;
+                guideLineLayerOptions.smoothType = smoothType;
             }
             
-            const tradeRoutesLayer = new Thematika.LineConnectionLayer(tradeRoutesLayerOptions);
+            const guideLineLayer = new Thematika.LineConnectionLayer(guideLineLayerOptions);
             
             // LineTextLayerインスタンスを作成（ラベルが有効な場合のみ）
-            let worldTourTextLayer = null;
-            let tradeRoutesTextLayer = null;
+            let textLayer = null;
             
             if (showLabels) {
-                // 世界一周ルートのテキストレイヤー
-                const worldTourTextOptions = {
-                    data: worldTour,
+                const textLayerOptions = {
+                    data: lineDemoData,
                     textProperty: 'name',
                     lineType: lineType,
                     startOffset: '50%',
                     textAnchor: 'middle',
-                    fontSize: 20,
+                    fontSize: 18,
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
                     followPath: followPath,
@@ -510,75 +352,44 @@ map.addLayer('line-texts', textLayer);</pre>
                     dx: dxOffset,
                     dy: dyOffset,
                     attr: {
-                        "fill": '#ff0000',
-                       "stroke": '#000',
-                        "stroke-width": 0
+                        "fill": (d, i) => {
+                            return i % 2 === 0 ? "#2c3e50" : "#1a237e"; // 偶数インデックスは濃いグレー、奇数インデックスは紺色
+                        },
                     }
                 };
                 
                 // ライン描画タイプに応じてオプションを追加
                 if (lineType === 'arc') {
-                    worldTourTextOptions.arcHeight = arcHeight;
+                    textLayerOptions.arcHeight = arcHeight;
                 } else if (lineType === 'smooth') {
-                    worldTourTextOptions.smoothType = smoothType;
+                    textLayerOptions.smoothType = smoothType;
                 }
                 
-                worldTourTextLayer = new Thematika.LineTextLayer(worldTourTextOptions);
-                
-                // 貿易ルートのテキストレイヤー
-                const tradeRoutesTextOptions = {
-                    data: tradeRoutes,
-                    textProperty: 'name',
-                    lineType: lineType,
-                    startOffset: '50%',
-                    textAnchor: 'middle',
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    fontFamily: 'メイリオ, Arial, sans-serif',
-                    followPath: followPath,
-                    flipText: flipText,
-                    dx: dxOffset,
-                    dy: dyOffset,
-                    attr: {
-                        "fill": (d, i) => ['#2c3e50', '#1a237e', '#004d40'][i % 3],
-                        "stroke": '#000',
-                        "stroke-width": 0
-                    }
-                };
-                
-                // ライン描画タイプに応じてオプションを追加
-                if (lineType === 'arc') {
-                    tradeRoutesTextOptions.arcHeight = arcHeight;
-                } else if (lineType === 'smooth') {
-                    tradeRoutesTextOptions.smoothType = smoothType;
-                }
-                
-                tradeRoutesTextLayer = new Thematika.LineTextLayer(tradeRoutesTextOptions);
+                textLayer = new Thematika.LineTextLayer(textLayerOptions);
             }
             
             // レイヤーを地図に追加
             map.addLayer('graticule', graticuleLayer);
             map.addLayer('world', worldLayer);
             map.addLayer('outline', outlineLayer);
-            map.addLayer('trade-routes', tradeRoutesLayer);
-            map.addLayer('world-tour', worldTourLayer);
+            map.addLayer('guide-lines', guideLineLayer);
             
             // テキストレイヤーを追加（ラベル表示が有効な場合）
-            if (worldTourTextLayer) {
-                map.addLayer('world-tour-text', worldTourTextLayer);
-            }
-            if (tradeRoutesTextLayer) {
-                map.addLayer('trade-routes-text', tradeRoutesTextLayer);
+            if (textLayer) {
+                map.addLayer('line-texts', textLayer);
             }
             
             // イベントリスナーを追加
-            worldTourLayer.on('click', (event, data) => {
-                console.log('World Tour clicked:', data);
+            guideLineLayer.on('click', (event, data) => {
+                console.log('Guide Line clicked:', data);
             });
             
-            tradeRoutesLayer.on('mouseover', (event, data) => {
-                console.log('Trade Route hover:', data);
-            });
+            if (textLayer) {
+                textLayer.on('mouseover', (event, data) => {
+                    console.log('Text hover:', data);
+                });
+            }
+    
         }
         
         // コントロールのイベントリスナー
@@ -604,7 +415,7 @@ map.addLayer('line-texts', textLayer);</pre>
             draw();
         });
         
-        // LineConnectionLayer固有のコントロール
+        // LineTextLayer固有のコントロール
         document.getElementById('line-type').addEventListener('change', (e) => {
             const lineType = e.target.value;
             
