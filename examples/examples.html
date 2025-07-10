@@ -361,6 +361,25 @@
     </style>
 </head>
 <body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
     <!-- ヒーローセクション -->
     <section class="hero">
         <div class="hero-content">
@@ -369,9 +388,7 @@
         </div>
     </section>
 
-    <!-- メインコンテンツ -->
-    <div class="container">
-        <!-- 統計情報 -->
+    <!-- 統計情報 -->
         <div class="stats-section">
             <div class="stat-item">
                 <div class="stat-number">15+</div>
@@ -684,8 +701,6 @@
             </div>
         </footer>
     </div>
-
-    <script>
         // 画像の遅延読み込み
         document.addEventListener('DOMContentLoaded', function() {
             const images = document.querySelectorAll('.example-thumbnail');
@@ -716,5 +731,5 @@
             });
         });
     </script>
-</body>
+    </body>
 </html>
