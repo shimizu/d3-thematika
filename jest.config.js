@@ -22,7 +22,8 @@ module.exports = {
   // テスト対象から除外するパターン
   testPathIgnorePatterns: [
     '<rootDir>/node_modules/',
-    '<rootDir>/dist/'
+    '<rootDir>/dist/',
+    '<rootDir>/storybook-static/'
   ],
   
   // カバレッジレポート形式
