@@ -185,8 +185,6 @@ function createImageStory(args: ImageLayerArgs) {
           src: cogResult.dataUri,
           bounds: cogResult.bounds,
           showBboxMarkers: args.showBboxMarkers,
-          useAdvancedReprojection: args.useAdvancedReprojection,
-          useMask: args.useMask,
           attr: {
             opacity: args.opacity
           }
@@ -215,8 +213,6 @@ function createImageStory(args: ImageLayerArgs) {
         src: SAMPLE_IMAGE_DATA_URI,
         bounds: [130, 30, 145, 45], // 日本周辺
         showBboxMarkers: args.showBboxMarkers,
-        useAdvancedReprojection: args.useAdvancedReprojection,
-        useMask: args.useMask,
         attr: {
           opacity: args.opacity
         }

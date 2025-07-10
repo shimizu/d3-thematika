@@ -273,14 +273,10 @@ describe('ImageLayer', () => {
     test('新しいオプションでインスタンス作成可能', () => {
       const layerWithOptions = new ImageLayer('test-options', {
         ...defaultOptions,
-        showBboxMarkers: true,
-        useAdvancedReprojection: false,
-        useMask: false
+        showBboxMarkers: true
       });
       
       expect(layerWithOptions['showBboxMarkers']).toBe(true);
-      expect(layerWithOptions['useAdvancedReprojection']).toBe(false);
-      expect(layerWithOptions['useMask']).toBe(false);
     });
   });
 
@@ -327,26 +323,28 @@ describe('ImageLayer', () => {
       imageLayer.setProjection(mockProjection);
     });
 
-    test('逆投影を近似的に計算する', () => {
-      const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
-      expect(result).not.toBeNull();
-      expect(Array.isArray(result)).toBe(true);
-      expect(result).toHaveLength(2);
-    });
+    // approximateInverseProjectionメソッドはリファクタリングで削除されたためテストをコメントアウト
+    // test('逆投影を近似的に計算する', () => {
+    //   const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
+    //   expect(result).not.toBeNull();
+    //   expect(Array.isArray(result)).toBe(true);
+    //   expect(result).toHaveLength(2);
+    // });
 
-    test('投影法が設定されていない場合はnullを返す', () => {
-      const layerWithoutProj = new ImageLayer('no-proj', defaultOptions);
-      const result = layerWithoutProj['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
-      expect(result).toBeNull();
-    });
+    // approximateInverseProjectionメソッドはリファクタリングで削除されたためテストをコメントアウト
+    // test('投影法が設定されていない場合はnullを返す', () => {
+    //   const layerWithoutProj = new ImageLayer('no-proj', defaultOptions);
+    //   const result = layerWithoutProj['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
+    //   expect(result).toBeNull();
+    // });
 
-    test('投影結果がnullの場合はnullを返す', () => {
-      const failingProjection = jest.fn(() => null) as any;
-      imageLayer['projection'] = failingProjection;
-      
-      const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
-      expect(result).toBeNull();
-    });
+    // approximateInverseProjectionメソッドはリファクタリングで削除されたためテストをコメントアウト
+    // test('投影結果がnullの場合はnullを返す', () => {
+    //   const failingProjection = jest.fn(() => null) as any;
+    //   imageLayer['projection'] = failingProjection;
+    //   const result = imageLayer['approximateInverseProjection'](0, 0, -180, -90, 180, 90);
+    //   expect(result).toBeNull();
+    // });
   });
 
   describe('エラーハンドリング', () => {
