@@ -229,7 +229,10 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                     data: worldData,
                     r: radiusFunction,
                     attr: {
-                        "fill": fillColor,
+                        "fill": (d,i) => {
+                            // 偶数インデックスは青、奇数インデックスはピンク
+                            return i % 2 === 0 ? '#74b9ff' : '#fd79a8';
+                        },
                         "stroke": '#d63031',
                         "stroke-width": 1,
                         "opacity": 0.8

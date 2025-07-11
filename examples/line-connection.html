@@ -11,14 +11,7 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <script src="./js/common.js"></script>
-    <style>
-        /* line-connection.html固有のスタイル */
-        #map {
-            background-color: #e6f3ff;
-        }
-        
-        /* line-connection.htmlでは共通クラスを使用 */
-    </style>
+
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -228,14 +221,16 @@ map.addLayer('connections', connectionLayer);
                 container: '#map',
                 width: width,
                 height: height,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
+
             });
             
             // 背景の世界地図レイヤー
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,
                 attr: {
-                    "fill": '#ccc',
+                    "fill": '#333',
                     "stroke": '#fff',
                     "stroke-width": 0.5,
                     "opacity": 0.8
@@ -285,7 +280,7 @@ map.addLayer('connections', connectionLayer);
                 arrowSize: 8,
                 attr: {
                     "stroke": (d, i) => {
-                        return i % 2 === 0 ? "#00ff00" : "#0000ff"; // 偶数インデックスは緑、奇数インデックスは青
+                        return i % 2 === 0 ? "#00FF00" : "#00FFFF"; // 偶数インデックスは緑、奇数インデックスは青
                     },
                     "stroke-width": 2,
                     "opacity": 0.7,
