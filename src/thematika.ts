@@ -225,6 +225,80 @@ export class Map {
 
 
   /**
+   * 地図をSVGファイルとしてダウンロードします
+   * @param filename - ダウンロードするファイル名（拡張子なし）
+   */
+  saveSVG(filename: string): void {
+    const svgElement = this.svg.node();
+    if (!svgElement) {
+      throw new Error('SVG要素が見つかりません');
+    }
+
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${filename}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /**
+   * 地図をPNGファイルとしてダウンロードします
+   * @param filename - ダウンロードするファイル名（拡張子なし）
+   */
+  savePNG(filename: string): void {
+    const svgElement = this.svg.node();
+    if (!svgElement) {
+      throw new Error('SVG要素が見つかりません');
+    }
+
+    const svgData = new XMLSerializer().serializeToString(svgElement);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('Canvas 2Dコンテキストを取得できません');
+    }
+    
+    const img = new Image();
+
+    // SVGのサイズを取得
+    const svgRect = svgElement.getBoundingClientRect();
+    canvas.width = svgRect.width || this.width;
+    canvas.height = svgRect.height || this.height;
+
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          throw new Error('PNG Blobの生成に失敗しました');
+        }
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+    };
+
+    img.onerror = () => {
+      throw new Error('画像の読み込みに失敗しました');
+    };
+
+    const blob = new Blob([svgData], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    img.src = url;
+  }
+
+  /**
    * defs要素を初期化します（初期化時の内部メソッド）
    * @private
    */
