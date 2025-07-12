@@ -42,7 +42,7 @@ export default {
   // パス設定
   paths: {
     examples: '../examples',
-    thumbnails: '../examples/thumbnails',
+    thumbnails: 'examples/thumbnails',
     baseURL: 'http://localhost:3000'  // 開発サーバーURL
   },
 

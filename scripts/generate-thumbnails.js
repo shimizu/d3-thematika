@@ -13,7 +13,7 @@ class ThumbnailGenerator {
     this.browser = null;
     this.successCount = 0;
     this.failedPages = [];
-    this.forceMode = process.argv.includes('--force');
+    this.forceMode = process.argv.includes('--force') || true; // デフォルトで上書き
   }
 
   /**
@@ -40,8 +40,10 @@ class ThumbnailGenerator {
    * 初期設定
    */
   async setup() {
-    // thumbnailsディレクトリの作成
-    await this.ensureDirectoryExists(config.paths.thumbnails);
+    // thumbnailsディレクトリの作成 (プロジェクトルートからの相対パス)
+    const projectRoot = path.join(__dirname, '..');
+    const thumbnailsPath = path.join(projectRoot, config.paths.thumbnails);
+    await this.ensureDirectoryExists(thumbnailsPath);
     
     // ブラウザ起動
     console.log('🚀 Puppeteerブラウザを起動中...');
@@ -151,6 +153,9 @@ class ThumbnailGenerator {
   async takeScreenshot(page, pageName) {
     console.log('  📸 スクリーンショット撮影中...');
     
+    // サーバーアクセス後の1秒待機
+    await this.wait(1000);
+    
     // #map要素の境界を取得
     const mapElement = await page.$('#map');
     if (!mapElement) {
@@ -164,7 +169,9 @@ class ThumbnailGenerator {
 
     // 出力ファイルパス
     const fileName = pageName.replace('.html', '.png');
-    const outputPath = path.join(config.paths.thumbnails, fileName);
+    const projectRoot = path.join(__dirname, '..');
+    const thumbnailsPath = path.join(projectRoot, config.paths.thumbnails);
+    const outputPath = path.join(thumbnailsPath, fileName);
 
     // 既存ファイルの確認
     if (!this.forceMode && await this.fileExists(outputPath)) {
