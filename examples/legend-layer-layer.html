@@ -11,14 +11,6 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <script src="./js/common.js"></script>
-    <style>
-        /* legend-layer-layer.html固有のスタイル */
-        #map {
-            background-color: #e6f3ff;
-        }
-        
-        /* legend-layer-layer.htmlでは共通クラスを使用 */
-    </style>
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -340,7 +332,8 @@ map.addLayer('temp-legend', tempLegend);</pre>
                 container: '#map',
                 width: width,
                 height: height,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
             });
 
             // 現在のスケールデータを取得

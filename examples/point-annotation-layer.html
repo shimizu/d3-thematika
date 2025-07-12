@@ -266,6 +266,8 @@ map.addLayer('annotations', annotationLayer);</pre>
     <script src="./thematika.umd.js"></script>
 
     <script>
+
+
         // 共通機能の初期化
         initializeCommonFeatures();
 
@@ -324,6 +326,11 @@ map.addLayer('annotations', annotationLayer);</pre>
         };
 
         async function draw() {
+
+                // 世界地図データを読み込み
+                const worldData = await d3.json('./geojson/world.geojson');
+
+
             try {
                 // 既存の地図を削除
                 d3.select('#map').selectAll('*').remove();
@@ -335,7 +342,7 @@ map.addLayer('annotations', annotationLayer);</pre>
 
                 // 投影法を設定
                 const projection = d3.geoNaturalEarth1()
-                    .fitExtent([[10, 10], [width-10, height-10]], citiesData);
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
 
                 // 地図を作成
                 map = new Thematika.Map({
@@ -345,14 +352,40 @@ map.addLayer('annotations', annotationLayer);</pre>
                     projection: projection
                 });
 
-                // 経緯線レイヤー
-                const graticuleLayer = new Thematika.GraticuleLayer({
-                    step: [20, 20],
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: worldData,                
+                attr: { 
+                    "fill": '#e8f4f8',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 0.5,
+                    "opacity": 0.9
+                }
+            });                
+
+
+                // OutlineLayerインスタンスを作成（クリップパス機能付き）
+                const outlineLayer = new Thematika.OutlineLayer({
+                    createClipPath: true,
+                    clipPathId: 'earth-outline-clip',
                     attr: {
                         "fill": 'none',
-                        "stroke": '#eee',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
+                // GraticuleLayerインスタンスを作成
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [10, 10], // 10度間隔
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#000',
                         "stroke-width": 0.5,
-                        "opacity": 0.5
+                        "stroke-dasharray": '1,2',
+                        "opacity": 0.6
                     }
                 });
 
@@ -391,7 +424,9 @@ map.addLayer('annotations', annotationLayer);</pre>
 
                 // レイヤーを地図に追加
                 map.addLayer('graticule', graticuleLayer);
+                map .addLayer('world', worldLayer);
                 map.addLayer('annotations', annotationLayer);
+                map.addLayer('outline', outlineLayer);
 
             } catch (error) {
                 console.error('デモの初期化に失敗しました:', error);
