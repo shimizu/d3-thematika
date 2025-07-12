@@ -216,3 +216,77 @@ body {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
+
+/* ==================================================
+   地図ヘッダーとダウンロードボタン
+   ================================================== */
+
+.map-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--dark-light);
+    padding: 1rem 1.5rem;
+    border-radius: 1rem 1rem 0 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.map-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--gray-light);
+}
+
+.download-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.download-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+}
+
+.download-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.download-button:active {
+    transform: translateY(0);
+}
+
+#download-svg {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+}
+
+#download-svg:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+}
+
+#download-png {
+    background: linear-gradient(135deg, #ec4899 0%, #f97316 100%);
+}
+
+#download-png:hover {
+    background: linear-gradient(135deg, #db2777 0%, #ea580c 100%);
+}
+
+#map {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+    border-radius: 0 0 1rem 1rem;
+    overflow: hidden;
+}

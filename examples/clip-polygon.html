@@ -16,37 +16,6 @@
             background-color: #e6f3ff;
         }
         
-        .map-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .map-header h3 {
-            margin: 0;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        .download-button {
-            padding: 6px 12px;
-            font-size: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: white;
-            font-weight: 500;
-        }
-        
-        #download-svg {
-            background: #2196F3;
-        }
-        
-        #download-png {
-            background: #FF9800;
-        }
     </style>
 </head>
 <body>
@@ -112,8 +81,10 @@
             <div class="map-wrapper">
                 <div class="map-header">
                     <h3>地図表示</h3>
-                    <button id="download-svg" class="download-button">SVG</button>
-                    <button id="download-png" class="download-button">PNG</button>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
                 </div>
                 <div id="map"></div>
             </div>
