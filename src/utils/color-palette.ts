@@ -178,12 +178,101 @@ export const CARTOPalettes: Record<string, ColorPalette> = {
 };
 
 /**
+ * Tailwind CSS パレット
+ * モダンで洗練されたWebデザイン用カラーパレット
+ */
+export const TailwindPalettes: Record<string, ColorPalette> = {
+  TailwindVivid: {
+    name: 'TailwindVivid',
+    type: 'categorical',
+    colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS ビビッドカラー（500シェード）',
+    maxClasses: 8
+  },
+  TailwindRich: {
+    name: 'TailwindRich',
+    type: 'categorical',
+    colors: ['#2563EB', '#DC2626', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS リッチカラー（600シェード）',
+    maxClasses: 8
+  },
+  TailwindDeep: {
+    name: 'TailwindDeep',
+    type: 'categorical',
+    colors: ['#1D4ED8', '#B91C1C', '#047857', '#B45309', '#6D28D9', '#BE185D', '#0E7490', '#4D7C0F'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS ディープカラー（700シェード）',
+    maxClasses: 8
+  },
+  TailwindDark: {
+    name: 'TailwindDark',
+    type: 'categorical',
+    colors: ['#1E40AF', '#991B1B', '#065F46', '#92400E', '#5B21B6', '#9D174D', '#155E75', '#3F6212'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS ダークカラー（800シェード）',
+    maxClasses: 8
+  },
+  TailwindWarm: {
+    name: 'TailwindWarm',
+    type: 'categorical',
+    colors: ['#F97316', '#EF4444', '#F59E0B', '#EAB308', '#EC4899', '#F43F5E', '#D946EF', '#A855F7'],
+    colorBlindSafe: false,
+    description: 'Tailwind CSS 暖色系（オレンジ・レッド・ピンク系）',
+    maxClasses: 8
+  },
+  TailwindCool: {
+    name: 'TailwindCool',
+    type: 'categorical',
+    colors: ['#3B82F6', '#06B6D4', '#0EA5E9', '#10B981', '#22C55E', '#84CC16', '#6366F1', '#8B5CF6'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS 寒色系（ブルー・グリーン・パープル系）',
+    maxClasses: 8
+  },
+  TailwindNeon: {
+    name: 'TailwindNeon',
+    type: 'categorical',
+    colors: ['#06B6D4', '#10B981', '#84CC16', '#EAB308', '#F59E0B', '#EC4899', '#D946EF', '#8B5CF6'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS ネオンカラー（明るく鮮やかな色調）',
+    maxClasses: 8
+  },
+  // 連続パレット
+  TailwindBlues: {
+    name: 'TailwindBlues',
+    type: 'sequential',
+    colors: ['#DBEAFE', '#BFDBFE', '#93C5FD', '#60A5FA', '#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF', '#1E3A8A'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS ブルー系連続カラー',
+    maxClasses: 9
+  },
+  TailwindGreens: {
+    name: 'TailwindGreens',
+    type: 'sequential',
+    colors: ['#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS グリーン系連続カラー',
+    maxClasses: 9
+  },
+  TailwindPurples: {
+    name: 'TailwindPurples',
+    type: 'sequential',
+    colors: ['#EDE9FE', '#DDD6FE', '#C4B5FD', '#A78BFA', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95'],
+    colorBlindSafe: true,
+    description: 'Tailwind CSS パープル系連続カラー',
+    maxClasses: 9
+  }
+};
+
+/**
  * 全パレットを統合
  */
 export const AllPalettes: Record<string, ColorPalette> = {
   ...ColorBrewerPalettes,
   ...ViridissPalettes,
-  ...CARTOPalettes
+  ...CARTOPalettes,
+  ...TailwindPalettes
 };
 
 /**

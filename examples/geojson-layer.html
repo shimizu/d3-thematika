@@ -111,11 +111,15 @@ const map = new Thematika.Map({
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
-        "fill": (d, i) => i % 2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+        "fill": (d, i) => {
+            // Viridis パレット - 2色の美しい対比
+            const colors = ['#440154', '#1f9d8a']; // ディープパープルとティールグリーン
+            return colors[i % colors.length];
+        },
         "filter": shadowFilter.url(), 
-        "stroke": '#1a3d1f',
-        "stroke-width": 0.8,
-        "opacity": (d, i) => 0.9,
+        "stroke": '#1e293b',
+        "stroke-width": 0.3,
+        "opacity": 0.85,
     }
 });
 
@@ -125,9 +129,9 @@ const outlineLayer = new Thematika.OutlineLayer({
     clipPathId: 'earth-outline-clip',
     attr: {
         "fill": 'none',
-        "stroke": '#2c3e50',
+        "stroke": '#475569',
         "stroke-width": 2,
-        "opacity": 0.8
+        "opacity": 0.7
     }
 });
 
@@ -136,8 +140,8 @@ const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10], // 10度間隔
     attr: {
         "fill": 'none',
-        "stroke": '#ddd',
-        "stroke-width": 0.5,
+        "stroke": 'rgba(148, 163, 184, 0.4)',
+        "stroke-width": 0.3,
         "opacity": 0.6
     }
 });
@@ -163,6 +167,15 @@ map.addLayer('world', worldLayer);</pre>
                 navbar.classList.remove('scrolled');
             }
         });
+
+        // カテゴリカルデータ用のパレット推奨
+        const recommendations = Thematika.recommendPalette('categorical', 8, true);
+        const bestPalette = recommendations[2].palette;
+
+        // 指定クラス数に最適化
+        const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
+
+
 
         // グローバル変数
         let map;
@@ -192,16 +205,35 @@ map.addLayer('world', worldLayer);</pre>
             });
 
             
-            // GeojsonLayerインスタンスを作成
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill": (d, i) => i % 2 === 0 ? "#8b5cf6" : "#ec4899",
+                    "fill": (d, i) => i%2 === 0 ?  optimizedColors[6] : optimizedColors[5], // ダーク系の2色
+
                     "filter": "url(#drop-shadow)",
-                    "stroke": '#ffffff',
-                    "stroke-width": 0.5,
-                    "opacity": 0.8,
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
                     "cursor": "pointer"
+                },
+                on: {
+                    "mouseover": function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("opacity", 1)
+                            .attr("stroke-width", 1.5)
+                            .attr("stroke", '#ffffff');
+                    },
+                    "mouseout": function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("opacity", 0.85)
+                            .attr("stroke-width", 0.3)
+                            .attr("stroke", '#1e293b');
+                    }
                 }
             });
 
@@ -211,9 +243,9 @@ map.addLayer('world', worldLayer);</pre>
                 clipPathId: 'earth-outline-clip',
                 attr: {
                     "fill": 'none',
-                    "stroke": '#6366f1',
-                    "stroke-width": 3,
-                    "opacity": 0.5
+                    "stroke": '#475569', // より落ち着いたダークグレー
+                    "stroke-width": 2,
+                    "opacity": 0.7
                 }
             });
 
@@ -222,10 +254,10 @@ map.addLayer('world', worldLayer);</pre>
                 step: [10, 10],
                 attr: {
                     "fill": 'none',
-                    "stroke": 'rgb(255, 255, 255)',
-                    "stroke-width": 0.5,
+                    "stroke": 'rgba(148, 163, 184, 0.4)', // 半透明のライトグレー
+                    "stroke-width": 0.3,
                     "stroke-dasharray": '1,3',
-                    "opacity": 0.5
+                    "opacity": 0.6
                 }
             });
 

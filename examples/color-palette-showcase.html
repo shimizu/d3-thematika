@@ -269,7 +269,8 @@ console.log('色覚障害対応:', isSafe);
 
 // 特定パレットの直接使用
 const viridisColors = AllPalettes.Viridis.colors;
-const cartoSafeColors = AllPalettes.Safe.colors;</pre>
+const cartoSafeColors = AllPalettes.Safe.colors;
+const tailwindRichColors = AllPalettes.TailwindRich.colors;</pre>
             </div>
         </section>
     </div>
@@ -390,6 +391,77 @@ const cartoSafeColors = AllPalettes.Safe.colors;</pre>
                 colors: ['#88CCEE', '#CC6677', '#DDCC77', '#117733', '#332288', '#AA4499', '#44AA99', '#999933', '#882255', '#661100', '#6699CC', '#888888'],
                 colorBlindSafe: true,
                 description: 'CARTO Safe カテゴリカルカラー（色覚障害完全対応）'
+            },
+            // Tailwind CSS パレット
+            TailwindVivid: {
+                name: 'TailwindVivid',
+                type: 'categorical',
+                colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ビビッドカラー（500シェード）'
+            },
+            TailwindRich: {
+                name: 'TailwindRich',
+                type: 'categorical',
+                colors: ['#2563EB', '#DC2626', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS リッチカラー（600シェード）'
+            },
+            TailwindDeep: {
+                name: 'TailwindDeep',
+                type: 'categorical',
+                colors: ['#1D4ED8', '#B91C1C', '#047857', '#B45309', '#6D28D9', '#BE185D', '#0E7490', '#4D7C0F'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ディープカラー（700シェード）'
+            },
+            TailwindDark: {
+                name: 'TailwindDark',
+                type: 'categorical',
+                colors: ['#1E40AF', '#991B1B', '#065F46', '#92400E', '#5B21B6', '#9D174D', '#155E75', '#3F6212'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ダークカラー（800シェード）'
+            },
+            TailwindWarm: {
+                name: 'TailwindWarm',
+                type: 'categorical',
+                colors: ['#F97316', '#EF4444', '#F59E0B', '#EAB308', '#EC4899', '#F43F5E', '#D946EF', '#A855F7'],
+                colorBlindSafe: false,
+                description: 'Tailwind CSS 暖色系（オレンジ・レッド・ピンク系）'
+            },
+            TailwindCool: {
+                name: 'TailwindCool',
+                type: 'categorical',
+                colors: ['#3B82F6', '#06B6D4', '#0EA5E9', '#10B981', '#22C55E', '#84CC16', '#6366F1', '#8B5CF6'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS 寒色系（ブルー・グリーン・パープル系）'
+            },
+            TailwindNeon: {
+                name: 'TailwindNeon',
+                type: 'categorical',
+                colors: ['#06B6D4', '#10B981', '#84CC16', '#EAB308', '#F59E0B', '#EC4899', '#D946EF', '#8B5CF6'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ネオンカラー（明るく鮮やかな色調）'
+            },
+            TailwindBlues: {
+                name: 'TailwindBlues',
+                type: 'sequential',
+                colors: ['#DBEAFE', '#BFDBFE', '#93C5FD', '#60A5FA', '#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF', '#1E3A8A'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ブルー系連続カラー'
+            },
+            TailwindGreens: {
+                name: 'TailwindGreens',
+                type: 'sequential',
+                colors: ['#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS グリーン系連続カラー'
+            },
+            TailwindPurples: {
+                name: 'TailwindPurples',
+                type: 'sequential',
+                colors: ['#EDE9FE', '#DDD6FE', '#C4B5FD', '#A78BFA', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS パープル系連続カラー'
             }
         };
 
@@ -480,6 +552,12 @@ const cartoSafeColors = AllPalettes.Safe.colors;</pre>
             const candidates = Object.values(ColorPalettes)
                 .filter(p => p.type === type && p.colors.length >= numClasses)
                 .sort((a, b) => {
+                    // Tailwindパレットを優先
+                    const aTailwind = a.name.startsWith('Tailwind');
+                    const bTailwind = b.name.startsWith('Tailwind');
+                    if (aTailwind && !bTailwind) return -1;
+                    if (!aTailwind && bTailwind) return 1;
+                    
                     // 色覚障害対応を優先
                     if (a.colorBlindSafe && !b.colorBlindSafe) return -1;
                     if (!a.colorBlindSafe && b.colorBlindSafe) return 1;
