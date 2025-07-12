@@ -11,6 +11,39 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <script src="./js/common.js"></script>
+    <style>
+        .map-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .map-header h3 {
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .download-button {
+            padding: 6px 12px;
+            font-size: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            color: white;
+            font-weight: 500;
+        }
+        
+        #download-svg {
+            background: #2196F3;
+        }
+        
+        #download-png {
+            background: #FF9800;
+        }
+    </style>
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -135,6 +168,11 @@
 
             <!-- マップ表示エリア -->
             <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <button id="download-svg" class="download-button">SVG</button>
+                    <button id="download-png" class="download-button">PNG</button>
+                </div>
                 <div id="map"></div>
             </div>
         </section>
@@ -456,6 +494,64 @@ map.addLayer('temp-legend', tempLegend);</pre>
 
         // 初期化
         draw();
+        
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
         
         // 初回ロード時にスライダーの最大値を設定
         setTimeout(updateSliderMaxValues, 100);
