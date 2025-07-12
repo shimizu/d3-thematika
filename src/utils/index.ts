@@ -5,3 +5,4 @@
 export * from './gis-utils';
 export * from './cog-utils';
 export * from './tile-utils';
+export * from './color-palette';

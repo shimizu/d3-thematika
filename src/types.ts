@@ -177,4 +177,58 @@ export interface TileGenerationOptions {
   clampToBounds?: boolean;
 }
 
+/**
+ * カラーパレットのタイプ
+ */
+export type PaletteType = 'categorical' | 'sequential' | 'diverging';
+
+/**
+ * 色覚障害のタイプ
+ */
+export type ColorBlindnessType = 'protanopia' | 'deuteranopia' | 'tritanopia';
+
+/**
+ * カラーパレット定義
+ */
+export interface ColorPalette {
+  /** パレット名 */
+  name: string;
+  /** パレットタイプ */
+  type: PaletteType;
+  /** 色配列 */
+  colors: string[];
+  /** 色覚障害対応フラグ */
+  colorBlindSafe: boolean;
+  /** 説明 */
+  description?: string;
+  /** 最大クラス数 */
+  maxClasses?: number;
+}
+
+/**
+ * パレット推奨結果
+ */
+export interface PaletteRecommendation {
+  /** 推奨パレット */
+  palette: ColorPalette;
+  /** スコア（0-100） */
+  score: number;
+  /** 推奨理由 */
+  reason: string;
+}
+
+/**
+ * カラーパレット選択オプション
+ */
+export interface PaletteSelectionOptions {
+  /** データタイプ */
+  type: PaletteType;
+  /** 必要なクラス数 */
+  numClasses: number;
+  /** 色覚障害対応が必要か */
+  requireColorBlindSafe?: boolean;
+  /** ブランドカラーとの調和が必要か */
+  harmonizeWithBrand?: string[];
+}
+
 
