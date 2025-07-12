@@ -291,8 +291,6 @@ const map = new Thematika.Map({
     projection: projection
 });
 
-// グローバル変数にmapインスタンスを保存
-currentMap = map;
 
 
 const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
@@ -425,35 +423,62 @@ map.addLayer('world_new', worldLayer);
       console.log = _log;
     });
     
-    // グローバル変数でmapインスタンスを保持
-    let currentMap = null;
-
     // SVGダウンロード機能
     document.getElementById('download-svg').addEventListener('click', () => {
-        if (!currentMap) {
+        const mapElement = document.querySelector('#map svg');
+        if (!mapElement) {
             alert('地図が表示されていません');
             return;
         }
         
-        try {
-            currentMap.saveSVG('map');
-        } catch (error) {
-            alert('SVGダウンロードに失敗しました: ' + error.message);
-        }
+        const svgData = new XMLSerializer().serializeToString(mapElement);
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'map.svg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     });
     
     // PNGダウンロード機能
     document.getElementById('download-png').addEventListener('click', () => {
-        if (!currentMap) {
+        const mapElement = document.querySelector('#map svg');
+        if (!mapElement) {
             alert('地図が表示されていません');
             return;
         }
         
-        try {
-            currentMap.savePNG('map');
-        } catch (error) {
-            alert('PNGダウンロードに失敗しました: ' + error.message);
-        }
+        const svgData = new XMLSerializer().serializeToString(mapElement);
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        // SVGのサイズを取得
+        const svgRect = mapElement.getBoundingClientRect();
+        canvas.width = svgRect.width;
+        canvas.height = svgRect.height;
+        
+        img.onload = () => {
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'map.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        };
+        
+        const blob = new Blob([svgData], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        img.src = url;
     });
     
     // コード例の定義
@@ -484,8 +509,6 @@ const map = new Thematika.Map({
     projection: projection
 });
 
-// グローバル変数にmapインスタンスを保存
-currentMap = map;
 
 
 const fillStyles =["#1a3d1f", '#e0f7fa', texture.url()];
@@ -547,8 +570,6 @@ const map = new Thematika.Map({
     projection: projection
 });
 
-// グローバル変数にmapインスタンスを保存
-currentMap = map;
 
 // Graticuleを前面に配置
 const graticuleLayer = new Thematika.GraticuleLayer({
@@ -664,8 +685,6 @@ const map = new Thematika.Map({
     projection: projection
 });
 
-// グローバル変数にmapインスタンスを保存
-currentMap = map;
 
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
