@@ -497,6 +497,58 @@
             }
         }
 
+        /* コードセクションのスタイル */
+        .code-section {
+            padding: 6rem 2rem;
+            background: var(--dark-lighter);
+        }
+
+        .code-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--gray-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+        }
+
+        .code-tab.active,
+        .code-tab:hover {
+            color: var(--white);
+            border-bottom-color: var(--primary);
+        }
+
+        .code-content {
+            position: relative;
+        }
+
+        .code-content pre {
+            background: var(--dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            color: var(--white);
+            font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+
         /* index.html固有のレスポンシブスタイル */
         @media (max-width: 768px) {
             .nav-links {
@@ -538,6 +590,21 @@
             .footer-content {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .code-tabs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .code-tab {
+                padding: 0.75rem 1rem;
+                text-align: center;
+            }
+
+            .code-content pre {
+                padding: 1.5rem;
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -677,19 +744,26 @@
                 <div class="code-tab active" onclick="showCode('basic')">Basic Setup</div>
                 <div class="code-tab" onclick="showCode('layers')">Adding Layers</div>
                 <div class="code-tab" onclick="showCode('style')">Styling</div>
+                <div class="code-tab" onclick="showCode('colors')">Color Palettes</div>
             </div>
             <div class="code-content">
-                <pre id="code-basic">// 基本的なセットアップ
+                <pre id="code-basic">// GeoJSONデータの読み込み
+const geojson = await d3.json("world.geojson");
+
+// 地図のサイズと投影法の設定
+const projection = d3.geoEquirectangular()
+    .fitExtent([[0, 0], [width, height]], geojson);
+
+// 基本的なセットアップ
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 600,
-    projection: d3.geoNaturalEarth1()
+    projection: projection
 });
 
-// GeoJSONデータの読み込み
-const geojson = await d3.json("world.geojson");</pre>
-                <pre id="code-layers" style="display: none;">// レイヤーの追加
+</pre>
+                <pre id="code-layers" style="display: none;">// 世界地図(geojson)を表示するレイヤー
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: {
@@ -699,6 +773,7 @@ const worldLayer = new Thematika.GeojsonLayer({
     }
 });
 
+// 経緯線を表示するレイヤー
 const graticuleLayer = new Thematika.GraticuleLayer({
     step: [10, 10],
     attr: {
@@ -707,28 +782,80 @@ const graticuleLayer = new Thematika.GraticuleLayer({
     }
 });
 
-map.addLayer('world', worldLayer);
-map.addLayer('graticule', graticuleLayer);</pre>
-                <pre id="code-style" style="display: none;">// 動的なスタイリング
-const colorScale = d3.scaleSequential(d3.interpolateViridis)
-    .domain([0, 100]);
+// 地図のアウトラインを強調するためのレイヤー
+const outlineLayer = new Thematika.OutlineLayer({
+    attr: {
+        "stroke": '#475569',
+    }
+});
 
+// レイヤーをマップに追加
+map.addLayer('world', worldLayer);
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('outline', outlineLayer);
+</pre>
+                <pre id="code-style" style="display: none;">// SVGエフェクトを使ったスタイリング
+
+// ドロップシャドウフィルターの作成
+const shadowFilter = map.createFilter('drop-shadow', {
+    dx: 2,
+    dy: 2,
+    stdDeviation: 3,
+    floodColor: '#000000',
+    floodOpacity: 0.3
+});
+
+// グラデーションの作成
+const gradient = map.createGradient('country-gradient', [
+    { offset: '0%', color: '#3498db' },
+    { offset: '100%', color: '#2c3e50' }
+]);
+
+// SVGエフェクトを適用したレイヤー
 const styledLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: {
-        fill: (d) => colorScale(d.properties.value),
-        opacity: 0.8,
-        cursor: 'pointer'
-    },
-    on: {
-        mouseover: function(event, d) {
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr('opacity', 1);
-        }
+        fill: gradient.url(),
+        stroke: '#fff',
+        'stroke-width': 1,
+        filter: shadowFilter.url()
     }
-});</pre>
+});
+
+map.addLayer('styled', styledLayer);</pre>
+                <pre id="code-colors" style="display: none;">// カラーパレットを使った地図の色分け
+
+// Viridisパレットを使用した連続データの表現
+const colorScale = d3.scaleSequential(d3.interpolateViridis)
+    .domain([0, 100]);
+
+// カテゴリカルデータ用のカラーパレット
+const categoricalColors = Thematika.AllPalettes.Set3.colors;
+
+// 地域ごとに色分けされたレイヤー
+const coloredLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        fill: (d, i) => categoricalColors[i % categoricalColors.length],
+        stroke: '#fff',
+        'stroke-width': 0.5,
+        opacity: 0.8
+    }
+});
+
+// ColorBrewerパレットを使用した主題図
+const choroplethLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        fill: (d) => Thematika.AllPalettes.Blues.colors[
+            Math.floor(Math.random() * 5) + 3
+        ],
+        stroke: '#333',
+        'stroke-width': 0.3
+    }
+});
+
+map.addLayer('colored', coloredLayer);</pre>
             </div>
         </div>
     </section>
@@ -750,7 +877,7 @@ const styledLayer = new Thematika.GeojsonLayer({
                         <line x1="12" y1="15" x2="12" y2="3"/>
                     </svg>
                 </a>
-                <a href="https://docs.d3-thematika.com" class="btn-secondary">
+                <a href="./docs" class="btn-secondary">
                     Read Documentation
                 </a>
             </div>

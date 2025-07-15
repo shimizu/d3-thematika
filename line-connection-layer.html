@@ -55,7 +55,7 @@
                 <ul>
                     <li>世界地図: examples/geojson/world.geojson（背景用）</li>
                     <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
-                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示、投影法切り替え</li>
+                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示・サイズ調整、投影法切り替え</li>
                     <li>データ例: 世界一周ルート（赤線）、貿易ルート（色分け破線）</li>
                 </ul>
             </div>
@@ -117,6 +117,14 @@
                         <label for="end-arrow">終了点に矢印を表示</label>
                     </div>
                 </div>
+                
+                <div class="control-item">
+                    <label>矢印サイズ</label>
+                    <div class="slider-control">
+                        <input type="range" id="arrow-size" min="4" max="32" step="2" value="16">
+                        <span class="value-display" id="arrow-size-value">16</span>
+                    </div>
+                </div>
             </div>
 
             <!-- マップ表示エリア -->
@@ -153,7 +161,7 @@ const connectionLayer = new Thematika.LineConnectionLayer({
     arcHeight: 0.3,        // アークの高さ（arcタイプの場合）
     startArrow: false,     // 開始点の矢印
     endArrow: true,        // 終了点の矢印
-    arrowSize: 12,         // 矢印のサイズ
+    arrowSize: 16,         // 矢印のサイズ（4-32の範囲で調整可能）
     attr: {
         "stroke": '#ff6b6b',
         "stroke-width": 2,
@@ -274,6 +282,7 @@ map.addLayer('connections', connectionLayer);
             const smoothType = document.getElementById('smooth-type').value;
             const startArrow = document.getElementById('start-arrow').checked;
             const endArrow = document.getElementById('end-arrow').checked;
+            const arrowSize = parseInt(document.getElementById('arrow-size').value);
             
             
             
@@ -281,9 +290,9 @@ map.addLayer('connections', connectionLayer);
             const tradeRoutesLayerOptions = {
                 data: lineDemoData,
                 lineType: lineType,
-                startArrow: false,
-                endArrow: true,
-                arrowSize: 8,
+                startArrow: startArrow,
+                endArrow: endArrow,
+                arrowSize: arrowSize,
                 attr: {
                     "stroke": (d, i) => {
                         return i % 2 === 0 ? "#00FF00" : "#00FFFF"; // 偶数インデックスは緑、奇数インデックスは青
@@ -365,6 +374,11 @@ map.addLayer('connections', connectionLayer);
         document.getElementById('smooth-type').addEventListener('change', draw);
         document.getElementById('start-arrow').addEventListener('change', draw);
         document.getElementById('end-arrow').addEventListener('change', draw);
+        
+        document.getElementById('arrow-size').addEventListener('input', (e) => {
+            document.getElementById('arrow-size-value').textContent = e.target.value;
+            draw();
+        });
         
         // 初期表示時のUI状態を設定
         const initialLineType = document.getElementById('line-type').value;
