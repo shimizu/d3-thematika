@@ -50,6 +50,7 @@ export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetA
 export type { PointSpikeLayerOptions } from './types';
 export type { PointTextLayerOptions } from './layers/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line-connection-layer';
+export type { LineEdgeBundlingLayerOptions } from './layers/line-edgebundling-layer';
 export type { LineTextLayerOptions } from './layers/line-text-layer';
 
 // コア機能
@@ -67,6 +68,7 @@ export { PointAnnotationLayer } from './layers/point-annotation-layer';
 export { PointSpikeLayer } from './layers/point-spike-layer';
 export { PointTextLayer } from './layers/point-text-layer';
 export { LineConnectionLayer } from './layers/line-connection-layer';
+export { LineEdgeBundlingLayer } from './layers/line-edgebundling-layer';
 export { LineTextLayer } from './layers/line-text-layer';
 
 // ユーティリティ

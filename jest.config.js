@@ -53,6 +53,7 @@ module.exports = {
     '^d3-scale-chromatic$': '<rootDir>/tests/mocks/d3-scale-chromatic.js',
     '^d3-shape$': '<rootDir>/tests/mocks/d3-shape.js',
     '^d3-path$': '<rootDir>/tests/mocks/d3-path.js',
+    '^d3-force$': '<rootDir>/tests/mocks/d3-force.js',
     '^.*/vendor/textures\\.esm\\.js$': '<rootDir>/tests/mocks/textures.js',
     '^geotiff$': '<rootDir>/tests/mocks/geotiff.js'
   },

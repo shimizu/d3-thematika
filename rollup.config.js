@@ -28,12 +28,14 @@ export default {
       globals: {
         'd3-geo': 'd3',
         'd3-selection': 'd3',
+        'd3-force': 'd3',
+        'd3-shape': 'd3',
         '@turf/turf': 'turf',
         'geotiff': 'GeoTIFF'
       }
     }
   ],
-  external: ['d3-geo', 'd3-selection', '@turf/turf', 'geotiff'],
+  external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', '@turf/turf', 'geotiff'],
   plugins: [
     resolve({
       browser: true

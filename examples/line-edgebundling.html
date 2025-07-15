@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineEdgeBundling Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">LineEdgeBundling Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">LineEdgeBundling Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>LineStringとMultiLineStringのGeoJSONデータ</li>
+                    <li>D3のcurveBundleとForce-directed layoutによるエッジバンドリング</li>
+                    <li>動的なバンドリング強度とフォース設定</li>
+                    <li>制御点とオリジナルラインの表示/非表示切り替え</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法を選択</label>
+                    <select id="projection-select">
+                        <option value="albersUsa" selected>Albers USA</option>
+                        <option value="equirectangular">Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="bundling-strength">バンドリング強度</label>
+                    <input type="range" id="bundling-strength" min="0" max="1" step="0.1" value="0.85">
+                    <span id="bundling-value">0.85</span>
+                </div>
+                <div class="control-item">
+                    <label for="force-strength">フォース強度</label>
+                    <input type="range" id="force-strength" min="0" max="50" step="5" value="20">
+                    <span id="force-value">20</span>
+                </div>
+                <div class="control-item">
+                    <label for="show-original">オリジナルライン表示</label>
+                    <input type="checkbox" id="show-original">
+                </div>
+                <div class="control-item">
+                    <label for="show-control-points">制御点表示</label>
+                    <input type="checkbox" id="show-control-points">
+                </div>
+                <div class="control-item">
+                    <label for="animate-force">フォースアニメーション</label>
+                    <input type="checkbox" id="animate-force" checked>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LineEdgeBundlingLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// LineEdgeBundlingLayerの使用例
+const lineData = {
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[-120, 40], [-75, 35]]
+            },
+            "properties": { "name": "route1" }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [[-118, 38], [-77, 37]]
+            },
+            "properties": { "name": "route2" }
+        }
+    ]
+};
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoAlbersUsa()
+    .scale(1000)
+    .translate([width / 2, height / 2]);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// LineEdgeBundlingLayerインスタンスを作成
+const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
+    data: lineData,
+    bundlingStrength: 0.85,
+    forceStrength: 20,
+    showOriginalLines: false,
+    showControlPoints: false,
+    animateForce: true,
+    attr: {
+        "stroke": '#ff6b6b',
+        "stroke-width": 2,
+        "opacity": 0.7
+    }
+});
+
+// イベントハンドラーを追加
+bundlingLayer.on('click', (event, data) => {
+    console.log('クリックされたライン:', data.feature.properties.name);
+});
+
+// レイヤーを地図に追加
+map.addLayer('bundling', bundlingLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+
+        // グローバル変数
+        let map;
+        let currentProjection = d3.geoAlbersUsa();        
+
+        // カテゴリカルデータ用のパレット推奨
+        const recommendations = Thematika.recommendPalette('categorical', 8, true);
+        const bestPalette = recommendations[2].palette;
+        // 指定クラス数に最適化
+        const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
+
+
+
+        
+        // サンプルのラインデータ（アメリカ国内のフライトルート風）
+        const lineData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-120, 40], [-75, 35]]
+                    },
+                    "properties": { "name": "west-to-east-1" }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-118, 38], [-77, 37]]
+                    },
+                    "properties": { "name": "west-to-east-2" }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-122, 42], [-73, 33]]
+                    },
+                    "properties": { "name": "west-to-east-3" }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-115, 36], [-80, 38]]
+                    },
+                    "properties": { "name": "west-to-east-4" }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [[-119, 41], [-76, 34]]
+                    },
+                    "properties": { "name": "west-to-east-5" }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "MultiLineString",
+                        "coordinates": [
+                            [[-110, 45], [-95, 40]],
+                            [[-105, 47], [-90, 42]]
+                        ]
+                    },
+                    "properties": { "name": "multi-route" }
+                }
+            ]
+        };
+        
+        async function draw() {
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法をデータに合わせて調整
+            currentProjection.fitExtent([[20, 20], [width-20, height-20]], lineData);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection
+            });
+
+
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": (d, i) => i%2 === 0 ?  optimizedColors[6] : optimizedColors[5], // ダーク系の2色
+
+                    "filter": "url(#drop-shadow)",
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
+                    "cursor": "pointer"
+                },
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#475569', // より落ち着いたダークグレー
+                    "stroke-width": 2,
+                    "opacity": 0.7
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": 'none',
+                    "stroke": 'rgba(148, 163, 184, 0.4)', // 半透明のライトグレー
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '1,3',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+
+
+            // UIコントロールの状態を取得
+            const bundlingStrength = parseFloat(document.getElementById('bundling-strength').value);
+            const forceStrength = parseFloat(document.getElementById('force-strength').value);
+            const showOriginalLines = document.getElementById('show-original').checked;
+            const showControlPoints = document.getElementById('show-control-points').checked;
+            const animateForce = document.getElementById('animate-force').checked;
+
+            // LineEdgeBundlingLayerインスタンスを作成
+            const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
+                data: lineData,
+                bundlingStrength: bundlingStrength,
+                forceStrength: forceStrength,
+                showOriginalLines: showOriginalLines,
+                showControlPoints: showControlPoints,
+                animateForce: animateForce,
+                attr: {
+                    "stroke": '#ff6b6b',
+                    "stroke-width": 2,
+                    "opacity": 0.7
+                }
+            });
+
+            // イベントハンドラーを追加
+            bundlingLayer.on('click', (event, data) => {
+                console.log('クリックされたライン:', data.feature.properties.name);
+            });
+
+            // レイヤーを地図に追加
+            map.addLayer('bundling', bundlingLayer);
+        }
+
+        // 投影法の変更
+        document.getElementById('projection-select').addEventListener('change', function(e) {
+            const projectionType = e.target.value;
+            
+            // 投影法を変更
+            switch(projectionType) {
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                default:
+                    currentProjection = d3.geoAlbersUsa();
+            }
+            
+            // 地図を再描画
+            draw();
+        });
+
+        // スライダーの値表示とイベントリスナー
+        document.getElementById('bundling-strength').addEventListener('input', function(e) {
+            const value = parseFloat(e.target.value);
+            document.getElementById('bundling-value').textContent = value;
+            draw();
+        });
+
+        document.getElementById('force-strength').addEventListener('input', function(e) {
+            const value = parseFloat(e.target.value);
+            document.getElementById('force-value').textContent = value;
+            draw();
+        });
+
+        // チェックボックスのイベントリスナー
+        document.getElementById('show-original').addEventListener('change', draw);
+        document.getElementById('show-control-points').addEventListener('change', draw);
+        document.getElementById('animate-force').addEventListener('change', draw);
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+
+        // 初期描画
+        draw();
+
+        // ウィンドウリサイズ対応
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 300);
+        });
+    </script>
+</body>
+</html>

@@ -28,6 +28,14 @@ const curveStep = { type: 'step' };
 const curveStepAfter = { type: 'stepAfter' };
 const curveStepBefore = { type: 'stepBefore' };
 
+// curveBundleのモック
+const curveBundle = {
+  type: 'bundle',
+  beta: jest.fn().mockImplementation((beta) => {
+    return { type: 'bundle', beta: beta || 0.85 };
+  })
+};
+
 module.exports = {
   line,
   curveBasis,
@@ -39,5 +47,6 @@ module.exports = {
   curveNatural,
   curveStep,
   curveStepAfter,
-  curveStepBefore
+  curveStepBefore,
+  curveBundle
 };
