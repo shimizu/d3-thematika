@@ -92,6 +92,10 @@
                     <label for="animate-force">フォースアニメーション</label>
                     <input type="checkbox" id="animate-force" checked>
                 </div>
+                <div class="control-item">
+                    <label for="show-airports">空港表示</label>
+                    <input type="checkbox" id="show-airports" checked>
+                </div>
             </div>
 
             <!-- マップ表示エリア -->
@@ -214,8 +218,11 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // 世界地図データを読み込み
             const geojson = await d3.json('./geojson/world.geojson');
 
-            // 世界地図データを読み込み
+            // 航空路線データを読み込み
             const lineData = await d3.json('./geojson/line/line-edgebunding-data.geojson');
+
+            // 空港ポイントデータを読み込み
+            const airportsData = await d3.json('./geojson/point/airports.geojson');
 
 
 
@@ -269,18 +276,32 @@ map.addLayer('bundling', bundlingLayer);</pre>
                 }
             });
 
-            // レイヤーインスタンスを地図に追加
-            map.addLayer('graticule', graticuleLayer);
-            map.addLayer('world', worldLayer);
-            map.addLayer('outline', outlineLayer);
-
-
             // UIコントロールの状態を取得
             const bundlingStrength = parseFloat(document.getElementById('bundling-strength').value);
             const forceStrength = parseFloat(document.getElementById('force-strength').value);
             const showOriginalLines = document.getElementById('show-original').checked;
             const showControlPoints = document.getElementById('show-control-points').checked;
             const animateForce = document.getElementById('animate-force').checked;
+            const showAirports = document.getElementById('show-airports').checked;
+
+            // 空港ポイントレイヤーを作成
+            const airportsLayer = new Thematika.PointCircleLayer({
+                data: airportsData,
+                r: (d) => Math.sqrt(d.properties.totalFlights) * 0.02, // フライト数に応じた動的サイズ
+                attr: {
+                    "fill": '#ffcc00', // 黄色
+                    "stroke": '#ffffff', // 白枠
+                    "stroke-width": 1.5,
+                    "opacity": showAirports ? 0.8 : 0, // 空港表示設定に応じて表示/非表示
+                    "cursor": "pointer"
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加（空港は航空路線の下に配置）
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('airports', airportsLayer); // 空港レイヤーを追加
+            map.addLayer('outline', outlineLayer);
 
             // LineEdgeBundlingLayerインスタンスを作成
             const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
@@ -302,8 +323,17 @@ map.addLayer('bundling', bundlingLayer);</pre>
                 console.log('クリックされたライン:', data.feature.properties.name);
             });
 
-            // レイヤーを地図に追加
+            // 航空路線レイヤーを地図に追加（空港の上に配置）
             map.addLayer('bundling', bundlingLayer);
+
+            // 空港ポイントにマウスオーバーイベントを追加
+            airportsLayer.on('mouseover', (event, data) => {
+                const airport = data.feature.properties;
+                console.log(`空港: ${airport.displayName}`);
+                console.log(`場所: ${airport.location}`);
+                console.log(`総フライト数: ${airport.totalFlights.toLocaleString()}便`);
+                console.log(`路線数: ${airport.routeCount}路線`);
+            });
         }
 
         // 投影法の変更
@@ -346,6 +376,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
         document.getElementById('show-original').addEventListener('change', draw);
         document.getElementById('show-control-points').addEventListener('change', draw);
         document.getElementById('animate-force').addEventListener('change', draw);
+        document.getElementById('show-airports').addEventListener('change', draw);
 
         // コードコピー機能
         function copyCode() {
