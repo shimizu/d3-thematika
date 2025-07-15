@@ -83,6 +83,8 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private smoothType: 'curveBasis' | 'curveCardinal' | 'curveCatmullRom' | 'curveLinear' | 'curveMonotoneX' | 'curveMonotoneY' | 'curveNatural' | 'curveStep' | 'curveStepAfter' | 'curveStepBefore';
   /** 投影法 */
   private projection?: GeoProjection;
+  /** マーカー定義を格納するdefs要素 */
+  private defs?: Selection<SVGDefsElement, unknown, HTMLElement, any>;
 
   /**
    * LineConnectionLayerを初期化します
@@ -215,42 +217,12 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
   private createArrowMarkers(): void {
     if (!this.layerGroup || (!this.startArrow && !this.endArrow)) return;
 
-    const markerId = `arrow-${this.id}`;
-    
-    
     // defsを作成
     const defs = this.layerGroup.append('defs')
       .attr('class', 'thematika-line-connection-defs');
 
-    // 開始点用の矢印マーカー
-    if (this.startArrow) {
-      defs.append('marker')
-        .attr('id', `${markerId}-start`)
-        .attr('viewBox', '0 0 10 10')
-        .attr('refX', 0)
-        .attr('refY', 5)
-        .attr('markerWidth', this.arrowSize / 2)
-        .attr('markerHeight', this.arrowSize / 2)
-        .attr('orient', 'auto-start-reverse')
-        .append('path')
-        .attr('d', 'M 0 0 L 10 5 L 0 10 z')
-        .style('fill', (typeof this.attr.stroke === 'function' ? '#333' : this.attr.stroke) || '#333');
-    }
-
-    // 終了点用の矢印マーカー
-    if (this.endArrow) {
-      defs.append('marker')
-        .attr('id', `${markerId}-end`)
-        .attr('viewBox', '0 0 10 10')
-        .attr('refX', 10)
-        .attr('refY', 5)
-        .attr('markerWidth', this.arrowSize / 2)
-        .attr('markerHeight', this.arrowSize / 2)
-        .attr('orient', 'auto')
-        .append('path')
-        .attr('d', 'M 0 0 L 10 5 L 0 10 z')
-        .style('fill', (typeof this.attr.stroke === 'function' ? '#333' : this.attr.stroke) || '#333');
-    }
+    // 基本的なマーカーを格納（後でdynamic markersが作成される）
+    this.defs = defs;
   }
 
   /**
@@ -286,11 +258,11 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
       .attr('d', d => d.pathData)
       .style('fill', 'none');
 
-    // 矢印マーカーを適用
-    this.applyArrowMarkers(paths);
-
     // 属性とスタイルを一括適用
     super.applyAllStylesToElements(paths, this.layerGroup!);
+
+    // 矢印マーカーを適用（スタイル適用後）
+    this.applyArrowMarkers(paths);
   }
 
   /**
@@ -346,19 +318,64 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
    * @private
    */
   private applyArrowMarkers(paths: Selection<SVGPathElement, LineData, SVGGElement, unknown>): void {
-    const markerId = `arrow-${this.id}`;
+    if (!this.defs) return;
+
+    const self = this;
     
-    paths.each(function(d) {
+    paths.each(function(d, i) {
       const path = d3Select(this);
       
+      // パスの現在のstroke色を取得
+      const strokeColor = path.style('stroke') || path.attr('stroke') || '#333';
+      
       if (d.needsStartArrow) {
-        path.attr('marker-start', `url(#${markerId}-start)`);
+        const startMarkerId = `arrow-start-${self.id}-${i}`;
+        self.createDynamicMarker(startMarkerId, strokeColor, 'start');
+        path.attr('marker-start', `url(#${startMarkerId})`);
       }
       
       if (d.needsEndArrow) {
-        path.attr('marker-end', `url(#${markerId}-end)`);
+        const endMarkerId = `arrow-end-${self.id}-${i}`;
+        self.createDynamicMarker(endMarkerId, strokeColor, 'end');
+        path.attr('marker-end', `url(#${endMarkerId})`);
       }
     });
+  }
+
+  /**
+   * 動的に色付きマーカーを作成します
+   * @param markerId - マーカーID
+   * @param color - 矢印の色
+   * @param type - マーカータイプ（start/end）
+   * @private
+   */
+  private createDynamicMarker(markerId: string, color: string, type: 'start' | 'end'): void {
+    if (!this.defs) return;
+
+    // 既存のマーカーがあれば削除
+    this.defs.select(`#${markerId}`).remove();
+
+    const marker = this.defs.append('marker')
+      .attr('id', markerId)
+      .attr('viewBox', '0 0 10 10')
+      .attr('markerWidth', this.arrowSize)
+      .attr('markerHeight', this.arrowSize);
+
+    if (type === 'start') {
+      marker
+        .attr('refX', 1)
+        .attr('refY', 5)
+        .attr('orient', 'auto-start-reverse');
+    } else {
+      marker
+        .attr('refX', 9)
+        .attr('refY', 5)
+        .attr('orient', 'auto');
+    }
+
+    marker.append('path')
+      .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+      .style('fill', color);
   }
 
   /**

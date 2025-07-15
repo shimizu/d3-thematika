@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Line Connection Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Line Connection Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Line Connection Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>🔗 LineConnectionLayer機能</h3>
+                <ul>
+                    <li>世界地図: examples/geojson/world.geojson（背景用）</li>
+                    <li>接続ライン: 動的に生成されるGeoJSONデータ（LineString/MultiLineString）</li>
+                    <li>機能: ライン描画タイプ切り替え（直線/アーク/スムージング）、矢印表示、投影法切り替え</li>
+                    <li>データ例: 世界一周ルート（赤線）、貿易ルート（色分け破線）</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular">Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1" selected>Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="line-type">ライン描画タイプ</label>
+                    <select id="line-type">
+                        <option value="straight">直線</option>
+                        <option value="arc" selected>アーク</option>
+                        <option value="smooth">スムージング</option>
+                    </select>
+                </div>
+                
+                <div class="control-item" id="arc-height-group">
+                    <label>アークの高さ</label>
+                    <div class="slider-control">
+                        <input type="range" id="arc-height" min="0" max="1" step="0.1" value="0.3">
+                        <span class="value-display" id="arc-height-value">0.3</span>
+                    </div>
+                </div>
+                
+                <div class="control-item" id="smooth-type-group" style="display: none;">
+                    <label for="smooth-type">スムージングタイプ</label>
+                    <select id="smooth-type">
+                        <option value="curveBasis" selected>Basis</option>
+                        <option value="curveCardinal">Cardinal</option>
+                        <option value="curveCatmullRom">Catmull-Rom</option>
+                        <option value="curveLinear">Linear</option>
+                        <option value="curveMonotoneX">Monotone X</option>
+                        <option value="curveMonotoneY">Monotone Y</option>
+                        <option value="curveNatural">Natural</option>
+                        <option value="curveStep">Step</option>
+                        <option value="curveStepAfter">Step After</option>
+                        <option value="curveStepBefore">Step Before</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>矢印オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="start-arrow">
+                        <label for="start-arrow">開始点に矢印を表示</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="end-arrow" checked>
+                        <label for="end-arrow">終了点に矢印を表示</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LineConnectionLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// LineConnectionLayerの使用例（GeoJSON形式）
+
+const lineDemoData = await d3.json('./geojson/line/line-demo-data.geojson');
+
+// LineConnectionLayerインスタンスを作成
+const connectionLayer = new Thematika.LineConnectionLayer({
+    data: lineDemoData,  // またはmultiLineStringData
+    lineType: 'arc',       // 'straight', 'arc', または 'smooth'
+    smoothType: 'curveBasis', // スムージング時のカーブタイプ
+    arcHeight: 0.3,        // アークの高さ（arcタイプの場合）
+    startArrow: false,     // 開始点の矢印
+    endArrow: true,        // 終了点の矢印
+    arrowSize: 12,         // 矢印のサイズ
+    attr: {
+        "stroke": '#ff6b6b',
+        "stroke-width": 2,
+        "opacity": 0.8
+    }
+});
+
+
+
+map.addLayer('connections', connectionLayer);
+</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // プロジェクション
+        let currentProjection = d3.geoNaturalEarth1();
+        
+
+        async function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
+            
+            const width = document.querySelector('#map').clientWidth;
+            const height = document.querySelector('#map').clientHeight;
+            
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+            
+            // 投影法を設定
+            currentProjection.fitExtent([[10, 10], [width-10, height-10]], geojson);
+            
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
+
+            });
+            
+            // 背景の世界地図レイヤー
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,
+                attr: {
+                    "fill": '#333',
+                    "stroke": '#fff',
+                    "stroke-width": 0.5,
+                    "opacity": 0.8
+                }
+            });
+            
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#333',
+                    "stroke-width": 1.5,
+                    "opacity": 0.6
+                }
+            });
+            
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [20, 20],
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#ddd',
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '2,2',
+                    "opacity": 0.5
+                }
+            });
+            
+
+            const lineDemoData = await d3.json('./geojson/line/line-demo-data.geojson');
+            
+            // LineConnectionLayerの設定を取得
+            const lineType = document.getElementById('line-type').value;
+            const arcHeight = parseFloat(document.getElementById('arc-height').value);
+            const smoothType = document.getElementById('smooth-type').value;
+            const startArrow = document.getElementById('start-arrow').checked;
+            const endArrow = document.getElementById('end-arrow').checked;
+            
+            
+            
+            // LineConnectionLayerインスタンスを作成（貿易ルート）
+            const tradeRoutesLayerOptions = {
+                data: lineDemoData,
+                lineType: lineType,
+                startArrow: startArrow,
+                endArrow: endArrow,
+                arrowSize: 16,
+                attr: {
+                    "stroke": (d, i) => {
+                        return i % 2 === 0 ? "#00FF00" : "#00FFFF"; // 偶数インデックスは緑、奇数インデックスは青
+                    },
+                    "stroke-width": 2,
+                    "opacity": 0.7,
+                    "stroke-dasharray": '5,3'
+                }
+            };
+            
+            // ライン描画タイプに応じてオプションを追加
+            if (lineType === 'arc') {
+                tradeRoutesLayerOptions.arcHeight = arcHeight;
+            } else if (lineType === 'smooth') {
+                tradeRoutesLayerOptions.smoothType = smoothType;
+            }
+            
+            const tradeRoutesLayer = new Thematika.LineConnectionLayer(tradeRoutesLayerOptions);
+            
+            // レイヤーを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('trade-routes', tradeRoutesLayer);
+            
+    
+        }
+        
+        // コントロールのイベントリスナー
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionName = e.target.value;
+            switch(projectionName) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            draw();
+        });
+        
+        // LineConnectionLayer固有のコントロール
+        document.getElementById('line-type').addEventListener('change', (e) => {
+            const lineType = e.target.value;
+            
+            // UI要素の表示/非表示を切り替え
+            const arcGroup = document.getElementById('arc-height-group');
+            const smoothGroup = document.getElementById('smooth-type-group');
+            
+            if (lineType === 'arc') {
+                arcGroup.style.display = 'block';
+                smoothGroup.style.display = 'none';
+            } else if (lineType === 'smooth') {
+                arcGroup.style.display = 'none';
+                smoothGroup.style.display = 'block';
+            } else {
+                arcGroup.style.display = 'none';
+                smoothGroup.style.display = 'none';
+            }
+            
+            draw();
+        });
+        
+        document.getElementById('arc-height').addEventListener('input', (e) => {
+            document.getElementById('arc-height-value').textContent = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('smooth-type').addEventListener('change', draw);
+        document.getElementById('start-arrow').addEventListener('change', draw);
+        document.getElementById('end-arrow').addEventListener('change', draw);
+        
+        // 初期表示時のUI状態を設定
+        const initialLineType = document.getElementById('line-type').value;
+        if (initialLineType === 'arc') {
+            document.getElementById('arc-height-group').style.display = 'block';
+            document.getElementById('smooth-type-group').style.display = 'none';
+        }
+        
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // 初回描画
+        draw();
+    </script>
+</body>
+</html>
