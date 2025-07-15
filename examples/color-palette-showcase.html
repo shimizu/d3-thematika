@@ -191,6 +191,7 @@
                     <li>色覚障害対応のアクセシビリティチェック</li>
                     <li>カテゴリカル、連続、発散の3タイプのパレット</li>
                     <li>データタイプに応じた自動パレット推奨機能</li>
+                    <li>「パレットコードをコピー」で<code>Thematika.AllPalettes.[name].colors</code>をコピー</li>
                 </ul>
             </div>
 
@@ -238,17 +239,23 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// カラーパレットユーティリティの使用例
-import { 
-    AllPalettes, 
-    recommendPalette, 
-    generateOptimizedPalette,
-    checkColorBlindnessSafety 
-} from './utils/color-palette';
+                <pre id="sample-code">// カラーパレットの使用例
 
-// カテゴリカルデータ用のパレット推奨
-const recommendations = recommendPalette('categorical', 8, true);
-const bestPalette = recommendations[0].palette;
+// パレットカードの「パレットコードをコピー」ボタンで取得したコードを使用
+const colors = Thematika.AllPalettes.Viridis.colors;
+
+// D3のカラースケールに適用
+const colorScale = d3.scaleOrdinal(Thematika.AllPalettes.Set3.colors);
+
+// GeojsonLayerでパレットを使用
+const layer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        fill: (d, i) => Thematika.AllPalettes.Category10.colors[i % 10],
+        stroke: '#fff',
+        'stroke-width': 0.5
+    }
+});
 
 // 指定クラス数に最適化
 const optimizedColors = generateOptimizedPalette(bestPalette, 5);
@@ -517,7 +524,7 @@ const tailwindRichColors = AllPalettes.TailwindRich.colors;</pre>
                     }
                 </div>
                 <div class="palette-actions">
-                    <button class="copy-colors-btn" onclick="copyColorsArray('${palette.name}', ${JSON.stringify(colors).replace(/"/g, "&quot;")})">HEXコードをコピー</button>
+                    <button class="copy-colors-btn" onclick="copyColorsArray('${palette.name}', ${JSON.stringify(colors).replace(/"/g, "&quot;")}, event)">パレットコードをコピー</button>
                 </div>
             `;
             
@@ -581,13 +588,42 @@ const tailwindRichColors = AllPalettes.TailwindRich.colors;</pre>
             navigator.clipboard.writeText(text).then(() => {
                 // 簡易フィードバック
                 console.log('コピーしました:', text);
+                
+                // 一時的な視覚的フィードバック
+                if (event && event.target) {
+                    const swatch = event.target;
+                    swatch.style.transform = 'scale(1.1)';
+                    swatch.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.5)';
+                    
+                    setTimeout(() => {
+                        swatch.style.transform = '';
+                        swatch.style.boxShadow = '';
+                    }, 300);
+                }
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
             });
         }
 
-        function copyColorsArray(paletteName, colors) {
-            const text = `// ${paletteName} パレット\nconst colors = ${JSON.stringify(colors, null, 2)};`;
+        function copyColorsArray(paletteName, colors, event) {
+            const text = `Thematika.AllPalettes.${paletteName}.colors`;
             navigator.clipboard.writeText(text).then(() => {
                 console.log(`${paletteName}パレットをコピーしました`);
+                
+                // 視覚的なフィードバック
+                if (event && event.target) {
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = 'コピーしました！';
+                    button.style.backgroundColor = '#10b981';
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.backgroundColor = '';
+                    }, 2000);
+                }
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
             });
         }
 
