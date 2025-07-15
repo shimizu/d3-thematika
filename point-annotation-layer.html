@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Annotation Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Annotation Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Annotation Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📝 PointAnnotationLayer機能</h3>
+                <ul>
+                    <li>データ: 主要都市のサンプルデータ（東京、ニューヨーク、パリ、ロンドン、北京、モスクワ）</li>
+                    <li>レイヤー: PointAnnotationLayer（アノテーション）、GraticuleLayer（経緯線）</li>
+                    <li>機能: アノテーションタイプ切り替え、位置調整、スタイルカスタマイズ</li>
+                    <li>特徴: 複数のアノテーションタイプ、オフセット調整、サブジェクト設定</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="annotation-type">アノテーションタイプ</label>
+                    <select id="annotation-type">
+                        <option value="callout" selected>Callout</option>
+                        <option value="calloutElbow">Callout Elbow</option>
+                        <option value="calloutCurve">Callout Curve</option>
+                        <option value="label">Label</option>
+                        <option value="badge">Badge</option>
+                        <option value="calloutCircle">Callout Circle</option>
+                        <option value="calloutRect">Callout Rect</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-type">サブジェクトタイプ</label>
+                    <select id="subject-type">
+                        <option value="point" selected>Point</option>
+                        <option value="circle">Circle</option>
+                        <option value="rect">Rectangle</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>X軸オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="offset-x" min="-100" max="100" step="5" value="30">
+                        <span class="value-display" id="offset-x-value">30</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>Y軸オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="offset-y" min="-100" max="100" step="5" value="-20">
+                        <span class="value-display" id="offset-y-value">-20</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト半径</label>
+                    <div class="slider-control">
+                        <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
+                        <span class="value-display" id="subject-radius-value">3</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト幅</label>
+                    <div class="slider-control">
+                        <input type="range" id="subject-width" min="1" max="400" step="1" value="16">
+                        <span class="value-display" id="subject-width-value">16</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト高さ</label>
+                    <div class="slider-control">
+                        <input type="range" id="subject-height" min="1" max="400" step="1" value="16">
+                        <span class="value-display" id="subject-height-value">16</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-stroke">サブジェクト境界線色</label>
+                    <input type="color" id="subject-stroke" value="#000000" class="color-picker">
+                </div>
+                
+                <div class="control-item">
+                    <label>サブジェクト境界線太さ</label>
+                    <div class="slider-control">
+                        <input type="range" id="subject-stroke-width" min="0" max="5" step="0.5" value="1">
+                        <span class="value-display" id="subject-stroke-width-value">1</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="subject-stroke-dasharray">サブジェクト境界線ダッシュパターン</label>
+                    <select id="subject-stroke-dasharray">
+                        <option value="none" selected>なし (実線)</option>
+                        <option value="2,2">短い点線 (2,2)</option>
+                        <option value="4,4">点線 (4,4)</option>
+                        <option value="8,4">長い点線 (8,4)</option>
+                        <option value="2,4,2">ドット・ダッシュ (2,4,2)</option>
+                        <option value="4,2,1,2">複合パターン (4,2,1,2)</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label for="note-background">ノート背景色</label>
+                    <input type="color" id="note-background" value="#ffffff" class="color-picker">
+                </div>
+                
+                <div class="control-item">
+                    <label>ノートパディング</label>
+                    <div class="slider-control">
+                        <input type="range" id="note-padding" min="0" max="20" step="1" value="4">
+                        <span class="value-display" id="note-padding-value">4</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-title">
+                        <label for="show-title">タイトル表示</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointAnnotationLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointAnnotationLayerの使用例
+
+// 主要都市データ
+const citiesData = {
+    type: 'FeatureCollection',
+    features: [
+        {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [139.6917, 35.6895] },
+            properties: { name: 'Tokyo', country: 'Japan', population: 37833000 }
+        },
+        {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [-74.0060, 40.7128] },
+            properties: { name: 'New York', country: 'USA', population: 20140470 }
+        }
+        // ... 他の都市
+    ]
+};
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoNaturalEarth1()
+    .fitExtent([[10, 10], [width-10, height-10]], citiesData);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// PointAnnotationLayerインスタンスを作成
+const annotationLayer = new Thematika.PointAnnotationLayer({
+    data: citiesData,
+    annotationType: 'callout',
+    textAccessor: 'name',
+    titleAccessor: 'country',
+    offsetAccessor: (feature, index) => [30, -20],
+    subjectOptions: {
+        type: 'point',      // 'point' | 'circle' | 'rect'
+        r: 3,               // 半径（point/circle用）
+        width: 16,          // 幅（rect用）
+        height: 16,         // 高さ（rect用）
+        fill: '#e74c3c',    // 塗りつぶし色
+        stroke: 'white',    // 境界線色
+        strokeWidth: 1,     // 境界線太さ
+        strokeDasharray: 'none'  // 境界線ダッシュパターン
+    },
+    connectorOptions: {
+        stroke: '#666666',
+        strokeWidth: 1
+    },
+    noteOptions: {
+        backgroundColor: '#ffffff',
+        fontSize: '12px',
+        textColor: '#000000',
+        borderColor: '#cccccc',
+        borderWidth: 1,
+        padding: 4              // パディング設定
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('annotations', annotationLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+
+
+        // 共通機能の初期化
+        initializeCommonFeatures();
+
+        let map = null;
+        let annotationLayer = null;
+        let annotationType = 'callout';
+        let showTitle = false;
+        let offsetX = 30;
+        let offsetY = -20;
+        let subjectType = 'point';
+        let subjectRadius = 3;
+        let subjectWidth = 16;
+        let subjectHeight = 16;
+        let subjectFill = 'none';
+        let subjectStroke = '#000000';
+        let subjectStrokeWidth = 1;
+        let subjectStrokeDasharray = 'none';
+        let noteBackground = '#ffffff';
+        let notePadding = 4;
+
+        // 主要都市データ
+        const citiesData = {
+            type: 'FeatureCollection',
+            features: [
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [139.6917, 35.6895] },
+                    properties: { name: 'Tokyo', country: 'Japan', population: 37833000 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [-74.0060, 40.7128] },
+                    properties: { name: 'New York', country: 'USA', population: 20140470 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [2.3522, 48.8566] },
+                    properties: { name: 'Paris', country: 'France', population: 11174000 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [-0.1276, 51.5074] },
+                    properties: { name: 'London', country: 'UK', population: 9648110 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [116.4074, 39.9042] },
+                    properties: { name: 'Beijing', country: 'China', population: 21893095 }
+                },
+                {
+                    type: 'Feature',
+                    geometry: { type: 'Point', coordinates: [37.6173, 55.7558] },
+                    properties: { name: 'Moscow', country: 'Russia', population: 12641000 }
+                }
+            ]
+        };
+
+        async function draw() {
+
+                // 世界地図データを読み込み
+                const worldData = await d3.json('./geojson/world.geojson');
+
+
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: worldData,                
+                attr: { 
+                    "fill": '#e8f4f8',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 0.5,
+                    "opacity": 0.9
+                }
+            });                
+
+
+                // OutlineLayerインスタンスを作成（クリップパス機能付き）
+                const outlineLayer = new Thematika.OutlineLayer({
+                    createClipPath: true,
+                    clipPathId: 'earth-outline-clip',
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
+                // GraticuleLayerインスタンスを作成
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [10, 10], // 10度間隔
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#000',
+                        "stroke-width": 0.5,
+                        "stroke-dasharray": '1,2',
+                        "opacity": 0.6
+                    }
+                });
+
+                // PointAnnotationLayerを作成
+                annotationLayer = new Thematika.PointAnnotationLayer({
+                    data: citiesData,
+                    annotationType: annotationType,
+                    textAccessor: 'name',
+                    titleAccessor: showTitle ? 'country' : undefined,
+                    offsetAccessor: (feature, index) => [offsetX, offsetY],
+                    subjectOptions: {
+                        type: subjectType,
+                        r: subjectRadius,
+                        width: subjectWidth,
+                        height: subjectHeight,
+                        fill: subjectFill,
+                        stroke: subjectStroke,
+                        strokeWidth: subjectStrokeWidth,
+                        strokeDasharray: subjectStrokeDasharray,
+                        // 後方互換性のため
+                        radius: subjectRadius
+                    },
+                    connectorOptions: {
+                        stroke: '#666666',
+                        strokeWidth: 1
+                    },
+                    noteOptions: {
+                        backgroundColor: noteBackground,
+                        fontSize: '12px',
+                        textColor: '#000000',
+                        borderColor: '#cccccc',
+                        borderWidth: 1,
+                        padding: notePadding
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map .addLayer('world', worldLayer);
+                map.addLayer('annotations', annotationLayer);
+                map.addLayer('outline', outlineLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        // 初期描画
+        draw();
+
+        // UI イベントリスナー
+        document.getElementById('annotation-type').addEventListener('change', function() {
+            annotationType = this.value;
+            draw();
+        });
+
+        document.getElementById('show-title').addEventListener('change', function() {
+            showTitle = this.checked;
+            draw();
+        });
+
+        document.getElementById('offset-x').addEventListener('input', function() {
+            offsetX = parseInt(this.value);
+            document.getElementById('offset-x-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('offset-y').addEventListener('input', function() {
+            offsetY = parseInt(this.value);
+            document.getElementById('offset-y-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-radius').addEventListener('input', function() {
+            subjectRadius = parseInt(this.value);
+            document.getElementById('subject-radius-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-type').addEventListener('change', function() {
+            subjectType = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-width').addEventListener('input', function() {
+            subjectWidth = parseInt(this.value);
+            document.getElementById('subject-width-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-height').addEventListener('input', function() {
+            subjectHeight = parseInt(this.value);
+            document.getElementById('subject-height-value').textContent = this.value;
+            draw();
+        });
+
+
+
+        document.getElementById('subject-stroke').addEventListener('change', function() {
+            subjectStroke = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-stroke-width').addEventListener('input', function() {
+            subjectStrokeWidth = parseFloat(this.value);
+            document.getElementById('subject-stroke-width-value').textContent = this.value;
+            draw();
+        });
+
+        document.getElementById('subject-stroke-dasharray').addEventListener('change', function() {
+            subjectStrokeDasharray = this.value;
+            draw();
+        });
+
+        document.getElementById('note-background').addEventListener('change', function() {
+            noteBackground = this.value;
+            draw();
+        });
+
+        document.getElementById('note-padding').addEventListener('input', function() {
+            notePadding = parseInt(this.value);
+            document.getElementById('note-padding-value').textContent = this.value;
+            draw();
+        });
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // リサイズイベントのハンドリング
+        setupResizeHandler(draw);
+
+    </script>
+</body>
+</html>

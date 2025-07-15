@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Text Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Text Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Text Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📝 PointTextLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>機能: GeoJSONデータからテキストラベル表示</li>
+                    <li>対応: ポイント・ポリゴン・ラインの中心点計算</li>
+                    <li>制御: 豊富なテキストスタイリングオプション（フォント・位置・回転）</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label>フォントサイズ</label>
+                    <div class="slider-control">
+                        <input type="range" id="font-size" min="8" max="32" value="16" step="2">
+                        <span class="value-display" id="font-size-value">16</span>px
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>X方向オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="dx-offset" min="-30" max="30" value="0" step="5">
+                        <span class="value-display" id="dx-offset-value">0</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>Y方向オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="dy-offset" min="-30" max="30" value="0" step="5">
+                        <span class="value-display" id="dy-offset-value">0</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>回転角度</label>
+                    <div class="slider-control">
+                        <input type="range" id="rotation" min="0" max="360" value="0" step="15">
+                        <span class="value-display" id="rotation-value">0</span>°
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label for="text-anchor">テキストアンカー</label>
+                    <select id="text-anchor">
+                        <option value="start" selected>start</option>
+                        <option value="middle">middle</option>
+                        <option value="end">end</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="font-weight">フォントウェイト</label>
+                    <select id="font-weight">
+                        <option value="normal" selected>normal</option>
+                        <option value="bold">bold</option>
+                        <option value="lighter">lighter</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointTextLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointTextLayer の使用例
+
+// 都市データ（GeoJSON形式）
+const cityData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [139.6917, 35.6895] },
+            properties: { text: "東京", population: 13960000 }
+        },
+        {
+            type: "Feature", 
+            geometry: { type: "Point", coordinates: [135.5023, 34.6937] },
+            properties: { text: "大阪", population: 2691000 }
+        }
+    ]
+};
+
+// テキストレイヤーを作成
+const textLayer = new Thematika.PointTextLayer({
+    data: cityData,
+    textProperty: 'text',  // テキスト取得元プロパティ
+    dx: 5,                 // X方向オフセット
+    dy: -10,               // Y方向オフセット
+    "font-size": 14,          // フォントサイズ
+    "font-weight": 'bold',    // フォントウェイト
+    "text-anchor": 'start',   // テキストアンカー
+    attr: {
+        "fill": '#333',      // テキスト色
+        "stroke": '#fff',    // アウトライン色
+        "stroke-width": 2     // アウトライン幅
+    }
+});
+
+// 地図に追加
+map.addLayer('cityLabels', textLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        let map = null;
+        let textLayer = null;
+        let fontSize = 16;
+        let dxOffset = 0;
+        let dyOffset = 0;
+        let rotation = 0;
+        let textAnchor = 'start';
+        let fontWeight = 'normal';
+
+        async function draw() {
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // サンプル都市データ
+                const cityData = {
+                    type: "FeatureCollection",
+                    features: [
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [139.6917, 35.6895] },
+                            properties: { text: "東京", name: "Tokyo", population: 13960000, country: "Japan" }
+                        },
+                        {
+                            type: "Feature", 
+                            geometry: { type: "Point", coordinates: [135.5023, 34.6937] },
+                            properties: { text: "大阪", name: "Osaka", population: 2691000, country: "Japan" }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [-74.0060, 40.7128] },
+                            properties: { text: "ニューヨーク", name: "New York", population: 8336000, country: "USA" }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [-0.1276, 51.5074] },
+                            properties: { text: "ロンドン", name: "London", population: 8982000, country: "UK" }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [2.3522, 48.8566] },
+                            properties: { text: "パリ", name: "Paris", population: 2161000, country: "France" }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [116.4074, 39.9042] },
+                            properties: { text: "北京", name: "Beijing", population: 21540000, country: "China" }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: { type: "Point", coordinates: [151.2093, -33.8688] },
+                            properties: { text: "シドニー", name: "Sydney", population: 5312000, country: "Australia" }
+                        }
+                    ]
+                };
+
+                // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+                const geojson = await d3.json('./geojson/world.geojson');
+
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .scale(150)
+                    .translate([width / 2, height / 2]);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+                
+
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [30, 30],
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#90a4ae',
+                        "stroke-width": 0.8,
+                        "opacity": 0.6
+                    }
+                });
+
+                // OutlineLayerインスタンスを作成（クリップパス機能付き）
+                const outlineLayer = new Thematika.OutlineLayer({
+                    createClipPath: true,
+                    clipPathId: 'earth-outline-clip',
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
+
+                // PointTextLayerを作成
+                textLayer = new Thematika.PointTextLayer({
+                    data: geojson,
+                    textProperty: 'NAME_JA',
+                    dx: dxOffset,
+                    dy: dyOffset,
+                    rotate: rotation,
+                    "font-size": fontSize,
+                    "font-weight": fontWeight,
+                    "text-anchor": textAnchor,
+                    alignmentBaseline: 'middle',
+                    attr: {
+                        "fill": '#ff0000',
+                        "stroke": '#000000',
+                        "stroke-width": 1
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('outline', outlineLayer);
+                map.addLayer('cityLabels', textLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        draw();
+
+        // フォントサイズの変更
+        document.getElementById('font-size').addEventListener('input', function() {
+            fontSize = parseInt(this.value);
+            document.getElementById('font-size-value').textContent = this.value;
+            draw();
+        });
+
+        // X方向オフセットの変更
+        document.getElementById('dx-offset').addEventListener('input', function() {
+            dxOffset = parseInt(this.value);
+            document.getElementById('dx-offset-value').textContent = this.value;
+            draw();
+        });
+
+        // Y方向オフセットの変更
+        document.getElementById('dy-offset').addEventListener('input', function() {
+            dyOffset = parseInt(this.value);
+            document.getElementById('dy-offset-value').textContent = this.value;
+            draw();
+        });
+
+        // 回転角度の変更
+        document.getElementById('rotation').addEventListener('input', function() {
+            rotation = parseInt(this.value);
+            document.getElementById('rotation-value').textContent = this.value;
+            draw();
+        });
+
+        // テキストアンカーの変更
+        document.getElementById('text-anchor').addEventListener('change', function() {
+            textAnchor = this.value;
+            draw();
+        });
+
+        // フォントウェイトの変更
+        document.getElementById('font-weight').addEventListener('change', function() {
+            fontWeight = this.value;
+            draw();
+        });
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カラーパレットショーケース - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <style>
+        /* color-palette-showcase.html固有のスタイル */
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .palette-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .palette-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .palette-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .palette-name {
+            font-weight: 600;
+            color: var(--heading-color);
+        }
+
+        .palette-type {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            background: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .palette-colors {
+            display: flex;
+            height: 40px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-swatch {
+            flex: 1;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .color-swatch:hover {
+            transform: scaleY(1.1);
+            z-index: 1;
+        }
+
+        .palette-info {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .palette-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .copy-colors-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            background: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background 0.2s ease;
+        }
+
+        .copy-colors-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .accessibility-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            background: #10b981;
+            color: white;
+        }
+
+        .accessibility-badge.warning {
+            background: #f59e0b;
+        }
+
+        .recommendation-section {
+            margin-top: 3rem;
+        }
+
+        .recommendation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .recommendation-card {
+            background: var(--surface-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .recommendation-score {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">カラーパレットショーケース</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">カラーパレットショーケース</h2>
+            
+            <div class="info-box">
+                <h3>🎨 カラーパレット機能</h3>
+                <ul>
+                    <li>科学的に検証されたColorBrewer、Viridis、CARTOパレット</li>
+                    <li>色覚障害対応のアクセシビリティチェック</li>
+                    <li>カテゴリカル、連続、発散の3タイプのパレット</li>
+                    <li>データタイプに応じた自動パレット推奨機能</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="palette-type">パレットタイプ</label>
+                    <select id="palette-type">
+                        <option value="all" selected>全タイプ</option>
+                        <option value="categorical">カテゴリカル</option>
+                        <option value="sequential">連続</option>
+                        <option value="diverging">発散</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="colorblind-safe" checked>
+                        色覚障害対応のみ表示
+                    </label>
+                </div>
+                <div class="control-item">
+                    <label for="num-classes">クラス数: <span id="num-classes-value">5</span></label>
+                    <input type="range" id="num-classes" min="3" max="12" value="5">
+                </div>
+            </div>
+
+            <!-- パレット表示エリア -->
+            <div class="palette-grid" id="palette-grid">
+                <!-- パレットがここに動的に表示されます -->
+            </div>
+            
+            <!-- 推奨パレット -->
+            <div class="recommendation-section">
+                <h3>データタイプ別推奨パレット</h3>
+                <div id="recommendations"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>カラーパレットの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// カラーパレットユーティリティの使用例
+import { 
+    AllPalettes, 
+    recommendPalette, 
+    generateOptimizedPalette,
+    checkColorBlindnessSafety 
+} from './utils/color-palette';
+
+// カテゴリカルデータ用のパレット推奨
+const recommendations = recommendPalette('categorical', 8, true);
+const bestPalette = recommendations[0].palette;
+
+// 指定クラス数に最適化
+const optimizedColors = generateOptimizedPalette(bestPalette, 5);
+
+// GeojsonLayerでの使用
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        "fill": (d, i) => optimizedColors[i % optimizedColors.length],
+        "stroke": '#ffffff',
+        "stroke-width": 0.5
+    }
+});
+
+// 色覚障害対応チェック
+const isSafe = checkColorBlindnessSafety(optimizedColors);
+console.log('色覚障害対応:', isSafe);
+
+// 特定パレットの直接使用
+const viridisColors = AllPalettes.Viridis.colors;
+const cartoSafeColors = AllPalettes.Safe.colors;
+const tailwindRichColors = AllPalettes.TailwindRich.colors;</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // カラーパレットデータ（color-palette.tsから抽出）
+        const ColorPalettes = {
+            // ColorBrewer パレット
+            Set1: {
+                name: 'Set1',
+                type: 'categorical',
+                colors: ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999'],
+                colorBlindSafe: false,
+                description: '鮮やかなカテゴリカルカラー（最大9クラス）'
+            },
+            Set2: {
+                name: 'Set2',
+                type: 'categorical',
+                colors: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f', '#e5c494', '#b3b3b3'],
+                colorBlindSafe: true,
+                description: 'パステル調カテゴリカルカラー（色覚障害対応）'
+            },
+            Set3: {
+                name: 'Set3',
+                type: 'categorical',
+                colors: ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69', '#fccde5', '#d9d9d9', '#bc80bd', '#ccebc5', '#ffed6f'],
+                colorBlindSafe: false,
+                description: '薄い色調のカテゴリカルカラー（最大12クラス）'
+            },
+            Blues: {
+                name: 'Blues',
+                type: 'sequential',
+                colors: ['#f7fbff', '#deebf7', '#c6dbef', '#9ecae1', '#6baed6', '#4292c6', '#2171b5', '#08519c', '#08306b'],
+                colorBlindSafe: true,
+                description: '青系連続カラー（色覚障害対応）'
+            },
+            Greens: {
+                name: 'Greens',
+                type: 'sequential',
+                colors: ['#f7fcf5', '#e5f5e0', '#c7e9c0', '#a1d99b', '#74c476', '#41ab5d', '#238b45', '#006d2c', '#00441b'],
+                colorBlindSafe: true,
+                description: '緑系連続カラー（色覚障害対応）'
+            },
+            Oranges: {
+                name: 'Oranges',
+                type: 'sequential',
+                colors: ['#fff5eb', '#fee6ce', '#fdd0a2', '#fdae6b', '#fd8d3c', '#f16913', '#d94801', '#a63603', '#7f2704'],
+                colorBlindSafe: true,
+                description: 'オレンジ系連続カラー（色覚障害対応）'
+            },
+            YlOrRd: {
+                name: 'YlOrRd',
+                type: 'sequential',
+                colors: ['#ffffcc', '#ffeda0', '#fed976', '#feb24c', '#fd8d3c', '#fc4e2a', '#e31a1c', '#bd0026', '#800026'],
+                colorBlindSafe: true,
+                description: '黄-オレンジ-赤系連続カラー（色覚障害対応）'
+            },
+            YlGnBu: {
+                name: 'YlGnBu',
+                type: 'sequential',
+                colors: ['#ffffd9', '#edf8b1', '#c7e9b4', '#7fcdbb', '#41b6c4', '#1d91c0', '#225ea8', '#253494', '#081d58'],
+                colorBlindSafe: true,
+                description: '黄-緑-青系連続カラー（色覚障害対応）'
+            },
+            RdYlBu: {
+                name: 'RdYlBu',
+                type: 'diverging',
+                colors: ['#a50026', '#d73027', '#f46d43', '#fdae61', '#fee090', '#ffffbf', '#e0f3f8', '#abd9e9', '#74add1', '#4575b4', '#313695'],
+                colorBlindSafe: false,
+                description: '赤-黄-青系発散カラー'
+            },
+            RdBu: {
+                name: 'RdBu',
+                type: 'diverging',
+                colors: ['#67001f', '#b2182b', '#d6604d', '#f4a582', '#fddbc7', '#f7f7f7', '#d1e5f0', '#92c5de', '#4393c3', '#2166ac', '#053061'],
+                colorBlindSafe: true,
+                description: '赤-青系発散カラー（色覚障害対応）'
+            },
+            // Viridis パレット
+            Viridis: {
+                name: 'Viridis',
+                type: 'sequential',
+                colors: ['#440154', '#482777', '#3f4a8a', '#31678e', '#26838f', '#1f9d8a', '#6cce5a', '#b6de2b', '#fee825'],
+                colorBlindSafe: true,
+                description: 'Viridis連続カラー（知覚的均一、色覚障害対応）'
+            },
+            Plasma: {
+                name: 'Plasma',
+                type: 'sequential',
+                colors: ['#0d0887', '#46039f', '#7201a8', '#9c179e', '#bd3786', '#d8576b', '#ed7953', '#fb9f3a', '#fdca26', '#f0f921'],
+                colorBlindSafe: true,
+                description: 'Plasma連続カラー（知覚的均一、色覚障害対応）'
+            },
+            // CARTO パレット
+            Prism: {
+                name: 'Prism',
+                type: 'categorical',
+                colors: ['#5F4690', '#1D6996', '#38A6A5', '#0F8554', '#73AF48', '#EDAD08', '#E17C05', '#CC503E', '#94346E', '#6F4070', '#994E95'],
+                colorBlindSafe: true,
+                description: 'CARTO Prism カテゴリカルカラー（色覚障害対応）'
+            },
+            Safe: {
+                name: 'Safe',
+                type: 'categorical',
+                colors: ['#88CCEE', '#CC6677', '#DDCC77', '#117733', '#332288', '#AA4499', '#44AA99', '#999933', '#882255', '#661100', '#6699CC', '#888888'],
+                colorBlindSafe: true,
+                description: 'CARTO Safe カテゴリカルカラー（色覚障害完全対応）'
+            },
+            // Tailwind CSS パレット
+            TailwindVivid: {
+                name: 'TailwindVivid',
+                type: 'categorical',
+                colors: ['#3B82F6', '#EF4444', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ビビッドカラー（500シェード）'
+            },
+            TailwindRich: {
+                name: 'TailwindRich',
+                type: 'categorical',
+                colors: ['#2563EB', '#DC2626', '#059669', '#D97706', '#7C3AED', '#DB2777', '#0891B2', '#65A30D'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS リッチカラー（600シェード）'
+            },
+            TailwindDeep: {
+                name: 'TailwindDeep',
+                type: 'categorical',
+                colors: ['#1D4ED8', '#B91C1C', '#047857', '#B45309', '#6D28D9', '#BE185D', '#0E7490', '#4D7C0F'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ディープカラー（700シェード）'
+            },
+            TailwindDark: {
+                name: 'TailwindDark',
+                type: 'categorical',
+                colors: ['#1E40AF', '#991B1B', '#065F46', '#92400E', '#5B21B6', '#9D174D', '#155E75', '#3F6212'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ダークカラー（800シェード）'
+            },
+            TailwindWarm: {
+                name: 'TailwindWarm',
+                type: 'categorical',
+                colors: ['#F97316', '#EF4444', '#F59E0B', '#EAB308', '#EC4899', '#F43F5E', '#D946EF', '#A855F7'],
+                colorBlindSafe: false,
+                description: 'Tailwind CSS 暖色系（オレンジ・レッド・ピンク系）'
+            },
+            TailwindCool: {
+                name: 'TailwindCool',
+                type: 'categorical',
+                colors: ['#3B82F6', '#06B6D4', '#0EA5E9', '#10B981', '#22C55E', '#84CC16', '#6366F1', '#8B5CF6'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS 寒色系（ブルー・グリーン・パープル系）'
+            },
+            TailwindNeon: {
+                name: 'TailwindNeon',
+                type: 'categorical',
+                colors: ['#06B6D4', '#10B981', '#84CC16', '#EAB308', '#F59E0B', '#EC4899', '#D946EF', '#8B5CF6'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ネオンカラー（明るく鮮やかな色調）'
+            },
+            TailwindBlues: {
+                name: 'TailwindBlues',
+                type: 'sequential',
+                colors: ['#DBEAFE', '#BFDBFE', '#93C5FD', '#60A5FA', '#3B82F6', '#2563EB', '#1D4ED8', '#1E40AF', '#1E3A8A'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS ブルー系連続カラー'
+            },
+            TailwindGreens: {
+                name: 'TailwindGreens',
+                type: 'sequential',
+                colors: ['#D1FAE5', '#A7F3D0', '#6EE7B7', '#34D399', '#10B981', '#059669', '#047857', '#065F46', '#064E3B'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS グリーン系連続カラー'
+            },
+            TailwindPurples: {
+                name: 'TailwindPurples',
+                type: 'sequential',
+                colors: ['#EDE9FE', '#DDD6FE', '#C4B5FD', '#A78BFA', '#8B5CF6', '#7C3AED', '#6D28D9', '#5B21B6', '#4C1D95'],
+                colorBlindSafe: true,
+                description: 'Tailwind CSS パープル系連続カラー'
+            }
+        };
+
+        // フィルタリング機能
+        function filterPalettes() {
+            const typeFilter = document.getElementById('palette-type').value;
+            const colorBlindFilter = document.getElementById('colorblind-safe').checked;
+            const numClasses = parseInt(document.getElementById('num-classes').value);
+            
+            const filteredPalettes = Object.values(ColorPalettes).filter(palette => {
+                if (typeFilter !== 'all' && palette.type !== typeFilter) return false;
+                if (colorBlindFilter && !palette.colorBlindSafe) return false;
+                if (palette.colors.length < numClasses) return false;
+                return true;
+            });
+            
+            renderPalettes(filteredPalettes, numClasses);
+            renderRecommendations(numClasses);
+        }
+
+        // パレット表示
+        function renderPalettes(palettes, numClasses) {
+            const grid = document.getElementById('palette-grid');
+            grid.innerHTML = '';
+            
+            palettes.forEach(palette => {
+                const card = createPaletteCard(palette, numClasses);
+                grid.appendChild(card);
+            });
+        }
+
+        // パレットカード作成
+        function createPaletteCard(palette, numClasses) {
+            const colors = palette.colors.slice(0, numClasses);
+            
+            const card = document.createElement('div');
+            card.className = 'palette-card';
+            
+            card.innerHTML = `
+                <div class="palette-header">
+                    <span class="palette-name">${palette.name}</span>
+                    <span class="palette-type">${getTypeLabel(palette.type)}</span>
+                </div>
+                <div class="palette-colors">${colors.map(color => 
+                    `<div class="color-swatch" style="background-color: ${color}" 
+                          title="${color}" onclick="copyToClipboard('${color}')"></div>`
+                ).join('')}</div>
+                <div class="palette-info">
+                    ${palette.description}
+                    ${palette.colorBlindSafe ? 
+                        '<span class="accessibility-badge">♿ 色覚障害対応</span>' : 
+                        '<span class="accessibility-badge warning">⚠️ 注意が必要</span>'
+                    }
+                </div>
+                <div class="palette-actions">
+                    <button class="copy-colors-btn" onclick="copyColorsArray('${palette.name}', ${JSON.stringify(colors).replace(/"/g, "&quot;")})">HEXコードをコピー</button>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // 推奨パレット表示
+        function renderRecommendations(numClasses) {
+            const container = document.getElementById('recommendations');
+            const types = ['categorical', 'sequential', 'diverging'];
+            
+            container.innerHTML = '<div class="recommendation-grid">' + 
+                types.map(type => {
+                    const best = getBestPalette(type, numClasses);
+                    if (!best) return '';
+                    
+                    return `
+                        <div class="recommendation-card">
+                            <div class="recommendation-title">${getTypeLabel(type)}データ用</div>
+                            <div class="recommendation-score">推奨: ${best.name}</div>
+                            <div class="palette-colors">${best.colors.slice(0, numClasses).map(color => 
+                                `<div class="color-swatch" style="background-color: ${color}"></div>`
+                            ).join('')}</div>
+                        </div>
+                    `;
+                }).join('') + 
+            '</div>';
+        }
+
+        // 最適パレット取得
+        function getBestPalette(type, numClasses) {
+            const candidates = Object.values(ColorPalettes)
+                .filter(p => p.type === type && p.colors.length >= numClasses)
+                .sort((a, b) => {
+                    // Tailwindパレットを優先
+                    const aTailwind = a.name.startsWith('Tailwind');
+                    const bTailwind = b.name.startsWith('Tailwind');
+                    if (aTailwind && !bTailwind) return -1;
+                    if (!aTailwind && bTailwind) return 1;
+                    
+                    // 色覚障害対応を優先
+                    if (a.colorBlindSafe && !b.colorBlindSafe) return -1;
+                    if (!a.colorBlindSafe && b.colorBlindSafe) return 1;
+                    return 0;
+                });
+            
+            return candidates[0];
+        }
+
+        // ユーティリティ関数
+        function getTypeLabel(type) {
+            const labels = {
+                'categorical': 'カテゴリカル',
+                'sequential': '連続',
+                'diverging': '発散'
+            };
+            return labels[type] || type;
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // 簡易フィードバック
+                console.log('コピーしました:', text);
+            });
+        }
+
+        function copyColorsArray(paletteName, colors) {
+            const text = `// ${paletteName} パレット\nconst colors = ${JSON.stringify(colors, null, 2)};`;
+            navigator.clipboard.writeText(text).then(() => {
+                console.log(`${paletteName}パレットをコピーしました`);
+            });
+        }
+
+        // 初期化
+        function init() {
+            // イベントリスナー設定
+            document.getElementById('palette-type').addEventListener('change', filterPalettes);
+            document.getElementById('colorblind-safe').addEventListener('change', filterPalettes);
+            document.getElementById('num-classes').addEventListener('input', function(e) {
+                document.getElementById('num-classes-value').textContent = e.target.value;
+                filterPalettes();
+            });
+
+            // 初期表示
+            filterPalettes();
+        }
+
+        // ページ読み込み時に初期化
+        document.addEventListener('DOMContentLoaded', init);
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+
+        // リサイズ対応（パレットグリッドは自動調整）
+    </script>
+</body>
+</html>
