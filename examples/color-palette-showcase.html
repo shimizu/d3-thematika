@@ -207,15 +207,17 @@
                     </select>
                 </div>
                 <div class="control-item">
-                    <label>
-                        <input type="checkbox" id="colorblind-safe" checked>
-                        色覚障害対応のみ表示
-                    </label>
-                </div>
-                <div class="control-item">
                     <label for="num-classes">クラス数: <span id="num-classes-value">5</span></label>
                     <input type="range" id="num-classes" min="3" max="12" value="5">
                 </div>
+                <div class="control-item">
+                    <label for="colorblind-safe">フィルター</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="colorblind-safe" checked>
+                        <label for="colorblind-safe">色覚障害対応のみ表示</label>
+                    </div>
+                </div>
+
             </div>
 
             <!-- パレット表示エリア -->
