@@ -175,7 +175,6 @@ map.addLayer('world', worldLayer);</pre>
         // カテゴリカルデータ用のパレット推奨
         const recommendations = Thematika.recommendPalette('categorical', 8, true);
         const bestPalette = recommendations[2].palette;
-
         // 指定クラス数に最適化
         const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
 
@@ -221,24 +220,6 @@ map.addLayer('world', worldLayer);</pre>
                     "opacity": 0.85,
                     "cursor": "pointer"
                 },
-                on: {
-                    "mouseover": function(event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr("opacity", 1)
-                            .attr("stroke-width", 1.5)
-                            .attr("stroke", '#ffffff');
-                    },
-                    "mouseout": function(event, d) {
-                        d3.select(this)
-                            .transition()
-                            .duration(200)
-                            .attr("opacity", 0.85)
-                            .attr("stroke-width", 0.3)
-                            .attr("stroke", '#1e293b');
-                    }
-                }
             });
 
             // OutlineLayerインスタンスを作成

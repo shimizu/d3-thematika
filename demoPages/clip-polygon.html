@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClipPolygon Effect - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <style>
+        /* clip-polygon.html固有のスタイル */
+        #map {
+            background-color: #e6f3ff;
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">ClipPolygon Effect</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">ClipPolygon Effect デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗾 クリップポリゴン機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>クリップデータ: examples/geojson/japan/pref.geojson（日本の都道府県データ）</li>
+                    <li>エフェクト: createClipPolygonで日本の範囲でクリップ</li>
+                    <li>機能: クリップパスのON/OFF切り替え</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label>クリップ設定</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="clip-toggle" checked>
+                        <label for="clip-toggle">日本の範囲でクリップ</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>createClipPolygonの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">
+// createClipPolygonの使用例
+
+// アフリカ大陸outlineデータを読み込み
+const aflicaClipGeoJSON = await d3.json('./geojson/aflica.geojson');
+
+
+// 投影法を地図データに合わせて設定
+currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+
+
+// クリップエフェクトを作成
+const clipEffect = Thematika.createClipPolygon({
+    id: 'aflica-clip',
+    polygon: aflicaClipGeoJSON,
+    projection: currentProjection
+});
+
+
+// 地図を作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 400,
+    projection: currentProjection,
+    defs: [clipEffect]  // クリップエフェクトを追加
+});
+
+
+// ラスターレイヤー（アフリカの画像を使用）
+imageLayer = new Thematika.ImageLayer('raster', {
+    src: './img/africa_img.png',
+    bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
+    style: { 
+        "opacity": 0.7 ,
+        "clip-path": clipEffect.url()  // クリップパスを適用
+    },
+    
+});
+map.addLayer('raster', imageLayer);
+            </pre>
+
+
+
+                </pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script >
+        
+        let currentProjection = d3.geoEquirectangular();
+        let isClipEnabled = true;
+
+        async function draw() {
+            // 既存の地図を削除
+            d3.select('#map').selectAll('*').remove();
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+            // アフリカ大陸outlineデータを読み込み
+            const aflicaClipGeoJSON = await d3.json('./geojson/aflica.geojson');
+
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+
+
+            // クリップエフェクトを作成
+            const clipEffect = Thematika.createClipPolygon({
+                id: 'aflica-clip',
+                polygon: aflicaClipGeoJSON,
+                projection: currentProjection
+            });
+
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: 800,
+                height: 400,
+                projection: currentProjection,
+                defs: [clipEffect]  // クリップエフェクトを追加
+            });
+
+
+            // 背景レイヤー（国境）
+            backgroundLayer = new Thematika.GeojsonLayer({
+                data: geojson,
+                attr: {
+                    "fill": '#ffffff',
+                    "stroke": '#333333',
+                    "stroke-width": 0.5
+                }
+            });
+            map.addLayer('countries', backgroundLayer);
+
+            
+            // ラスターレイヤー（アフリカの画像を使用）
+            imageLayer = new Thematika.ImageLayer('raster', {
+                src: './img/africa_img.png',
+                bounds: [-25.855061, -38.477223, 66.427949, 41.479176], // [west, south, east, north]
+                attr:{
+                    "clip-path": isClipEnabled ? clipEffect.url() : undefined  // クリップパスを条件付きで適用
+                },
+                style: { 
+                    "opacity": 0.7 ,
+                },
+                
+            });
+            map.addLayer('raster', imageLayer);
+            
+
+            // 経緯線レイヤー
+            graticuleLayer = new Thematika.GraticuleLayer({
+                step: [15, 15],
+                attr: {
+                    "stroke": '#999999',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '2,2'
+                }
+            });
+            map.addLayer('graticule', graticuleLayer);        
+
+        }
+
+        draw()
+
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // クリップトグルのイベントハンドラ
+        document.getElementById('clip-toggle').addEventListener('change', (e) => {
+            isClipEnabled = e.target.checked;
+            draw(); // 地図全体を再描画
+        });
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>d3-thematika Example Template</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">GeoJSON Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">GeoJSON Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>GeoJSONフォーマットの世界地図データ</li>
+                    <li>複数の投影法による動的な地図変換</li>
+                    <li>レイヤーベースのデータ可視化システム</li>
+                    <li>リアルタイムプロジェクション切り替え</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法を選択</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>GeojsonLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// GeojsonLayerの使用例
+const geojson = await d3.json("./geojson/world.geojson");
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoEquirectangular()
+    .fitExtent([[10, 0], [width-10, height]], geojson);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,                
+    attr: { 
+        "fill": (d, i) => {
+            // Viridis パレット - 2色の美しい対比
+            const colors = ['#440154', '#1f9d8a']; // ディープパープルとティールグリーン
+            return colors[i % colors.length];
+        },
+        "filter": shadowFilter.url(), 
+        "stroke": '#1e293b',
+        "stroke-width": 0.3,
+        "opacity": 0.85,
+    }
+});
+
+// OutlineLayerインスタンスを作成（クリップパス機能ON）
+const outlineLayer = new Thematika.OutlineLayer({
+    createClipPath: true,
+    clipPathId: 'earth-outline-clip',
+    attr: {
+        "fill": 'none',
+        "stroke": '#475569',
+        "stroke-width": 2,
+        "opacity": 0.7
+    }
+});
+
+// GraticuleLayerインスタンスを作成
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [10, 10], // 10度間隔
+    attr: {
+        "fill": 'none',
+        "stroke": 'rgba(148, 163, 184, 0.4)',
+        "stroke-width": 0.3,
+        "opacity": 0.6
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('world', worldLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // カテゴリカルデータ用のパレット推奨
+        const recommendations = Thematika.recommendPalette('categorical', 8, true);
+        const bestPalette = recommendations[2].palette;
+        // 指定クラス数に最適化
+        const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
+
+
+
+        // グローバル変数
+        let map;
+        let currentProjection = d3.geoEquirectangular();
+        
+        async function draw() {
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 既存のSVGをクリア
+            d3.select("#map").selectAll("*").remove();
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
+            });
+
+            
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": (d, i) => i%2 === 0 ?  optimizedColors[6] : optimizedColors[5], // ダーク系の2色
+
+                    "filter": "url(#drop-shadow)",
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
+                    "cursor": "pointer"
+                },
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#475569', // より落ち着いたダークグレー
+                    "stroke-width": 2,
+                    "opacity": 0.7
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": 'none',
+                    "stroke": 'rgba(148, 163, 184, 0.4)', // 半透明のライトグレー
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '1,3',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+        }
+
+        // 投影法の変更
+        document.getElementById('projection-select').addEventListener('change', async function(e) {
+            const projectionType = e.target.value;
+            
+            // 投影法を変更
+            switch(projectionType) {
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+                default:
+                    currentProjection = d3.geoEquirectangular();
+            }
+            
+            // 地図を再描画
+            await draw();
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // 初期描画
+        draw();
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // ウィンドウリサイズ対応
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 300);
+        });
+    </script>
+</body>
+</html>

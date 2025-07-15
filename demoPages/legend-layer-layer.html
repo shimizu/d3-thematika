@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legend Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+    <style>
+    </style>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Legend Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Legend Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📊 LegendLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: GeojsonLayer（国境線）、LegendLayer（凡例）、OutlineLayer（アウトライン）</li>
+                    <li>機能: D3スケールに基づく自動凡例生成、位置調整、シンボルタイプ選択</li>
+                    <li>サイズスケール: チェックボックスで有効化（circle/cell/lineタイプで使用可能）</li>
+                    <li>操作: 凡例をマウスでドラッグして移動可能（スライダーも連動）</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="scale-type-select">スケール型</label>
+                    <select id="scale-type-select">
+                        <option value="ordinal" selected>序数スケール (Ordinal)</option>
+                        <option value="linear">連続スケール (Linear)</option>
+                        <option value="threshold">閾値スケール (Threshold)</option>
+                        <option value="sequential">連続色スケール (Sequential)</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="symbol-type-select">シンボルタイプ</label>
+                    <select id="symbol-type-select">
+                        <option value="auto" selected>自動選択</option>
+                        <option value="cell">セル (Cell)</option>
+                        <option value="circle">円 (Circle)</option>
+                        <option value="line">線 (Line)</option>
+                        <option value="gradient">グラデーション (Gradient)</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="legend-orientation-select">配置方向</label>
+                    <select id="legend-orientation-select">
+                        <option value="vertical" selected>縦方向</option>
+                        <option value="horizontal">横方向</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>X座標</label>
+                    <div class="slider-control">
+                        <input type="range" id="legend-x-slider" min="0" max="800" value="20">
+                        <span class="value-display" id="legend-x-value">20</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label>Y座標</label>
+                    <div class="slider-control">
+                        <input type="range" id="legend-y-slider" min="0" max="600" value="20">
+                        <span class="value-display" id="legend-y-value">20</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>アイテム間隔</label>
+                    <div class="slider-control">
+                        <input type="range" id="item-spacing-slider" min="-10" max="200" value="20">
+                        <span class="value-display" id="item-spacing-value">20</span>px
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="enable-size-scale-checkbox">
+                        <label for="enable-size-scale-checkbox">サイズスケールを有効化</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="overlapping-checkbox">
+                        <label for="overlapping-checkbox">重ね表示モード（サイズスケール時）</label>
+                    </div>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-background-checkbox" checked>
+                        <label for="show-background-checkbox">背景ボックスを表示</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>LegendLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// LegendLayerの使用例
+
+// 序数スケールの例
+const colorScale = d3.scaleOrdinal()
+    .domain(['都市', '農村', '工業地域'])
+    .range(['#ff0000', '#00ff00', '#0000ff']);
+
+const legendLayer = new Thematika.LegendLayer({
+    scale: colorScale,
+    position: { top: 20, left: 20 },  // SVG座標系でのピクセル値
+    title: '土地利用',
+    orientation: 'vertical',
+    showBackground: true,  // 背景ボックスを表示
+    backgroundStyle: {
+        "fill": '#ffffff',
+        "stroke": '#cccccc', 
+        "opacity": 0.9,
+        rx: 4
+    }
+});
+
+// サイズスケールの例（セルタイプ）
+const densityScale = d3.scaleOrdinal()
+    .domain(['低', '中', '高'])
+    .range(['#ffcccc', '#ff6666', '#ff0000']);
+
+const sizeScale = d3.scaleLinear()
+    .domain([0, 1, 2])
+    .range([100, 400, 900]); // 面積値
+
+const sizeLegend = new Thematika.LegendLayer({
+    scale: densityScale,
+    sizeScale: sizeScale,
+    symbolType: 'cell',  // セルタイプを指定
+    position: { top: 300, left: 200 },
+    title: '人口密度'
+});
+
+// 連続スケールの例
+const temperatureScale = d3.scaleLinear()
+    .domain([0, 100])
+    .range(['#ffffff', '#ff0000']);
+
+const tempLegend = new Thematika.LegendLayer({
+    scale: temperatureScale,
+    symbolType: 'gradient',
+    position: { top: 50, left: 600 },
+    title: '気温 (°C)',
+    orientation: 'horizontal'
+});
+
+// 地図に追加
+map.addLayer('legend', legendLayer);
+map.addLayer('size-legend', sizeLegend);
+map.addLayer('temp-legend', tempLegend);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // 現在のスケール設定
+        let currentScaleType = 'ordinal';
+        let currentPosition = { top: 350, left: 60 };
+        let currentOrientation = 'vertical';
+        let currentSymbolType = 'auto';
+        let showBackground = true;
+        let currentItemSpacing = 20;
+        let enableSizeScale = false;
+        let overlappingMode = false;
+        
+        // プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        
+        // 各スケール型のデータを定義
+        const scaleData = {
+            ordinal: {
+                scale: d3.scaleOrdinal()
+                    .domain(['Aグループ', 'Bグループ', 'Cグループ'])
+                    .range(['#2E86AB', '#A23B72', '#F18F01']),
+                title: '経済発展レベル',
+                colorFunction: (d, i) => {
+                    const types = ['Aグループ', 'Bグループ', 'Cグループ'];
+                    return scaleData.ordinal.scale(types[i % 3]);
+                }
+            },
+            linear: {
+                scale: d3.scaleLinear()
+                    .domain([0, 100])
+                    .range(['#ffffff', '#ff0000']),
+                title: 'GDP成長率 (%)',
+                colorFunction: (d, i) => {
+                    const value = Math.random() * 100;
+                    return scaleData.linear.scale(value);
+                }
+            },
+            threshold: {
+                scale: d3.scaleThreshold()
+                    .domain([10, 25, 50, 75])
+                    .range(['#ffffcc', '#c7e9b4', '#7fcdbb', '#41b6c4', '#2c7fb8']),
+                title: '人口密度 (人/km²)',
+                colorFunction: (d, i) => {
+                    const values = [5, 15, 30, 60, 80];
+                    return scaleData.threshold.scale(values[i % 5]);
+                }
+            },
+            sequential: {
+                scale: d3.scaleSequential(d3.interpolateYlGnBu)
+                    .domain([0, 1]),
+                title: '環境指数',
+                colorFunction: (d, i) => {
+                    const value = Math.random();
+                    return scaleData.sequential.scale(value);
+                }
+            }
+        };
+        
+        // サイズスケールの定義（シンボルタイプごと）
+        const sizeScales = {
+            circle: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([5, 15, 30]),
+            cell: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([100, 400, 900]), // 面積値
+            line: d3.scaleLinear()
+                .domain([0, 1, 2])
+                .range([1, 3, 6]) // 線の太さ
+        };
+        
+        async function draw() {
+            const id = "#map";
+            
+            // 既存の地図を削除
+            d3.select(id).selectAll('*').remove();
+
+            const width = document.querySelector(id).clientWidth;
+            const height = document.querySelector(id).clientHeight;
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 60], [width-10, height-20]], geojson);
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
+            });
+
+            // 現在のスケールデータを取得
+            const currentScale = scaleData[currentScaleType];
+            
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": currentScale.colorFunction,
+                    "stroke": '#333',
+                    "stroke-width": 0.5,
+                    "opacity": 0.8
+                }
+            });
+            
+            // LegendLayerインスタンスを作成
+            const legendOptions = {
+                scale: currentScale.scale,
+                position: currentPosition,
+                title: currentScale.title,
+                orientation: currentOrientation,
+                showBackground: showBackground,
+                itemSpacing: currentItemSpacing
+            };
+            
+            // シンボルタイプが指定されている場合
+            if (currentSymbolType !== 'auto') {
+                legendOptions.symbolType = currentSymbolType;
+            }
+            
+            // サイズスケールが有効な場合
+            if (enableSizeScale && currentSymbolType !== 'auto' && currentSymbolType !== 'gradient') {
+                legendOptions.sizeScale = sizeScales[currentSymbolType];
+                // 重ね表示モードを設定
+                legendOptions.overlapping = overlappingMode;
+            }
+            
+            const legendLayer = new Thematika.LegendLayer(legendOptions);
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('legend', legendLayer);
+        }
+
+        // 初回ロード時にスライダーの最大値を設定
+        function updateSliderMaxValues() {
+            const width = document.querySelector('#map').clientWidth;
+            const height = document.querySelector('#map').clientHeight;
+            
+            document.getElementById('legend-x-slider').max = width;
+            document.getElementById('legend-y-slider').max = height;
+        }
+
+        // コントロールのイベントハンドラ
+        document.getElementById('scale-type-select').addEventListener('change', (e) => {
+            currentScaleType = e.target.value;
+            draw();
+        });
+        
+        // X座標スライダー
+        document.getElementById('legend-x-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('legend-x-value').textContent = value;
+            currentPosition.left = value;
+            draw();
+        });
+        
+        // Y座標スライダー
+        document.getElementById('legend-y-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('legend-y-value').textContent = value;
+            currentPosition.top = value;
+            draw();
+        });
+        
+        document.getElementById('legend-orientation-select').addEventListener('change', (e) => {
+            currentOrientation = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('symbol-type-select').addEventListener('change', (e) => {
+            currentSymbolType = e.target.value;
+            draw();
+        });
+        
+        document.getElementById('show-background-checkbox').addEventListener('change', (e) => {
+            showBackground = e.target.checked;
+            draw();
+        });
+        
+        // アイテム間隔スライダー
+        document.getElementById('item-spacing-slider').addEventListener('input', (e) => {
+            const value = parseInt(e.target.value);
+            document.getElementById('item-spacing-value').textContent = value;
+            currentItemSpacing = value;
+            draw();
+        });
+        
+        document.getElementById('enable-size-scale-checkbox').addEventListener('change', (e) => {
+            enableSizeScale = e.target.checked;
+            draw();
+        });
+        
+        document.getElementById('overlapping-checkbox').addEventListener('change', (e) => {
+            overlappingMode = e.target.checked;
+            draw();
+        });
+
+        // 初期化
+        draw();
+        
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // 初回ロード時にスライダーの最大値を設定
+        setTimeout(updateSliderMaxValues, 100);
+    </script>
+</body>
+</html>

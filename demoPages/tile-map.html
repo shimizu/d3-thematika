@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile Map - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+    <style>
+        /* tile-map.html固有のスタイル */
+        #map {
+            background-color: #e6f3ff;
+        }
+        
+        /* tile-map.htmlでは共通クラスを使用 */
+        
+        
+    </style>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Tile Map</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Tile Map デモ</h2>
+            
+            <div class="info-box">
+                <h3>🗺️ TileMap機能</h3>
+                <ul>
+                    <li>データ: OpenStreetMapタイルサーバー（https://c.tile.openstreetmap.org/）</li>
+                    <li>レイヤー: ImageLayer（タイル画像）、OutlineLayer（投影境界）</li>
+                    <li>機能: 地域選択、ズームレベル調整、投影法切り替え、タイル境界表示</li>
+                    <li>特徴: tile-utilsによる動的タイル座標計算とURL生成</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="region-select">表示地域</label>
+                    <select id="region-select">
+                        <option value="tokyo" selected>東京</option>
+                        <option value="osaka">大阪</option>
+                        <option value="fukuoka">福岡</option>
+                        <option value="japan">日本全域</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>ズームレベル</label>
+                    <div class="slider-control">
+                        <input type="range" id="zoom-select" min="5" max="15" value="10">
+                        <span class="value-display" id="zoom-value">10</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="mercator" selected>Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="equirectangular">Equirectangular</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>表示オプション</label>
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="show-bbox-markers">
+                        <label for="show-bbox-markers">タイル境界マーカーを表示</label>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>タイル情報</label>
+                    <div id="tile-info" class="info-display">
+                        タイルを読み込み中...
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>TileMapの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// TileMapの使用例（ImageLayer + tile-utils）
+
+// 地域の境界を定義
+const regions = {
+    tokyo: [139.4, 35.5, 139.9, 35.8],
+    osaka: [135.3, 34.5, 135.7, 34.8],
+    fukuoka: [130.2, 33.4, 130.6, 33.8],
+    japan: [129.0, 30.0, 146.0, 46.0]
+};
+
+// タイルUtilsを使用してタイル座標を計算
+const bounds = regions.tokyo;
+const zoom = 10;
+const tiles = Thematika.generateTileUrls(bounds, zoom, {
+    urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+});
+
+// 地図の作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoMercator().fitExtent([[10, 10], [790, 590]], {
+        type: 'Polygon',
+        coordinates: [[
+            [bounds[0], bounds[1]], [bounds[2], bounds[1]],
+            [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
+        ]]
+    })
+});
+
+// 各タイルをImageLayerとして追加
+tiles.forEach((tile, index) => {
+    const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
+        src: tile.url,
+        bounds: tile.bounds.bounds,
+        showBboxMarkers: false
+    });
+    map.addLayer(`tile-${index}`, imageLayer);
+});
+
+// アウトライン追加
+const outlineLayer = new Thematika.OutlineLayer({
+    attr: { stroke: '#333', 'stroke-width': 2, fill: 'none' }
+});
+map.addLayer('outline', outlineLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // 共通機能の初期化
+        initializeCommonFeatures();
+        
+        // 地域の境界を定義
+        const regions = {
+            tokyo: [139.4, 35.5, 139.9, 35.8],
+            osaka: [135.3, 34.5, 135.7, 34.8], 
+            fukuoka: [130.2, 33.4, 130.6, 33.8],
+            japan: [129.0, 30.0, 146.0, 46.0]
+        };
+
+        // 現在の設定
+        let currentRegion = 'tokyo';
+        let currentZoom = 10;
+        let currentProjectionType = 'mercator';
+        let showBboxMarkers = false;
+
+        // 投影法を取得
+        function getProjection(type) {
+            switch (type) {
+                case 'mercator':
+                    return d3.geoMercator();
+                case 'naturalEarth1':
+                    return d3.geoNaturalEarth1();
+                case 'equirectangular':
+                    return d3.geoEquirectangular();
+                default:
+                    return d3.geoMercator();
+            }
+        }
+
+        // タイル情報を更新
+        function updateTileInfo(tiles, bounds, zoom) {
+            const infoDiv = document.getElementById('tile-info');
+            const tileCount = tiles.length;
+            const resolution = Thematika.getResolution(zoom, (bounds[1] + bounds[3]) / 2);
+            
+            infoDiv.innerHTML = `
+                <strong>タイル情報:</strong><br>
+                ・タイル数: ${tileCount}個<br>
+                ・ズームレベル: ${zoom}<br>
+                ・範囲: ${bounds[0].toFixed(3)}, ${bounds[1].toFixed(3)} - ${bounds[2].toFixed(3)}, ${bounds[3].toFixed(3)}<br>
+                ・解像度: ${resolution.toFixed(2)} m/pixel<br>
+                ・URLテンプレート: https://c.tile.openstreetmap.org/{z}/{x}/{y}.png
+            `;
+        }
+
+        // メイン描画関数
+        async function draw() {
+            const id = "#map";
+
+            // 既存の地図を削除
+            d3.select(id).selectAll('*').remove();
+
+            const width = document.querySelector(id).clientWidth;
+            const height = document.querySelector(id).clientHeight;
+
+            // 現在の地域の境界を取得
+            const bounds = regions[currentRegion];
+            
+            // タイルデータを生成
+            const tiles = Thematika.generateTileUrls(bounds, currentZoom, {
+                urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                clampToBounds: true
+            });
+
+            // タイル情報を更新
+            updateTileInfo(tiles, bounds, currentZoom);
+
+            // 投影法を設定
+            const projection = getProjection(currentProjectionType);
+            
+            // タイル表示用に適切なスケールを設定
+            if (currentProjectionType === 'mercator') {
+                // Web Mercatorタイル用の設定
+                const centerLon = (bounds[0] + bounds[2]) / 2;
+                const centerLat = (bounds[1] + bounds[3]) / 2;
+                
+                // ズームレベルに基づいてスケールを計算
+                const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);
+                
+                projection
+                    .scale(scale)
+                    .center([centerLon, centerLat])
+                    .translate([width / 2, height / 2]);
+            } else {
+                // 他の投影法の場合は既存のfitExtentを使用
+                const boundsGeoJSON = {
+                    type: 'Polygon',
+                    coordinates: [[
+                        [bounds[0], bounds[1]], [bounds[2], bounds[1]],
+                        [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
+                    ]]
+                };
+                projection.fitExtent([[10, 10], [width - 10, height - 10]], boundsGeoJSON);
+            }
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: id,
+                width: width,
+                height: height,
+                projection: projection
+            });
+
+            // 各タイルをImageLayerとして追加
+            tiles.forEach((tile, index) => {
+                console.log(`=== Tile ${index} ===`);
+                console.log('Tile data:', tile);
+                console.log('Tile URL:', tile.url);
+                console.log('Tile bounds:', tile.bounds.bounds);
+                console.log('Current projection:', currentProjectionType);
+                
+                const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
+                    src: tile.url,
+                    bounds: tile.bounds.bounds,
+                    showBboxMarkers: showBboxMarkers,
+                    // useAdvancedReprojectionのデフォルト値（true）を使用
+                    attr: { opacity: 1 }
+                });
+                map.addLayer(`tile-${index}`, imageLayer);
+            });
+
+            // アウトライン（投影法境界）を追加
+            const outlineLayer = new Thematika.OutlineLayer({
+                attr: {
+                    fill: 'none',
+                    stroke: '#333',
+                    'stroke-width': 2,
+                    opacity: 0.8
+                }
+            });
+            map.addLayer('outline', outlineLayer);
+
+            console.log(`描画完了: ${currentRegion}, ズーム${currentZoom}, タイル数${tiles.length}`);
+        }
+
+        // イベントリスナーを設定
+        function setupEventListeners() {
+            // 地域選択
+            document.getElementById('region-select').addEventListener('change', function(e) {
+                currentRegion = e.target.value;
+                draw();
+            });
+
+            // ズームレベル
+            document.getElementById('zoom-select').addEventListener('input', function(e) {
+                currentZoom = parseInt(e.target.value);
+                document.getElementById('zoom-value').textContent = currentZoom;
+                draw();
+            });
+
+            // 投影法
+            document.getElementById('projection-select').addEventListener('change', function(e) {
+                currentProjectionType = e.target.value;
+                draw();
+            });
+
+            // bbox マーカー
+            document.getElementById('show-bbox-markers').addEventListener('change', function(e) {
+                showBboxMarkers = e.target.checked;
+                draw();
+            });
+        }
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // 初期化
+        setupEventListeners();
+        draw();
+    </script>
+</body>
+</html>

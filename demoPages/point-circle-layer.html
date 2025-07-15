@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Circle Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Circle Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Circle Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>⭕ PointCircleLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: PointCircleLayer（サークル表示）、GraticuleLayer（経緯線）</li>
+                    <li>機能: 半径調整、固定値/関数切り替え</li>
+                    <li>対応: ポイント・ポリゴン・ラインの中心点にサークル配置</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="radius-type">半径タイプ</label>
+                    <select id="radius-type">
+                        <option value="fixed" selected>固定値</option>
+                        <option value="index">インデックスベース</option>
+                        <option value="population">人口ベース</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>半径</label>
+                    <div class="slider-control">
+                        <input type="range" id="radius-slider" min="1" max="20" step="1" value="5">
+                        <span class="value-display" id="radius-value">5</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="fill-color">塗りつぶし色</label>
+                    <input type="color" id="fill-color" value="#ff6b6b" class="color-picker">
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointCircleLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointCircleLayerの使用例
+
+const geojson = await d3.json("./geojson/world.geojson");
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoNaturalEarth1()
+});
+
+// PointCircleLayerインスタンスを作成
+const circleLayer = new Thematika.PointCircleLayer({
+    data: geojson,
+    r: 5, // 固定半径
+    attr: {
+        "fill": '#ff6b6b',
+        "stroke": '#d63031',
+        "stroke-width": 1,
+        "opacity": 0.8
+    }
+});
+
+// または関数を使った動的半径設定
+const dynamicCircleLayer = new Thematika.PointCircleLayer({
+    data: geojson,
+    r: (feature, index) => {
+        // 人口に基づいて半径を決定
+        const population = feature.properties?.POP_EST || 0;
+        return Math.sqrt(population / 1000000) + 2;
+    },
+    attr: {
+        "fill": (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
+        "stroke": '#2d3436',
+        "stroke-width": 0.5
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('circles', circleLayer);
+
+// 半径を動的に更新
+circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // 共通機能の初期化
+        initializeCommonFeatures();
+
+        let map = null;
+        let circleLayer = null;
+        let worldData = null;
+        let radiusType = 'fixed';
+        let baseRadius = 5;
+        let fillColor = '#ff6b6b';
+
+        async function draw() {
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 世界地図データを読み込み（初回のみ）
+                if (!worldData) {
+                    worldData = await d3.json('./geojson/world.geojson');
+                }
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [20, 20],
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#ddd',
+                        "stroke-width": 0.5,
+                        "opacity": 0.6
+                    }
+                });
+
+                // 半径の設定
+                let radiusFunction;
+                switch (radiusType) {
+                    case 'fixed':
+                        radiusFunction = baseRadius;
+                        break;
+                    case 'index':
+                        radiusFunction = (feature, index) => (index % 5) + baseRadius;
+                        break;
+                    case 'population':
+                        radiusFunction = (feature, index) => {
+                            const population = feature.properties?.POP_EST || 0;
+                            return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
+                        };
+                        break;
+                    default:
+                        radiusFunction = baseRadius;
+                }
+
+                // PointCircleLayerを作成
+                circleLayer = new Thematika.PointCircleLayer({
+                    data: worldData,
+                    r: radiusFunction,
+                    attr: {
+                        "fill": (d,i) => {
+                            // 偶数インデックスは青、奇数インデックスはピンク
+                            return i % 2 === 0 ? '#74b9ff' : '#fd79a8';
+                        },
+                        "stroke": '#d63031',
+                        "stroke-width": 1,
+                        "opacity": 0.8
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('circles', circleLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        draw();
+
+        // 半径タイプの変更
+        document.getElementById('radius-type').addEventListener('change', function() {
+            radiusType = this.value;
+            draw();
+        });
+        
+        // 半径スライダーの変更
+        document.getElementById('radius-slider').addEventListener('input', function() {
+            baseRadius = parseInt(this.value);
+            document.getElementById('radius-value').textContent = this.value;
+            draw();
+        });
+        
+        // 色の変更
+        document.getElementById('fill-color').addEventListener('change', function() {
+            fillColor = this.value;
+            draw();
+        });
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // リサイズイベントのハンドリング
+        setupResizeHandler(draw);
+
+    </script>
+</body>
+</html>

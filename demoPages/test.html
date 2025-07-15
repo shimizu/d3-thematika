@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[LAYER_NAME] - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .map-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .control-group {
+            margin-bottom: 15px;
+        }
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        .control-group select,
+        .control-group input[type="range"] {
+            width: 200px;
+        }
+        .control-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        .code-example {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        .note {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        #map {
+            width: 100%;
+            height: 100%;            
+            aspect-ratio: 16 / 9;
+            background-color: #e6f3ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GeojsonLayer デモ</h1>
+        <p class="description">
+            GeojsonLayerを使用してGeoJSONデータを地図上に表示します。
+            世界地図データを表示し、アウトライン、経緯線、スタイリング機能を確認できます。
+        </p>
+
+
+        <div id="map"></div>
+
+
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script >
+        
+        const effect = Thematika.FilterPresets.standardDropShadow()
+
+        async function draw() {
+            const id = "#map"
+
+
+            const width = document.querySelector(id).clientWidth ;
+            const height = document.querySelector(id).clientHeight;
+
+            const projection = d3.geoOrthographic();
+    
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            projection
+            .rotate([0, 0, 10])
+            .fitExtent([[10, 60], [width-10, height-20]], geojson);
+
+            // 地図を作成
+            const map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: projection,
+                defs:[effect],
+            });
+
+            map.svg
+                .append('defs')
+                .html(`
+<radialGradient id="globeLight" cx="30%" cy="30%" r="70%">
+    <!-- 光が当たる中心は明るく、外側は暗く -->
+    <stop offset="0%" stop-color="#e6f3ff" stop-opacity="0.8"/>
+    <stop offset="100%" stop-color="#6f7b7b" stop-opacity="1"/>
+</radialGradient>
+
+<filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+    <!-- 元グラフィックのアルファをぼかす -->
+    <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
+    <!-- 影を少し下にオフセット -->
+    <feOffset in="blur" dx="0" dy="8" result="offsetBlur"/>
+    <!-- 元グラフィックと影を合成 -->
+    <feMerge>
+        <feMergeNode in="offsetBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+</filter>
+                `)
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill":(d,i)=> i%2 === 0 ? "#1a3d1f" : '#e0f7fa', 
+                    "stroke": '#1a3d1f',
+                    "stroke-width": 0.8,
+                    "opacity": (d,i) => 0.9,
+                }
+            });
+
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: false,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'url(#globeLight)',
+                    "filter": 'url(#dropShadow)',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
+                },
+                style:{
+                    "mix-blend-mode": "multiply",
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#000',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '1,2',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world_new', worldLayer);
+            map.addLayer('outline', outlineLayer);
+
+        }
+
+        draw()
+
+
+
+
+    </script>
+</body>
+</html>
