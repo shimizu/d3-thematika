@@ -90,7 +90,7 @@
                 </div>
                 <div class="control-item">
                     <label for="animate-force">フォースアニメーション</label>
-                    <input type="checkbox" id="animate-force" checked>
+                    <input type="checkbox" id="animate-force">
                 </div>
                 <div class="control-item">
                     <label for="show-airports">空港表示</label>
@@ -343,7 +343,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // 投影法を変更
             switch(projectionType) {
                 case 'mercator':
-                    currentProjection = d3.geoMercator();
+                    currentProjection = d3.geoTwoPointAzimuthalUsa();
                     break;
                 case 'naturalEarth1':
                     currentProjection = d3.geoNaturalEarth1();

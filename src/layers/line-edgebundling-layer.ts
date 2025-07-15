@@ -154,7 +154,7 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
     this.segmentSteps = options.segmentSteps ?? 'auto';
     this.showControlPoints = options.showControlPoints ?? false;
     this.showOriginalLines = options.showOriginalLines ?? false;
-    this.animateForce = options.animateForce ?? true;
+    this.animateForce = options.animateForce ?? false;
     this.controlPointSize = options.controlPointSize ?? 3;
     this.endpointSize = options.endpointSize ?? 6;
   }
@@ -552,7 +552,7 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
    * @private
    */
   private startForceSimulation(): void {
-    if (!this.bundlingData || !this.animateForce) return;
+    if (!this.bundlingData) return;
 
     // 既存のsimulationを停止
     if (this.simulation) {
@@ -570,11 +570,22 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
         .strength(0.5)
         .distance(0)
       )
-      .alphaDecay(0.02)
-      .on('tick', () => this.updatePositions());
+      .alphaDecay(0.02);
 
-    // アニメーションを開始
-    this.simulation.alpha(0.3).restart();
+    if (this.animateForce) {
+      // アニメーション有効の場合
+      this.simulation.on('tick', () => this.updatePositions());
+      this.simulation.alpha(0.3).restart();
+    } else {
+      // アニメーション無効の場合、固定回数実行して即座に収束
+      for (let i = 0; i < 300; i++) {
+        this.simulation.tick();
+        if (this.simulation.alpha() < 0.01) {
+          break;
+        }
+      }
+      this.updatePositions();
+    }
   }
 
   /**
