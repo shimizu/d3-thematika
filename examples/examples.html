@@ -9,12 +9,23 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <style>
+        /* main-containerの設定を調整 */
+        .main-container {
+            padding-top: 80px !important;
+        }
+        
         /* Examples Gallery特有のヒーローセクション */
         .hero {
             position: relative;
-            padding: 8rem 2rem 4rem;
+            padding: 2rem 2rem 1rem !important;
             text-align: center;
             overflow: hidden;
+            height: 40vh !important;
+            max-height: 400px !important;
+            min-height: 300px !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .hero::before {
@@ -334,7 +345,10 @@
         /* examples.html専用レスポンシブ */
         @media (max-width: 768px) {
             .hero {
-                padding: 4rem 1rem 2rem;
+                padding: 1rem 1rem 0.5rem !important;
+                height: 30vh !important;
+                max-height: 300px !important;
+                min-height: 200px !important;
             }
 
             .examples-grid {
@@ -372,7 +386,7 @@
             </a>
             <div class="nav-links">
                 <a href="examples.html" class="nav-link">Examples</a>
-                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="docs/" class="nav-link">Documentation</a>
                 <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
             </div>
         </div>
@@ -540,9 +554,9 @@
                 <span class="category-count">2 examples</span>
             </div>
             <div class="examples-grid">
-                <a href="line-connection.html" class="example-card">
+                <a href="line-connection-layer.html" class="example-card">
                     <div class="example-thumbnail-wrapper">
-                        <img src="thumbnails/line-connection.png" alt="ライン接続レイヤー" class="example-thumbnail loading-shimmer">
+                        <img src="thumbnails/line-connection-layer.png" alt="ライン接続レイヤー" class="example-thumbnail loading-shimmer">
                     </div>
                     <div class="example-content">
                         <div class="example-title">ライン接続レイヤー</div>
@@ -555,6 +569,21 @@
                     </div>
                 </a>
                 
+                <a href="line-edgebundling-layer.html" class="example-card">
+                    <span class="new-badge">New</span>
+                    <div class="example-thumbnail-wrapper">
+                        <img src="thumbnails/line-edgebundling-layer.png" alt="ラインエッジバンドリングレイヤー" class="example-thumbnail loading-shimmer">
+                    </div>
+                    <div class="example-content">
+                        <div class="example-title">ラインエッジバンドリングレイヤー</div>
+                        <div class="example-description">D3のフォースシミュレーションを使用してラインをバンドリングするレイヤー。航空路線や交通ネットワークの可視化に最適。</div>
+                        <div class="example-tags">
+                            <span class="tag">エッジバンドリング</span>
+                            <span class="tag">フォース</span>
+                            <span class="tag">ネットワーク</span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </section>
 

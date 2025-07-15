@@ -10,10 +10,11 @@ const __dirname = path.dirname(__filename);
 
 /**
  * demoPages用のファイルを構築するスクリプト
- * examples/とdist/thematika.umd.jsをdemoPagesにコピーします
+ * examples/、docs/、dist/thematika.umd.jsをdemoPagesにコピーします
  */
 
 const sourceExamplesDir = path.join(__dirname, '../examples');
+const sourceDocsDir = path.join(__dirname, '../docs');
 const sourceDistFile = path.join(__dirname, '../dist/thematika.umd.js');
 const targetDir = path.join(__dirname, '../demoPages');
 
@@ -61,6 +62,15 @@ try {
   // examples/ の全ファイルをコピー
   console.log('📁 Copying examples directory...');
   copyDirectory(sourceExamplesDir, targetDir);
+
+  // docs/ の全ファイルをコピー
+  console.log('📚 Copying docs directory...');
+  const targetDocsDir = path.join(targetDir, 'docs');
+  if (fs.existsSync(sourceDocsDir)) {
+    copyDirectory(sourceDocsDir, targetDocsDir);
+  } else {
+    console.log('⚠️  docs directory not found, skipping...');
+  }
 
   // dist/thematika.umd.js をコピー
   console.log('📦 Copying thematika.umd.js...');
