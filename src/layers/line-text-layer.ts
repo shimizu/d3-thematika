@@ -647,26 +647,6 @@ export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
 
 
 
-  /**
-   * テキストにイベントリスナーを追加します（LineConnectionLayerパターン準拠）
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: any) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('.thematika-line-text')
-        .on(eventType, function(event, d: any) {
-          // 統一されたLineTextDataを直接渡す
-          handler(event, {
-            feature: d.feature,
-            featureIndex: d.featureIndex,
-            coordinates: d.coordinates,
-            lineIndex: d.lineIndex,
-            textContent: d.textContent
-          });
-        });
-    }
-  }
 
   /**
    * セグメントのパスを生成します（line-connection-layerから移植）

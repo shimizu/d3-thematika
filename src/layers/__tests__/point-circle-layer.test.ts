@@ -200,32 +200,6 @@ describe('PointCircleLayer', () => {
   });
 
 
-  describe('event handling', () => {
-    test('on()でイベントリスナーを追加できる', () => {
-      const handler = jest.fn();
-      const mockCircleSelection = {
-        on: jest.fn()
-      };
-      const mockLayerGroup = {
-        selectAll: jest.fn(() => mockCircleSelection)
-      };
-
-      pointCircleLayer['layerGroup'] = mockLayerGroup as any;
-      pointCircleLayer.on('click', handler);
-
-      expect(mockLayerGroup.selectAll).toHaveBeenCalledWith('circle');
-      expect(mockCircleSelection.on).toHaveBeenCalledWith('click', expect.any(Function));
-    });
-
-    test('レイヤーグループが未設定の場合はイベント登録されない', () => {
-      const handler = jest.fn();
-      
-      pointCircleLayer.on('click', handler);
-
-      // layerGroupが未設定の場合は何も実行されない
-      expect(mockContainer.on).not.toHaveBeenCalled();
-    });
-  });
 
   describe('style application', () => {
     test('動的スタイル関数が適用される', () => {

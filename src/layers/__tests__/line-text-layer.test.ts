@@ -371,19 +371,6 @@ describe('LineTextLayer', () => {
     });
   });
 
-  describe('event handling', () => {
-    it('on()でイベントリスナーを追加できる', () => {
-      layer = new LineTextLayer({ data: sampleLineStringData });
-      const mockContainer = createMockSelection();
-      
-      layer.render(mockContainer);
-      
-      const handler = jest.fn();
-      layer.on('click', handler);
-      
-      expect(mockContainer.selectAll).toHaveBeenCalledWith('.thematika-line-text');
-    });
-  });
 
   describe('getData', () => {
     it('GeoJSONデータを取得できる', () => {

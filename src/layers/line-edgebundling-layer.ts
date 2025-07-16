@@ -630,24 +630,6 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
     super.destroy();
   }
 
-  /**
-   * ラインにイベントリスナーを追加します
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: any) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('.thematika-line-bundled')
-        .on(eventType, function(event, d: any) {
-          handler(event, {
-            feature: d.feature,
-            featureIndex: d.featureIndex,
-            lineIndex: d.lineIndex,
-            nodes: d.nodes
-          });
-        });
-    }
-  }
 
   /**
    * Force simulationを取得します（デバッグ用）

@@ -172,10 +172,6 @@ const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
     }
 });
 
-// イベントハンドラーを追加
-bundlingLayer.on('click', (event, data) => {
-    console.log('クリックされたライン:', data.feature.properties.name);
-});
 
 // レイヤーを地図に追加
 map.addLayer('bundling', bundlingLayer);</pre>
@@ -317,22 +313,10 @@ map.addLayer('bundling', bundlingLayer);</pre>
                 }
             });
 
-            // イベントハンドラーを追加
-            bundlingLayer.on('click', (event, data) => {
-                console.log('クリックされたライン:', data.feature.properties.name);
-            });
 
             // 航空路線レイヤーを地図に追加（空港の上に配置）
             map.addLayer('bundling', bundlingLayer);
 
-            // 空港ポイントにマウスオーバーイベントを追加
-            airportsLayer.on('mouseover', (event, data) => {
-                const airport = data.feature.properties;
-                console.log(`空港: ${airport.displayName}`);
-                console.log(`場所: ${airport.location}`);
-                console.log(`総フライト数: ${airport.totalFlights.toLocaleString()}便`);
-                console.log(`路線数: ${airport.routeCount}路線`);
-            });
         }
 
         // 投影法の変更

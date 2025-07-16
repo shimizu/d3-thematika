@@ -202,28 +202,6 @@ describe('PointTextLayer', () => {
     });
   });
 
-  describe('event handling', () => {
-    it('on()でイベントリスナーを追加できる', () => {
-      const layer = new PointTextLayer({ data: testDataFeatureCollection });
-      const handler = jest.fn();
-      
-      layer.render(container);
-      layer.on('click', handler);
-      
-      expect(container.selectAll).toHaveBeenCalledWith('text');
-      expect(container.on).toHaveBeenCalledWith('click', expect.any(Function));
-    });
-
-    it('レイヤーグループが未設定の場合はイベント登録されない', () => {
-      const layer = new PointTextLayer({ data: testDataFeatureCollection });
-      const handler = jest.fn();
-      
-      layer.on('click', handler);
-      
-      // レンダリング前はイベント登録されない（selectAllは呼ばれない）
-      expect(container.selectAll).not.toHaveBeenCalled();
-    });
-  });
 
   describe('CSS class application', () => {
     it('レイヤーグループが作成される', () => {

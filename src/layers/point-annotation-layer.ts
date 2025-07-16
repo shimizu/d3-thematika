@@ -189,19 +189,6 @@ export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
     this.renderAnnotations();
   }
 
-  /**
-   * フィーチャーにイベントリスナーを追加します
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: GeoJSON.Feature) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('.annotation')
-        .on(eventType, function(event, d: any) {
-          handler(event, d.feature);
-        });
-    }
-  }
 
   /**
    * 投影法を設定します

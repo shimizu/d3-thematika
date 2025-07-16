@@ -65,19 +65,6 @@ export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
 
 
 
-  /**
-   * フィーチャーにイベントリスナーを追加します
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: GeoJSON.Feature) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('circle')
-        .on(eventType, function(event, d) {
-          handler(event, d as GeoJSON.Feature);
-        });
-    }
-  }
 
   /**
    * 投影法を設定します

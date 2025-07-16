@@ -161,32 +161,6 @@ describe('GeojsonLayer', () => {
   });
 
 
-  describe('event handling', () => {
-    test('on()でイベントリスナーを追加できる', () => {
-      const handler = jest.fn();
-      const mockPathSelection = {
-        on: jest.fn()
-      };
-      const mockLayerGroup = {
-        selectAll: jest.fn(() => mockPathSelection)
-      };
-
-      geojsonLayer['layerGroup'] = mockLayerGroup as any;
-      geojsonLayer.on('click', handler);
-
-      expect(mockLayerGroup.selectAll).toHaveBeenCalledWith('path');
-      expect(mockPathSelection.on).toHaveBeenCalledWith('click', expect.any(Function));
-    });
-
-    test('レイヤーグループが未設定の場合はイベント登録されない', () => {
-      const handler = jest.fn();
-      
-      geojsonLayer.on('click', handler);
-
-      // layerGroupが未設定の場合は何も実行されない
-      expect(mockContainer.on).not.toHaveBeenCalled();
-    });
-  });
 
   describe('style application', () => {
     test('動的スタイル関数が適用される', () => {

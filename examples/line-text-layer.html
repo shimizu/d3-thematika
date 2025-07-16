@@ -393,16 +393,6 @@ map.addLayer('line-texts', textLayer);</pre>
                 map.addLayer('line-texts', textLayer);
             }
             
-            // イベントリスナーを追加
-            guideLineLayer.on('click', (event, data) => {
-                console.log('Guide Line clicked:', data);
-            });
-            
-            if (textLayer) {
-                textLayer.on('mouseover', (event, data) => {
-                    console.log('Text hover:', data);
-                });
-            }
     
         }
         
