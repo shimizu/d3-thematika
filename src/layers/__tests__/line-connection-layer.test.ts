@@ -34,7 +34,8 @@ describe('LineConnectionLayer', () => {
       node: jest.fn(() => mockElement),
       size: jest.fn(() => 5),
       call: jest.fn().mockReturnThis(),
-      on: jest.fn().mockReturnThis()
+      on: jest.fn().mockReturnThis(),
+      each: jest.fn().mockReturnThis()
     } as any;
 
     // テスト用のデータ（単一Feature）

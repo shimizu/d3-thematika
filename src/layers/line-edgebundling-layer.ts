@@ -154,7 +154,7 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
     this.segmentSteps = options.segmentSteps ?? 'auto';
     this.showControlPoints = options.showControlPoints ?? false;
     this.showOriginalLines = options.showOriginalLines ?? false;
-    this.animateForce = options.animateForce ?? false;
+    this.animateForce = options.animateForce ?? true;
     this.controlPointSize = options.controlPointSize ?? 3;
     this.endpointSize = options.endpointSize ?? 6;
   }
@@ -654,6 +654,9 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
    * @returns Force simulation
    */
   getSimulation(): any | undefined {
+    if (!this.animateForce) {
+      return undefined;
+    }
     return this.simulation;
   }
 
