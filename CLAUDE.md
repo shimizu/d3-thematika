@@ -147,6 +147,7 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 
 - ライブラリの正式名称は「d3-thematika」です。
 - ライブラリは開発中のため後方互換を保つ必要はありません。
+- レイヤーはイベントハンドリングを行いません。
 - 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
