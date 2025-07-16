@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D3.js Voronoi Labels</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        
+        #map {
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+        }
+        
+        .voronoi-cell {
+            fill: none;
+            stroke: #999;
+            stroke-width: 0.5;
+            stroke-dasharray: 2,2;
+            opacity: 0.3;
+        }
+        
+        .point {
+            fill: #333;
+            stroke: #fff;
+            stroke-width: 1;
+        }
+        
+        .label {
+            font-size: 12px;
+            font-weight: 500;
+            fill: #333;
+            stroke: #fff;
+            stroke-width: 3;
+            paint-order: stroke;
+            cursor: default;
+        }
+        
+        .connector {
+            fill: none;
+            stroke: #666;
+            stroke-width: 1;
+            opacity: 0.5;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        .controls label {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label>
+            <input type="checkbox" id="showVoronoi" checked> Voronoiセルを表示
+        </label>
+        <label>
+            <input type="checkbox" id="showConnectors" checked> 接続線を表示
+        </label>
+        <label>
+            <input type="range" id="pointSize" min="2" max="10" value="4" step="1">
+            ポイントサイズ: <span id="pointSizeValue">4</span>
+        </label>
+    </div>
+    <svg id="map"></svg>
+
+    <script>
+        // Voronoiラベル配置クラス
+        class VoronoiLabels {
+            constructor(options = {}) {
+                this.width = options.width || 800;
+                this.height = options.height || 600;
+                this.margin = options.margin || { top: 20, right: 20, bottom: 20, left: 20 };
+                this.projection = options.projection || d3.geoMercator();
+                this.showVoronoi = options.showVoronoi !== false;
+                this.showConnectors = options.showConnectors !== false;
+                this.pointRadius = options.pointRadius || 4;
+                this.labelOffset = options.labelOffset || 5;
+                
+                this.svg = null;
+                this.voronoi = null;
+                this.data = null;
+            }
+            
+            // 初期化
+            init(container) {
+                this.svg = d3.select(container)
+                    .attr('width', this.width)
+                    .attr('height', this.height);
+                
+                // レイヤーグループの作成
+                this.voronoiLayer = this.svg.append('g').attr('class', 'voronoi-layer');
+                this.connectorLayer = this.svg.append('g').attr('class', 'connector-layer');
+                this.pointLayer = this.svg.append('g').attr('class', 'point-layer');
+                this.labelLayer = this.svg.append('g').attr('class', 'label-layer');
+                
+                return this;
+            }
+            
+            // データの設定とレンダリング
+            setData(geojson) {
+                this.data = this.processGeoJSON(geojson);
+                this.updateProjection();
+                this.calculateVoronoi();
+                this.render();
+                return this;
+            }
+            
+            // GeoJSONの処理
+            processGeoJSON(geojson) {
+                return geojson.features.map(feature => {
+                    const coords = feature.geometry.coordinates;
+                    return {
+                        id: feature.properties.id || Math.random().toString(36),
+                        name: feature.properties.name || 'Unknown',
+                        originalCoords: coords,
+                        properties: feature.properties
+                    };
+                });
+            }
+            
+            // プロジェクションの更新
+            updateProjection() {
+                // データの境界を計算
+                const bounds = this.data.reduce((acc, d) => {
+                    const [lon, lat] = d.originalCoords;
+                    acc[0][0] = Math.min(acc[0][0], lon);
+                    acc[0][1] = Math.min(acc[0][1], lat);
+                    acc[1][0] = Math.max(acc[1][0], lon);
+                    acc[1][1] = Math.max(acc[1][1], lat);
+                    return acc;
+                }, [[Infinity, Infinity], [-Infinity, -Infinity]]);
+                
+                // プロジェクションをフィット
+                this.projection.fitExtent([
+                    [this.margin.left, this.margin.top],
+                    [this.width - this.margin.right, this.height - this.margin.bottom]
+                ], {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'LineString',
+                        coordinates: [bounds[0], bounds[1]]
+                    }
+                });
+                
+                // 投影座標を計算
+                this.data.forEach(d => {
+                    d.projectedCoords = this.projection(d.originalCoords);
+                });
+            }
+            
+            // Voronoi図の計算
+            calculateVoronoi() {
+                const delaunay = d3.Delaunay.from(
+                    this.data,
+                    d => d.projectedCoords[0],
+                    d => d.projectedCoords[1]
+                );
+                
+                this.voronoi = delaunay.voronoi([
+                    this.margin.left,
+                    this.margin.top,
+                    this.width - this.margin.right,
+                    this.height - this.margin.bottom
+                ]);
+                
+                // 各セルの重心を計算
+                this.data.forEach((d, i) => {
+                    const cell = this.voronoi.cellPolygon(i);
+                    if (cell) {
+                        d.centroid = d3.polygonCentroid(cell);
+                        d.cell = cell;
+                    } else {
+                        d.centroid = d.projectedCoords;
+                        d.cell = null;
+                    }
+                });
+            }
+            
+            // 曲線パスの生成
+            createCurvedPath(x1, y1, x2, y2) {
+                const dx = x2 - x1;
+                const dy = y2 - y1;
+                const dr = Math.sqrt(dx * dx + dy * dy) * 0.3;
+                
+                return `M${x1},${y1} Q${(x1 + x2) / 2 + dy * 0.1},${(y1 + y2) / 2 - dx * 0.1} ${x2},${y2}`;
+            }
+            
+            // レンダリング
+            render() {
+                // Voronoiセル
+                const cells = this.voronoiLayer.selectAll('.voronoi-cell')
+                    .data(this.data.filter(d => d.cell))
+                    .join('path')
+                    .attr('class', 'voronoi-cell')
+                    .attr('d', d => `M${d.cell.join('L')}Z`)
+                    .style('display', this.showVoronoi ? null : 'none');
+                
+                // 接続線
+                const connectors = this.connectorLayer.selectAll('.connector')
+                    .data(this.data)
+                    .join('path')
+                    .attr('class', 'connector')
+                    .attr('d', d => this.createCurvedPath(
+                        d.projectedCoords[0],
+                        d.projectedCoords[1],
+                        d.centroid[0],
+                        d.centroid[1]
+                    ))
+                    .style('display', this.showConnectors ? null : 'none');
+                
+                // ポイント
+                const points = this.pointLayer.selectAll('.point')
+                    .data(this.data)
+                    .join('circle')
+                    .attr('class', 'point')
+                    .attr('cx', d => d.projectedCoords[0])
+                    .attr('cy', d => d.projectedCoords[1])
+                    .attr('r', this.pointRadius);
+                
+                // ラベル
+                const labels = this.labelLayer.selectAll('.label')
+                    .data(this.data)
+                    .join('text')
+                    .attr('class', 'label')
+                    .attr('x', d => d.centroid[0])
+                    .attr('y', d => d.centroid[1])
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '0.35em')
+                    .text(d => d.name);
+            }
+            
+            // 設定の更新
+            updateOptions(options) {
+                Object.assign(this, options);
+                if (this.data) {
+                    this.render();
+                }
+                return this;
+            }
+        }
+        
+        // サンプルデータ（日本の主要都市）
+        const sampleGeoJSON = {
+            type: "FeatureCollection",
+            features: [
+                { type: "Feature", properties: { name: "東京", id: "tokyo" }, 
+                  geometry: { type: "Point", coordinates: [139.6917, 35.6895] }},
+                { type: "Feature", properties: { name: "大阪", id: "osaka" }, 
+                  geometry: { type: "Point", coordinates: [135.5023, 34.6937] }},
+                { type: "Feature", properties: { name: "名古屋", id: "nagoya" }, 
+                  geometry: { type: "Point", coordinates: [136.9066, 35.1815] }},
+                { type: "Feature", properties: { name: "札幌", id: "sapporo" }, 
+                  geometry: { type: "Point", coordinates: [141.3545, 43.0642] }},
+                { type: "Feature", properties: { name: "福岡", id: "fukuoka" }, 
+                  geometry: { type: "Point", coordinates: [130.4017, 33.5904] }},
+                { type: "Feature", properties: { name: "仙台", id: "sendai" }, 
+                  geometry: { type: "Point", coordinates: [140.8719, 38.2682] }},
+                { type: "Feature", properties: { name: "広島", id: "hiroshima" }, 
+                  geometry: { type: "Point", coordinates: [132.4596, 34.3853] }},
+                { type: "Feature", properties: { name: "京都", id: "kyoto" }, 
+                  geometry: { type: "Point", coordinates: [135.7681, 35.0116] }},
+                { type: "Feature", properties: { name: "横浜", id: "yokohama" }, 
+                  geometry: { type: "Point", coordinates: [139.6380, 35.4437] }},
+                { type: "Feature", properties: { name: "神戸", id: "kobe" }, 
+                  geometry: { type: "Point", coordinates: [135.1955, 34.6901] }},
+                { type: "Feature", properties: { name: "新潟", id: "niigata" }, 
+                  geometry: { type: "Point", coordinates: [139.0364, 37.9026] }},
+                { type: "Feature", properties: { name: "静岡", id: "shizuoka" }, 
+                  geometry: { type: "Point", coordinates: [138.3829, 34.9769] }},
+                { type: "Feature", properties: { name: "金沢", id: "kanazawa" }, 
+                  geometry: { type: "Point", coordinates: [136.6256, 36.5611] }},
+                { type: "Feature", properties: { name: "岡山", id: "okayama" }, 
+                  geometry: { type: "Point", coordinates: [133.9350, 34.6617] }},
+                { type: "Feature", properties: { name: "熊本", id: "kumamoto" }, 
+                  geometry: { type: "Point", coordinates: [130.7418, 32.7898] }}
+            ]
+        };
+        
+        // 使用例
+        const voronoiLabels = new VoronoiLabels({
+            width: 800,
+            height: 600,
+            projection: d3.geoMercator(),
+            showVoronoi: true,
+            showConnectors: true,
+            pointRadius: 4
+        });
+        
+        voronoiLabels
+            .init('#map')
+            .setData(sampleGeoJSON);
+        
+        // コントロールの設定
+        document.getElementById('showVoronoi').addEventListener('change', (e) => {
+            voronoiLabels.updateOptions({ showVoronoi: e.target.checked });
+        });
+        
+        document.getElementById('showConnectors').addEventListener('change', (e) => {
+            voronoiLabels.updateOptions({ showConnectors: e.target.checked });
+        });
+        
+        document.getElementById('pointSize').addEventListener('input', (e) => {
+            const size = parseInt(e.target.value);
+            document.getElementById('pointSizeValue').textContent = size;
+            voronoiLabels.updateOptions({ pointRadius: size });
+        });
+    </script>
+</body>
+</html>
