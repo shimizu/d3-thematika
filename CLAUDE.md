@@ -8,10 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### ライブラリの目的
 
-- 更新の止まっているbertin.jsに変わって主にスタティックな主題図を作る主題図ライブラリを作成
+- 主にスタティックな主題図を作る主題図ライブラリを作成
 - D3.jsの機能をフルに活用し、CSSやSVGのエフェクトを適用しやすい作りにする
 - 一般的な地図ライブラリとは違い、パンやズームといった機能は持たない
-- 目標とする地図スタイル: img/reference_map_style.png を参照
 
 ## アーキテクチャ概要
 
@@ -31,7 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発環境
 
 - プラットフォーム: Linux (WSL2)
-- 作業ディレクトリ: /home/shimizu/_make_libs/d3-thematika
+- 作業ディレクトリ: d3-thematika
 - Node.js: v16以上必須（ESMサポートのため）
 
 ### コーディング規約
