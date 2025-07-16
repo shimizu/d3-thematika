@@ -322,16 +322,6 @@ function createPointTextStory(args: PointTextLayerArgs) {
   map.addLayer('graticule', graticuleLayer);
   map.addLayer('text', textLayer);
   
-  // インタラクション追加
-  textLayer.on('click', (event, feature) => {
-    console.log('Text clicked:', feature);
-    alert(`Clicked: ${feature.properties?.text || feature.properties?.name || 'Unknown'}`);
-  });
-  
-  textLayer.on('mouseover', (event, feature) => {
-    console.log('Text hover:', feature);
-  });
-  
   return container;
 }
 

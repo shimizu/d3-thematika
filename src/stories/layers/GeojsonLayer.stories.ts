@@ -160,19 +160,6 @@ const render = (args: GeojsonLayerArgs) => {
     // レイヤーを追加
     map.addLayer('graticule', graticuleLayer);
     map.addLayer('geojson', geojsonLayer);
-    
-    // インタラクション例：ホバー効果
-    geojsonLayer.on('mouseenter', (event, d) => {
-      const target = event.target as SVGElement;
-      target.style.opacity = '1';
-      target.style.strokeWidth = String(args.strokeWidth * 2);
-    });
-    
-    geojsonLayer.on('mouseleave', (event, d) => {
-      const target = event.target as SVGElement;
-      target.style.opacity = String(args.opacity);
-      target.style.strokeWidth = String(args.strokeWidth);
-    });
   }, 0);
   
   return container;
