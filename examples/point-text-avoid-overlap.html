@@ -97,8 +97,8 @@
                 <div class="control-item">
                     <label for="text-anchor">テキストアンカー</label>
                     <select id="text-anchor">
-                        <option value="start" selected>start</option>
-                        <option value="middle">middle</option>
+                        <option value="start" >start</option>
+                        <option value="middle" selected>middle</option>
                         <option value="end">end</option>
                     </select>
                 </div>
@@ -257,16 +257,16 @@ map.addLayer('cityLabels', textLayer);</pre>
         let dxOffset = 0;
         let dyOffset = 0;
         let rotation = 0;
-        let textAnchor = 'start';
+        let textAnchor = 'middle';
         let fontWeight = 'normal';
         let avoidOverlap = true;
         let showConnectors = true;
         let voronoiMargin = 30;
 
         async function draw() {
-            try {
-                // 既存の地図を削除
-                d3.select('#map').selectAll('*').remove();
+
+                // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+                const world = await d3.json('./geojson/world.geojson');
 
                 // 地図の寸法を取得
                 const mapElement = document.querySelector('#map');
@@ -281,8 +281,6 @@ map.addLayer('cityLabels', textLayer);</pre>
                           geometry: { type: "Point", coordinates: [139.6917, 35.6895] }},
                         { type: "Feature", properties: { name: "横浜", population: 3748781 }, 
                           geometry: { type: "Point", coordinates: [139.6380, 35.4437] }},
-                        { type: "Feature", properties: { name: "川崎", population: 1475213 }, 
-                          geometry: { type: "Point", coordinates: [139.6973, 35.5309] }},
                         { type: "Feature", properties: { name: "さいたま", population: 1263979 }, 
                           geometry: { type: "Point", coordinates: [139.6566, 35.8617] }},
                         { type: "Feature", properties: { name: "千葉", population: 971882 }, 
@@ -311,7 +309,7 @@ map.addLayer('cityLabels', textLayer);</pre>
                 // 投影法を設定（日本中心）
                 const projection = d3.geoMercator()
                     .center([138, 38])
-                    .scale(1200)
+                    .scale(2000)
                     .translate([width / 2, height / 2]);
 
                 // 地図を作成
@@ -320,18 +318,22 @@ map.addLayer('cityLabels', textLayer);</pre>
                     width: width,
                     height: height,
                     projection: projection,
-                    backgroundColor: '#f0f8ff'
+                    backgroundColor: '#0f172a'
                 });
 
-                // 背景レイヤー（日本の境界）
-                const outlineLayer = new Thematika.OutlineLayer({
-                    bounds: [122, 24, 154, 46], // 日本の境界
-                    style: {
-                        fill: '#e6f3ff',
-                        stroke: '#ccc',
-                        'stroke-width': 1
+                                // 背景の世界地図レイヤー
+                const worldLayer = new Thematika.GeojsonLayer({
+                    data: world,
+                    attr: {
+                        "fill": '#333',
+                        "stroke": '#fff',
+                        "stroke-width": 0.5,
+                        "opacity": 0.8
                     }
                 });
+               
+
+
 
                 // ポイントレイヤー（都市の位置）
                 const pointLayer = new Thematika.GeojsonLayer({
@@ -363,28 +365,25 @@ map.addLayer('cityLabels', textLayer);</pre>
                     connectorStyle: (feature, index) => {
                         const population = feature.properties.population;
                         return {
-                            stroke: population > 2000000 ? '#ff6b6b' : '#666',
-                            'stroke-width': population > 2000000 ? 2 : 1,
-                            opacity: 0.6,
-                            'stroke-dasharray': population > 3000000 ? 'none' : '2,2'
+                            stroke: population > 2000000 ? '#ff6b6b' : '#fff',
+                            'stroke-width': 2,
+                            opacity: 0.9,
+                            'stroke-dasharray':  '2,2' 
                         };
                     },
                     style: {
-                        fill: '#333',
-                        stroke: '#fff',
+                        fill: '#fff',
+                        stroke: 'none',
                         'stroke-width': 3,
                         'paint-order': 'stroke'
                     }
                 });
 
                 // レイヤーを地図に追加
-                map.addLayer('outline', outlineLayer);
+                map.addLayer('world', worldLayer);
                 map.addLayer('points', pointLayer);
                 map.addLayer('cityLabels', textLayer);
 
-            } catch (error) {
-                console.error('デモの初期化に失敗しました:', error);
-            }
         }
 
         draw();

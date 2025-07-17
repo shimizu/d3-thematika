@@ -81,8 +81,8 @@
                     <span id="force-value">20</span>
                 </div>
                 <div class="control-item">
-                    <label for="show-original">オリジナルライン表示</label>
-                    <input type="checkbox" id="show-original">
+                    <label for="enable-bundling">バンドリング有効</label>
+                    <input type="checkbox" id="enable-bundling" checked>
                 </div>
                 <div class="control-item">
                     <label for="show-control-points">制御点表示</label>
@@ -120,51 +120,14 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// LineEdgeBundlingLayerの使用例
-const lineData = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[-120, 40], [-75, 35]]
-            },
-            "properties": { "name": "route1" }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[-118, 38], [-77, 37]]
-            },
-            "properties": { "name": "route2" }
-        }
-    ]
-};
-
-const width = 800;
-const height = 600;
-
-const projection = d3.geoAlbersUsa()
-    .scale(1000)
-    .translate([width / 2, height / 2]);
-
-const map = new Thematika.Map({
-    container: '#map',
-    width: width,
-    height: height,
-    projection: projection
-});
-
-// LineEdgeBundlingLayerインスタンスを作成
+                <pre id="sample-code">// LineEdgeBundlingLayerインスタンスを作成
 const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
-    data: lineData,
-    bundlingStrength: 0.85,
-    forceStrength: 20,
-    showOriginalLines: false,
-    showControlPoints: false,
-    animateForce: true,
+    data: lineData, //GeoJSONデータ(line, multiLine)
+    bundlingStrength: 0.85,  // バンドリング強度（0-1）
+    forceStrength: 20,       // フォース強度
+    showOriginalLines: false, // バンドリング時はfalse
+    showControlPoints: false, // 制御点表示
+    animateForce: true,      // フォースアニメーション
     attr: {
         "stroke": '#ff6b6b',
         "stroke-width": 2,
@@ -274,7 +237,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // UIコントロールの状態を取得
             const bundlingStrength = parseFloat(document.getElementById('bundling-strength').value);
             const forceStrength = parseFloat(document.getElementById('force-strength').value);
-            const showOriginalLines = document.getElementById('show-original').checked;
+            const enableBundling = document.getElementById('enable-bundling').checked;
             const showControlPoints = document.getElementById('show-control-points').checked;
             const animateForce = document.getElementById('animate-force').checked;
             const showAirports = document.getElementById('show-airports').checked;
@@ -301,9 +264,9 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // LineEdgeBundlingLayerインスタンスを作成
             const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
                 data: lineData,
-                bundlingStrength: bundlingStrength,
+                bundlingStrength: enableBundling ? bundlingStrength : 0,
                 forceStrength: forceStrength,
-                showOriginalLines: showOriginalLines,
+                showOriginalLines: !enableBundling,
                 showControlPoints: showControlPoints,
                 animateForce: animateForce,
                 attr: {
@@ -354,7 +317,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
         });
 
         // チェックボックスのイベントリスナー
-        document.getElementById('show-original').addEventListener('change', draw);
+        document.getElementById('enable-bundling').addEventListener('change', draw);
         document.getElementById('show-control-points').addEventListener('change', draw);
         document.getElementById('animate-force').addEventListener('change', draw);
         document.getElementById('show-airports').addEventListener('change', draw);
