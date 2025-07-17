@@ -449,71 +449,14 @@ map.addLayer('cityLabels', textLayer);</pre>
 
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            map.saveSVG("map.svg");
         });
         
         // PNGダウンロード機能
         document.getElementById('download-png').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            // SVGのサイズを取得
-            const svgRect = mapElement.getBoundingClientRect();
-            canvas.width = svgRect.width;
-            canvas.height = svgRect.height;
-            
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            };
-            
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            img.src = url;
+            map.savePNG("map.png")
         });
         
-        // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
-        });
-
     </script>
 </body>
 </html>

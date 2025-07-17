@@ -190,6 +190,8 @@ map.addLayer('spikes', spikeLayer);</pre>
             }, 2000);
         }
         
+        let map; // グローバル変数として地図インスタンスを保持
+
         // カラーパレットの設定
         const color = Thematika.AllPalettes.TailwindVivid.colors
 
@@ -212,7 +214,7 @@ map.addLayer('spikes', spikeLayer);</pre>
             currentProjection.fitExtent([[10, 60], [width-10, height-20]], worldData);
 
             // 地図を作成
-            const map = new Thematika.Map({
+            map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
@@ -317,29 +319,6 @@ map.addLayer('spikes', spikeLayer);</pre>
         // スパイク方向変更イベントリスナー
         document.getElementById('spike-direction').addEventListener('change', draw);
         
-        // SVGダウンロード機能
-        document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-        
-        // PNGダウンロード機能
-        document.getElementById('download-png').addEventListener('click', () => {
             const mapElement = document.querySelector('#map svg');
             if (!mapElement) {
                 alert('地図が表示されていません');
@@ -376,6 +355,17 @@ map.addLayer('spikes', spikeLayer);</pre>
         });
         
         draw()
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
+
     </script>
 </body>
 </html>
