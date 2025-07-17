@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Text Avoid Overlap - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Text Avoid Overlap</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Text Avoid Overlap デモ</h2>
+            
+            <div class="info-box">
+                <h3>🎯 ラベル重なり回避機能</h3>
+                <ul>
+                    <li>データ: 日本の主要都市（密集したポイントデータ）</li>
+                    <li>機能: Voronoi図を使用したラベル自動配置最適化</li>
+                    <li>接続線: 元の位置と移動後の位置を結ぶ動的スタイルライン</li>
+                    <li>設定: 重なり回避の有効/無効、接続線表示、Voronoiマージン調整</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label>フォントサイズ</label>
+                    <div class="slider-control">
+                        <input type="range" id="font-size" min="8" max="32" value="16" step="2">
+                        <span class="value-display" id="font-size-value">16</span>px
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>X方向オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="dx-offset" min="-30" max="30" value="0" step="5">
+                        <span class="value-display" id="dx-offset-value">0</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>Y方向オフセット</label>
+                    <div class="slider-control">
+                        <input type="range" id="dy-offset" min="-30" max="30" value="0" step="5">
+                        <span class="value-display" id="dy-offset-value">0</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label>回転角度</label>
+                    <div class="slider-control">
+                        <input type="range" id="rotation" min="0" max="360" value="0" step="15">
+                        <span class="value-display" id="rotation-value">0</span>°
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <label for="text-anchor">テキストアンカー</label>
+                    <select id="text-anchor">
+                        <option value="start" selected>start</option>
+                        <option value="middle">middle</option>
+                        <option value="end">end</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label for="font-weight">フォントウェイト</label>
+                    <select id="font-weight">
+                        <option value="normal" selected>normal</option>
+                        <option value="bold">bold</option>
+                        <option value="lighter">lighter</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="avoid-overlap" checked>
+                        ラベル重なり回避
+                    </label>
+                </div>
+
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="show-connectors" checked>
+                        接続線を表示
+                    </label>
+                </div>
+
+                <div class="control-item">
+                    <label>Voronoiマージン</label>
+                    <div class="slider-control">
+                        <input type="range" id="voronoi-margin" min="10" max="100" value="30" step="10">
+                        <span class="value-display" id="voronoi-margin-value">30</span>px
+                    </div>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>ラベル重なり回避機能の使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointTextLayer のラベル重なり回避機能
+
+// 都市データ（GeoJSON形式）
+const cityData = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            geometry: { type: "Point", coordinates: [139.6917, 35.6895] },
+            properties: { name: "東京", population: 13960000 }
+        },
+        {
+            type: "Feature", 
+            geometry: { type: "Point", coordinates: [139.6380, 35.4437] },
+            properties: { name: "横浜", population: 3748781 }
+        },
+        // 他の近接した都市データ...
+    ]
+};
+
+// ラベル重なり回避機能付きテキストレイヤーを作成
+const textLayer = new Thematika.PointTextLayer({
+    data: cityData,
+    textProperty: 'name',          // テキスト取得元プロパティ
+    fontSize: 14,                  // フォントサイズ
+    avoidOverlap: true,            // ラベル重なり回避を有効化
+    showConnectors: true,          // 接続線を表示
+    voronoiMargin: 30,            // Voronoi計算のマージン
+    
+    // 動的な接続線スタイリング
+    connectorStyle: (feature, index) => {
+        const population = feature.properties.population;
+        return {
+            stroke: population > 2000000 ? '#ff6b6b' : '#666',
+            'stroke-width': population > 2000000 ? 2 : 1,
+            opacity: 0.6,
+            'stroke-dasharray': population > 3000000 ? 'none' : '2,2'
+        };
+    },
+    
+    style: {
+        fill: '#333',              // テキスト色
+        stroke: '#fff',            // アウトライン色
+        'stroke-width': 3,         // アウトライン幅
+        'paint-order': 'stroke'    // アウトラインを背景に
+    }
+});
+
+// 地図に追加
+map.addLayer('cityLabels', textLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // カラーパレットの設定
+        const color = Thematika.AllPalettes.TailwindVivid.colors
+
+
+        let map = null;
+        let textLayer = null;
+        let fontSize = 16;
+        let dxOffset = 0;
+        let dyOffset = 0;
+        let rotation = 0;
+        let textAnchor = 'start';
+        let fontWeight = 'normal';
+        let avoidOverlap = true;
+        let showConnectors = true;
+        let voronoiMargin = 30;
+
+        async function draw() {
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 日本の主要都市データ（ラベル重なりデモ用）
+                const cityData = {
+                    type: "FeatureCollection",
+                    features: [
+                        { type: "Feature", properties: { name: "東京", population: 13929286 }, 
+                          geometry: { type: "Point", coordinates: [139.6917, 35.6895] }},
+                        { type: "Feature", properties: { name: "横浜", population: 3748781 }, 
+                          geometry: { type: "Point", coordinates: [139.6380, 35.4437] }},
+                        { type: "Feature", properties: { name: "川崎", population: 1475213 }, 
+                          geometry: { type: "Point", coordinates: [139.6973, 35.5309] }},
+                        { type: "Feature", properties: { name: "さいたま", population: 1263979 }, 
+                          geometry: { type: "Point", coordinates: [139.6566, 35.8617] }},
+                        { type: "Feature", properties: { name: "千葉", population: 971882 }, 
+                          geometry: { type: "Point", coordinates: [140.1233, 35.6074] }},
+                        { type: "Feature", properties: { name: "大阪", population: 2691185 }, 
+                          geometry: { type: "Point", coordinates: [135.5023, 34.6937] }},
+                        { type: "Feature", properties: { name: "名古屋", population: 2327557 }, 
+                          geometry: { type: "Point", coordinates: [136.9066, 35.1815] }},
+                        { type: "Feature", properties: { name: "札幌", population: 1952356 }, 
+                          geometry: { type: "Point", coordinates: [141.3545, 43.0642] }},
+                        { type: "Feature", properties: { name: "福岡", population: 1579450 }, 
+                          geometry: { type: "Point", coordinates: [130.4017, 33.5904] }},
+                        { type: "Feature", properties: { name: "神戸", population: 1537272 }, 
+                          geometry: { type: "Point", coordinates: [135.1955, 34.6901] }},
+                        { type: "Feature", properties: { name: "京都", population: 1475183 }, 
+                          geometry: { type: "Point", coordinates: [135.7681, 35.0116] }},
+                        { type: "Feature", properties: { name: "仙台", population: 1082159 }, 
+                          geometry: { type: "Point", coordinates: [140.8719, 38.2682] }},
+                        { type: "Feature", properties: { name: "広島", population: 1194034 }, 
+                          geometry: { type: "Point", coordinates: [132.4596, 34.3853] }},
+                        { type: "Feature", properties: { name: "北九州", population: 961286 }, 
+                          geometry: { type: "Point", coordinates: [130.8748, 33.8834] }}
+                    ]
+                };
+
+                // 投影法を設定（日本中心）
+                const projection = d3.geoMercator()
+                    .center([138, 38])
+                    .scale(1200)
+                    .translate([width / 2, height / 2]);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection,
+                    backgroundColor: '#f0f8ff'
+                });
+
+                // 背景レイヤー（日本の境界）
+                const outlineLayer = new Thematika.OutlineLayer({
+                    bounds: [122, 24, 154, 46], // 日本の境界
+                    style: {
+                        fill: '#e6f3ff',
+                        stroke: '#ccc',
+                        'stroke-width': 1
+                    }
+                });
+
+                // ポイントレイヤー（都市の位置）
+                const pointLayer = new Thematika.GeojsonLayer({
+                    data: cityData,
+                    style: {
+                        fill: '#ff6b6b',
+                        stroke: '#fff',
+                        'stroke-width': 2
+                    },
+                    attr: {
+                        r: (d) => Math.sqrt(d.properties.population / 500000) + 3 // 人口に比例したサイズ
+                    }
+                });
+
+                // PointTextLayerを作成（新機能対応）
+                textLayer = new Thematika.PointTextLayer({
+                    data: cityData,
+                    textProperty: 'name',
+                    dx: dxOffset,
+                    dy: dyOffset,
+                    rotate: rotation,
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
+                    textAnchor: textAnchor,
+                    alignmentBaseline: 'middle',
+                    avoidOverlap: avoidOverlap,
+                    showConnectors: showConnectors,
+                    voronoiMargin: voronoiMargin,
+                    connectorStyle: (feature, index) => {
+                        const population = feature.properties.population;
+                        return {
+                            stroke: population > 2000000 ? '#ff6b6b' : '#666',
+                            'stroke-width': population > 2000000 ? 2 : 1,
+                            opacity: 0.6,
+                            'stroke-dasharray': population > 3000000 ? 'none' : '2,2'
+                        };
+                    },
+                    style: {
+                        fill: '#333',
+                        stroke: '#fff',
+                        'stroke-width': 3,
+                        'paint-order': 'stroke'
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('outline', outlineLayer);
+                map.addLayer('points', pointLayer);
+                map.addLayer('cityLabels', textLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        draw();
+
+        // フォントサイズの変更
+        document.getElementById('font-size').addEventListener('input', function() {
+            fontSize = parseInt(this.value);
+            document.getElementById('font-size-value').textContent = this.value;
+            draw();
+        });
+
+        // X方向オフセットの変更
+        document.getElementById('dx-offset').addEventListener('input', function() {
+            dxOffset = parseInt(this.value);
+            document.getElementById('dx-offset-value').textContent = this.value;
+            draw();
+        });
+
+        // Y方向オフセットの変更
+        document.getElementById('dy-offset').addEventListener('input', function() {
+            dyOffset = parseInt(this.value);
+            document.getElementById('dy-offset-value').textContent = this.value;
+            draw();
+        });
+
+        // 回転角度の変更
+        document.getElementById('rotation').addEventListener('input', function() {
+            rotation = parseInt(this.value);
+            document.getElementById('rotation-value').textContent = this.value;
+            draw();
+        });
+
+        // テキストアンカーの変更
+        document.getElementById('text-anchor').addEventListener('change', function() {
+            textAnchor = this.value;
+            draw();
+        });
+
+        // フォントウェイトの変更
+        document.getElementById('font-weight').addEventListener('change', function() {
+            fontWeight = this.value;
+            draw();
+        });
+
+        // ラベル重なり回避の変更
+        document.getElementById('avoid-overlap').addEventListener('change', function() {
+            avoidOverlap = this.checked;
+            draw();
+        });
+
+        // 接続線表示の変更
+        document.getElementById('show-connectors').addEventListener('change', function() {
+            showConnectors = this.checked;
+            draw();
+        });
+
+        // Voronoiマージンの変更
+        document.getElementById('voronoi-margin').addEventListener('input', function() {
+            voronoiMargin = parseInt(this.value);
+            document.getElementById('voronoi-margin-value').textContent = this.value;
+            draw();
+        });
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'map.svg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            const mapElement = document.querySelector('#map svg');
+            if (!mapElement) {
+                alert('地図が表示されていません');
+                return;
+            }
+            
+            const svgData = new XMLSerializer().serializeToString(mapElement);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            // SVGのサイズを取得
+            const svgRect = mapElement.getBoundingClientRect();
+            canvas.width = svgRect.width;
+            canvas.height = svgRect.height;
+            
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'map.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            const blob = new Blob([svgData], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(blob);
+            img.src = url;
+        });
+        
+        // リサイズイベントのハンドリング
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                draw();
+            }, 250);
+        });
+
+    </script>
+</body>
+</html>
