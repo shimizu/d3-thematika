@@ -132,6 +132,8 @@
                 backgroundColor: '#acc3b3',
             });
 
+            console.log(map)
+
             map.svg
                 .append('defs')
                 .html(`
@@ -203,6 +205,9 @@
                 }
             });
 
+
+            console.log(worldLayer)
+
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
             const outlineLayer = new Thematika.OutlineLayer({
                 createClipPath: true,
@@ -210,7 +215,7 @@
                 attr: {
                     "fill": 'url(#globeLight)',
                    // "filter": 'url(#parchment)',
-                    "stroke": '#2c3e50',
+                    "stroke": '#ffaea0',
                     "stroke-width": 4,
                     "opacity": 1
                 },
