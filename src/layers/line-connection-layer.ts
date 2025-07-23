@@ -618,25 +618,6 @@ export class LineConnectionLayer extends BaseLayer implements ILineConnectionLay
     }
   }
 
-  /**
-   * ラインにイベントリスナーを追加します
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: any) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('.thematika-line-path')
-        .on(eventType, function(event, d: any) {
-          // 統一されたLineDataを直接渡す
-          handler(event, {
-            feature: d.feature,
-            featureIndex: d.featureIndex,
-            coordinates: d.coordinates,
-            lineIndex: d.lineIndex
-          });
-        });
-    }
-  }
 
   /**
    * ライン座標から統一されたパス文字列を生成します

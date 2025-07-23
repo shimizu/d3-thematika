@@ -34,7 +34,8 @@ describe('LineConnectionLayer', () => {
       node: jest.fn(() => mockElement),
       size: jest.fn(() => 5),
       call: jest.fn().mockReturnThis(),
-      on: jest.fn().mockReturnThis()
+      on: jest.fn().mockReturnThis(),
+      each: jest.fn().mockReturnThis()
     } as any;
 
     // テスト用のデータ（単一Feature）
@@ -365,27 +366,6 @@ describe('LineConnectionLayer', () => {
   });
 
 
-  describe('event handling', () => {
-    it('on()でイベントリスナーを追加できる', () => {
-      const layer = new LineConnectionLayer({ data: testDataFeature });
-      const handler = jest.fn();
-      
-      layer.render(container);
-      layer.on('click', handler);
-      
-      expect(container.on).toHaveBeenCalledWith('click', expect.any(Function));
-    });
-
-    it('レイヤーグループが未設定の場合はイベント登録されない', () => {
-      const layer = new LineConnectionLayer({ data: testDataFeature });
-      const handler = jest.fn();
-      
-      layer.on('click', handler);
-      
-      // レンダリング前はイベント登録されない
-      expect(container.on).not.toHaveBeenCalled();
-    });
-  });
 
 
   describe('CSS class application', () => {

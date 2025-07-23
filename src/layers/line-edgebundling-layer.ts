@@ -154,7 +154,7 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
     this.segmentSteps = options.segmentSteps ?? 'auto';
     this.showControlPoints = options.showControlPoints ?? false;
     this.showOriginalLines = options.showOriginalLines ?? false;
-    this.animateForce = options.animateForce ?? false;
+    this.animateForce = options.animateForce ?? true;
     this.controlPointSize = options.controlPointSize ?? 3;
     this.endpointSize = options.endpointSize ?? 6;
   }
@@ -630,30 +630,15 @@ export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionL
     super.destroy();
   }
 
-  /**
-   * ラインにイベントリスナーを追加します
-   * @param eventType - イベントタイプ
-   * @param handler - イベントハンドラー
-   */
-  on(eventType: string, handler: (event: Event, data: any) => void): void {
-    if (this.layerGroup) {
-      this.layerGroup.selectAll('.thematika-line-bundled')
-        .on(eventType, function(event, d: any) {
-          handler(event, {
-            feature: d.feature,
-            featureIndex: d.featureIndex,
-            lineIndex: d.lineIndex,
-            nodes: d.nodes
-          });
-        });
-    }
-  }
 
   /**
    * Force simulationを取得します（デバッグ用）
    * @returns Force simulation
    */
   getSimulation(): any | undefined {
+    if (!this.animateForce) {
+      return undefined;
+    }
     return this.simulation;
   }
 

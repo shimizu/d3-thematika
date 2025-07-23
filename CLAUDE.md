@@ -8,10 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### ライブラリの目的
 
-- 更新の止まっているbertin.jsに変わって主にスタティックな主題図を作る主題図ライブラリを作成
+- 主にスタティックな主題図を作る主題図ライブラリを作成
 - D3.jsの機能をフルに活用し、CSSやSVGのエフェクトを適用しやすい作りにする
 - 一般的な地図ライブラリとは違い、パンやズームといった機能は持たない
-- 目標とする地図スタイル: img/reference_map_style.png を参照
 
 ## アーキテクチャ概要
 
@@ -31,7 +30,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 開発環境
 
 - プラットフォーム: Linux (WSL2)
-- 作業ディレクトリ: /home/shimizu/_make_libs/d3-thematika
+- 作業ディレクトリ: d3-thematika
 - Node.js: v16以上必須（ESMサポートのため）
 
 ### コーディング規約
@@ -148,6 +147,10 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - ライブラリの正式名称は「d3-thematika」です。
 - ライブラリは開発中のため後方互換を保つ必要はありません。
 - レイヤーはイベントハンドリングを行いません。
+  - **禁止**: レイヤークラスに`on()`メソッドを追加すること
+  - **禁止**: レイヤー内でD3イベントリスナーを設定すること
+  - **理由**: シンプルで一貫性のあるライブラリ設計を維持するため
+  - **代替手段**: インタラクティブな機能が必要な場合は、Map レベルまたはアプリケーション側で実装する
 - 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。

@@ -3,205 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>[LAYER_NAME] - d3-thematika</title>
+    <title>テストページ - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .description {
-            color: #666;
-            margin-bottom: 20px;
-        }
-        .map-container {
-            margin: 20px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .control-group {
-            margin-bottom: 15px;
-        }
-        .control-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
-        }
-        .control-group select,
-        .control-group input[type="range"] {
-            width: 200px;
-        }
-        .control-group input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        .code-example {
-            background-color: #f4f4f4;
-            padding: 15px;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-        .note {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 4px;
-            margin: 20px 0;
-        }
-        #map {
-            width: 100%;
-            height: 100%;            
-            aspect-ratio: 16 / 9;
-            background-color: #dddcc3;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
 </head>
 <body>
-    <div class="container">
-        <h1>GeojsonLayer デモ</h1>
-        <p class="description">
-            GeojsonLayerを使用してGeoJSONデータを地図上に表示します。
-            世界地図データを表示し、アウトライン、経緯線、スタイリング機能を確認できます。
-        </p>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
 
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">テストページ</li>
+            </ol>
+        </nav>
 
-        <div id="map"></div>
+        <section>
+            <h2 class="section-title">テストページ</h2>
+            
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>GeoJSONフォーマットの世界地図データ</li>
+                    <li>複数のレイヤーによる地図表現</li>
+                    <li>SVGエフェクトを使用した高度な視覚化</li>
+                    <li>カスタムスタイリング機能</li>
+                </ul>
+            </div>
 
-
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
 
-    <script >
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // グローバル変数
+        let map;
         
-        const effect = Thematika.FilterPresets.standardDropShadow()
-
         async function draw() {
-            const id = "#map"
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
 
+            // 既存のSVGをクリア
+            d3.select("#map").selectAll("*").remove();
 
-            const width = document.querySelector(id).clientWidth ;
-            const height = document.querySelector(id).clientHeight;
-
-    
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
             const geojson = await d3.json('./geojson/world_land.geojson');
 
-
-
             // 投影法を地図データに合わせて設定
-               const projection = d3.geoInterruptedMollweideHemispheres()
-                    .scale(180)
-                    .translate([width / 2, height / 2]);
+            const projection = d3.geoInterruptedMollweideHemispheres()
+                .scale(180)
+                .translate([width / 2, height / 2]);
 
             // 地図を作成
-            const map = new Thematika.Map({
+            map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
                 projection: projection,
-                defs:[effect],
                 backgroundColor: '#acc3b3',
             });
 
-            console.log(map)
+            // カスタムエフェクトを定義
+            const svg = d3.select("#map svg");
+            const defs = svg.append("defs");
+            
+            // 地球の光源効果
+            const globeLight = defs.append("radialGradient")
+                .attr("id", "globeLight")
+                .attr("cx", "30%")
+                .attr("cy", "30%")
+                .attr("r", "70%");
+            
+            globeLight.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", "#ffffff")
+                .attr("stop-opacity", "0.8");
+            
+            globeLight.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", "#aaaaaa")
+                .attr("stop-opacity", "1");
 
-            map.svg
-                .append('defs')
-                .html(`
-<radialGradient id="globeLight" cx="30%" cy="30%" r="70%">
-    <!-- 光が当たる中心は明るく、外側は暗く -->
-    <stop offset="0%" stop-color="#ffffff" stop-opacity="0.8"/>
-    <stop offset="100%" stop-color="#aaaaaa" stop-opacity="1"/>
-</radialGradient>
+            // ドロップシャドウフィルター
+            const dropShadow = defs.append("filter")
+                .attr("id", "dropShadow")
+                .attr("x", "-50%")
+                .attr("y", "-50%")
+                .attr("width", "200%")
+                .attr("height", "200%");
+            
+            dropShadow.append("feGaussianBlur")
+                .attr("in", "SourceAlpha")
+                .attr("stdDeviation", "10")
+                .attr("result", "blur");
+            
+            dropShadow.append("feOffset")
+                .attr("in", "blur")
+                .attr("dx", "0")
+                .attr("dy", "8")
+                .attr("result", "offsetBlur");
+            
+            const shadowMerge = dropShadow.append("feMerge");
+            shadowMerge.append("feMergeNode").attr("in", "offsetBlur");
+            shadowMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
-<filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
-    <!-- 元グラフィックのアルファをぼかす -->
-    <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="blur"/>
-    <!-- 影を少し下にオフセット -->
-    <feOffset in="blur" dx="0" dy="8" result="offsetBlur"/>
-    <!-- 元グラフィックと影を合成 -->
-    <feMerge>
-        <feMergeNode in="offsetBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-</filter>
+            // ラインの光彩効果
+            const lineGlow = defs.append("filter")
+                .attr("id", "lineglow");
+            
+            lineGlow.append("feColorMatrix")
+                .attr("in", "SourceGraphic")
+                .attr("type", "matrix")
+                .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 500 0")
+                .attr("result", "mask");
+            
+            lineGlow.append("feMorphology")
+                .attr("in", "mask")
+                .attr("radius", "1")
+                .attr("operator", "erode")
+                .attr("result", "r1");
+            
+            lineGlow.append("feGaussianBlur")
+                .attr("in", "r1")
+                .attr("stdDeviation", "4")
+                .attr("result", "r2");
+            
+            lineGlow.append("feColorMatrix")
+                .attr("in", "r2")
+                .attr("type", "matrix")
+                .attr("values", "1 0 0 0 0.5803921568627451 0 1 0 0 0.3607843137254902 0 0 1 0 0.10588235294117647 0 0 0 -1 1")
+                .attr("result", "r3");
+            
+            lineGlow.append("feComposite")
+                .attr("operator", "in")
+                .attr("in", "r3")
+                .attr("in2", "mask")
+                .attr("result", "comp");
+            
+            const glowMerge = lineGlow.append("feMerge");
+            glowMerge.append("feMergeNode").attr("in", "SourceGraphic");
+            glowMerge.append("feMergeNode").attr("in", "comp");
 
-
-    <filter id="parchment" x="0%" y="0%" width="100%" height="100%">
-      <!-- クリーム色のベース -->
-      <feColorMatrix type="matrix" values="0.95 0.05 0    0 0.05
-                                           0.85 0.85 0    0 0.05
-                                           0.65 0.65 0.65 0 0.05
-                                           0    0    0    1 0"/>
-      
-      <!-- 繊維質のテクスチャ -->
-      <feTurbulence baseFrequency="0.1 0.04" numOctaves="4" result="fibers" seed="25"/>
-      <feColorMatrix in="fibers" type="saturate" values="0.1"/>
-      <feGaussianBlur stdDeviation="0.5"/>
-      <feBlend mode="multiply"/>
-      
-      <!-- 微細なノイズ -->
-      <feTurbulence baseFrequency="3" numOctaves="1" result="grain" seed="30"/>
-      <feColorMatrix in="grain" type="saturate" values="0"/>
-      <feComponentTransfer>
-        <feFuncA type="table" tableValues="0 0.8 0.9 1"/>
-      </feComponentTransfer>
-      <feBlend mode="screen"/>
-    </filter>
-
-
-<filter id="lineglow">
-    <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 500 0" result="mask"></feColorMatrix>
-    <feMorphology in="mask" radius="1" operator="erode" result="r1"></feMorphology>
-    <feGaussianBlur in="r1" stdDeviation="4" result="r2"></feGaussianBlur>
-    <feColorMatrix in="r2" type="matrix" values="1 0 0 0 0.5803921568627451 0 1 0 0 0.3607843137254902 0 0 1 0 0.10588235294117647 0 0 0 -1 1" result="r3"></feColorMatrix>
-    <feComposite operator="in" in="r3" in2="mask" result="comp"></feComposite>
-    <feMerge>
-        <feMergeNode in="SourceGraphic"></feMergeNode>
-        <feMergeNode in="comp"></feMergeNode>
-    </feMerge>
-</filter>
-
-
-                `)
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill":'#fffafa', 
+                    "fill": '#fffafa', 
                     "filter": 'url(#lineglow)',
                     "stroke": '#1a3d1f',
                     "stroke-width": 0.8,
-                    "opacity": (d,i) => 0.9,
+                    "opacity": 0.9,
                 }
             });
 
@@ -219,7 +223,7 @@
                     "stroke-width": 4,
                     "opacity": 1
                 },
-                style:{
+                style: {
                     "mix-blend-mode": "multiply",
                 }
             });
@@ -240,19 +244,21 @@
             map.addLayer('graticule', graticuleLayer);
             map.addLayer('world_new', worldLayer);
             map.addLayer('outline', outlineLayer);
-
-
-            //map.svg.select(".thematika-background").attr("filter", "url(#parchment)");
-
         }
 
-        draw()
 
+        // 初期描画
+        draw();
 
-
-
-
-
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
     </script>
 </body>
 </html>

@@ -305,16 +305,6 @@ function createLineConnectionStory(args: LineConnectionLayerArgs) {
     map.addLayer('world', worldLayer);
     map.addLayer('connections', connectionLayer);
     
-    // インタラクション追加
-    connectionLayer.on('click', (event, data) => {
-      console.log('Connection clicked:', data);
-      alert(`Clicked: ${data.feature.properties?.name || 'Unknown route'}`);
-    });
-    
-    connectionLayer.on('mouseover', (event, data) => {
-      console.log('Connection hover:', data);
-    });
-    
   }).catch(error => {
     container.innerHTML = `<div style="color: red; padding: 20px;">エラー: ${error.message}</div>`;
   });

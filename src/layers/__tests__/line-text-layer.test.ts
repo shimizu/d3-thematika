@@ -14,10 +14,13 @@ const createMockSelection = (): any => {
     attr: jest.fn(),
     style: jest.fn(),
     selectAll: jest.fn(),
+    data: jest.fn(),
+    enter: jest.fn(),
     remove: jest.fn(),
     text: jest.fn(),
     on: jest.fn(),
     node: jest.fn(),
+    each: jest.fn(),
   };
   
   // 循環参照を設定
@@ -25,10 +28,13 @@ const createMockSelection = (): any => {
   mockElement.attr.mockReturnValue(mockElement);
   mockElement.style.mockReturnValue(mockElement);
   mockElement.selectAll.mockReturnValue(mockElement);
+  mockElement.data.mockReturnValue(mockElement);
+  mockElement.enter.mockReturnValue(mockElement);
   mockElement.remove.mockReturnValue(mockElement);
   mockElement.text.mockReturnValue(mockElement);
   mockElement.on.mockReturnValue(mockElement);
   mockElement.node.mockReturnValue(mockNode);
+  mockElement.each.mockReturnValue(mockElement);
   
   return mockElement;
 };
@@ -365,19 +371,6 @@ describe('LineTextLayer', () => {
     });
   });
 
-  describe('event handling', () => {
-    it('on()でイベントリスナーを追加できる', () => {
-      layer = new LineTextLayer({ data: sampleLineStringData });
-      const mockContainer = createMockSelection();
-      
-      layer.render(mockContainer);
-      
-      const handler = jest.fn();
-      layer.on('click', handler);
-      
-      expect(mockContainer.selectAll).toHaveBeenCalledWith('text');
-    });
-  });
 
   describe('getData', () => {
     it('GeoJSONデータを取得できる', () => {

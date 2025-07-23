@@ -499,23 +499,6 @@ describe('LineEdgeBundlingLayer', () => {
     });
   });
 
-  describe('event handling', () => {
-    it('should add event listeners to bundled lines', () => {
-      const layer = new LineEdgeBundlingLayer({
-        data: testLineStringData
-      });
-      
-      layer.setProjection(projection);
-      layer.render(container);
-      
-      const handler = jest.fn();
-      layer.on('click', handler);
-      
-      // イベントが設定されていることを確認
-      const bundledLines = container.selectAll('.thematika-line-bundled');
-      expect(bundledLines.empty()).toBe(false);
-    });
-  });
 
   describe('destroy', () => {
     it('should stop simulation and clean up', () => {

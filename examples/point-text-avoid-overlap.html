@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Point Text Layer - d3-thematika</title>
+    <title>Point Text Avoid Overlap - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -43,20 +43,20 @@
                     <a href="examples.html">Examples</a>
                 </li>
                 <li class="breadcrumb-item breadcrumb-separator">></li>
-                <li class="breadcrumb-item breadcrumb-current">Point Text Layer</li>
+                <li class="breadcrumb-item breadcrumb-current">Point Text Avoid Overlap</li>
             </ol>
         </nav>
 
         <section>
-            <h2 class="section-title">Point Text Layer デモ</h2>
+            <h2 class="section-title">Point Text Avoid Overlap デモ</h2>
             
             <div class="info-box">
-                <h3>📝 PointTextLayer機能</h3>
+                <h3>🎯 ラベル重なり回避機能</h3>
                 <ul>
-                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                    <li>機能: GeoJSONデータからテキストラベル表示</li>
-                    <li>対応: ポイント・ポリゴン・ラインの中心点計算</li>
-                    <li>制御: 豊富なテキストスタイリングオプション（フォント・位置・回転）</li>
+                    <li>データ: 日本の主要都市（密集したポイントデータ）</li>
+                    <li>機能: Voronoi図を使用したラベル自動配置最適化</li>
+                    <li>接続線: 元の位置と移動後の位置を結ぶ動的スタイルライン</li>
+                    <li>設定: 重なり回避の有効/無効、接続線表示、Voronoiマージン調整</li>
                 </ul>
             </div>
 
@@ -97,8 +97,8 @@
                 <div class="control-item">
                     <label for="text-anchor">テキストアンカー</label>
                     <select id="text-anchor">
-                        <option value="start" selected>start</option>
-                        <option value="middle">middle</option>
+                        <option value="start" >start</option>
+                        <option value="middle" selected>middle</option>
                         <option value="end">end</option>
                     </select>
                 </div>
@@ -110,6 +110,28 @@
                         <option value="bold">bold</option>
                         <option value="lighter">lighter</option>
                     </select>
+                </div>
+
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="avoid-overlap" checked>
+                        ラベル重なり回避
+                    </label>
+                </div>
+
+                <div class="control-item">
+                    <label>
+                        <input type="checkbox" id="show-connectors" checked>
+                        接続線を表示
+                    </label>
+                </div>
+
+                <div class="control-item">
+                    <label>Voronoiマージン</label>
+                    <div class="slider-control">
+                        <input type="range" id="voronoi-margin" min="10" max="100" value="30" step="10">
+                        <span class="value-display" id="voronoi-margin-value">30</span>px
+                    </div>
                 </div>
             </div>
 
@@ -131,11 +153,11 @@
             <h2 class="section-title">実装サンプル</h2>
             
             <div class="code-header">
-                <h3>PointTextLayerの使用例</h3>
+                <h3>ラベル重なり回避機能の使用例</h3>
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// PointTextLayer の使用例
+                <pre id="sample-code">// PointTextLayer のラベル重なり回避機能
 
 // 都市データ（GeoJSON形式）
 const cityData = {
@@ -144,29 +166,42 @@ const cityData = {
         {
             type: "Feature",
             geometry: { type: "Point", coordinates: [139.6917, 35.6895] },
-            properties: { text: "東京", population: 13960000 }
+            properties: { name: "東京", population: 13960000 }
         },
         {
             type: "Feature", 
-            geometry: { type: "Point", coordinates: [135.5023, 34.6937] },
-            properties: { text: "大阪", population: 2691000 }
-        }
+            geometry: { type: "Point", coordinates: [139.6380, 35.4437] },
+            properties: { name: "横浜", population: 3748781 }
+        },
+        // 他の近接した都市データ...
     ]
 };
 
-// テキストレイヤーを作成
+// ラベル重なり回避機能付きテキストレイヤーを作成
 const textLayer = new Thematika.PointTextLayer({
     data: cityData,
-    textProperty: 'text',  // テキスト取得元プロパティ
-    dx: 5,                 // X方向オフセット
-    dy: -10,               // Y方向オフセット
-    "font-size": 14,          // フォントサイズ
-    "font-weight": 'bold',    // フォントウェイト
-    "text-anchor": 'start',   // テキストアンカー
-    attr: {
-        "fill": '#333',      // テキスト色
-        "stroke": '#fff',    // アウトライン色
-        "stroke-width": 2     // アウトライン幅
+    textProperty: 'name',          // テキスト取得元プロパティ
+    fontSize: 14,                  // フォントサイズ
+    avoidOverlap: true,            // ラベル重なり回避を有効化
+    showConnectors: true,          // 接続線を表示
+    voronoiMargin: 30,            // Voronoi計算のマージン
+    
+    // 動的な接続線スタイリング
+    connectorStyle: (feature, index) => {
+        const population = feature.properties.population;
+        return {
+            stroke: population > 2000000 ? '#ff6b6b' : '#666',
+            'stroke-width': population > 2000000 ? 2 : 1,
+            opacity: 0.6,
+            'stroke-dasharray': population > 3000000 ? 'none' : '2,2'
+        };
+    },
+    
+    style: {
+        fill: '#333',              // テキスト色
+        stroke: '#fff',            // アウトライン色
+        'stroke-width': 3,         // アウトライン幅
+        'paint-order': 'stroke'    // アウトラインを背景に
     }
 });
 
@@ -222,31 +257,59 @@ map.addLayer('cityLabels', textLayer);</pre>
         let dxOffset = 0;
         let dyOffset = 0;
         let rotation = 0;
-        let textAnchor = 'start';
+        let textAnchor = 'middle';
         let fontWeight = 'normal';
+        let avoidOverlap = true;
+        let showConnectors = true;
+        let voronoiMargin = 30;
 
         async function draw() {
-            try {
-                // 既存の地図を削除
-                d3.select('#map').selectAll('*').remove();
+
+                // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+                const world = await d3.json('./geojson/world.geojson');
 
                 // 地図の寸法を取得
                 const mapElement = document.querySelector('#map');
                 const width = mapElement.clientWidth;
                 const height = mapElement.clientHeight;
 
+                // 日本の主要都市データ（ラベル重なりデモ用）
+                const cityData = {
+                    type: "FeatureCollection",
+                    features: [
+                        { type: "Feature", properties: { name: "東京", population: 13929286 }, 
+                          geometry: { type: "Point", coordinates: [139.6917, 35.6895] }},
+                        { type: "Feature", properties: { name: "横浜", population: 3748781 }, 
+                          geometry: { type: "Point", coordinates: [139.6380, 35.4437] }},
+                        { type: "Feature", properties: { name: "さいたま", population: 1263979 }, 
+                          geometry: { type: "Point", coordinates: [139.6566, 35.8617] }},
+                        { type: "Feature", properties: { name: "千葉", population: 971882 }, 
+                          geometry: { type: "Point", coordinates: [140.1233, 35.6074] }},
+                        { type: "Feature", properties: { name: "大阪", population: 2691185 }, 
+                          geometry: { type: "Point", coordinates: [135.5023, 34.6937] }},
+                        { type: "Feature", properties: { name: "名古屋", population: 2327557 }, 
+                          geometry: { type: "Point", coordinates: [136.9066, 35.1815] }},
+                        { type: "Feature", properties: { name: "札幌", population: 1952356 }, 
+                          geometry: { type: "Point", coordinates: [141.3545, 43.0642] }},
+                        { type: "Feature", properties: { name: "福岡", population: 1579450 }, 
+                          geometry: { type: "Point", coordinates: [130.4017, 33.5904] }},
+                        { type: "Feature", properties: { name: "神戸", population: 1537272 }, 
+                          geometry: { type: "Point", coordinates: [135.1955, 34.6901] }},
+                        { type: "Feature", properties: { name: "京都", population: 1475183 }, 
+                          geometry: { type: "Point", coordinates: [135.7681, 35.0116] }},
+                        { type: "Feature", properties: { name: "仙台", population: 1082159 }, 
+                          geometry: { type: "Point", coordinates: [140.8719, 38.2682] }},
+                        { type: "Feature", properties: { name: "広島", population: 1194034 }, 
+                          geometry: { type: "Point", coordinates: [132.4596, 34.3853] }},
+                        { type: "Feature", properties: { name: "北九州", population: 961286 }, 
+                          geometry: { type: "Point", coordinates: [130.8748, 33.8834] }}
+                    ]
+                };
 
-                // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-                const world = await d3.json('./geojson/world.geojson');
-                let geojson = JSON.parse(JSON.stringify(world)); // 深いコピーを作成
-
-                const countrys = ["アメリカ合衆国", "日本", "中国", "ロシア", "フランス", "ブラジル", "イギリス", "ガーナ", "南アフリカ共和国", "カナダ", "インド", "オーストラリア"];
-                geojson.features = world.features.filter(f => countrys.includes(f.properties.NAME_JA))
-
-
-                // 投影法を設定
-                const projection = d3.geoInterruptedMollweideHemispheres()
-                    .scale(200)
+                // 投影法を設定（日本中心）
+                const projection = d3.geoMercator()
+                    .center([138, 38])
+                    .scale(2000)
                     .translate([width / 2, height / 2]);
 
                 // 地図を作成
@@ -258,7 +321,7 @@ map.addLayer('cityLabels', textLayer);</pre>
                     backgroundColor: '#0f172a'
                 });
 
-                // 背景の世界地図レイヤー
+                                // 背景の世界地図レイヤー
                 const worldLayer = new Thematika.GeojsonLayer({
                     data: world,
                     attr: {
@@ -268,58 +331,59 @@ map.addLayer('cityLabels', textLayer);</pre>
                         "opacity": 0.8
                     }
                 });
-        
-                // 経緯線レイヤー
-                const graticuleLayer = new Thematika.GraticuleLayer({
-                    step: [30, 30],
+               
+
+
+
+                // ポイントレイヤー（都市の位置）
+                const pointLayer = new Thematika.GeojsonLayer({
+                    data: cityData,
+                    style: {
+                        fill: '#ff6b6b',
+                        stroke: '#fff',
+                        'stroke-width': 2
+                    },
                     attr: {
-                        "fill": 'none',
-                        "stroke": '#90a4ae',
-                        "stroke-width": 0.8,
-                        "opacity": 0.6
+                        r: (d) => Math.sqrt(d.properties.population / 500000) + 3 // 人口に比例したサイズ
                     }
                 });
 
-                // OutlineLayerインスタンスを作成（クリップパス機能付き）
-                const outlineLayer = new Thematika.OutlineLayer({
-                    createClipPath: true,
-                    clipPathId: 'earth-outline-clip',
-                    attr: {
-                        "fill": 'none',
-                        "stroke": '#2c3e50',
-                        "stroke-width": 2,
-                        "opacity": 0.8
-                    }
-                });
-
-
-                // PointTextLayerを作成
+                // PointTextLayerを作成（新機能対応）
                 textLayer = new Thematika.PointTextLayer({
-                    data: geojson,
-                    textProperty: 'NAME_JA',
+                    data: cityData,
+                    textProperty: 'name',
                     dx: dxOffset,
                     dy: dyOffset,
                     rotate: rotation,
-                    "font-size": fontSize,
-                    "font-weight": fontWeight,
-                    "text-anchor": textAnchor,
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
+                    textAnchor: textAnchor,
                     alignmentBaseline: 'middle',
-                    attr: {
-                        "fill": (d,i) => color[i%3], // 色をインデックスで循環
-                        "stroke": (d,i) => color[i%3],
-                        "stroke-width": 1
+                    avoidOverlap: avoidOverlap,
+                    showConnectors: showConnectors,
+                    voronoiMargin: voronoiMargin,
+                    connectorStyle: (feature, index) => {
+                        const population = feature.properties.population;
+                        return {
+                            stroke: population > 2000000 ? '#ff6b6b' : '#fff',
+                            'stroke-width': 2,
+                            opacity: 0.9,
+                            'stroke-dasharray':  '2,2' 
+                        };
+                    },
+                    style: {
+                        fill: '#fff',
+                        stroke: 'none',
+                        'stroke-width': 3,
+                        'paint-order': 'stroke'
                     }
                 });
 
                 // レイヤーを地図に追加
-                map.addLayer('graticule', graticuleLayer);
-                map.addLayer('outline', outlineLayer);
                 map.addLayer('world', worldLayer);
+                map.addLayer('points', pointLayer);
                 map.addLayer('cityLabels', textLayer);
 
-            } catch (error) {
-                console.error('デモの初期化に失敗しました:', error);
-            }
         }
 
         draw();
@@ -363,6 +427,26 @@ map.addLayer('cityLabels', textLayer);</pre>
             fontWeight = this.value;
             draw();
         });
+
+        // ラベル重なり回避の変更
+        document.getElementById('avoid-overlap').addEventListener('change', function() {
+            avoidOverlap = this.checked;
+            draw();
+        });
+
+        // 接続線表示の変更
+        document.getElementById('show-connectors').addEventListener('change', function() {
+            showConnectors = this.checked;
+            draw();
+        });
+
+        // Voronoiマージンの変更
+        document.getElementById('voronoi-margin').addEventListener('input', function() {
+            voronoiMargin = parseInt(this.value);
+            document.getElementById('voronoi-margin-value').textContent = this.value;
+            draw();
+        });
+
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
             map.saveSVG("map.svg");
@@ -372,7 +456,7 @@ map.addLayer('cityLabels', textLayer);</pre>
         document.getElementById('download-png').addEventListener('click', () => {
             map.savePNG("map.png")
         });
-
+        
     </script>
 </body>
 </html>

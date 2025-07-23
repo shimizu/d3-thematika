@@ -1,0 +1,48 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="neon-glow" x="-50%" y="-50%" width="200%" height="200%">
+   
+     
+      <!-- 複数のぼかしレイヤー -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur1" />
+      <feGaussianBlur in="cyan" stdDeviation="4" result="blur2" />
+      <feGaussianBlur in="cyan" stdDeviation="6" result="blur3" />
+      
+      <!-- 明るさを調整 -->
+      <feComponentTransfer in="blur1" result="brightBlur1">
+        <feFuncA type="discrete" tableValues="0 .5 .5 .5 .5 .5 .5 .5 .5 .5 1" />
+      </feComponentTransfer>
+      
+      <feComponentTransfer in="blur2" result="brightBlur2">
+        <feFuncA type="discrete" tableValues="0 .3 .3 .3 .3 .3 .3 .3 .3 .3 1" />
+      </feComponentTransfer>
+      
+      <!-- 全てを合成 -->
+      <feMerge>
+        <feMergeNode in="blur3" />
+        <feMergeNode in="brightBlur2" />
+        <feMergeNode in="brightBlur1" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect x="0" y="0" width="400" height="300" fill="#000000" />
+
+
+  <!-- 追加のサンプル線 -->
+  <path d="M100,50 L300,50 L300,250 L100,250 Z"
+        stroke="#ff0000"
+        stroke-width="3"
+        fill="none"
+        filter="url(#neon-glow)" />
+
+
+    <circle cx="200" cy="150" r="50"
+            fill="#00ffff"
+            stroke="#00ffff"
+            stroke-width="3"
+            filter="url(#neon-glow)" />
+
+
+</svg>

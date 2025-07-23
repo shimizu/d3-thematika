@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Point Circle Layer - d3-thematika</title>
+    <title>Point Symbol Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
-    <script src="./js/common.js"></script>
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -43,39 +42,44 @@
                     <a href="examples.html">Examples</a>
                 </li>
                 <li class="breadcrumb-item breadcrumb-separator">></li>
-                <li class="breadcrumb-item breadcrumb-current">Point Circle Layer</li>
+                <li class="breadcrumb-item breadcrumb-current">Point Symbol Layer</li>
             </ol>
         </nav>
 
         <section>
-            <h2 class="section-title">Point Circle Layer デモ</h2>
+            <h2 class="section-title">Point Symbol Layer デモ</h2>
             
             <div class="info-box">
-                <h3>⭕ PointCircleLayer機能</h3>
+                <h3>🔸 PointSymbolLayer機能</h3>
                 <ul>
                     <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                    <li>レイヤー: PointCircleLayer（サークル表示）、GraticuleLayer（経緯線）</li>
-                    <li>機能: 半径調整、固定値/関数切り替え</li>
-                    <li>対応: ポイント・ポリゴン・ラインの中心点にサークル配置</li>
+                    <li>レイヤー: PointSymbolLayer（d3.symbol使用）、GraticuleLayer（経緯線）</li>
+                    <li>機能: シンボルタイプ切り替え、サイズ調整、固定値/関数パターン</li>
+                    <li>対応: ポイント・ポリゴン・ラインの中心点にシンボル配置</li>
                 </ul>
             </div>
 
             <!-- コントロールパネル -->
             <div class="controls-panel">
                 <div class="control-item">
-                    <label for="radius-type">半径タイプ</label>
-                    <select id="radius-type">
-                        <option value="fixed" selected>固定値</option>
-                        <option value="index">インデックスベース</option>
-                        <option value="population">人口ベース</option>
+                    <label for="symbol-type">シンボルタイプ</label>
+                    <select id="symbol-type">
+                        <option value="cross" selected>Cross（十字）</option>
+                        <option value="circle">Circle（円）</option>
+                        <option value="diamond">Diamond（ダイヤモンド）</option>
+                        <option value="square">Square（正方形）</option>
+                        <option value="star">Star（星）</option>
+                        <option value="triangle">Triangle（三角形）</option>
+                        <option value="wye">Wye（Y字）</option>
+                        <option value="alternate">Alternate（交互パターン）</option>
                     </select>
                 </div>
                 
                 <div class="control-item">
-                    <label>半径</label>
+                    <label>サイズ</label>
                     <div class="slider-control">
-                        <input type="range" id="radius-slider" min="1" max="20" step="1" value="5">
-                        <span class="value-display" id="radius-value">5</span>
+                        <input type="range" id="size-slider" min="16" max="256" step="16" value="64">
+                        <span class="value-display" id="size-value">64</span>
                     </div>
                 </div>
                 
@@ -103,11 +107,11 @@
             <h2 class="section-title">実装サンプル</h2>
             
             <div class="code-header">
-                <h3>PointCircleLayerの使用例</h3>
+                <h3>PointSymbolLayerの使用例</h3>
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// PointCircleLayerの使用例
+                <pre id="sample-code">// PointSymbolLayerの使用例
 
 const geojson = await d3.json("./geojson/world.geojson");
 
@@ -118,10 +122,11 @@ const map = new Thematika.Map({
     projection: d3.geoNaturalEarth1()
 });
 
-// PointCircleLayerインスタンスを作成
-const circleLayer = new Thematika.PointCircleLayer({
+// PointSymbolLayerインスタンスを作成
+const symbolLayer = new Thematika.PointSymbolLayer({
     data: geojson,
-    r: 5, // 固定半径
+    size: 64, // 固定サイズ
+    symbolType: d3.symbolCross, // デフォルトのCross
     attr: {
         "fill": '#ff6b6b',
         "stroke": '#d63031',
@@ -130,13 +135,17 @@ const circleLayer = new Thematika.PointCircleLayer({
     }
 });
 
-// または関数を使った動的半径設定
-const dynamicCircleLayer = new Thematika.PointCircleLayer({
+// または関数を使った動的設定
+const dynamicSymbolLayer = new Thematika.PointSymbolLayer({
     data: geojson,
-    r: (feature, index) => {
-        // 人口に基づいて半径を決定
+    size: (feature, index) => {
+        // 人口に基づいてサイズを決定
         const population = feature.properties?.POP_EST || 0;
-        return Math.sqrt(population / 1000000) + 2;
+        return Math.min(Math.sqrt(population / 1000000) * 32 + 16, 256);
+    },
+    symbolType: (feature, index) => {
+        // 交互にシンボルを切り替え
+        return index % 2 === 0 ? d3.symbolCircle : d3.symbolDiamond;
     },
     attr: {
         "fill": (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
@@ -146,28 +155,28 @@ const dynamicCircleLayer = new Thematika.PointCircleLayer({
 });
 
 // レイヤーを地図に追加
-map.addLayer('circles', circleLayer);
-
-// 半径を動的に更新
-circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
+map.addLayer('symbols', symbolLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('world', worldLayer);</pre>
             </div>
         </section>
     </div>
 
     <!-- UMD版のライブラリを使用 -->
     <script src="./thematika.umd.js"></script>
+    <script src="./js/common.js"></script>
 
     <script>
         // 共通機能の初期化
         initializeCommonFeatures();
 
         let map = null;
-        let circleLayer = null;
+        let symbolLayer = null;
         let worldData = null;
-        let radiusType = 'fixed';
-        let baseRadius = 5;
+        let symbolType = 'cross';
+        let baseSize = 64;
         let fillColor = '#ff6b6b';
-
+        
         async function draw() {
             try {
                 // 既存の地図を削除
@@ -206,35 +215,48 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                     }
                 });
 
-                // 半径の設定
-                let radiusFunction;
-                switch (radiusType) {
-                    case 'fixed':
-                        radiusFunction = baseRadius;
+                // シンボルタイプの設定
+                let symbolTypeFunction;
+                switch (symbolType) {
+                    case 'cross':
+                        symbolTypeFunction = d3.symbolCross;
                         break;
-                    case 'index':
-                        radiusFunction = (feature, index) => (index % 5) + baseRadius;
+                    case 'circle':
+                        symbolTypeFunction = d3.symbolCircle;
                         break;
-                    case 'population':
-                        radiusFunction = (feature, index) => {
-                            const population = feature.properties?.POP_EST || 0;
-                            return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
+                    case 'diamond':
+                        symbolTypeFunction = d3.symbolDiamond;
+                        break;
+                    case 'square':
+                        symbolTypeFunction = d3.symbolSquare;
+                        break;
+                    case 'star':
+                        symbolTypeFunction = d3.symbolStar;
+                        break;
+                    case 'triangle':
+                        symbolTypeFunction = d3.symbolTriangle;
+                        break;
+                    case 'wye':
+                        symbolTypeFunction = d3.symbolWye;
+                        break;
+                    case 'alternate':
+                        symbolTypeFunction = (feature, index) => {
+                            const symbols = [d3.symbolCircle, d3.symbolSquare, d3.symbolTriangle, d3.symbolDiamond];
+                            return symbols[index % symbols.length];
                         };
                         break;
                     default:
-                        radiusFunction = baseRadius;
+                        symbolTypeFunction = d3.symbolCross;
                 }
 
-                // PointCircleLayerを作成
-                circleLayer = new Thematika.PointCircleLayer({
+                // PointSymbolLayerを作成
+                symbolLayer = new Thematika.PointSymbolLayer({
                     data: worldData,
-                    r: radiusFunction,
+                    size: baseSize,
+                    symbolType: symbolTypeFunction,
                     attr: {
-                        "fill": (d,i) => {
-                            // 偶数インデックスは青、奇数インデックスはピンク
-                            return i % 2 === 0 ? '#74b9ff' : '#fd79a8';
-                        },
-                        "stroke": '#d63031',
+                        "fill": fillColor,
+                        "stroke": '#2d3436',
                         "stroke-width": 1,
                         "opacity": 0.8
                     }
@@ -242,25 +264,23 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
 
                 // レイヤーを地図に追加
                 map.addLayer('graticule', graticuleLayer);
-                map.addLayer('circles', circleLayer);
+                map.addLayer('symbols', symbolLayer);
 
             } catch (error) {
                 console.error('デモの初期化に失敗しました:', error);
             }
         }
 
-        draw();
-
-        // 半径タイプの変更
-        document.getElementById('radius-type').addEventListener('change', function() {
-            radiusType = this.value;
+        // シンボルタイプの変更
+        document.getElementById('symbol-type').addEventListener('change', function() {
+            symbolType = this.value;
             draw();
         });
         
-        // 半径スライダーの変更
-        document.getElementById('radius-slider').addEventListener('input', function() {
-            baseRadius = parseInt(this.value);
-            document.getElementById('radius-value').textContent = this.value;
+        // サイズスライダーの変更
+        document.getElementById('size-slider').addEventListener('input', function() {
+            baseSize = parseInt(this.value);
+            document.getElementById('size-value').textContent = this.value;
             draw();
         });
         
@@ -269,6 +289,31 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
             fillColor = this.value;
             draw();
         });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // 初期描画
+        draw();
 
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
@@ -279,8 +324,6 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
         document.getElementById('download-png').addEventListener('click', () => {
             map.savePNG("map.png")
         });
-
-
 
     </script>
 </body>

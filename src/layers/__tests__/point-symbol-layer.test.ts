@@ -1,8 +1,9 @@
-import { PointCircleLayer } from '../point-circle-layer';
+import { PointSymbolLayer } from '../point-symbol-layer';
+import { symbolCross, symbolCircle, symbolDiamond } from 'd3-shape';
 import { LayerAttr } from '../../types';
 
-describe('PointCircleLayer', () => {
-  let pointCircleLayer: PointCircleLayer;
+describe('PointSymbolLayer', () => {
+  let pointSymbolLayer: PointSymbolLayer;
   let mockContainer: any;
   let mockProjection: any;
   let sampleGeoJSON: GeoJSON.FeatureCollection;
@@ -39,9 +40,10 @@ describe('PointCircleLayer', () => {
       ]
     };
 
-    pointCircleLayer = new PointCircleLayer({
+    pointSymbolLayer = new PointSymbolLayer({
       data: sampleGeoJSON,
-      r: 5,
+      size: 64,
+      symbolType: symbolCircle,
       attr: {
         fill: '#ff0000',
         stroke: '#000000',
@@ -53,14 +55,14 @@ describe('PointCircleLayer', () => {
     mockProjection = jest.fn((coord) => [coord[0] * 10, coord[1] * 10]);
 
     // モックコンテナの設定
-    const mockCircleElement = {
+    const mockPathElement = {
       attr: jest.fn().mockReturnThis(),
       style: jest.fn().mockReturnThis(),
       on: jest.fn().mockReturnThis()
     };
 
     const mockEnterSelection = {
-      append: jest.fn(() => mockCircleElement)
+      append: jest.fn(() => mockPathElement)
     };
 
     const mockDataSelection = {
@@ -98,46 +100,78 @@ describe('PointCircleLayer', () => {
 
   describe('constructor', () => {
     test('GeoJSONデータが正しく設定される', () => {
-      expect(pointCircleLayer.getData()).toEqual(sampleGeoJSON);
+      expect(pointSymbolLayer.getData()).toEqual(sampleGeoJSON);
     });
 
     test('配列形式のデータがFeatureCollectionに変換される', () => {
       const arrayData = sampleGeoJSON.features;
-      const layer = new PointCircleLayer({ data: arrayData });
+      const layer = new PointSymbolLayer({ data: arrayData });
       
       const result = layer.getData();
       expect(result.type).toBe('FeatureCollection');
       expect(result.features).toEqual(arrayData);
     });
 
-    test('固定半径が正しく設定される', () => {
-      const layer = new PointCircleLayer({
+    test('固定サイズが正しく設定される', () => {
+      const layer = new PointSymbolLayer({
         data: sampleGeoJSON,
-        r: 10
+        size: 128
       });
 
-      const radiusFunction = layer['radiusFunction'];
-      expect(radiusFunction({} as any, 0)).toBe(10);
+      const sizeFunction = layer['sizeFunction'];
+      expect(sizeFunction({} as any, 0)).toBe(128);
     });
 
-    test('関数型半径が正しく設定される', () => {
-      const radiusFunc = (feature: GeoJSON.Feature, index: number) => index + 5;
-      const layer = new PointCircleLayer({
+    test('関数型サイズが正しく設定される', () => {
+      const sizeFunc = (feature: GeoJSON.Feature, index: number) => index * 32 + 64;
+      const layer = new PointSymbolLayer({
         data: sampleGeoJSON,
-        r: radiusFunc
+        size: sizeFunc
       });
 
-      const radiusFunction = layer['radiusFunction'];
-      expect(radiusFunction({} as any, 2)).toBe(7);
+      const sizeFunction = layer['sizeFunction'];
+      expect(sizeFunction({} as any, 2)).toBe(128);
     });
 
-    test('デフォルト半径が適用される', () => {
-      const layer = new PointCircleLayer({
+    test('デフォルトサイズが適用される', () => {
+      const layer = new PointSymbolLayer({
         data: sampleGeoJSON
       });
 
-      const radiusFunction = layer['radiusFunction'];
-      expect(radiusFunction({} as any, 0)).toBe(5);
+      const sizeFunction = layer['sizeFunction'];
+      expect(sizeFunction({} as any, 0)).toBe(64);
+    });
+
+    test('固定シンボルタイプが正しく設定される', () => {
+      const layer = new PointSymbolLayer({
+        data: sampleGeoJSON,
+        symbolType: symbolDiamond
+      });
+
+      const symbolTypeFunction = layer['symbolTypeFunction'];
+      expect(symbolTypeFunction({} as any, 0)).toBe(symbolDiamond);
+    });
+
+    test('関数型シンボルタイプが正しく設定される', () => {
+      const symbolTypeFunc = (feature: GeoJSON.Feature, index: number) => 
+        index % 2 === 0 ? symbolCircle : symbolDiamond;
+      const layer = new PointSymbolLayer({
+        data: sampleGeoJSON,
+        symbolType: symbolTypeFunc
+      });
+
+      const symbolTypeFunction = layer['symbolTypeFunction'];
+      expect(symbolTypeFunction({} as any, 0)).toBe(symbolCircle);
+      expect(symbolTypeFunction({} as any, 1)).toBe(symbolDiamond);
+    });
+
+    test('デフォルトシンボルタイプがCrossになる', () => {
+      const layer = new PointSymbolLayer({
+        data: sampleGeoJSON
+      });
+
+      const symbolTypeFunction = layer['symbolTypeFunction'];
+      expect(symbolTypeFunction({} as any, 0)).toBe(symbolCross);
     });
 
     test('スタイル設定が正しく適用される', () => {
@@ -147,7 +181,7 @@ describe('PointCircleLayer', () => {
         strokeWidth: 2
       };
 
-      const layer = new PointCircleLayer({
+      const layer = new PointSymbolLayer({
         data: sampleGeoJSON,
         attr: customStyle
       });
@@ -158,7 +192,7 @@ describe('PointCircleLayer', () => {
     });
 
     test('attr設定がstyleよりも優先される', () => {
-      const layer = new PointCircleLayer({
+      const layer = new PointSymbolLayer({
         data: sampleGeoJSON,
         attr: { fill: 'green' }
       });
@@ -169,41 +203,37 @@ describe('PointCircleLayer', () => {
 
   describe('projection management', () => {
     test('setProjection()で投影法を設定できる', () => {
-      pointCircleLayer.setProjection(mockProjection);
-      expect(pointCircleLayer['projection']).toBe(mockProjection);
+      pointSymbolLayer.setProjection(mockProjection);
+      expect(pointSymbolLayer['projection']).toBe(mockProjection);
     });
-
   });
-
 
   describe('render', () => {
     test('render()でレイヤーグループが作成される', () => {
-      pointCircleLayer.render(mockContainer);
+      pointSymbolLayer.render(mockContainer);
 
       expect(mockContainer.append).toHaveBeenCalledWith('g');
       expect(mockContainer.attr).toHaveBeenCalledWith('class', expect.stringContaining('thematika-layer'));
     });
 
     test('投影法が設定されていない場合は描画されない', () => {
-      pointCircleLayer.render(mockContainer);
+      pointSymbolLayer.render(mockContainer);
       
       // projectionが未設定の場合は早期リターン
       expect(mockContainer.selectAll).not.toHaveBeenCalled();
     });
 
     test('投影法設定後に描画が実行される', () => {
-      pointCircleLayer.setProjection(mockProjection);
-      pointCircleLayer.render(mockContainer);
+      pointSymbolLayer.setProjection(mockProjection);
+      pointSymbolLayer.render(mockContainer);
 
-      expect(pointCircleLayer.isRendered()).toBe(true);
+      expect(pointSymbolLayer.isRendered()).toBe(true);
     });
   });
 
-
-
   describe('style application', () => {
     test('動的スタイル関数が適用される', () => {
-      const dynamicLayer = new PointCircleLayer({
+      const dynamicLayer = new PointSymbolLayer({
         data: sampleGeoJSON,
         attr: {
           fill: (d, i) => (i || 0) % 2 === 0 ? 'red' : 'blue',
@@ -221,7 +251,6 @@ describe('PointCircleLayer', () => {
       const strokeResult = (dynamicLayer['attr'].strokeWidth as Function)(sampleGeoJSON.features[1]);
       expect(strokeResult).toBe(2);
     });
-
   });
 
   describe('geometry handling', () => {
@@ -235,14 +264,14 @@ describe('PointCircleLayer', () => {
         }
       };
 
-      const layer = new PointCircleLayer({
+      const layer = new PointSymbolLayer({
         data: { type: 'FeatureCollection', features: [pointFeature] }
       });
       layer['projection'] = mockProjection;
       layer['layerGroup'] = mockContainer;
       layer.render(mockContainer);
 
-      // renderCircles内でPoint座標が直接使用されることを確認
+      // renderSymbols内でPoint座標が直接使用されることを確認
       expect(mockProjection).toHaveBeenCalledWith([10, 20]);
     });
 
@@ -256,7 +285,7 @@ describe('PointCircleLayer', () => {
         }
       };
 
-      const layer = new PointCircleLayer({
+      const layer = new PointSymbolLayer({
         data: { type: 'FeatureCollection', features: [polygonFeature] }
       });
       layer['projection'] = mockProjection;
@@ -270,7 +299,7 @@ describe('PointCircleLayer', () => {
 
   describe('feature properties', () => {
     test('フィーチャープロパティが正しく取得される', () => {
-      const data = pointCircleLayer.getData();
+      const data = pointSymbolLayer.getData();
       const firstFeature = data.features[0];
 
       expect(firstFeature.properties?.name).toBe('Test Point');
@@ -278,7 +307,7 @@ describe('PointCircleLayer', () => {
     });
 
     test('異なるジオメトリタイプが正しく設定される', () => {
-      const data = pointCircleLayer.getData();
+      const data = pointSymbolLayer.getData();
       
       expect(data.features[0].geometry.type).toBe('Point');
       expect(data.features[1].geometry.type).toBe('Polygon');
@@ -288,14 +317,14 @@ describe('PointCircleLayer', () => {
 
   describe('CSS class application', () => {
     test('カスタムクラス名が適用される', () => {
-      const layerWithClass = new PointCircleLayer({
+      const layerWithClass = new PointSymbolLayer({
         data: sampleGeoJSON,
         attr: {
-          className: 'custom-circle-layer'
+          className: 'custom-symbol-layer'
         }
       });
 
-      expect(layerWithClass['attr'].className).toBe('custom-circle-layer');
+      expect(layerWithClass['attr'].className).toBe('custom-symbol-layer');
     });
 
     test('フィーチャー固有のクラスが適用される', () => {
@@ -311,7 +340,7 @@ describe('PointCircleLayer', () => {
         }]
       };
 
-      const layer = new PointCircleLayer({ data: geoJSONWithClass });
+      const layer = new PointSymbolLayer({ data: geoJSONWithClass });
       const feature = layer.getData().features[0];
 
       expect(feature.properties?.class).toBe('important-point');

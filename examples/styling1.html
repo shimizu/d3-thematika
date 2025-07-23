@@ -240,31 +240,6 @@
             map.addLayer('outline', outlineLayer);
         }
 
-        // 投影法の変更
-        document.getElementById('projection-select').addEventListener('change', async function(e) {
-            const projectionType = e.target.value;
-            
-            // 投影法を変更
-            switch(projectionType) {
-                case 'mercator':
-                    currentProjection = d3.geoMercator();
-                    break;
-                case 'naturalEarth1':
-                    currentProjection = d3.geoNaturalEarth1();
-                    break;
-                case 'orthographic':
-                    currentProjection = d3.geoOrthographic();
-                    break;
-                case 'azimuthalEqualArea':
-                    currentProjection = d3.geoAzimuthalEqualArea();
-                    break;
-                default:
-                    currentProjection = d3.geoEquirectangular();
-            }
-            
-            // 地図を再描画
-            await draw();
-        });
 
         // コードコピー機能
         function copyCode() {

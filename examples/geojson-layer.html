@@ -98,26 +98,12 @@
                 <pre id="sample-code">// GeojsonLayerの使用例
 const geojson = await d3.json("./geojson/world.geojson");
 
-const width = 800;
-const height = 600;
-
-const projection = d3.geoEquirectangular()
-    .fitExtent([[10, 0], [width-10, height]], geojson);
-
-const map = new Thematika.Map({
-    container: '#map',
-    width: width,
-    height: height,
-    projection: projection
-});
-
 // GeojsonLayerインスタンスを作成
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
         "fill": (d, i) => {
-            // Viridis パレット - 2色の美しい対比
-            const colors = ['#440154', '#1f9d8a']; // ディープパープルとティールグリーン
+            const colors = ['#440154', '#1f9d8a']; 
             return colors[i % colors.length];
         },
         "filter": shadowFilter.url(), 
@@ -127,32 +113,7 @@ const worldLayer = new Thematika.GeojsonLayer({
     }
 });
 
-// OutlineLayerインスタンスを作成（クリップパス機能ON）
-const outlineLayer = new Thematika.OutlineLayer({
-    createClipPath: true,
-    clipPathId: 'earth-outline-clip',
-    attr: {
-        "fill": 'none',
-        "stroke": '#475569',
-        "stroke-width": 2,
-        "opacity": 0.7
-    }
-});
-
-// GraticuleLayerインスタンスを作成
-const graticuleLayer = new Thematika.GraticuleLayer({
-    step: [10, 10], // 10度間隔
-    attr: {
-        "fill": 'none',
-        "stroke": 'rgba(148, 163, 184, 0.4)',
-        "stroke-width": 0.3,
-        "opacity": 0.6
-    }
-});
-
 // レイヤーインスタンスを地図に追加
-map.addLayer('graticule', graticuleLayer);
-map.addLayer('outline', outlineLayer);
 map.addLayer('world', worldLayer);</pre>
             </div>
         </section>
@@ -305,70 +266,14 @@ map.addLayer('world', worldLayer);</pre>
 
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            map.saveSVG("map.svg");
         });
         
         // PNGダウンロード機能
         document.getElementById('download-png').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            // SVGのサイズを取得
-            const svgRect = mapElement.getBoundingClientRect();
-            canvas.width = svgRect.width;
-            canvas.height = svgRect.height;
-            
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            };
-            
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            img.src = url;
+            map.savePNG("map.png")
         });
         
-        // ウィンドウリサイズ対応
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 300);
-        });
     </script>
 </body>
 </html>
