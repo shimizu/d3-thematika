@@ -15,20 +15,40 @@ const config: StorybookConfig = {
     { from: '../dist', to: '/' }
   ],
   viteFinal: async (config) => {
-    // TypeScriptとUMDビルドをサポート
+    // TypeScriptとモジュール解決をサポート
     return {
       ...config,
-      build: {
-        ...config.build,
-        rollupOptions: {
-          external: ['d3-geo', 'd3-selection', 'geotiff'],
-          output: {
-            globals: {
-              'd3-geo': 'd3',
-              'd3-selection': 'd3',
-              'geotiff': 'GeoTIFF'
-            }
-          }
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve?.alias,
+          // ライブラリ本体へのエイリアス
+          '@': '/src'
+        }
+      },
+      optimizeDeps: {
+        ...config.optimizeDeps,
+        include: [
+          'd3-geo',
+          'd3-selection',
+          'd3-shape',
+          'd3-scale',
+          'd3-force',
+          'd3-path',
+          'd3-polygon',
+          'd3-delaunay',
+          'd3-drag',
+          'd3-scale-chromatic',
+          '@turf/turf',
+          'geotiff'
+        ],
+        exclude: ['@storybook/blocks']
+      },
+      server: {
+        ...config.server,
+        fs: {
+          ...config.server?.fs,
+          allow: ['..']
         }
       }
     };

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/html';
+import type { Meta, StoryObj } from '@storybook/html-vite';
 import { Map } from '../../thematika';
 import { LegendLayer } from '../../layers/legend-layer';
 import { PointCircleLayer } from '../../layers/point-circle-layer';

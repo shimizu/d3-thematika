@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/html';
+import type { Meta, StoryObj } from '@storybook/html-vite';
 import { Map } from '../../thematika';
 import { PointTextLayer } from '../../layers/point-text-layer';
 import { GeojsonLayer } from '../../layers/geojson-layer';

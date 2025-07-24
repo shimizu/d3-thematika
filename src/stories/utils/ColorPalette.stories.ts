@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/html';
+import type { Meta, StoryObj } from '@storybook/html-vite';
 import { AllPalettes, recommendPalette, generateOptimizedPalette, checkColorBlindnessSafety } from '../../utils/color-palette';
 import { ColorPalette, PaletteType } from '../../types';
 
