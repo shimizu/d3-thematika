@@ -16,9 +16,7 @@
     "test:ci": "jest --ci --coverage --watchAll=false",
     "build:demo": "node scripts/build-demo.js",
     "predeploy": "npm run build && npm run build:demo",
-    "deploy": "gh-pages -d demoPages -m 'Deploy demo pages'",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "deploy": "gh-pages -d demoPages -m 'Deploy demo pages'"
   },
   "author": "",
   "license": "ISC",
@@ -47,8 +45,6 @@
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.4",
-    "@storybook/builder-vite": "^9.0.17",
-    "@storybook/html-vite": "^9.0.17",
     "@types/d3-delaunay": "^6.0.4",
     "@types/d3-force": "^3.0.10",
     "@types/d3-geo": "^3.1.0",
@@ -66,7 +62,6 @@
     "jsdom": "^26.1.0",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^3.0.0",
-    "storybook": "^9.0.17",
     "ts-jest": "^29.4.0",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
