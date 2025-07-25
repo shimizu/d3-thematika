@@ -81,8 +81,8 @@
                     <span id="force-value">20</span>
                 </div>
                 <div class="control-item">
-                    <label for="show-original">オリジナルライン表示</label>
-                    <input type="checkbox" id="show-original">
+                    <label for="enable-bundling">バンドリング有効</label>
+                    <input type="checkbox" id="enable-bundling" checked>
                 </div>
                 <div class="control-item">
                     <label for="show-control-points">制御点表示</label>
@@ -120,51 +120,14 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// LineEdgeBundlingLayerの使用例
-const lineData = {
-    "type": "FeatureCollection",
-    "features": [
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[-120, 40], [-75, 35]]
-            },
-            "properties": { "name": "route1" }
-        },
-        {
-            "type": "Feature",
-            "geometry": {
-                "type": "LineString",
-                "coordinates": [[-118, 38], [-77, 37]]
-            },
-            "properties": { "name": "route2" }
-        }
-    ]
-};
-
-const width = 800;
-const height = 600;
-
-const projection = d3.geoAlbersUsa()
-    .scale(1000)
-    .translate([width / 2, height / 2]);
-
-const map = new Thematika.Map({
-    container: '#map',
-    width: width,
-    height: height,
-    projection: projection
-});
-
-// LineEdgeBundlingLayerインスタンスを作成
+                <pre id="sample-code">// LineEdgeBundlingLayerインスタンスを作成
 const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
-    data: lineData,
-    bundlingStrength: 0.85,
-    forceStrength: 20,
-    showOriginalLines: false,
-    showControlPoints: false,
-    animateForce: true,
+    data: lineData, //GeoJSONデータ(line, multiLine)
+    bundlingStrength: 0.85,  // バンドリング強度（0-1）
+    forceStrength: 20,       // フォース強度
+    showOriginalLines: false, // バンドリング時はfalse
+    showControlPoints: false, // 制御点表示
+    animateForce: true,      // フォースアニメーション
     attr: {
         "stroke": '#ff6b6b',
         "stroke-width": 2,
@@ -172,10 +135,6 @@ const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
     }
 });
 
-// イベントハンドラーを追加
-bundlingLayer.on('click', (event, data) => {
-    console.log('クリックされたライン:', data.feature.properties.name);
-});
 
 // レイヤーを地図に追加
 map.addLayer('bundling', bundlingLayer);</pre>
@@ -278,7 +237,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // UIコントロールの状態を取得
             const bundlingStrength = parseFloat(document.getElementById('bundling-strength').value);
             const forceStrength = parseFloat(document.getElementById('force-strength').value);
-            const showOriginalLines = document.getElementById('show-original').checked;
+            const enableBundling = document.getElementById('enable-bundling').checked;
             const showControlPoints = document.getElementById('show-control-points').checked;
             const animateForce = document.getElementById('animate-force').checked;
             const showAirports = document.getElementById('show-airports').checked;
@@ -305,9 +264,9 @@ map.addLayer('bundling', bundlingLayer);</pre>
             // LineEdgeBundlingLayerインスタンスを作成
             const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
                 data: lineData,
-                bundlingStrength: bundlingStrength,
+                bundlingStrength: enableBundling ? bundlingStrength : 0,
                 forceStrength: forceStrength,
-                showOriginalLines: showOriginalLines,
+                showOriginalLines: !enableBundling,
                 showControlPoints: showControlPoints,
                 animateForce: animateForce,
                 attr: {
@@ -317,22 +276,10 @@ map.addLayer('bundling', bundlingLayer);</pre>
                 }
             });
 
-            // イベントハンドラーを追加
-            bundlingLayer.on('click', (event, data) => {
-                console.log('クリックされたライン:', data.feature.properties.name);
-            });
 
             // 航空路線レイヤーを地図に追加（空港の上に配置）
             map.addLayer('bundling', bundlingLayer);
 
-            // 空港ポイントにマウスオーバーイベントを追加
-            airportsLayer.on('mouseover', (event, data) => {
-                const airport = data.feature.properties;
-                console.log(`空港: ${airport.displayName}`);
-                console.log(`場所: ${airport.location}`);
-                console.log(`総フライト数: ${airport.totalFlights.toLocaleString()}便`);
-                console.log(`路線数: ${airport.routeCount}路線`);
-            });
         }
 
         // 投影法の変更
@@ -370,7 +317,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
         });
 
         // チェックボックスのイベントリスナー
-        document.getElementById('show-original').addEventListener('change', draw);
+        document.getElementById('enable-bundling').addEventListener('change', draw);
         document.getElementById('show-control-points').addEventListener('change', draw);
         document.getElementById('animate-force').addEventListener('change', draw);
         document.getElementById('show-airports').addEventListener('change', draw);
@@ -397,75 +344,20 @@ map.addLayer('bundling', bundlingLayer);</pre>
             }, 2000);
         }
 
-        // SVGダウンロード機能
-        document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-        
-        // PNGダウンロード機能
-        document.getElementById('download-png').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            // SVGのサイズを取得
-            const svgRect = mapElement.getBoundingClientRect();
-            canvas.width = svgRect.width;
-            canvas.height = svgRect.height;
-            
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            };
-            
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            img.src = url;
-        });
 
         // 初期描画
         draw();
 
-        // ウィンドウリサイズ対応
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 300);
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
         });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
+        
     </script>
 </body>
 </html>

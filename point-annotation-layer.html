@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Point Annotation Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -78,8 +77,8 @@
                 <div class="control-item">
                     <label for="subject-type">サブジェクトタイプ</label>
                     <select id="subject-type">
-                        <option value="point" selected>Point</option>
-                        <option value="circle">Circle</option>
+                        <option value="point">Point</option>
+                        <option value="circle" selected>Circle</option>
                         <option value="rect">Rectangle</option>
                     </select>
                 </div>
@@ -103,8 +102,8 @@
                 <div class="control-item">
                     <label>サブジェクト半径</label>
                     <div class="slider-control">
-                        <input type="range" id="subject-radius" min="1" max="200" step="1" value="3">
-                        <span class="value-display" id="subject-radius-value">3</span>
+                        <input type="range" id="subject-radius" min="1" max="200" step="1" value="23">
+                        <span class="value-display" id="subject-radius-value">23</span>
                     </div>
                 </div>
                 
@@ -126,7 +125,7 @@
                 
                 <div class="control-item">
                     <label for="subject-stroke">サブジェクト境界線色</label>
-                    <input type="color" id="subject-stroke" value="#000000" class="color-picker">
+                    <input type="color" id="subject-stroke" value="#ffffff" class="color-picker">
                 </div>
                 
                 <div class="control-item">
@@ -140,8 +139,8 @@
                 <div class="control-item">
                     <label for="subject-stroke-dasharray">サブジェクト境界線ダッシュパターン</label>
                     <select id="subject-stroke-dasharray">
-                        <option value="none" selected>なし (実線)</option>
-                        <option value="2,2">短い点線 (2,2)</option>
+                        <option value="none">なし (実線)</option>
+                        <option value="2,2" selected>短い点線 (2,2)</option>
                         <option value="4,4">点線 (4,4)</option>
                         <option value="8,4">長い点線 (8,4)</option>
                         <option value="2,4,2">ドット・ダッシュ (2,4,2)</option>
@@ -278,14 +277,14 @@ map.addLayer('annotations', annotationLayer);</pre>
         let showTitle = false;
         let offsetX = 30;
         let offsetY = -20;
-        let subjectType = 'point';
-        let subjectRadius = 3;
+        let subjectType = 'circle';
+        let subjectRadius = 23;
         let subjectWidth = 16;
         let subjectHeight = 16;
         let subjectFill = 'none';
-        let subjectStroke = '#000000';
+        let subjectStroke = '#ffffff';
         let subjectStrokeWidth = 1;
-        let subjectStrokeDasharray = 'none';
+        let subjectStrokeDasharray = '2,2';
         let noteBackground = '#ffffff';
         let notePadding = 4;
 
@@ -302,11 +301,6 @@ map.addLayer('annotations', annotationLayer);</pre>
                     type: 'Feature',
                     geometry: { type: 'Point', coordinates: [-74.0060, 40.7128] },
                     properties: { name: 'New York', country: 'USA', population: 20140470 }
-                },
-                {
-                    type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [2.3522, 48.8566] },
-                    properties: { name: 'Paris', country: 'France', population: 11174000 }
                 },
                 {
                     type: 'Feature',
@@ -350,7 +344,9 @@ map.addLayer('annotations', annotationLayer);</pre>
                     container: '#map',
                     width: width,
                     height: height,
-                    projection: projection
+                    projection: projection,
+                    backgroundColor: '#0f172a'
+
                 });
 
 
@@ -358,10 +354,10 @@ map.addLayer('annotations', annotationLayer);</pre>
             const worldLayer = new Thematika.GeojsonLayer({
                 data: worldData,                
                 attr: { 
-                    "fill": '#e8f4f8',
-                    "stroke": '#2c3e50',
+                    "fill": '#333',
+                    "stroke": '#fff',
                     "stroke-width": 0.5,
-                    "opacity": 0.9
+                    "opacity": 0.8
                 }
             });                
 
@@ -410,7 +406,7 @@ map.addLayer('annotations', annotationLayer);</pre>
                         radius: subjectRadius
                     },
                     connectorOptions: {
-                        stroke: '#666666',
+                        stroke: '#ffffff',
                         strokeWidth: 1
                     },
                     noteOptions: {
