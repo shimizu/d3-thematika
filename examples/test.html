@@ -137,28 +137,7 @@
                 .attr("stop-color", "#aaaaaa")
                 .attr("stop-opacity", "1");
 
-            // ドロップシャドウフィルター
-            const dropShadow = defs.append("filter")
-                .attr("id", "dropShadow")
-                .attr("x", "-50%")
-                .attr("y", "-50%")
-                .attr("width", "200%")
-                .attr("height", "200%");
-            
-            dropShadow.append("feGaussianBlur")
-                .attr("in", "SourceAlpha")
-                .attr("stdDeviation", "10")
-                .attr("result", "blur");
-            
-            dropShadow.append("feOffset")
-                .attr("in", "blur")
-                .attr("dx", "0")
-                .attr("dy", "8")
-                .attr("result", "offsetBlur");
-            
-            const shadowMerge = dropShadow.append("feMerge");
-            shadowMerge.append("feMergeNode").attr("in", "offsetBlur");
-            shadowMerge.append("feMergeNode").attr("in", "SourceGraphic");
+
 
             // ラインの光彩効果
             const lineGlow = defs.append("filter")
@@ -218,7 +197,6 @@
                 clipPathId: 'earth-outline-clip',
                 attr: {
                     "fill": 'url(#globeLight)',
-                   // "filter": 'url(#parchment)',
                     "stroke": '#ffaea0',
                     "stroke-width": 4,
                     "opacity": 1
