@@ -8,6 +8,8 @@ D3.jsを使用した主題図作成（thematika）ライブラリです。
 npm install d3-thematika
 ```
 
+
+
 ## 使用方法
 
 ### UMD版（ブラウザ）
