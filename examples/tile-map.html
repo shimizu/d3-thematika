@@ -154,18 +154,27 @@ const tiles = Thematika.generateTileUrls(bounds, zoom, {
     urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
 });
 
+// 投影法を設定
+const projection = d3.geoMercator();
+
+// タイル表示用に適切なスケールを設定
+const centerLon = (bounds[0] + bounds[2]) / 2;
+const centerLat = (bounds[1] + bounds[3]) / 2;
+
+// ズームレベルに基づいてスケールを計算
+const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);                
+projection
+    .scale(scale)
+    .center([centerLon, centerLat])
+    .translate([width / 2, height / 2]);
+
+
 // 地図の作成
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 600,
-    projection: d3.geoMercator().fitExtent([[10, 10], [790, 590]], {
-        type: 'Polygon',
-        coordinates: [[
-            [bounds[0], bounds[1]], [bounds[2], bounds[1]],
-            [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
-        ]]
-    })
+    projection:projection
 });
 
 // 各タイルをImageLayerとして追加
@@ -178,11 +187,7 @@ tiles.forEach((tile, index) => {
     map.addLayer(`tile-${index}`, imageLayer);
 });
 
-// アウトライン追加
-const outlineLayer = new Thematika.OutlineLayer({
-    attr: { stroke: '#333', 'stroke-width': 2, fill: 'none' }
-});
-map.addLayer('outline', outlineLayer);</pre>
+</pre>
             </div>
         </section>
     </div>
@@ -243,6 +248,10 @@ map.addLayer('outline', outlineLayer);</pre>
         async function draw() {
             const id = "#map";
 
+            // 世界地図データを読み込み
+            const city_geojson = await d3.json('./geojson/japan/city.geojson');
+
+
             // 既存の地図を削除
             d3.select(id).selectAll('*').remove();
 
@@ -265,29 +274,16 @@ map.addLayer('outline', outlineLayer);</pre>
             const projection = getProjection(currentProjectionType);
             
             // タイル表示用に適切なスケールを設定
-            if (currentProjectionType === 'mercator') {
-                // Web Mercatorタイル用の設定
-                const centerLon = (bounds[0] + bounds[2]) / 2;
-                const centerLat = (bounds[1] + bounds[3]) / 2;
-                
-                // ズームレベルに基づいてスケールを計算
-                const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);
-                
-                projection
-                    .scale(scale)
-                    .center([centerLon, centerLat])
-                    .translate([width / 2, height / 2]);
-            } else {
-                // 他の投影法の場合は既存のfitExtentを使用
-                const boundsGeoJSON = {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [bounds[0], bounds[1]], [bounds[2], bounds[1]],
-                        [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
-                    ]]
-                };
-                projection.fitExtent([[10, 10], [width - 10, height - 10]], boundsGeoJSON);
-            }
+            const centerLon = (bounds[0] + bounds[2]) / 2;
+            const centerLat = (bounds[1] + bounds[3]) / 2;
+            
+            // ズームレベルに基づいてスケールを計算
+            const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);                
+            projection
+                .scale(scale)
+                .center([centerLon, centerLat])
+                .translate([width / 2, height / 2]);
+
 
             // 地図を作成
             map = new Thematika.Map({
@@ -296,6 +292,22 @@ map.addLayer('outline', outlineLayer);</pre>
                 height: height,
                 projection: projection
             });
+
+
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
+            const japanCityLayer = new Thematika.GeojsonLayer({
+                data: city_geojson,                
+                attr: { 
+                    "fill": "none",
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
+                },
+            });
+            map.addLayer('city', japanCityLayer);
+
+
+            
 
             // 各タイルをImageLayerとして追加
             tiles.forEach((tile, index) => {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Point Text Layer - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -212,6 +212,10 @@ map.addLayer('cityLabels', textLayer);</pre>
             }, 2000);
         }
 
+        // カラーパレットの設定
+        const color = Thematika.AllPalettes.TailwindVivid.colors
+
+
         let map = null;
         let textLayer = null;
         let fontSize = 16;
@@ -231,55 +235,18 @@ map.addLayer('cityLabels', textLayer);</pre>
                 const width = mapElement.clientWidth;
                 const height = mapElement.clientHeight;
 
-                // サンプル都市データ
-                const cityData = {
-                    type: "FeatureCollection",
-                    features: [
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [139.6917, 35.6895] },
-                            properties: { text: "東京", name: "Tokyo", population: 13960000, country: "Japan" }
-                        },
-                        {
-                            type: "Feature", 
-                            geometry: { type: "Point", coordinates: [135.5023, 34.6937] },
-                            properties: { text: "大阪", name: "Osaka", population: 2691000, country: "Japan" }
-                        },
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [-74.0060, 40.7128] },
-                            properties: { text: "ニューヨーク", name: "New York", population: 8336000, country: "USA" }
-                        },
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [-0.1276, 51.5074] },
-                            properties: { text: "ロンドン", name: "London", population: 8982000, country: "UK" }
-                        },
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [2.3522, 48.8566] },
-                            properties: { text: "パリ", name: "Paris", population: 2161000, country: "France" }
-                        },
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [116.4074, 39.9042] },
-                            properties: { text: "北京", name: "Beijing", population: 21540000, country: "China" }
-                        },
-                        {
-                            type: "Feature",
-                            geometry: { type: "Point", coordinates: [151.2093, -33.8688] },
-                            properties: { text: "シドニー", name: "Sydney", population: 5312000, country: "Australia" }
-                        }
-                    ]
-                };
 
                 // 世界地図データを読み込み（ローカルのGeoJSONを使用）
-                const geojson = await d3.json('./geojson/world.geojson');
+                const world = await d3.json('./geojson/world.geojson');
+                let geojson = JSON.parse(JSON.stringify(world)); // 深いコピーを作成
+
+                const countrys = ["アメリカ合衆国", "日本", "中国", "ロシア", "フランス", "ブラジル", "イギリス", "ガーナ", "南アフリカ共和国", "カナダ", "インド", "オーストラリア"];
+                geojson.features = world.features.filter(f => countrys.includes(f.properties.NAME_JA))
 
 
                 // 投影法を設定
-                const projection = d3.geoNaturalEarth1()
-                    .scale(150)
+                const projection = d3.geoInterruptedMollweideHemispheres()
+                    .scale(200)
                     .translate([width / 2, height / 2]);
 
                 // 地図を作成
@@ -287,11 +254,21 @@ map.addLayer('cityLabels', textLayer);</pre>
                     container: '#map',
                     width: width,
                     height: height,
-                    projection: projection
+                    projection: projection,
+                    backgroundColor: '#0f172a'
                 });
 
-                
-
+                // 背景の世界地図レイヤー
+                const worldLayer = new Thematika.GeojsonLayer({
+                    data: world,
+                    attr: {
+                        "fill": '#333',
+                        "stroke": '#fff',
+                        "stroke-width": 0.5,
+                        "opacity": 0.8
+                    }
+                });
+        
                 // 経緯線レイヤー
                 const graticuleLayer = new Thematika.GraticuleLayer({
                     step: [30, 30],
@@ -328,8 +305,8 @@ map.addLayer('cityLabels', textLayer);</pre>
                     "text-anchor": textAnchor,
                     alignmentBaseline: 'middle',
                     attr: {
-                        "fill": '#ff0000',
-                        "stroke": '#000000',
+                        "fill": (d,i) => color[i%3], // 色をインデックスで循環
+                        "stroke": (d,i) => color[i%3],
                         "stroke-width": 1
                     }
                 });
@@ -337,6 +314,7 @@ map.addLayer('cityLabels', textLayer);</pre>
                 // レイヤーを地図に追加
                 map.addLayer('graticule', graticuleLayer);
                 map.addLayer('outline', outlineLayer);
+                map.addLayer('world', worldLayer);
                 map.addLayer('cityLabels', textLayer);
 
             } catch (error) {
@@ -385,72 +363,14 @@ map.addLayer('cityLabels', textLayer);</pre>
             fontWeight = this.value;
             draw();
         });
-
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            map.saveSVG("map.svg");
         });
         
         // PNGダウンロード機能
         document.getElementById('download-png').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            // SVGのサイズを取得
-            const svgRect = mapElement.getBoundingClientRect();
-            canvas.width = svgRect.width;
-            canvas.height = svgRect.height;
-            
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            };
-            
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            img.src = url;
-        });
-        
-        // リサイズイベントのハンドリング
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                draw();
-            }, 250);
+            map.savePNG("map.png")
         });
 
     </script>

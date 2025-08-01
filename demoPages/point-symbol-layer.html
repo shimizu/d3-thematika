@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Symbol Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Symbol Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Symbol Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>🔸 PointSymbolLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: PointSymbolLayer（d3.symbol使用）、GraticuleLayer（経緯線）</li>
+                    <li>機能: シンボルタイプ切り替え、サイズ調整、固定値/関数パターン</li>
+                    <li>対応: ポイント・ポリゴン・ラインの中心点にシンボル配置</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="symbol-type">シンボルタイプ</label>
+                    <select id="symbol-type">
+                        <option value="cross" selected>Cross（十字）</option>
+                        <option value="circle">Circle（円）</option>
+                        <option value="diamond">Diamond（ダイヤモンド）</option>
+                        <option value="square">Square（正方形）</option>
+                        <option value="star">Star（星）</option>
+                        <option value="triangle">Triangle（三角形）</option>
+                        <option value="wye">Wye（Y字）</option>
+                        <option value="alternate">Alternate（交互パターン）</option>
+                    </select>
+                </div>
+                
+                <div class="control-item">
+                    <label>サイズ</label>
+                    <div class="slider-control">
+                        <input type="range" id="size-slider" min="16" max="256" step="16" value="64">
+                        <span class="value-display" id="size-value">64</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="fill-color">塗りつぶし色</label>
+                    <input type="color" id="fill-color" value="#ff6b6b" class="color-picker">
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointSymbolLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointSymbolLayerの使用例
+
+const geojson = await d3.json("./geojson/world.geojson");
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: d3.geoNaturalEarth1()
+});
+
+// PointSymbolLayerインスタンスを作成
+const symbolLayer = new Thematika.PointSymbolLayer({
+    data: geojson,
+    size: 64, // 固定サイズ
+    symbolType: d3.symbolCross, // デフォルトのCross
+    attr: {
+        "fill": '#ff6b6b',
+        "stroke": '#d63031',
+        "stroke-width": 1,
+        "opacity": 0.8
+    }
+});
+
+// または関数を使った動的設定
+const dynamicSymbolLayer = new Thematika.PointSymbolLayer({
+    data: geojson,
+    size: (feature, index) => {
+        // 人口に基づいてサイズを決定
+        const population = feature.properties?.POP_EST || 0;
+        return Math.min(Math.sqrt(population / 1000000) * 32 + 16, 256);
+    },
+    symbolType: (feature, index) => {
+        // 交互にシンボルを切り替え
+        return index % 2 === 0 ? d3.symbolCircle : d3.symbolDiamond;
+    },
+    attr: {
+        "fill": (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
+        "stroke": '#2d3436',
+        "stroke-width": 0.5
+    }
+});
+
+// レイヤーを地図に追加
+map.addLayer('symbols', symbolLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('world', worldLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+    <script src="./js/common.js"></script>
+
+    <script>
+        // 共通機能の初期化
+        initializeCommonFeatures();
+
+        let map = null;
+        let symbolLayer = null;
+        let worldData = null;
+        let symbolType = 'cross';
+        let baseSize = 64;
+        let fillColor = '#ff6b6b';
+        
+        async function draw() {
+            try {
+                // 既存の地図を削除
+                d3.select('#map').selectAll('*').remove();
+
+                // 地図の寸法を取得
+                const mapElement = document.querySelector('#map');
+                const width = mapElement.clientWidth;
+                const height = mapElement.clientHeight;
+
+                // 世界地図データを読み込み（初回のみ）
+                if (!worldData) {
+                    worldData = await d3.json('./geojson/world.geojson');
+                }
+
+                // 投影法を設定
+                const projection = d3.geoNaturalEarth1()
+                    .fitExtent([[10, 10], [width-10, height-10]], worldData);
+
+                // 地図を作成
+                map = new Thematika.Map({
+                    container: '#map',
+                    width: width,
+                    height: height,
+                    projection: projection
+                });
+
+                // 経緯線レイヤー
+                const graticuleLayer = new Thematika.GraticuleLayer({
+                    step: [20, 20],
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#ddd',
+                        "stroke-width": 0.5,
+                        "opacity": 0.6
+                    }
+                });
+
+                // シンボルタイプの設定
+                let symbolTypeFunction;
+                switch (symbolType) {
+                    case 'cross':
+                        symbolTypeFunction = d3.symbolCross;
+                        break;
+                    case 'circle':
+                        symbolTypeFunction = d3.symbolCircle;
+                        break;
+                    case 'diamond':
+                        symbolTypeFunction = d3.symbolDiamond;
+                        break;
+                    case 'square':
+                        symbolTypeFunction = d3.symbolSquare;
+                        break;
+                    case 'star':
+                        symbolTypeFunction = d3.symbolStar;
+                        break;
+                    case 'triangle':
+                        symbolTypeFunction = d3.symbolTriangle;
+                        break;
+                    case 'wye':
+                        symbolTypeFunction = d3.symbolWye;
+                        break;
+                    case 'alternate':
+                        symbolTypeFunction = (feature, index) => {
+                            const symbols = [d3.symbolCircle, d3.symbolSquare, d3.symbolTriangle, d3.symbolDiamond];
+                            return symbols[index % symbols.length];
+                        };
+                        break;
+                    default:
+                        symbolTypeFunction = d3.symbolCross;
+                }
+
+                // PointSymbolLayerを作成
+                symbolLayer = new Thematika.PointSymbolLayer({
+                    data: worldData,
+                    size: baseSize,
+                    symbolType: symbolTypeFunction,
+                    attr: {
+                        "fill": fillColor,
+                        "stroke": '#2d3436',
+                        "stroke-width": 1,
+                        "opacity": 0.8
+                    }
+                });
+
+                // レイヤーを地図に追加
+                map.addLayer('graticule', graticuleLayer);
+                map.addLayer('symbols', symbolLayer);
+
+            } catch (error) {
+                console.error('デモの初期化に失敗しました:', error);
+            }
+        }
+
+        // シンボルタイプの変更
+        document.getElementById('symbol-type').addEventListener('change', function() {
+            symbolType = this.value;
+            draw();
+        });
+        
+        // サイズスライダーの変更
+        document.getElementById('size-slider').addEventListener('input', function() {
+            baseSize = parseInt(this.value);
+            document.getElementById('size-value').textContent = this.value;
+            draw();
+        });
+        
+        // 色の変更
+        document.getElementById('fill-color').addEventListener('change', function() {
+            fillColor = this.value;
+            draw();
+        });
+
+        // コードコピー機能
+        function copyCode() {
+            const codeElement = document.getElementById('sample-code');
+            const textArea = document.createElement('textarea');
+            textArea.value = codeElement.textContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            // フィードバック
+            const button = document.querySelector('.copy-button');
+            const originalText = button.textContent;
+            button.textContent = 'コピーしました！';
+            button.style.background = '#10b981';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+            }, 2000);
+        }
+
+        // 初期描画
+        draw();
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
+
+    </script>
+</body>
+</html>

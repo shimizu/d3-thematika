@@ -242,6 +242,11 @@ map.addLayer('line-texts', textLayer);</pre>
                 button.style.background = '';
             }, 2000);
         }
+        
+        let map; // 地図インスタンスをグローバルに定義
+
+        // カラーパレットの設定
+        const color = Thematika.AllPalettes.TailwindVivid.colors
 
         // プロジェクション
         let currentProjection = d3.geoNaturalEarth1();
@@ -260,7 +265,7 @@ map.addLayer('line-texts', textLayer);</pre>
             currentProjection.fitExtent([[10, 10], [width-10, height-10]], geojson);
             
             // 地図を作成
-            const map = new Thematika.Map({
+            map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
@@ -325,11 +330,14 @@ map.addLayer('line-texts', textLayer);</pre>
                 arrowSize: 8,
                 attr: {
                     "stroke": (d, i) => {
-                        return i % 2 === 0 ? "#ff6b6b" : "#45b7d1"; // 偶数インデックスは赤、奇数インデックスは青
+                        return color[i]
                     },
-                    "stroke-width": 2,
-                    "opacity": 0.7,
-                    "stroke-dasharray": '5,3'
+                    "stroke-width": 3,
+                    "opacity": 0.9,
+                    "stroke-dasharray": (d,i) =>  {
+                        const sd = ['none', '5,3', '2,2'];
+                        return sd[i]
+                    }
                 }
             };
             
@@ -352,7 +360,7 @@ map.addLayer('line-texts', textLayer);</pre>
                     lineType: lineType,
                     startOffset: '50%',
                     textAnchor: 'middle',
-                    fontSize: 18,
+                    fontSize: 20,
                     fontWeight: 'bold',
                     fontFamily: 'メイリオ, Arial, sans-serif',
                     followPath: followPath,
@@ -360,9 +368,9 @@ map.addLayer('line-texts', textLayer);</pre>
                     dx: dxOffset,
                     dy: dyOffset,
                     attr: {
-                        "fill": (d, i) => {
-                            return i % 2 === 0 ? "#2c3e50" : "#1a237e"; // 偶数インデックスは濃いグレー、奇数インデックスは紺色
-                        },
+                    "fill": (d, i) => {
+                        return color[i]
+                    },
                     }
                 };
                 
@@ -387,16 +395,6 @@ map.addLayer('line-texts', textLayer);</pre>
                 map.addLayer('line-texts', textLayer);
             }
             
-            // イベントリスナーを追加
-            guideLineLayer.on('click', (event, data) => {
-                console.log('Guide Line clicked:', data);
-            });
-            
-            if (textLayer) {
-                textLayer.on('mouseover', (event, data) => {
-                    console.log('Text hover:', data);
-                });
-            }
     
         }
         
@@ -504,66 +502,20 @@ map.addLayer('line-texts', textLayer);</pre>
             textOffsetGroup.style.display = 'block';
         }
         
+
+        // 初回描画
+        draw();
+
+
         // SVGダウンロード機能
         document.getElementById('download-svg').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'map.svg';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            map.saveSVG("map.svg");
         });
         
         // PNGダウンロード機能
         document.getElementById('download-png').addEventListener('click', () => {
-            const mapElement = document.querySelector('#map svg');
-            if (!mapElement) {
-                alert('地図が表示されていません');
-                return;
-            }
-            
-            const svgData = new XMLSerializer().serializeToString(mapElement);
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const img = new Image();
-            
-            // SVGのサイズを取得
-            const svgRect = mapElement.getBoundingClientRect();
-            canvas.width = svgRect.width;
-            canvas.height = svgRect.height;
-            
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0);
-                canvas.toBlob((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'map.png';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
-            };
-            
-            const blob = new Blob([svgData], { type: 'image/svg+xml' });
-            const url = URL.createObjectURL(blob);
-            img.src = url;
-        });
-        
-        // 初回描画
-        draw();
+            map.savePNG("map.png")
+        });        
     </script>
 </body>
 </html>
