@@ -113,3 +113,25 @@ function initializeCommonFeatures() {
 
 // 自動初期化（オプション）
 // initializeCommonFeatures();
+
+// コードコピー機能
+function copyCode() {
+    const codeElement = document.getElementById('sample-code');
+    const textArea = document.createElement('textarea');
+    textArea.value = codeElement.textContent;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    
+    // フィードバック
+    const button = document.querySelector('.copy-button');
+    const originalText = button.textContent;
+    button.textContent = 'コピーしました！';
+    button.style.background = '#10b981';
+    
+    setTimeout(() => {
+        button.textContent = originalText;
+        button.style.background = '';
+    }, 2000);
+}
