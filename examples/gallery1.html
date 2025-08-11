@@ -72,6 +72,143 @@
                 <div id="map"></div>
             </div>
         </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>GeojsonLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// 世界地図データを読み込み（ローカルのGeoJSONを使用）
+const geojson = await d3.json('./geojson/world_land.geojson');
+
+// 投影法を地図データに合わせて設定
+const projection = d3.geoInterruptedMollweideHemispheres()
+    .scale(180)
+    .translate([width / 2, height / 2]);
+
+// 地図を作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection,
+    backgroundColor: '#acc3b3',
+});
+
+// カスタムエフェクトを定義
+const svg = d3.select("#map svg");
+const defs = svg.append("defs");
+
+// 地球の光源効果
+const globeLight = defs.append("radialGradient")
+    .attr("id", "globeLight")
+    .attr("cx", "30%")
+    .attr("cy", "30%")
+    .attr("r", "70%");
+
+globeLight.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "#ffffff")
+    .attr("stop-opacity", "0.8");
+
+globeLight.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#aaaaaa")
+    .attr("stop-opacity", "1");
+
+
+
+// ラインの光彩効果
+const lineGlow = defs.append("filter")
+    .attr("id", "lineglow");
+
+lineGlow.append("feColorMatrix")
+    .attr("in", "SourceGraphic")
+    .attr("type", "matrix")
+    .attr("values", "0 0 0 0 0   0 0 0 0 0   0 0 0 0 0   0 0 0 500 0")
+    .attr("result", "mask");
+
+lineGlow.append("feMorphology")
+    .attr("in", "mask")
+    .attr("radius", "1")
+    .attr("operator", "erode")
+    .attr("result", "r1");
+
+lineGlow.append("feGaussianBlur")
+    .attr("in", "r1")
+    .attr("stdDeviation", "4")
+    .attr("result", "r2");
+
+lineGlow.append("feColorMatrix")
+    .attr("in", "r2")
+    .attr("type", "matrix")
+    .attr("values", "1 0 0 0 0.5803921568627451 0 1 0 0 0.3607843137254902 0 0 1 0 0.10588235294117647 0 0 0 -1 1")
+    .attr("result", "r3");
+
+lineGlow.append("feComposite")
+    .attr("operator", "in")
+    .attr("in", "r3")
+    .attr("in2", "mask")
+    .attr("result", "comp");
+
+const glowMerge = lineGlow.append("feMerge");
+glowMerge.append("feMergeNode").attr("in", "SourceGraphic");
+glowMerge.append("feMergeNode").attr("in", "comp");
+
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,                
+    attr: { 
+        "fill": '#fffafa', 
+        "filter": 'url(#lineglow)',
+        "stroke": '#1a3d1f',
+        "stroke-width": 0.8,
+        "opacity": 0.9,
+    }
+});
+
+
+// OutlineLayerインスタンスを作成（クリップパス機能付き）
+const outlineLayer = new Thematika.OutlineLayer({
+    createClipPath: true,
+    clipPathId: 'earth-outline-clip',
+    attr: {
+        "fill": 'url(#globeLight)',
+        "stroke": '#ffaea0',
+        "stroke-width": 4,
+        "opacity": 1
+    },
+    style: {
+        "mix-blend-mode": "multiply",
+    }
+});
+
+// GraticuleLayerインスタンスを作成
+const graticuleLayer = new Thematika.GraticuleLayer({
+    step: [10, 10], // 10度間隔
+    attr: {
+        "fill": 'none',
+        "stroke": '#000',
+        "stroke-width": 0.5,
+        "stroke-dasharray": '1,2',
+        "opacity": 0.6
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('world_new', worldLayer);
+map.addLayer('outline', outlineLayer);
+
+                </pre>
+            </div>
+        </section>
+
+
     </div>
 
     <!-- UMD版のライブラリを使用 -->
@@ -88,16 +225,11 @@
             }
         });
 
-        // グローバル変数
-        let map;
         
         async function draw() {
             const container = document.querySelector("#map");
             const width = container.clientWidth;
             const height = container.clientHeight;
-
-            // 既存のSVGをクリア
-            d3.select("#map").selectAll("*").remove();
 
             // 世界地図データを読み込み（ローカルのGeoJSONを使用）
             const geojson = await d3.json('./geojson/world_land.geojson');
@@ -108,7 +240,7 @@
                 .translate([width / 2, height / 2]);
 
             // 地図を作成
-            map = new Thematika.Map({
+            const map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
@@ -188,8 +320,6 @@
                 }
             });
 
-
-            console.log(worldLayer)
 
             // OutlineLayerインスタンスを作成（クリップパス機能付き）
             const outlineLayer = new Thematika.OutlineLayer({

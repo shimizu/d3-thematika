@@ -1,7 +1,7 @@
 import {
   AllPalettes,
   ColorBrewerPalettes,
-  ViridissPalettes,
+  ViridisPalettes,
   CARTOPalettes,
   recommendPalette,
   generateOptimizedPalette,
@@ -20,11 +20,11 @@ describe('color-palette', () => {
     });
 
     test('Viridis パレットが正しく定義されている', () => {
-      expect(ViridissPalettes.Viridis).toBeDefined();
-      expect(ViridissPalettes.Viridis.name).toBe('Viridis');
-      expect(ViridissPalettes.Viridis.type).toBe('sequential');
-      expect(ViridissPalettes.Viridis.colorBlindSafe).toBe(true);
-      expect(ViridissPalettes.Viridis.colors.length).toBeGreaterThan(0);
+      expect(ViridisPalettes.Viridis).toBeDefined();
+      expect(ViridisPalettes.Viridis.name).toBe('Viridis');
+      expect(ViridisPalettes.Viridis.type).toBe('sequential');
+      expect(ViridisPalettes.Viridis.colorBlindSafe).toBe(true);
+      expect(ViridisPalettes.Viridis.colors.length).toBeGreaterThan(0);
     });
 
     test('CARTO パレットが正しく定義されている', () => {
@@ -38,7 +38,7 @@ describe('color-palette', () => {
     test('AllPalettes に全パレットが含まれている', () => {
       expect(Object.keys(AllPalettes).length).toBeGreaterThan(10);
       expect(AllPalettes.Set2).toBe(ColorBrewerPalettes.Set2);
-      expect(AllPalettes.Viridis).toBe(ViridissPalettes.Viridis);
+      expect(AllPalettes.Viridis).toBe(ViridisPalettes.Viridis);
       expect(AllPalettes.Safe).toBe(CARTOPalettes.Safe);
     });
   });

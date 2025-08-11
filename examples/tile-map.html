@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tile Map - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -85,7 +84,7 @@
                 <div class="control-item">
                     <label>ズームレベル</label>
                     <div class="slider-control">
-                        <input type="range" id="zoom-select" min="5" max="15" value="10">
+                        <input type="range" id="zoom-select" min="1" max="15" value="10">
                         <span class="value-display" id="zoom-value">10</span>
                     </div>
                 </div>
@@ -93,9 +92,10 @@
                 <div class="control-item">
                     <label for="projection-select">投影法</label>
                     <select id="projection-select">
-                        <option value="mercator" selected>Mercator</option>
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
                         <option value="naturalEarth1">Natural Earth</option>
-                        <option value="equirectangular">Equirectangular</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
                     </select>
                 </div>
 
@@ -223,6 +223,10 @@ tiles.forEach((tile, index) => {
                     return d3.geoNaturalEarth1();
                 case 'equirectangular':
                     return d3.geoEquirectangular();
+                case 'azimuthalEqualArea':
+                    return d3.geoAzimuthalEqualArea();
+                    break;
+
                 default:
                     return d3.geoMercator();
             }
@@ -267,20 +271,25 @@ tiles.forEach((tile, index) => {
                 clampToBounds: true
             });
 
+
             // タイル情報を更新
             updateTileInfo(tiles, bounds, currentZoom);
 
             // 投影法を設定
             const projection = getProjection(currentProjectionType);
+
             
             // タイル表示用に適切なスケールを設定
             const centerLon = (bounds[0] + bounds[2]) / 2;
             const centerLat = (bounds[1] + bounds[3]) / 2;
             
             // ズームレベルに基づいてスケールを計算
-            const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);                
+            const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);        
+           
+            projection.scale(scale)
+
+
             projection
-                .scale(scale)
                 .center([centerLon, centerLat])
                 .translate([width / 2, height / 2]);
 
@@ -311,11 +320,13 @@ tiles.forEach((tile, index) => {
 
             // 各タイルをImageLayerとして追加
             tiles.forEach((tile, index) => {
+                /*
                 console.log(`=== Tile ${index} ===`);
                 console.log('Tile data:', tile);
                 console.log('Tile URL:', tile.url);
                 console.log('Tile bounds:', tile.bounds.bounds);
                 console.log('Current projection:', currentProjectionType);
+                */
                 
                 const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
                     src: tile.url,

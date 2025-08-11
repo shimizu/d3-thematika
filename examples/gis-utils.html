@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -149,27 +151,7 @@ const isValid = Thematika.isValidGeoJSON(japan);
             }
         });
 
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
+    
 
         let worldData = null;
         let map = null;
@@ -189,6 +171,8 @@ const isValid = Thematika.isValidGeoJSON(japan);
                 const projection = d3.geoNaturalEarth1()
                     .fitExtent([[10, 10], [width-10, height-10]], worldData);
                 
+                projection.rotate([250,0,0])
+
                 // 地図を作成
                 map = new Thematika.Map({
                     container: '#map',

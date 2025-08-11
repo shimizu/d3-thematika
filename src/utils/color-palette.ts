@@ -111,7 +111,11 @@ export const ColorBrewerPalettes: Record<string, ColorPalette> = {
  * Viridis パレット
  * 知覚的に均一で色覚障害に配慮したパレット
  */
-export const ViridissPalettes: Record<string, ColorPalette> = {
+// Viridisパレット集
+// NOTE: The variable name was misspelled as `ViridissPalettes` which could
+// lead to confusion for library consumers.  Correct the name to
+// `ViridisPalettes` so it matches the actual palette name.
+export const ViridisPalettes: Record<string, ColorPalette> = {
   Viridis: {
     name: 'Viridis',
     type: 'sequential',
@@ -270,7 +274,7 @@ export const TailwindPalettes: Record<string, ColorPalette> = {
  */
 export const AllPalettes: Record<string, ColorPalette> = {
   ...ColorBrewerPalettes,
-  ...ViridissPalettes,
+  ...ViridisPalettes,
   ...CARTOPalettes,
   ...TailwindPalettes
 };
