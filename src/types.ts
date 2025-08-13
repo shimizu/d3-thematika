@@ -15,7 +15,7 @@ export interface ThematikaOptions {
   projection: GeoProjection;
   /** SVG定義（テクスチャやパターン、フィルターなど）- コールバック関数の配列 */
   defs?: any[];
-  /** 背景色 **/
+  /** 背景色 */
   backgroundColor?: string;
 
 }
