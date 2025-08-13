@@ -80,8 +80,8 @@ const map = new Map({
 // GeojsonLayerインスタンスを作成
 const worldLayer = new GeojsonLayer({
     data: geojson,
-    style: { 
-        fill: '#f8f9fa', 
+    attr: {
+        fill: '#f8f9fa',
         stroke: '#1a3d1f',
         strokeWidth: 0.8,
         opacity: 0.9,
