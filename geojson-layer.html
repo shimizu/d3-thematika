@@ -137,7 +137,7 @@ map.addLayer('world', worldLayer);</pre>
 
         // カテゴリカルデータ用のパレット推奨
         const recommendations = Thematika.recommendPalette('categorical', 8, true);
-        const bestPalette = recommendations[2].palette;
+        const bestPalette = recommendations[1].palette;
         // 指定クラス数に最適化
         const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
 
@@ -167,7 +167,7 @@ map.addLayer('world', worldLayer);</pre>
                 width: width,
                 height: height,
                 projection: currentProjection,
-                backgroundColor: '#0f172a'
+                backgroundColor: '#ddd'
             });
 
             
@@ -175,9 +175,7 @@ map.addLayer('world', worldLayer);</pre>
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill": (d, i) => i%2 === 0 ?  optimizedColors[6] : optimizedColors[5], // ダーク系の2色
-
-                    "filter": "url(#drop-shadow)",
+                    "fill": (d, i) => optimizedColors[i%7], // ダーク系の2色
                     "stroke": '#1e293b', // ダーク系のストローク
                     "stroke-width": 0.3,
                     "opacity": 0.85,
@@ -191,7 +189,7 @@ map.addLayer('world', worldLayer);</pre>
                 clipPathId: 'earth-outline-clip',
                 attr: {
                     "fill": 'none',
-                    "stroke": '#475569', // より落ち着いたダークグレー
+                    "stroke": 'none', // より落ち着いたダークグレー
                     "stroke-width": 2,
                     "opacity": 0.7
                 }
