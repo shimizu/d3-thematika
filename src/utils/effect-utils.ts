@@ -515,11 +515,11 @@ export const FilterPresets = {
   standardDropShadow: () =>
     createDropShadow({
       id: 'standardDropShadow',
-      dx: 3,
-      dy: 3,
+      dx: 2,
+      dy: 2,
       stdDeviation: 2,
       floodColor: '#000000',
-      floodOpacity: 0.3
+      floodOpacity: 0.8
     }),
 
   softDropShadow: () =>

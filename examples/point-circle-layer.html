@@ -193,7 +193,7 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                     width: width,
                     height: height,
                     projection: projection,
-                    backgroundColor: '#0f172a'
+                    backgroundColor: '#ddd'
                 });
 
                 // 背景の世界地図レイヤー
@@ -208,16 +208,28 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                 });         
 
 
+
                 // 経緯線レイヤー
                 const graticuleLayer = new Thematika.GraticuleLayer({
                     step: [20, 20],
                     attr: {
                         "fill": 'none',
-                        "stroke": '#ddd',
+                        "stroke": '#333',
                         "stroke-width": 0.5,
                         "opacity": 0.6
                     }
                 });
+
+                // OutlineLayerインスタンスを作成
+                const outlineLayer = new Thematika.OutlineLayer({
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
 
                 // 半径の設定
                 let radiusFunction;
@@ -257,6 +269,7 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                 map.addLayer('graticule', graticuleLayer);
                 map.addLayer('worldLayer', worldLayer);
                 map.addLayer('circles', circleLayer);
+                map.addLayer('outlineLayer', outlineLayer);
 
             } catch (error) {
                 console.error('デモの初期化に失敗しました:', error);
