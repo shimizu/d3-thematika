@@ -207,6 +207,7 @@ map.addLayer("anotationLayer", annotationLayer)</pre>
         });
 
 
+        let map;
 
         async function draw() {
 
@@ -233,7 +234,7 @@ map.addLayer("anotationLayer", annotationLayer)</pre>
             const grayscale = Thematika.FilterPresets.grayscale()
 
             // 地図を作成
-            const map = new Thematika.Map({
+            map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,

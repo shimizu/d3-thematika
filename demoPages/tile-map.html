@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tile Map - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -85,7 +84,7 @@
                 <div class="control-item">
                     <label>ズームレベル</label>
                     <div class="slider-control">
-                        <input type="range" id="zoom-select" min="5" max="15" value="10">
+                        <input type="range" id="zoom-select" min="1" max="15" value="10">
                         <span class="value-display" id="zoom-value">10</span>
                     </div>
                 </div>
@@ -93,9 +92,10 @@
                 <div class="control-item">
                     <label for="projection-select">投影法</label>
                     <select id="projection-select">
-                        <option value="mercator" selected>Mercator</option>
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
                         <option value="naturalEarth1">Natural Earth</option>
-                        <option value="equirectangular">Equirectangular</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
                     </select>
                 </div>
 
@@ -154,18 +154,27 @@ const tiles = Thematika.generateTileUrls(bounds, zoom, {
     urlTemplate: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
 });
 
+// 投影法を設定
+const projection = d3.geoMercator();
+
+// タイル表示用に適切なスケールを設定
+const centerLon = (bounds[0] + bounds[2]) / 2;
+const centerLat = (bounds[1] + bounds[3]) / 2;
+
+// ズームレベルに基づいてスケールを計算
+const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);                
+projection
+    .scale(scale)
+    .center([centerLon, centerLat])
+    .translate([width / 2, height / 2]);
+
+
 // 地図の作成
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 600,
-    projection: d3.geoMercator().fitExtent([[10, 10], [790, 590]], {
-        type: 'Polygon',
-        coordinates: [[
-            [bounds[0], bounds[1]], [bounds[2], bounds[1]],
-            [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
-        ]]
-    })
+    projection:projection
 });
 
 // 各タイルをImageLayerとして追加
@@ -178,11 +187,7 @@ tiles.forEach((tile, index) => {
     map.addLayer(`tile-${index}`, imageLayer);
 });
 
-// アウトライン追加
-const outlineLayer = new Thematika.OutlineLayer({
-    attr: { stroke: '#333', 'stroke-width': 2, fill: 'none' }
-});
-map.addLayer('outline', outlineLayer);</pre>
+</pre>
             </div>
         </section>
     </div>
@@ -218,6 +223,10 @@ map.addLayer('outline', outlineLayer);</pre>
                     return d3.geoNaturalEarth1();
                 case 'equirectangular':
                     return d3.geoEquirectangular();
+                case 'azimuthalEqualArea':
+                    return d3.geoAzimuthalEqualArea();
+                    break;
+
                 default:
                     return d3.geoMercator();
             }
@@ -243,6 +252,10 @@ map.addLayer('outline', outlineLayer);</pre>
         async function draw() {
             const id = "#map";
 
+            // 世界地図データを読み込み
+            const city_geojson = await d3.json('./geojson/japan/city.geojson');
+
+
             // 既存の地図を削除
             d3.select(id).selectAll('*').remove();
 
@@ -258,36 +271,28 @@ map.addLayer('outline', outlineLayer);</pre>
                 clampToBounds: true
             });
 
+
             // タイル情報を更新
             updateTileInfo(tiles, bounds, currentZoom);
 
             // 投影法を設定
             const projection = getProjection(currentProjectionType);
+
             
             // タイル表示用に適切なスケールを設定
-            if (currentProjectionType === 'mercator') {
-                // Web Mercatorタイル用の設定
-                const centerLon = (bounds[0] + bounds[2]) / 2;
-                const centerLat = (bounds[1] + bounds[3]) / 2;
-                
-                // ズームレベルに基づいてスケールを計算
-                const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);
-                
-                projection
-                    .scale(scale)
-                    .center([centerLon, centerLat])
-                    .translate([width / 2, height / 2]);
-            } else {
-                // 他の投影法の場合は既存のfitExtentを使用
-                const boundsGeoJSON = {
-                    type: 'Polygon',
-                    coordinates: [[
-                        [bounds[0], bounds[1]], [bounds[2], bounds[1]],
-                        [bounds[2], bounds[3]], [bounds[0], bounds[3]], [bounds[0], bounds[1]]
-                    ]]
-                };
-                projection.fitExtent([[10, 10], [width - 10, height - 10]], boundsGeoJSON);
-            }
+            const centerLon = (bounds[0] + bounds[2]) / 2;
+            const centerLat = (bounds[1] + bounds[3]) / 2;
+            
+            // ズームレベルに基づいてスケールを計算
+            const scale = 256 * Math.pow(2, currentZoom) / (2 * Math.PI);        
+           
+            projection.scale(scale)
+
+
+            projection
+                .center([centerLon, centerLat])
+                .translate([width / 2, height / 2]);
+
 
             // 地図を作成
             map = new Thematika.Map({
@@ -297,13 +302,31 @@ map.addLayer('outline', outlineLayer);</pre>
                 projection: projection
             });
 
+
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
+            const japanCityLayer = new Thematika.GeojsonLayer({
+                data: city_geojson,                
+                attr: { 
+                    "fill": "none",
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
+                },
+            });
+            map.addLayer('city', japanCityLayer);
+
+
+            
+
             // 各タイルをImageLayerとして追加
             tiles.forEach((tile, index) => {
+                /*
                 console.log(`=== Tile ${index} ===`);
                 console.log('Tile data:', tile);
                 console.log('Tile URL:', tile.url);
                 console.log('Tile bounds:', tile.bounds.bounds);
                 console.log('Current projection:', currentProjectionType);
+                */
                 
                 const imageLayer = new Thematika.ImageLayer(`tile-${index}`, {
                     src: tile.url,
