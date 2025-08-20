@@ -90,12 +90,17 @@ export class ImageLayer extends BaseLayer {
     
     this.element = g.node() as SVGGElement;
 
+
+
     try {
       const img = await this.loadImage(this.src);
+
       
       if (this.canUseDirectRendering(this.projection)) {
+        console.log("direct")
         await this.renderDirect(img);
       } else {
+        console.log("repuro")
         await this.renderReprojected(img);
       }
     } catch (error) {
@@ -146,8 +151,14 @@ export class ImageLayer extends BaseLayer {
   private renderDirect(img: HTMLImageElement): void {
     if (!this.element || !this.projection) return;
 
+
+    console.log(this.bounds)
+
+
     const [west, south, east, north] = this.bounds;
+
     
+
     // 境界の四隅を投影法で座標変換
     const topLeft = this.projection([west, north]);
     const topRight = this.projection([east, north]);
@@ -166,6 +177,8 @@ export class ImageLayer extends BaseLayer {
 
     // 画像要素を作成
     const selection = select(this.element as any) as Selection<SVGGElement, unknown, any, any>;
+
+
     this.imageElement = selection
       .append('image')
       .attr('x', projectedX)
