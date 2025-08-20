@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -186,72 +188,32 @@ map.addLayer('world', worldLayer);</pre>
             // 投影法を地図データに合わせて設定
             currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
 
+            // カテゴリカルデータ用のパレット推奨
+            const recommendations = Thematika.recommendPalette('categorical', 8, true);
+            const bestPalette = recommendations[2].palette;
+            // 指定クラス数に最適化
+            const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
+
+
             // 地図を作成
             map = new Thematika.Map({
                 container: '#map',
                 width: width,
                 height: height,
-                projection: currentProjection
+                projection: currentProjection,
+                backgroundColor: '#0f172a'
+
             });
 
             // グラデーション定義
             const svg = d3.select("#map svg");
             const defs = svg.append("defs");
             
-            // 国ごとのグラデーション
-            const gradient1 = defs.append("linearGradient")
-                .attr("id", "country-gradient-1")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", "0%").attr("y1", "0%")
-                .attr("x2", "100%").attr("y2", "100%");
-            
-            gradient1.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", "#6366f1");
-            
-            gradient1.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", "#8b5cf6");
-            
-            const gradient2 = defs.append("linearGradient")
-                .attr("id", "country-gradient-2")
-                .attr("gradientUnits", "userSpaceOnUse")
-                .attr("x1", "0%").attr("y1", "0%")
-                .attr("x2", "100%").attr("y2", "100%");
-            
-            gradient2.append("stop")
-                .attr("offset", "0%")
-                .attr("stop-color", "#ec4899");
-            
-            gradient2.append("stop")
-                .attr("offset", "100%")
-                .attr("stop-color", "#f97316");
-
-            // ドロップシャドウフィルター
-            const filter = defs.append("filter")
-                .attr("id", "drop-shadow")
-                .attr("height", "130%");
-            
-            filter.append("feGaussianBlur")
-                .attr("in", "SourceAlpha")
-                .attr("stdDeviation", 3);
-            
-            filter.append("feOffset")
-                .attr("dx", 0)
-                .attr("dy", 2)
-                .attr("result", "offsetblur");
-            
-            const feMerge = filter.append("feMerge");
-            feMerge.append("feMergeNode");
-            feMerge.append("feMergeNode")
-                .attr("in", "SourceGraphic");
-
             // GeojsonLayerインスタンスを作成
             const worldLayer = new Thematika.GeojsonLayer({
                 data: geojson,                
                 attr: { 
-                    "fill": (d, i) => i % 2 === 0 ? "url(#country-gradient-1)" : "url(#country-gradient-2)",
-                    "filter": "url(#drop-shadow)",
+                    "fill": (d, i) =>  optimizedColors[i%7],
                     "stroke": '#ffffff',
                     "stroke-width": 0.5,
                     "opacity": 0.8,
@@ -331,27 +293,6 @@ map.addLayer('world', worldLayer);</pre>
             await draw();
         });
 
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
 
         // 初期描画
         draw();

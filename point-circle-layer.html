@@ -192,8 +192,21 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                     container: '#map',
                     width: width,
                     height: height,
-                    projection: projection
+                    projection: projection,
+                    backgroundColor: '#0f172a'
                 });
+
+                // 背景の世界地図レイヤー
+                const worldLayer = new Thematika.GeojsonLayer({
+                    data: worldData,
+                    attr: {
+                        "fill": '#333',
+                        "stroke": '#fff',
+                        "stroke-width": 0.5,
+                        "opacity": 0.8
+                    }
+                });         
+
 
                 // 経緯線レイヤー
                 const graticuleLayer = new Thematika.GraticuleLayer({
@@ -242,6 +255,7 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
 
                 // レイヤーを地図に追加
                 map.addLayer('graticule', graticuleLayer);
+                map.addLayer('worldLayer', worldLayer);
                 map.addLayer('circles', circleLayer);
 
             } catch (error) {

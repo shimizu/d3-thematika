@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -54,7 +56,8 @@
                 <ul>
                     <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
                     <li>レイヤー: PointSymbolLayer（d3.symbol使用）、GraticuleLayer（経緯線）</li>
-                    <li>機能: シンボルタイプ切り替え、サイズ調整、固定値/関数パターン</li>
+                    <li>機能: インデックスベースでシンボルと色を自動割り当て、サイズ調整</li>
+                    <li>カラー: CARTO Safeパレット使用（色覚障害完全対応）</li>
                     <li>対応: ポイント・ポリゴン・ラインの中心点にシンボル配置</li>
                 </ul>
             </div>
@@ -62,30 +65,11 @@
             <!-- コントロールパネル -->
             <div class="controls-panel">
                 <div class="control-item">
-                    <label for="symbol-type">シンボルタイプ</label>
-                    <select id="symbol-type">
-                        <option value="cross" selected>Cross（十字）</option>
-                        <option value="circle">Circle（円）</option>
-                        <option value="diamond">Diamond（ダイヤモンド）</option>
-                        <option value="square">Square（正方形）</option>
-                        <option value="star">Star（星）</option>
-                        <option value="triangle">Triangle（三角形）</option>
-                        <option value="wye">Wye（Y字）</option>
-                        <option value="alternate">Alternate（交互パターン）</option>
-                    </select>
-                </div>
-                
-                <div class="control-item">
                     <label>サイズ</label>
                     <div class="slider-control">
                         <input type="range" id="size-slider" min="16" max="256" step="16" value="64">
                         <span class="value-display" id="size-value">64</span>
                     </div>
-                </div>
-                
-                <div class="control-item">
-                    <label for="fill-color">塗りつぶし色</label>
-                    <input type="color" id="fill-color" value="#ff6b6b" class="color-picker">
                 </div>
             </div>
 
@@ -111,9 +95,12 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// PointSymbolLayerの使用例
+                <pre id="sample-code">// PointSymbolLayerの使用例（インデックスベースの自動割り当て）
 
 const geojson = await d3.json("./geojson/world.geojson");
+
+// CARTO Safeパレット（色覚障害完全対応）
+const colorPalette = ['#88CCEE', '#CC6677', '#DDCC77', '#117733', '#332288', '#AA4499', '#44AA99', '#999933'];
 
 const map = new Thematika.Map({
     container: '#map',
@@ -122,20 +109,32 @@ const map = new Thematika.Map({
     projection: d3.geoNaturalEarth1()
 });
 
-// PointSymbolLayerインスタンスを作成
+// インデックスベースでシンボルと色を自動割り当て
 const symbolLayer = new Thematika.PointSymbolLayer({
     data: geojson,
     size: 64, // 固定サイズ
-    symbolType: d3.symbolCross, // デフォルトのCross
+    symbolType: (feature, index) => {
+        // インデックスに基づいて7種類のシンボルを順番に使用
+        const symbols = [
+            d3.symbolCircle,
+            d3.symbolCross,
+            d3.symbolDiamond,
+            d3.symbolSquare,
+            d3.symbolStar,
+            d3.symbolTriangle,
+            d3.symbolWye
+        ];
+        return symbols[index % symbols.length];
+    },
     attr: {
-        "fill": '#ff6b6b',
-        "stroke": '#d63031',
+        "fill": (d, i) => colorPalette[i % colorPalette.length], // インデックスで色を割り当て
+        "stroke": '#2d3436',
         "stroke-width": 1,
         "opacity": 0.8
     }
 });
 
-// または関数を使った動的設定
+// サイズも動的に設定する場合
 const dynamicSymbolLayer = new Thematika.PointSymbolLayer({
     data: geojson,
     size: (feature, index) => {
@@ -144,20 +143,20 @@ const dynamicSymbolLayer = new Thematika.PointSymbolLayer({
         return Math.min(Math.sqrt(population / 1000000) * 32 + 16, 256);
     },
     symbolType: (feature, index) => {
-        // 交互にシンボルを切り替え
-        return index % 2 === 0 ? d3.symbolCircle : d3.symbolDiamond;
+        const symbols = [d3.symbolCircle, d3.symbolCross, d3.symbolDiamond, d3.symbolSquare, d3.symbolStar, d3.symbolTriangle, d3.symbolWye];
+        return symbols[index % symbols.length];
     },
     attr: {
-        "fill": (d, i) => i % 2 === 0 ? '#74b9ff' : '#fd79a8',
+        "fill": (d, i) => colorPalette[i % colorPalette.length],
         "stroke": '#2d3436',
-        "stroke-width": 0.5
+        "stroke-width": 0.5,
+        "opacity": 0.8
     }
 });
 
 // レイヤーを地図に追加
-map.addLayer('symbols', symbolLayer);
-map.addLayer('outline', outlineLayer);
-map.addLayer('world', worldLayer);</pre>
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('symbols', symbolLayer);</pre>
             </div>
         </section>
     </div>
@@ -173,14 +172,16 @@ map.addLayer('world', worldLayer);</pre>
         let map = null;
         let symbolLayer = null;
         let worldData = null;
-        let symbolType = 'cross';
         let baseSize = 64;
-        let fillColor = '#ff6b6b';
         
+
+        // カテゴリカルデータ用のパレット推奨
+        const colorPalette = Thematika.AllPalettes.TailwindVivid.colors       
+        
+        
+
         async function draw() {
             try {
-                // 既存の地図を削除
-                d3.select('#map').selectAll('*').remove();
 
                 // 地図の寸法を取得
                 const mapElement = document.querySelector('#map');
@@ -201,8 +202,21 @@ map.addLayer('world', worldLayer);</pre>
                     container: '#map',
                     width: width,
                     height: height,
-                    projection: projection
+                    projection: projection,
+                    backgroundColor: '#0f172a'
                 });
+
+
+                // 背景の世界地図レイヤー
+                const worldLayer = new Thematika.GeojsonLayer({
+                    data: worldData,
+                    attr: {
+                        "fill": '#333',
+                        "stroke": '#fff',
+                        "stroke-width": 0.5,
+                        "opacity": 0.8
+                    }
+                });                
 
                 // 経緯線レイヤー
                 const graticuleLayer = new Thematika.GraticuleLayer({
@@ -215,39 +229,19 @@ map.addLayer('world', worldLayer);</pre>
                     }
                 });
 
-                // シンボルタイプの設定
-                let symbolTypeFunction;
-                switch (symbolType) {
-                    case 'cross':
-                        symbolTypeFunction = d3.symbolCross;
-                        break;
-                    case 'circle':
-                        symbolTypeFunction = d3.symbolCircle;
-                        break;
-                    case 'diamond':
-                        symbolTypeFunction = d3.symbolDiamond;
-                        break;
-                    case 'square':
-                        symbolTypeFunction = d3.symbolSquare;
-                        break;
-                    case 'star':
-                        symbolTypeFunction = d3.symbolStar;
-                        break;
-                    case 'triangle':
-                        symbolTypeFunction = d3.symbolTriangle;
-                        break;
-                    case 'wye':
-                        symbolTypeFunction = d3.symbolWye;
-                        break;
-                    case 'alternate':
-                        symbolTypeFunction = (feature, index) => {
-                            const symbols = [d3.symbolCircle, d3.symbolSquare, d3.symbolTriangle, d3.symbolDiamond];
-                            return symbols[index % symbols.length];
-                        };
-                        break;
-                    default:
-                        symbolTypeFunction = d3.symbolCross;
-                }
+                // インデックスベースのシンボルタイプ設定
+                const symbolTypeFunction = (feature, index) => {
+                    const symbols = [
+                        d3.symbolCircle,
+                        d3.symbolCross,
+                        d3.symbolDiamond,
+                        d3.symbolSquare,
+                        d3.symbolStar,
+                        d3.symbolTriangle,
+                        d3.symbolWye
+                    ];
+                    return symbols[index % symbols.length];
+                };
 
                 // PointSymbolLayerを作成
                 symbolLayer = new Thematika.PointSymbolLayer({
@@ -255,7 +249,7 @@ map.addLayer('world', worldLayer);</pre>
                     size: baseSize,
                     symbolType: symbolTypeFunction,
                     attr: {
-                        "fill": fillColor,
+                        "fill": (d, i) => colorPalette[i % colorPalette.length],
                         "stroke": '#2d3436',
                         "stroke-width": 1,
                         "opacity": 0.8
@@ -264,6 +258,7 @@ map.addLayer('world', worldLayer);</pre>
 
                 // レイヤーを地図に追加
                 map.addLayer('graticule', graticuleLayer);
+                map.addLayer('worldLayer', worldLayer);
                 map.addLayer('symbols', symbolLayer);
 
             } catch (error) {
@@ -271,46 +266,13 @@ map.addLayer('world', worldLayer);</pre>
             }
         }
 
-        // シンボルタイプの変更
-        document.getElementById('symbol-type').addEventListener('change', function() {
-            symbolType = this.value;
-            draw();
-        });
-        
         // サイズスライダーの変更
         document.getElementById('size-slider').addEventListener('input', function() {
             baseSize = parseInt(this.value);
             document.getElementById('size-value').textContent = this.value;
             draw();
         });
-        
-        // 色の変更
-        document.getElementById('fill-color').addEventListener('change', function() {
-            fillColor = this.value;
-            draw();
-        });
 
-        // コードコピー機能
-        function copyCode() {
-            const codeElement = document.getElementById('sample-code');
-            const textArea = document.createElement('textarea');
-            textArea.value = codeElement.textContent;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            // フィードバック
-            const button = document.querySelector('.copy-button');
-            const originalText = button.textContent;
-            button.textContent = 'コピーしました！';
-            button.style.background = '#10b981';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-            }, 2000);
-        }
 
         // 初期描画
         draw();
