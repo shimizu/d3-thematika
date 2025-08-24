@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drop Shadow Effect - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Drop Shadow Effect</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Drop Shadow Effect デモ</h2>
+            
+            <div class="info-box">
+                <h3>🎨 Drop Shadowエフェクト機能</h3>
+                <ul>
+                    <li>SVGフィルターによる立体的な影の実装</li>
+                    <li>effect-utils.tsのcreateDropShadow関数を使用</li>
+                    <li>X/Y方向のオフセット、ぼかし、色、透明度をリアルタイムで調整可能</li>
+                    <li>プリセット（標準/ソフト/ハード）とカスタム設定の切り替え</li>
+                    <li>複数レイヤーへの影の適用と深度表現</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="effect-toggle">Drop Shadowエフェクト</label>
+                    <input type="checkbox" id="effect-toggle" checked>
+                </div>
+                <div class="control-item">
+                    <label for="preset-select">プリセット</label>
+                    <select id="preset-select">
+                        <option value="standard">標準</option>
+                        <option value="soft">ソフト</option>
+                        <option value="hard">ハード</option>
+                        <option value="custom" selected>カスタム</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="dx-slider">X方向オフセット: <span id="dx-value">4</span>px</label>
+                    <input type="range" id="dx-slider" min="-20" max="20" value="4" step="1">
+                </div>
+                <div class="control-item">
+                    <label for="dy-slider">Y方向オフセット: <span id="dy-value">4</span>px</label>
+                    <input type="range" id="dy-slider" min="-20" max="20" value="4" step="1">
+                </div>
+                <div class="control-item">
+                    <label for="blur-slider">ぼかし強度: <span id="blur-value">3</span></label>
+                    <input type="range" id="blur-slider" min="0" max="10" value="3" step="0.5">
+                </div>
+                <div class="control-item">
+                    <label for="opacity-slider">影の透明度: <span id="opacity-value">0.4</span></label>
+                    <input type="range" id="opacity-slider" min="0" max="1" value="0.4" step="0.05">
+                </div>
+                <div class="control-item">
+                    <label for="color-picker">影の色</label>
+                    <input type="color" id="color-picker" value="#000000">
+                </div>
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>Drop Shadowエフェクトの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// Drop Shadowエフェクトの使用例
+// UMDビルドではThematikaオブジェクトから直接アクセス
+
+// カスタムDrop Shadowフィルターの作成
+const dropShadowFilter = Thematika.createDropShadow({
+    id: 'custom-shadow',
+    dx: 4,              // X方向のオフセット
+    dy: 4,              // Y方向のオフセット
+    stdDeviation: 3,    // ぼかしの強度
+    floodColor: '#000000',  // 影の色
+    floodOpacity: 0.4       // 影の透明度
+});
+
+// SVGのdefsにフィルターを追加
+const svg = d3.select('#map svg');
+const defs = svg.append('defs');
+dropShadowFilter(defs);
+
+// GeojsonLayerにフィルターを適用
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        'fill': (d, i) => {
+            // 高さを表現するグラデーションカラー
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            return colors[i % colors.length];
+        },
+        'filter': dropShadowFilter.url(),  // Drop Shadowフィルターを適用
+        'stroke': '#ffffff',
+        'stroke-width': 0.5,
+        'opacity': 0.9
+    }
+});
+
+// プリセットフィルターの使用例
+const standardShadow = Thematika.FilterPresets.standardDropShadow();
+const softShadow = Thematika.FilterPresets.softDropShadow();
+
+// ハードシャドウ（カスタム定義）
+const hardShadow = Thematika.createDropShadow({
+    id: 'hard-shadow',
+    dx: 6,
+    dy: 6,
+    stdDeviation: 1,
+    floodColor: '#000000',
+    floodOpacity: 0.6
+});</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // グローバル変数
+        let map;
+        let currentProjection = d3.geoEquirectangular();
+        let shadowEnabled = true;
+        let shadowPreset = 'custom';
+        let shadowDx = 4;
+        let shadowDy = 4;
+        let shadowBlur = 3;
+        let shadowOpacity = 0.4;
+        let shadowColor = '#000000';
+        
+        async function draw() {
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 既存のSVGをクリア
+            d3.select("#map").selectAll("*").remove();
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#f8fafc'
+            });
+
+            // SVGと defs を取得
+            const svg = d3.select("#map svg");
+            const defs = svg.append("defs");
+            
+            // Drop Shadowフィルターの作成
+            let dropShadowFilter;
+            if (shadowEnabled) {
+                if (shadowPreset === 'standard') {
+                    dropShadowFilter = Thematika.FilterPresets.standardDropShadow();
+                } else if (shadowPreset === 'soft') {
+                    dropShadowFilter = Thematika.FilterPresets.softDropShadow();
+                } else if (shadowPreset === 'hard') {
+                    // ハードシャドウのカスタム定義
+                    dropShadowFilter = Thematika.createDropShadow({
+                        id: 'hard-shadow',
+                        dx: 6,
+                        dy: 6,
+                        stdDeviation: 1,
+                        floodColor: '#000000',
+                        floodOpacity: 0.6
+                    });
+                } else {
+                    // カスタム設定
+                    dropShadowFilter = Thematika.createDropShadow({
+                        id: 'custom-shadow',
+                        dx: shadowDx,
+                        dy: shadowDy,
+                        stdDeviation: shadowBlur,
+                        floodColor: shadowColor,
+                        floodOpacity: shadowOpacity
+                    });
+                }
+                // フィルターをSVGに追加
+                dropShadowFilter(defs);
+            }
+
+            // 高さを表現するカラーパレット
+            const elevationColors = [
+                '#3b82f6', // 青
+                '#10b981', // 緑
+                '#f59e0b', // 黄
+                '#ef4444', // 赤
+                '#8b5cf6', // 紫
+                '#ec4899', // ピンク
+                '#06b6d4', // シアン
+                '#84cc16', // ライム
+            ];
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": (d, i) => elevationColors[i % elevationColors.length],
+                    "filter": shadowEnabled ? dropShadowFilter.url() : 'none',
+                    "stroke": '#ffffff',
+                    "stroke-width": 0.5,
+                    "opacity": 0.95,
+                    "cursor": "pointer"
+                },
+                on: {
+                    "mouseover": function(event, d) {
+                        // ホバー時により強い影を適用
+                        if (shadowEnabled) {
+                            const hoverShadow = Thematika.createDropShadow({
+                                id: 'hover-shadow',
+                                dx: shadowDx * 1.5,
+                                dy: shadowDy * 1.5,
+                                stdDeviation: shadowBlur * 1.2,
+                                floodColor: shadowColor,
+                                floodOpacity: Math.min(shadowOpacity * 1.5, 1)
+                            });
+                            hoverShadow(defs);
+                            d3.select(this)
+                                .transition()
+                                .duration(200)
+                                .attr("filter", "url(#hover-shadow)")
+                                .attr("transform", "translate(-2, -2)");
+                        }
+                    },
+                    "mouseout": function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("filter", shadowEnabled ? dropShadowFilter.url() : 'none')
+                            .attr("transform", "translate(0, 0)");
+                    }
+                }
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#64748b',
+                    "stroke-width": 2,
+                    "opacity": 0.4,
+                    "filter": shadowEnabled ? dropShadowFilter.url() : 'none'
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#e2e8f0',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '2,3',
+                    "opacity": 0.7
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+        }
+
+        // UIコントロールのイベントリスナー
+        
+        // Drop Shadowエフェクトのトグル
+        document.getElementById('effect-toggle').addEventListener('change', async function(e) {
+            shadowEnabled = e.target.checked;
+            await draw();
+        });
+
+        // プリセット選択
+        document.getElementById('preset-select').addEventListener('change', async function(e) {
+            shadowPreset = e.target.value;
+            const customControls = ['dx-slider', 'dy-slider', 'blur-slider', 'opacity-slider', 'color-picker'];
+            const isCustom = shadowPreset === 'custom';
+            
+            // カスタム設定の有効/無効切り替え
+            customControls.forEach(id => {
+                document.getElementById(id).disabled = !isCustom;
+            });
+            
+            await draw();
+        });
+
+        // X方向オフセットスライダー
+        document.getElementById('dx-slider').addEventListener('input', async function(e) {
+            shadowDx = parseInt(e.target.value);
+            document.getElementById('dx-value').textContent = shadowDx;
+            if (shadowPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // Y方向オフセットスライダー
+        document.getElementById('dy-slider').addEventListener('input', async function(e) {
+            shadowDy = parseInt(e.target.value);
+            document.getElementById('dy-value').textContent = shadowDy;
+            if (shadowPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // ぼかしスライダー
+        document.getElementById('blur-slider').addEventListener('input', async function(e) {
+            shadowBlur = parseFloat(e.target.value);
+            document.getElementById('blur-value').textContent = shadowBlur;
+            if (shadowPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 透明度スライダー
+        document.getElementById('opacity-slider').addEventListener('input', async function(e) {
+            shadowOpacity = parseFloat(e.target.value);
+            document.getElementById('opacity-value').textContent = shadowOpacity;
+            if (shadowPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 色ピッカー
+        document.getElementById('color-picker').addEventListener('change', async function(e) {
+            shadowColor = e.target.value;
+            if (shadowPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 投影法の変更
+        document.getElementById('projection-select').addEventListener('change', async function(e) {
+            const projectionType = e.target.value;
+            
+            // 投影法を変更
+            switch(projectionType) {
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                default:
+                    currentProjection = d3.geoEquirectangular();
+            }
+            
+            // 地図を再描画
+            await draw();
+        });
+
+        // 初期描画
+        draw();
+        
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("drop-shadow.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("drop-shadow.png")
+        });
+
+    </script>
+</body>
+</html>

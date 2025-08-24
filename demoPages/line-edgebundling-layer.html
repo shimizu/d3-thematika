@@ -195,7 +195,7 @@ map.addLayer('bundling', bundlingLayer);</pre>
                 width: width,
                 height: height,
                 projection: currentProjection,
-                backgroundColor: '#0f172a'
+                backgroundColor: '#ddd'
             });
 
 
@@ -210,18 +210,6 @@ map.addLayer('bundling', bundlingLayer);</pre>
                     "opacity": 0.85,
                     "cursor": "pointer"
                 },
-            });
-
-            // OutlineLayerインスタンスを作成
-            const outlineLayer = new Thematika.OutlineLayer({
-                createClipPath: true,
-                clipPathId: 'earth-outline-clip',
-                attr: {
-                    "fill": 'none',
-                    "stroke": '#475569', // より落ち着いたダークグレー
-                    "stroke-width": 2,
-                    "opacity": 0.7
-                }
             });
 
             // GraticuleLayerインスタンスを作成
@@ -261,7 +249,6 @@ map.addLayer('bundling', bundlingLayer);</pre>
             map.addLayer('graticule', graticuleLayer);
             map.addLayer('world', worldLayer);
             map.addLayer('airports', airportsLayer); // 空港レイヤーを追加
-            map.addLayer('outline', outlineLayer);
 
             // LineEdgeBundlingLayerインスタンスを作成
             const bundlingLayer = new Thematika.LineEdgeBundlingLayer({
