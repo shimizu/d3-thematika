@@ -56,6 +56,7 @@ module.exports = {
     '^d3-force$': '<rootDir>/tests/mocks/d3-force.js',
     '^d3-delaunay$': '<rootDir>/tests/mocks/d3-delaunay.js',
     '^d3-polygon$': '<rootDir>/tests/mocks/d3-polygon.js',
+    '^d3-contour$': '<rootDir>/tests/mocks/d3-contour.js',
     '^.*/vendor/textures\\.esm\\.js$': '<rootDir>/tests/mocks/textures.js',
     '^geotiff$': '<rootDir>/tests/mocks/geotiff.js'
   },

@@ -30,12 +30,13 @@ export default {
         'd3-selection': 'd3',
         'd3-force': 'd3',
         'd3-shape': 'd3',
+        'd3-contour': 'd3',
         '@turf/turf': 'turf',
         'geotiff': 'GeoTIFF'
       }
     }
   ],
-  external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', '@turf/turf', 'geotiff'],
+  external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', 'd3-contour', '@turf/turf', 'geotiff'],
   plugins: [
     resolve({
       browser: true
@@ -52,7 +53,9 @@ export default {
       host: 'localhost',
       port: 3000,
       headers: {
-        'Access-Control-Allow-Origin': '*'
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Cache-Control'
       },
       cleanUrls: false,
     }),

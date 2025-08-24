@@ -81,3 +81,4 @@ export * from './utils/gis-utils';
 export * from './utils/cog-utils';
 export * from './utils/tile-utils';
 export * from './utils/color-palette';
+export * from './utils/hachure-utils';
