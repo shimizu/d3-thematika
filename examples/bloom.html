@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloom Effect - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Bloom Effect</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Bloom Effect デモ</h2>
+            
+            <div class="info-box">
+                <h3>✨ Bloomエフェクト機能</h3>
+                <ul>
+                    <li>SVGフィルターによる発光効果の実装</li>
+                    <li>effect-utils.tsのcreateBloom関数を使用</li>
+                    <li>強度・閾値・色をリアルタイムで調整可能</li>
+                    <li>プリセットとカスタム設定の切り替え</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="effect-toggle">Bloomエフェクト</label>
+                    <input type="checkbox" id="effect-toggle" checked>
+                </div>
+                <div class="control-item">
+                    <label for="preset-select">プリセット</label>
+                    <select id="preset-select">
+                        <option value="standard">標準</option>
+                        <option value="strong">強い</option>
+                        <option value="custom" selected>カスタム</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="intensity-slider">強度: <span id="intensity-value">5</span></label>
+                    <input type="range" id="intensity-slider" min="1" max="20" value="5" step="0.5">
+                </div>
+                <div class="control-item">
+                    <label for="threshold-slider">閾値: <span id="threshold-value">0.5</span></label>
+                    <input type="range" id="threshold-slider" min="0" max="1" value="0.5" step="0.05">
+                </div>
+                <div class="control-item">
+                    <label for="color-picker">発光色</label>
+                    <input type="color" id="color-picker" value="#ffffff">
+                </div>
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>Bloomエフェクトの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// effect-utils.tsを使用したBloomエフェクトの実装
+// UMDビルドではThematikaオブジェクトから直接アクセス
+
+// カスタムBloomフィルターの作成
+const bloomFilter = Thematika.createBloom({
+    id: 'custom-bloom',
+    intensity: 5,      // ブラーの強度
+    threshold: 0.5,    // 明度閾値
+    color: '#ffffff'   // 発光色
+});
+
+// SVGのdefsにフィルターを追加
+const svg = d3.select('#map svg');
+const defs = svg.append('defs');
+bloomFilter(defs);
+
+// GeojsonLayerにフィルターを適用
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        'fill': (d, i) => {
+            // 明るい色を使用してBloom効果を強調
+            const colors = ['#00ffff', '#ff00ff', '#ffff00', '#00ff00', '#ff6b6b'];
+            return colors[i % colors.length];
+        },
+        'filter': bloomFilter.url(),  // Bloomフィルターを適用
+        'stroke': '#ffffff',
+        'stroke-width': 1,
+        'opacity': 0.9
+    }
+});
+
+// プリセットフィルターの使用例
+const standardBloom = Thematika.FilterPresets.standardBloom();
+const strongBloom = Thematika.FilterPresets.strongBloom();</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // グローバル変数
+        let map;
+        let currentProjection = d3.geoEquirectangular();
+        let bloomEnabled = true;
+        let bloomPreset = 'custom';
+        let bloomIntensity = 5;
+        let bloomThreshold = 0.5;
+        let bloomColor = '#ffffff';
+        
+        async function draw() {
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 既存のSVGをクリア
+            d3.select("#map").selectAll("*").remove();
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                 backgroundColor: '#0f172a'
+            });
+
+            // SVGと defs を取得
+            const svg = d3.select("#map svg");
+            const defs = svg.append("defs");
+            
+            // Bloomフィルターの作成
+            let bloomFilter;
+            if (bloomEnabled) {
+                if (bloomPreset === 'standard') {
+                    bloomFilter = Thematika.FilterPresets.standardBloom();
+                } else if (bloomPreset === 'strong') {
+                    bloomFilter = Thematika.FilterPresets.strongBloom();
+                } else {
+                    // カスタム設定
+                    bloomFilter = Thematika.createBloom({
+                        id: 'custom-bloom',
+                        intensity: bloomIntensity,
+                        threshold: bloomThreshold,
+                        color: bloomColor
+                    });
+                }
+                // フィルターをSVGに追加
+                bloomFilter(defs);
+            }
+
+            // 明るい色のパレット（Bloom効果が映えるように）
+            const brightColors = [
+                '#00ffff', // シアン
+                '#ff00ff', // マゼンタ
+                '#ffff00', // イエロー
+                '#00ff00', // ライムグリーン
+                '#ff6b6b', // ライトレッド
+                '#6b6bff', // ライトブルー
+                '#ffa500', // オレンジ
+                '#ff69b4', // ホットピンク
+                '#32cd32', // ライムグリーン
+                '#1e90ff'  // ドジャーブルー
+            ];
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": (d, i) => brightColors[i % brightColors.length],
+                    "filter": bloomEnabled ? bloomFilter.url() : 'none',
+                    "stroke": '#ffffff',
+                    "stroke-width": 1,
+                    "opacity": 0.9,
+                    "cursor": "pointer"
+                },
+                on: {
+                    "mouseover": function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("opacity", 1)
+                            .attr("stroke-width", 2);
+                    },
+                    "mouseout": function(event, d) {
+                        d3.select(this)
+                            .transition()
+                            .duration(200)
+                            .attr("opacity", 0.9)
+                            .attr("stroke-width", 1);
+                    }
+                }
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#ffffff',
+                    "stroke-width": 2,
+                    "opacity": 0.8,
+                    "filter": bloomEnabled ? bloomFilter.url() : 'none'
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": 'none',
+                    "stroke": 'rgba(255, 255, 255, 0.2)',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '2,3',
+                    "opacity": 0.5
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+        }
+
+        // UIコントロールのイベントリスナー
+        
+        // Bloomエフェクトのトグル
+        document.getElementById('effect-toggle').addEventListener('change', async function(e) {
+            bloomEnabled = e.target.checked;
+            await draw();
+        });
+
+        // プリセット選択
+        document.getElementById('preset-select').addEventListener('change', async function(e) {
+            bloomPreset = e.target.value;
+            const customControls = ['intensity-slider', 'threshold-slider', 'color-picker'];
+            const isCustom = bloomPreset === 'custom';
+            
+            // カスタム設定の有効/無効切り替え
+            customControls.forEach(id => {
+                document.getElementById(id).disabled = !isCustom;
+            });
+            
+            await draw();
+        });
+
+        // 強度スライダー
+        document.getElementById('intensity-slider').addEventListener('input', async function(e) {
+            bloomIntensity = parseFloat(e.target.value);
+            document.getElementById('intensity-value').textContent = bloomIntensity;
+            if (bloomPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 閾値スライダー
+        document.getElementById('threshold-slider').addEventListener('input', async function(e) {
+            bloomThreshold = parseFloat(e.target.value);
+            document.getElementById('threshold-value').textContent = bloomThreshold;
+            if (bloomPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 色ピッカー
+        document.getElementById('color-picker').addEventListener('change', async function(e) {
+            bloomColor = e.target.value;
+            if (bloomPreset === 'custom') {
+                await draw();
+            }
+        });
+
+        // 投影法の変更
+        document.getElementById('projection-select').addEventListener('change', async function(e) {
+            const projectionType = e.target.value;
+            
+            // 投影法を変更
+            switch(projectionType) {
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                default:
+                    currentProjection = d3.geoEquirectangular();
+            }
+            
+            // 地図を再描画
+            await draw();
+        });
+
+        // 初期描画
+        draw();
+        
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("bloom-effect.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("bloom-effect.png")
+        });
+
+    </script>
+</body>
+</html>
