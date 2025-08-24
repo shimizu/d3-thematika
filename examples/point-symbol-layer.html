@@ -203,7 +203,7 @@ map.addLayer('symbols', symbolLayer);</pre>
                     width: width,
                     height: height,
                     projection: projection,
-                    backgroundColor: '#0f172a'
+                    backgroundColor: '#ddd'
                 });
 
 
@@ -223,11 +223,22 @@ map.addLayer('symbols', symbolLayer);</pre>
                     step: [20, 20],
                     attr: {
                         "fill": 'none',
-                        "stroke": '#ddd',
+                        "stroke": '#666',
                         "stroke-width": 0.5,
                         "opacity": 0.6
                     }
                 });
+
+                                // OutlineLayerインスタンスを作成
+                const outlineLayer = new Thematika.OutlineLayer({
+                    attr: {
+                        "fill": 'none',
+                        "stroke": '#2c3e50',
+                        "stroke-width": 2,
+                        "opacity": 0.8
+                    }
+                });
+
 
                 // インデックスベースのシンボルタイプ設定
                 const symbolTypeFunction = (feature, index) => {
@@ -260,6 +271,8 @@ map.addLayer('symbols', symbolLayer);</pre>
                 map.addLayer('graticule', graticuleLayer);
                 map.addLayer('worldLayer', worldLayer);
                 map.addLayer('symbols', symbolLayer);
+                map.addLayer('outlineLayer', outlineLayer);
+
 
             } catch (error) {
                 console.error('デモの初期化に失敗しました:', error);

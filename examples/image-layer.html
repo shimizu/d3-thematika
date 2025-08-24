@@ -207,7 +207,7 @@ map.addLayer('raster', imageLayer);</pre>
                 width: width,
                 height: height,
                 projection: currentProjection,
-                backgroundColor: '#0f172a'
+                backgroundColor: '#ddd'
             });
 
             // 背景レイヤー（国境）
@@ -231,7 +231,7 @@ map.addLayer('raster', imageLayer);</pre>
                 showBboxMarkers: showBboxMarkers
             });
 
-            imageLayer.setProjection(currentProjection);
+            //imageLayer.setProjection(currentProjection);
 
             // 経緯線レイヤー
             graticuleLayer = new Thematika.GraticuleLayer({

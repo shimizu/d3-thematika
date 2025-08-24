@@ -11,14 +11,6 @@
     <link rel="stylesheet" href="./css/components.css">
     <link rel="stylesheet" href="./css/responsive.css">
     <script src="./js/common.js"></script>
-
-    <style>
-        /* clip-polygon.html固有のスタイル */
-        #map {
-            background-color: #e6f3ff;
-        }
-        
-    </style>
 </head>
 <body>
     <!-- ナビゲーションバー -->
@@ -62,7 +54,7 @@
                 <h3>🗾 クリップポリゴン機能</h3>
                 <ul>
                     <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                    <li>クリップデータ: examples/geojson/japan/pref.geojson（日本の都道府県データ）</li>
+                    <li>クリップデータ: examples/geojson/aflica.geojson（アフリカ大陸データ）</li>
                     <li>エフェクト: createClipPolygonで日本の範囲でクリップ</li>
                     <li>機能: クリップパスのON/OFF切り替え</li>
                 </ul>
@@ -74,7 +66,7 @@
                     <label>クリップ設定</label>
                     <div class="checkbox-wrapper">
                         <input type="checkbox" id="clip-toggle" checked>
-                        <label for="clip-toggle">日本の範囲でクリップ</label>
+                        <label for="clip-toggle">アフリカ大陸でクリップ</label>
                     </div>
                 </div>
             </div>
@@ -155,8 +147,14 @@ map.addLayer('raster', imageLayer);
 
     <script >
         
+        let map;
         let currentProjection = d3.geoEquirectangular();
         let isClipEnabled = true;
+
+
+        // SVGフィルターをプリセットから取得
+        const dropShadow = Thematika.FilterPresets.standardDropShadow()
+
 
         async function draw() {
             // 既存の地図を削除
@@ -169,7 +167,7 @@ map.addLayer('raster', imageLayer);
 
 
             // 投影法を地図データに合わせて設定
-            currentProjection.fitExtent([[10, 10], [790, 390]], geojson);
+            currentProjection.fitExtent([[10, 10], [790, 390]], aflicaClipGeoJSON);
 
 
             // クリップエフェクトを作成
@@ -181,12 +179,13 @@ map.addLayer('raster', imageLayer);
 
 
             // 地図を作成
-            const map = new Thematika.Map({
+            map = new Thematika.Map({
                 container: '#map',
                 width: 800,
                 height: 400,
                 projection: currentProjection,
-                defs: [clipEffect]  // クリップエフェクトを追加
+                backgroundColor:"#ddd",
+                defs: [clipEffect, dropShadow]  // クリップエフェクトを追加
             });
 
 
@@ -199,7 +198,19 @@ map.addLayer('raster', imageLayer);
                     "stroke-width": 0.5
                 }
             });
-            map.addLayer('countries', backgroundLayer);
+
+
+            const aflicaPoligon = new Thematika.GeojsonLayer({
+                data: aflicaClipGeoJSON,
+                attr: {
+                    "filter":dropShadow.url(),
+                    "fill": 'none',
+                    "stroke": '#000',
+                    "stroke-width": 1
+                }
+            });
+
+
 
             
             // ラスターレイヤー（アフリカの画像を使用）
@@ -210,11 +221,10 @@ map.addLayer('raster', imageLayer);
                     "clip-path": isClipEnabled ? clipEffect.url() : undefined  // クリップパスを条件付きで適用
                 },
                 style: { 
-                    "opacity": 0.7 ,
+                    "opacity": 1,
                 },
                 
             });
-            map.addLayer('raster', imageLayer);
             
 
             // 経緯線レイヤー
@@ -226,7 +236,12 @@ map.addLayer('raster', imageLayer);
                     "stroke-dasharray": '2,2'
                 }
             });
+
+
             map.addLayer('graticule', graticuleLayer);        
+            map.addLayer('countries', backgroundLayer);
+            map.addLayer('raster', imageLayer);
+            map.addLayer('aflicaPoligon', aflicaPoligon);
 
         }
 
