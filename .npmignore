@@ -1,0 +1,84 @@
+# Development files
+examples/
+demoPages/
+scripts/
+tests/
+src/**/__tests__/
+*.test.ts
+*.test.js
+
+# Configuration files
+.github/
+.vscode/
+.serena/
+jest.config.cjs
+rollup.config.js
+tsconfig.json
+.gitignore
+.npmignore
+
+# Documentation source
+docs/
+*.md
+!README.md
+!LICENSE
+!CHANGELOG.md
+
+# Build artifacts
+coverage/
+.nyc_output/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Git
+.git/
+.gitattributes
+
+# Node modules (should already be ignored by npm)
+node_modules/
+
+# Development data
+data/
+geojson/
+*.geojson
+*.json
+!package.json
+!package-lock.json
+
+# Images and media (except necessary ones)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+!dist/**/*.svg
+
+# Misc
+*.bak
+*.backup
+*.old
