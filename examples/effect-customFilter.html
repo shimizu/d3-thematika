@@ -24,7 +24,7 @@
             </a>
             <div class="nav-links">
                 <a href="examples.html" class="nav-link">Examples</a>
-                <a href="https://docs.d3-thematika.com" class="nav-link">Documentation</a>
+                <a href="docs/" class="nav-link">Docs</a>
                 <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
             </div>
         </div>
@@ -43,19 +43,20 @@
                     <a href="examples.html">Examples</a>
                 </li>
                 <li class="breadcrumb-item breadcrumb-separator">></li>
-                <li class="breadcrumb-item breadcrumb-current">GeoJSON Layer</li>
+                <li class="breadcrumb-item breadcrumb-current">Custom Filter</li>
             </ol>
         </nav>
 
         <section>
-            <h2 class="section-title">GeoJSON Layer デモ</h2>
+            <h2 class="section-title">カスタムフィルター デモ</h2>
             
             <div class="info-box">
-                <h3>🌍 GeoJSONレイヤー機能</h3>
+                <h3>✨ カスタムフィルター効果</h3>
                 <ul>
-                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
-                    <li>レイヤー: GeojsonLayer（世界地図）、GraticuleLayer（経緯線）、OutlineLayer（アウトライン）</li>
-                    <li>機能: 複数投影法の切り替え、カスタムフィルター効果、レイヤー合成</li>
+                    <li>SVGフィルター: createCustomFilter APIを使用した独自エフェクトの定義</li>
+                    <li>フィルター要素: ベベル効果、テクスチャ、変位マップ、カラーマトリックスの組み合わせ</li>
+                    <li>適用方法: GeojsonLayerのattr属性でfilter: "url(#customFilter)"を指定</li>
+                    <li>効果の特徴: 立体的な質感と複雑な視覚効果を地図要素に追加</li>
                 </ul>
             </div>
 
@@ -95,71 +96,33 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// GeojsonLayerの使用例
-const geojson = await d3.json("./geojson/world.geojson");
+                <pre id="sample-code">// カスタムフィルター効果を作成
+const customFilter = Thematika.createCustomFilter('customFilter', 
+     //ここにsvg filterを書く
+);
 
-const width = 800;
-const height = 600;
-
-const projection = d3.geoEquirectangular()
-    .fitExtent([[10, 0], [width-10, height]], geojson);
 
 const map = new Thematika.Map({
     container: '#map',
     width: width,
     height: height,
-    projection: projection
+    projection: projection,
+     defs:[customFilter]
 });
 
-// カスタムフィルター効果を作成
-const woodtype = Thematika.createCustomFilter('woodtype', `
-    <feFlood flood-color="#73DCFF" flood-opacity="0.75" result="COLOR-blu" />
-    <feFlood flood-color="#9673FF" flood-opacity="0.4" result="COLOR-red" />
-    <feTurbulence baseFrequency=".05" type="fractalNoise" numOctaves="3" seed="0" result="Texture_10" />
-    <!-- その他のフィルター効果... -->
-`);
 
 // GeojsonLayerインスタンスを作成
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
         "fill": (d, i) => i % 2 === 0 ? "#8b5cf6" : "#ec4899",
-        "filter": "url(#woodtype)",
+        "filter": "url(#customFilter)",
         "stroke": '#ffffff',
         "stroke-width": 0.5,
         "opacity": 0.8,
         "cursor": "pointer"
-    }
-});
-
-// OutlineLayerインスタンスを作成（クリップパス機能ON）
-const outlineLayer = new Thematika.OutlineLayer({
-    createClipPath: true,
-    clipPathId: 'earth-outline-clip',
-    attr: {
-        "fill": 'none',
-        "stroke": '#6366f1',
-        "stroke-width": 3,
-        "opacity": 0.5
-    }
-});
-
-// GraticuleLayerインスタンスを作成
-const graticuleLayer = new Thematika.GraticuleLayer({
-    step: [10, 10], // 10度間隔
-    attr: {
-        "fill": 'none',
-        "stroke": 'rgba(255, 255, 255, 0.1)',
-        "stroke-width": 0.5,
-        "stroke-dasharray": '2,3',
-        "opacity": 0.5
-    }
-});
-
-// レイヤーインスタンスを地図に追加
-map.addLayer('graticule', graticuleLayer);
-map.addLayer('world', worldLayer);
-map.addLayer('outline', outlineLayer);</pre>
+    },
+});</pre>
             </div>
         </section>
     </div>
@@ -190,24 +153,79 @@ map.addLayer('outline', outlineLayer);</pre>
             currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
 
             // カスタムフィルター効果を作成
-            const woodtype = Thematika.createCustomFilter('woodtype', `
-<!-- BLUR -->
-<feGaussianBlur in="SourceAlpha" stdDeviation="5" result="BLUR"></feGaussianBlur>
-<!-- SPECULAR -->
-<feSpecularLighting in="BLUR" surfaceScale="6" specularExponent="30" result="SPECULAR" lighting-color="#white">
-    <!-- 7d702d1b-2e97-4362-afa1-b1382bfe7770 -->
-    <fePointLight x="40" y="-30" z="200" result="7d702d1b-2e97-4362-afa1-b1382bfe7770"></fePointLight>
-</feSpecularLighting>
-<!-- COMPOSITE -->
-<feComposite in="SPECULAR" in2="SourceAlpha" operator="in" result="COMPOSITE"></feComposite>
-<!-- 8749b11e-0e1b-42a1-8b4f-66d3bdbcabbb -->
-<feMerge result="8749b11e-0e1b-42a1-8b4f-66d3bdbcabbb">
-    <feMergeNode in="SourceGraphic"></feMergeNode>
-    <feMergeNode in="COMPOSITE"></feMergeNode>
+            const customFilter = Thematika.createCustomFilter('customFilter', `
+<!-- COLOR-red -->
+<feFlood flood-color="#9673FF" flood-opacity="0.4" result="COLOR-red"></feFlood>
+<!-- BEVEL_10 -->
+<feConvolveMatrix in="SourceAlpha" order="8,8" kernelMatrix="1 0 0 0 0 0 0 0,
+0 1 0 0 0 0 0 0,
+0 0 1 0 0 0 0 0,
+0 0 0 1 0 0 0 0,
+0 0 0 0 1 0 0 0,
+0 0 0 0 0 1 0 0,
+0 0 0 0 0 0 1 0,
+0 0 0 0 0 0 0 1" result="BEVEL_10"></feConvolveMatrix>
+<!-- BEVEL-FILL_10 -->
+<feOffset in="BEVEL_10" dx="-9" dy="-9" result="BEVEL-FILL_10"></feOffset>
+<!-- OUTLINE_10 -->
+<feMorphology in="SourceAlpha" operator="dilate" radius="3" result="OUTLINE_10"></feMorphology>
+<!-- BEVEL-FILL_20 -->
+<feComposite in="BEVEL-FILL_10" in2="OUTLINE_10" operator="out" result="BEVEL-FILL_20"></feComposite>
+<!-- Texture_10 -->
+<feTurbulence baseFrequency=".05" numOctaves="3" type="fractalNoise" result="Texture_10"></feTurbulence>
+<!-- BEVEL-FILL_30 -->
+<feDisplacementMap in="BEVEL-FILL_20" in2="Texture_10" scale="17" result="BEVEL-FILL_30"></feDisplacementMap>
+<!-- BEVEL-FILL_50 -->
+<feComposite in="COLOR-red" in2="BEVEL-FILL_30" operator="in" result="BEVEL-FILL_50"></feComposite>
+<!-- Texture_20 -->
+<feColorMatrix in="Texture_10" result="Texture_20" values="0 0 0 0 0,
+0 0 0 0 0,
+0 0 0 0 0,
+0 0 0 -2.1 1.1"></feColorMatrix>
+<!-- BEVEL_20 -->
+<feMorphology in="BEVEL_10" operator="dilate" radius="2" result="BEVEL_20"></feMorphology>
+<!-- BEVEL_30 -->
+<feComposite in="BEVEL_20" in2="BEVEL_10" operator="out" result="BEVEL_30"></feComposite>
+<!-- BEVEL_40 -->
+<feDisplacementMap in="BEVEL_30" in2="Texture_10" scale="7" result="BEVEL_40"></feDisplacementMap>
+<!-- BEVEL_50 -->
+<feComposite in="Texture_20" in2="BEVEL_40" operator="arithmetic" k2="-1" k3="1" result="BEVEL_50"></feComposite>
+<!-- BEVEL_60 -->
+<feOffset in="BEVEL_50" dx="-7" dy="-7" result="BEVEL_60"></feOffset>
+<!-- BEVEL_70 -->
+<feComposite in="BEVEL_60" in2="OUTLINE_10" operator="out" result="BEVEL_70"></feComposite>
+<!-- COLOR-blu -->
+<feFlood flood-color="#73DCFF" flood-opacity="0.75" result="COLOR-blu"></feFlood>
+<!-- Texture_30 -->
+<feColorMatrix in="Texture_10" result="Texture_30" values="0 0 0 0 0,
+0 0 0 0 0,
+0 0 0 0 0,
+0 0 0 -1.7 1.8"></feColorMatrix>
+<!-- FILL_10 -->
+<feOffset in="SourceAlpha" dx="-3" dy="4" result="FILL_10"></feOffset>
+<!-- FILL_20 -->
+<feDisplacementMap in="FILL_10" in2="Texture_10" scale="17" result="FILL_20"></feDisplacementMap>
+<!-- FILL_40 -->
+<feComposite in="Texture_30" in2="FILL_20" operator="in" result="FILL_40"></feComposite>
+<!-- FILL_50 -->
+<feComposite in="COLOR-blu" in2="FILL_40" operator="in" result="FILL_50"></feComposite>
+<!-- OUTLINE_20 -->
+<feComposite in="OUTLINE_10" in2="SourceAlpha" operator="out" result="OUTLINE_20"></feComposite>
+<!-- OUTLINE_30 -->
+<feDisplacementMap in="OUTLINE_20" in2="Texture_10" scale="7" result="OUTLINE_30"></feDisplacementMap>
+<!-- OUTLINE_40 -->
+<feComposite in="Texture_20" in2="OUTLINE_30" operator="arithmetic" k2="-1" k3="1" result="OUTLINE_40"></feComposite>
+<!-- merge2 -->
+<feMerge result="merge2">
+    <feMergeNode in="BEVEL-FILL_50"></feMergeNode>
+    <feMergeNode in="BEVEL_70"></feMergeNode>
+    <feMergeNode in="FILL_50"></feMergeNode>
+    <feMergeNode in="OUTLINE_40"></feMergeNode>
 </feMerge>
             
             `);
 
+       
             // 地図を作成
             map = new Thematika.Map({
                 container: '#map',
@@ -215,7 +233,7 @@ map.addLayer('outline', outlineLayer);</pre>
                 height: height,
                 projection: currentProjection,
                 backgroundColor: '#dafaff',
-                defs:[woodtype]
+                defs:[customFilter]
             });
 
             // GeojsonLayerインスタンスを作成
@@ -223,7 +241,7 @@ map.addLayer('outline', outlineLayer);</pre>
                 data: geojson,                
                 attr: { 
                     "fill": (d, i) => i % 2 === 0 ? "#8b5cf6" : "#ec4899",
-                    "filter": "url(#woodtype)",
+                    "filter": "url(#customFilter)",
                     "stroke": '#ffffff',
                     "stroke-width": 0.5,
                     "opacity": 0.8,
