@@ -1,16 +1,46 @@
 // typedoc.json
 {
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "d3-thematika",
+  "readme": "README.md",
   "entryPoints": [
     "src/index.ts",          // ライブラリのエントリ
     "src/types.ts",          // IGeojsonLayer などを定義しているファイル
     "src/layers/**/*.{ts,js}"// レイヤーファイル群
   ],
-  "out": "docs",            // 出力先ディレクトリ
-  "excludePrivate": true,                // private は除外（デフォルト）
-  "excludeProtected": false,             // protected は出力
-  "excludeInternal": true,               // @internal タグは除外
-  "excludeExternals": true,              // 外部モジュールは除外
+  "entryPointStrategy": "expand",         // ファイルパターンを展開
+  "out": "docs",                          // 出力先ディレクトリ
+  "theme": "default",                     // ドキュメントテーマ
+  "includeVersion": true,                 // バージョン番号を含める
+  "excludePrivate": true,                 // private は除外（デフォルト）
+  "excludeProtected": false,              // protected は出力
+  "excludeInternal": true,                // @internal タグは除外
+  "excludeExternals": true,               // 外部モジュールは除外
   "excludeNotDocumented": true,           // コメントのない要素は除外
+  "categorizeByGroup": true,              // @group タグでグループ化
+  "searchInComments": true,               // コメント内も検索対象に
+  "navigationLinks": {
+    "GitHub": "https://github.com/shimizu/d3-thematika",
+    "Examples": "https://shimizu.github.io/d3-thematika/examples/"
+  },
+  "sidebarLinks": {
+    "NPM Package": "https://www.npmjs.com/package/d3-thematika",
+    "Issues": "https://github.com/shimizu/d3-thematika/issues"
+  },
+  "groupOrder": [
+    "Core",
+    "Layers",
+    "Effects",
+    "Utils",
+    "Types",
+    "*"
+  ],
+  "skipErrorChecking": false,             // TypeScriptエラーチェックを実行
+  "validation": {
+    "notExported": true,                  // エクスポートされていない要素の警告
+    "invalidLink": true,                  // 無効なリンクの警告
+    "notDocumented": false                // ドキュメントなし要素の警告（既に除外設定済み）
+  },
   "tsconfig": "tsconfig.json",
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }
