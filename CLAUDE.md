@@ -18,7 +18,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
 - **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
-- **各種レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, ImageLayer, LegendLayer
+
+### 実装済みレイヤータイプ
+
+#### 基本レイヤー
+- **GeojsonLayer**: GeoJSONデータの表示、動的スタイリング
+- **ImageLayer**: 画像データの投影変換表示
+- **LegendLayer**: D3スケールと連携した凡例自動生成
+- **GraticuleLayer**: 経緯線グリッド
+- **OutlineLayer**: 地球アウトライン
+
+#### ポイントレイヤー
+- **PointCircleLayer**: 円形ポイント、サイズ・色の動的変更
+- **PointSymbolLayer**: d3.symbolを使用したシンボル表示
+- **PointAnnotationLayer**: アノテーション（注釈）、引き出し線とテキストボックス
+- **PointTextLayer**: テキストラベル表示
+- **PointSpikeLayer**: 3Dスパイク（棒グラフ）表示
+
+#### ラインレイヤー
+- **LineConnectionLayer**: 直線・弧・スムージング接続
+- **LineEdgeBundlingLayer**: フォースシミュレーションによる集約
+- **LineTextLayer**: ライン上のテキスト配置
+
+#### エフェクト・ユーティリティ
+- **カスタムフィルター**: createCustomFilter APIによるSVGフィルター定義
+- **ブルームエフェクト**: 発光効果
+- **ドロップシャドウ**: 影効果
+- **クリップ機能**: ポリゴン形状によるクリッピング
+- **COG対応**: Cloud Optimized GeoTIFFの読み込み
+- **タイル機能**: Web地図タイルシステム
 
 ### ビルド出力
 - **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間
@@ -90,6 +118,56 @@ npm run deploy
 
 これにより全デモページで一貫したデザインとUXを維持できます。
 
+## Examples ディレクトリ構造
+
+### 概要
+examples/ディレクトリには21個のデモページが6つのカテゴリーに分類されて配置されています。
+
+### カテゴリー別構成
+1. **基本レイヤー** (3例)
+   - geojson-layer.html - GeoJSONデータの基本表示
+   - image-layer.html - 衛星画像・地形データ表示
+   - legend-layer-layer.html - 凡例の自動生成
+
+2. **ポイントレイヤー** (6例)
+   - point-circle-layer.html - 円形ポイント
+   - point-symbol-layer.html - d3.symbolシンボル
+   - point-annotation-layer.html - 注釈・コールアウト
+   - point-text-layer.html - テキストラベル
+   - point-text-avoid-overlap.html - Voronoi重なり回避
+   - point-spike.html - 3Dスパイク表示
+
+3. **ラインレイヤー** (3例)
+   - line-connection-layer.html - 直線・弧接続
+   - line-edgebundling-layer.html - エッジバンドリング
+   - line-text-layer.html - ライン上テキスト
+
+4. **エフェクト** (3例)
+   - effect-bloom.html - ブルーム効果
+   - effect-dropshadow.html - ドロップシャドウ
+   - effect-customFilter.html - カスタムSVGフィルター
+
+5. **ユーティリティ** (5例)
+   - clip-polygon.html - ポリゴンクリップ
+   - cog-load.html - Cloud Optimized GeoTIFF
+   - tile-map.html - タイル地図システム
+   - color-palette-showcase.html - カラーパレット展示
+   - playground.html - 実験的複合デモ
+
+6. **ギャラリー** (1例)
+   - gallery1.html - 古地図風デモ
+
+### 重要ファイル
+- **examples.html**: サンプル一覧ページ（ギャラリー形式）
+- **template.html**: 新規デモ作成用テンプレート
+- **index.html**: エントリーページ
+
+### リソースディレクトリ
+- **css/**: 共通スタイルシート
+- **js/**: 共通JavaScript（common.js）
+- **geojson/**: GeoJSONデータファイル
+- **thumbnails/**: デモページのサムネイル画像
+
 ## トークン削減戦略
 
 Claude Code 使用時は以下の方法でトークン消費を最小限に抑える：
@@ -98,6 +176,14 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - 初回ファイル確認は `compact` モード使用
 - 必要に応じて `limit`/`offset` で部分読み込み
 - Task/Agent ツールで事前調査してピンポイント特定
+
+### コード解析最適化（serena MCP活用）
+- **serena MCPサーバー**を活用してシンボルベースで効率的にコード解析
+- `mcp__serena__find_symbol`で特定のクラス・関数をピンポイント読み込み
+- `mcp__serena__get_symbols_overview`でファイル構造を軽量に把握
+- `mcp__serena__search_for_pattern`で柔軟なパターン検索
+- `mcp__serena__list_dir`でディレクトリ構造を効率的に探索
+- **重要**: ファイル全体の`Read`は最終手段。serenaツールで必要部分のみ取得
 
 ### 効率的な処理
 - 複数ファイル読み込みを並列実行
@@ -123,6 +209,7 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
 - **重要**: HTMLファイルでのスクリプト参照は必ず `<script src="thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
+- **実装状況**: 21個のデモページ、20種類以上のレイヤータイプが実装済み。新機能追加時は必ず対応するexampleを作成
 
 ### Immutableパターンの採用
 
