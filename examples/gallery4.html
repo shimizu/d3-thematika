@@ -92,26 +92,101 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// GeojsonLayerの使用例
-const geojson = await d3.json("./geojson/world.geojson");
+                <pre id="sample-code">            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
 
-// GeojsonLayerインスタンスを作成
-const worldLayer = new Thematika.GeojsonLayer({
-    data: geojson,                
-    attr: { 
-        "fill": (d, i) => {
-            const colors = ['#440154', '#1f9d8a']; 
-            return colors[i % colors.length];
-        },
-        "filter": shadowFilter.url(), 
-        "stroke": '#1e293b',
-        "stroke-width": 0.3,
-        "opacity": 0.85,
-    }
-});
 
-// レイヤーインスタンスを地図に追加
-map.addLayer('world', worldLayer);</pre>
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            const america = await d3.json('./geojson/america/regions_TL2.geojson');
+            const others = await d3.json('./geojson/america/others.geojson');
+            const roads = await d3.json('./geojson/america/roads_north_america.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection  .scale(400)               // 地球のサイズ（ピクセル単位）
+              .translate([width/2, height/2.5])  // SVG内での中心位置
+            　　.rotate([103, 0])
+                .fitExtent([[20, 20], [width-20, height-20]], america)
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#fff',
+                defs:[dropShadowFilter]
+            });
+
+            
+    
+            const americaLayer = new Thematika.GeojsonLayer({
+                data: america,                
+                attr: { 
+                    "filter":dropShadowFilter.url(),
+                    "fill": "#f7da48", // ダーク系の2色
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.5,
+                    "opacity": 1,
+                },
+            });
+
+
+            const othersLayer = new Thematika.GeojsonLayer({
+                data: others,                
+                attr: { 
+                    "fill": "#ccc", // ダーク系の2色
+                    "stroke": 'none', // ダーク系のストローク
+                    "stroke-width": 0.5,
+                    "opacity": 1,
+                },
+            });
+
+
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": '#add8f7',
+                    "stroke": 'add8f7', // より落ち着いたダークグレー
+                    "stroke-width": 2,
+                    "opacity": 1
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": '#add8f7',
+                    "stroke": 'rgba(148, 163, 184, 0.4)', // 半透明のライトグレー
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '1,3',
+                    "opacity": 0.6
+                }
+            });
+
+                       // LineConnectionLayerインスタンスを作成
+            const lineLayer = new Thematika.LineConnectionLayer({
+                data: roads,
+                attr: {
+                    "stroke": "#ff3333",
+                    "stroke-width": 0.75,
+                    "opacity": 1,
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            //map.addLayer('graticule', graticuleLayer);
+            //map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('othersLayer', othersLayer);
+            map.addLayer('americaLayer', americaLayer);
+            map.addLayer('lineLayer', lineLayer);</pre>
             </div>
         </section>
     </div>
@@ -148,8 +223,6 @@ map.addLayer('world', worldLayer);</pre>
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            // 既存のSVGをクリア
-            d3.select("#map").selectAll("*").remove();
 
             // 世界地図データを読み込み
             const geojson = await d3.json('./geojson/world.geojson');
