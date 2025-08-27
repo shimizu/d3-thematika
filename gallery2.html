@@ -88,26 +88,69 @@
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// GeojsonLayerの使用例
-const geojson = await d3.json("./geojson/world.geojson");
+                <pre id="sample-code">const container = document.querySelector("#map");
+const width = container.clientWidth;
+const height = container.clientHeight;
 
-// GeojsonLayerインスタンスを作成
+// 世界地図データを読み込み
+const geojson = await d3.json('./geojson/aus/AUS.geojson');
+const point = await d3.json('./geojson/aus/AUS_ports.geojson');
+const roads = await d3.json('geojson/aus/AUS_roads.geojson')
+
+// 投影法を地図データに合わせて設定
+currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+// 地図を作成
+map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: currentProjection,
+    backgroundColor: '#ddd'
+});
+
+
+// GeojsonLayerインスタンスを作成（カラーパレット使用）
 const worldLayer = new Thematika.GeojsonLayer({
     data: geojson,                
     attr: { 
-        "fill": (d, i) => {
-            const colors = ['#440154', '#1f9d8a']; 
-            return colors[i % colors.length];
-        },
-        "filter": shadowFilter.url(), 
-        "stroke": '#1e293b',
+        "fill": "#f7da48",// ダーク系の2色
+        "stroke": '#1e293b', // ダーク系のストローク
         "stroke-width": 0.3,
         "opacity": 0.85,
+        "cursor": "pointer"
+    },
+});
+
+
+                    // PointSymbolLayerを作成
+const symbolLayer = new Thematika.PointSymbolLayer({
+        data: point,
+        size: 42,
+        symbolType: d3.symbolSquare,
+        attr: {
+            "fill": (d, i) => colorPalette[i % colorPalette.length],
+            "stroke": '#2d3436',
+            "stroke-width": 1,
+            "opacity": 0.8
+        }
+    });
+
+
+// LineConnectionLayerインスタンスを作成
+const lineLayer = new Thematika.LineConnectionLayer({
+    data: roads,
+    attr: {
+        "stroke": "#333",
+        "stroke-width": 0.75,
+        "opacity": 1,
     }
 });
 
 // レイヤーインスタンスを地図に追加
-map.addLayer('world', worldLayer);</pre>
+map.addLayer('world', worldLayer);
+map.addLayer('world', lineLayer);
+map.addLayer('world', symbolLayer);</pre>
             </div>
         </section>
     </div>
@@ -142,9 +185,6 @@ map.addLayer('world', worldLayer);</pre>
             const container = document.querySelector("#map");
             const width = container.clientWidth;
             const height = container.clientHeight;
-
-            // 既存のSVGをクリア
-            d3.select("#map").selectAll("*").remove();
 
             // 世界地図データを読み込み
             const geojson = await d3.json('./geojson/aus/AUS.geojson');
