@@ -44,12 +44,12 @@
                     <a href="examples.html">Examples</a>
                 </li>
                 <li class="breadcrumb-item breadcrumb-separator">></li>
-                <li class="breadcrumb-item breadcrumb-current">GeoJSON Layer</li>
+                <li class="breadcrumb-item breadcrumb-current">Gallery 2</li>
             </ol>
         </nav>
 
         <section>
-            <h2 class="section-title">ギャラリー２</h2>
+            <h2 class="section-title">オーストラリア 空港ネットワーク</h2>
             
 
             <!-- コントロールパネル -->
@@ -176,22 +176,7 @@ map.addLayer('world', worldLayer);</pre>
                 },
             });
 
-                            // PointCircleLayerを作成
-            const circleLayer = new Thematika.PointCircleLayer({
-                    data: point,
-                    r: 6,
-                    attr: {
-                        "fill": (d,i) => {
-                            // 偶数インデックスは青、奇数インデックスはピンク
-                            return i % 2 === 0 ? '#74b9ff' : '#fd79a8';
-                        },
-                        "stroke": '#d63031',
-                        "stroke-width": 1,
-                        "opacity": 0.8
-                    }
-                });
-
-
+    
                                 // PointSymbolLayerを作成
             const symbolLayer = new Thematika.PointSymbolLayer({
                     data: point,
