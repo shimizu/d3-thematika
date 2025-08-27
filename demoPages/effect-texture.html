@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>d3-thematika Example Template</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/components.css">
+    <link rel="stylesheet" href="./css/responsive.css">
+    <script src="./js/common.js"></script>
+
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="examples.html" class="nav-link">Examples</a>
+                <a href="docs/" class="nav-link">Docs</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">effect texture</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">GeoJSON Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>GeoJSONフォーマットの世界地図データ</li>
+                    <li>fillにテクスチャーを適用</li>
+                    <li>リアルタイムプロジェクション切り替え</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法を選択</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>GeojsonLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// GeojsonLayerの使用例
+const geojson = await d3.json("./geojson/world.geojson");
+
+// GeojsonLayerインスタンスを作成
+const worldLayer = new Thematika.GeojsonLayer({
+    data: geojson,                
+    attr: { 
+        "fill": (d, i) => {
+            const colors = ['#440154', '#1f9d8a']; 
+            return colors[i % colors.length];
+        },
+        "filter": shadowFilter.url(), 
+        "stroke": '#1e293b',
+        "stroke-width": 0.3,
+        "opacity": 0.85,
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('world', worldLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="./thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // テクスチャをプリセットから取得
+        const lightOcean = Thematika.TexturePresets.lightOcean()
+        const sparseForest = Thematika.TexturePresets.sparseForest()
+
+
+        // カテゴリカルデータ用のパレット推奨
+        const recommendations = Thematika.recommendPalette('categorical', 8, true);
+        const bestPalette = recommendations[1].palette;
+        // 指定クラス数に最適化
+        const optimizedColors = Thematika.generateOptimizedPalette(bestPalette, 8);
+
+
+
+        // グローバル変数
+        let map;
+        let currentProjection = d3.geoEquirectangular();
+        
+        async function draw() {
+            const container = document.querySelector("#map");
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // 既存のSVGをクリア
+            d3.select("#map").selectAll("*").remove();
+
+            // 世界地図データを読み込み
+            const geojson = await d3.json('./geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[20, 20], [width-20, height-20]], geojson);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#666',
+                defs:[lightOcean, sparseForest]
+            });
+
+            
+            // GeojsonLayerインスタンスを作成（カラーパレット使用）
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: geojson,                
+                attr: { 
+                    "fill": (d, i) => i%2 === 0 ? lightOcean.url() : sparseForest.url(), // ダーク系の2色
+                    "stroke": '#1e293b', // ダーク系のストローク
+                    "stroke-width": 0.3,
+                    "opacity": 0.85,
+                    "cursor": "pointer"
+                },
+            });
+
+            // OutlineLayerインスタンスを作成
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": 'none', // より落ち着いたダークグレー
+                    "stroke-width": 2,
+                    "opacity": 0.7
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10],
+                attr: {
+                    "fill": 'none',
+                    "stroke": 'rgba(148, 163, 184, 0.4)', // 半透明のライトグレー
+                    "stroke-width": 0.3,
+                    "stroke-dasharray": '1,3',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+        }
+
+        // 投影法の変更
+        document.getElementById('projection-select').addEventListener('change', async function(e) {
+            const projectionType = e.target.value;
+            
+            // 投影法を変更
+            switch(projectionType) {
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+                default:
+                    currentProjection = d3.geoEquirectangular();
+            }
+            
+            // 地図を再描画
+            await draw();
+        });
+
+
+        // 初期描画
+        draw();
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
+        
+    </script>
+</body>
+</html>
