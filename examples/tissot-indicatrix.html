@@ -6,7 +6,6 @@
     <title>Tissot's Indicatrix - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-    <script src="https://unpkg.com/@turf/turf/turf.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="./css/components.css">
@@ -82,7 +81,7 @@
                 <div class="control-item">
                     <label>円半径 (km)</label>
                     <div class="slider-control">
-                        <input type="range" id="buffer-distance" min="50" max="425" step="25" value="350">
+                        <input type="range" id="buffer-distance" min="50" max="1000" step="25" value="300">
                         <span class="value-display" id="buffer-value">300</span>
                     </div>
                 </div>
@@ -90,6 +89,7 @@
                 <div class="control-item">
                     <label for="grid-spacing">グリッド間隔</label>
                     <select id="grid-spacing">
+                        <option value="10">10度</option>
                         <option value="15" selected>15度</option>
                         <option value="30">30度</option>
                         <option value="45">45度</option>
@@ -116,39 +116,39 @@
             <h2 class="section-title">実装サンプル</h2>
             
             <div class="code-header">
-                <h3>Tissot's Indicatrixの実装例</h3>
+                <h3>Tissot's Indicatrixの実装例 (d3.geoCircle)</h3>
                 <button class="copy-button" onclick="copyCode()">コードをコピー</button>
             </div>
             <div class="code-block">
-                <pre id="sample-code">// Tissot円生成関数
-function generateTissotCircles(bufferDistance, gridSpacing) {
+                <pre id="sample-code">// Tissot円生成関数 (d3.geoCircleでkm単位の半径を扱う)
+function generateTissotCircles(radiusInKm, gridSpacing) {
     const features = [];
-    
-    // 緯度経度の格子を作成
-    for (let lat = -75; lat <= 75; lat += gridSpacing) {
-        for (let lon = -180; lon <= 180; lon += gridSpacing) {
-            // ポイントを作成
-            const point = turf.point([lon, lat]);
-            
-            // バッファで円を作成（km単位）
-            const buffered = turf.buffer(point, bufferDistance, {units: 'kilometers'});
-            
-            features.push(buffered);
+    const earthCircumference = 6371 * Math.PI * 2;
+    const radiusInDegrees = (radiusInKm / earthCircumference) * 360;
+    const circle = d3.geoCircle().radius(radiusInDegrees).precision(10);
+
+    for (let lat = -80; lat <= 80; lat += gridSpacing) {
+        for (let lon = -180; lon < 180; lon += gridSpacing) {
+            const polygon = circle.center([lon, lat])();
+            features.push({
+                type: 'Feature',
+                properties: { lat, lon, radius: radiusInKm },
+                geometry: polygon
+            });
         }
     }
-    
     return { type: "FeatureCollection", features: features };
 }
 
 // Tissot円を生成
-const tissotCircles = generateTissotCircles(500, 30); // 500km, 30度間隔
+const tissotCircles = generateTissotCircles(300, 30); // 半径300km, 30度間隔
 
 // 地図を作成
 const map = new Thematika.Map({
     container: '#map',
     width: 800,
     height: 600,
-    projection: d3.geoMercator() // 投影法を変更して歪みを比較
+    projection: d3.geoMercator()
 });
 
 // Tissot円レイヤーを追加
@@ -165,18 +165,6 @@ const tissotLayer = new Thematika.GeojsonLayer({
 map.addLayer('tissot', tissotLayer);</pre>
             </div>
             
-            <div class="info-box" style="margin-top: 20px;">
-                <h3>📚 Tissot's Indicatrixとは</h3>
-                <p>
-                    Tissot's Indicatrix（ティソーの指示楕円）は、地図投影による歪みを可視化するための手法です。
-                    地球上の同じサイズの円を様々な場所に配置し、投影によってどのように変形されるかを示します。
-                </p>
-                <ul style="margin-top: 10px;">
-                    <li><strong>Mercator投影</strong>: 緯度が高くなるほど円が大きくなる</li>
-                    <li><strong>Equal Area投影</strong>: 円の面積が保たれる</li>
-                    <li><strong>Orthographic投影</strong>: 地球の端で楕円化が進む</li>
-                </ul>
-            </div>
         </section>
     </div>
 
@@ -198,32 +186,28 @@ map.addLayer('tissot', tissotLayer);</pre>
         let currentProjection = d3.geoMercator();
         let tissotCircles = null;
         
-        function generateTissotCircles(bufferDistance, gridSpacing) {
+        function generateTissotCircles(radiusInKm, gridSpacing) {
             const features = [];
+            // 地球の円周を計算 (半径6371km)
+            const earthCircumference = 6371 * Math.PI * 2;
+            // kmで指定された半径を度数に変換
+            const radiusInDegrees = (radiusInKm / earthCircumference) * 360;
             
-            // 緯度経度の格子を作成（緯度-75°〜75°）
-            for (let lat = -75; lat <= 75; lat += gridSpacing) {
-                for (let lon = -180; lon <= 180; lon += gridSpacing) {
-                    const point = turf.point([lon, lat]);
-                    const buffered = turf.buffer(point, bufferDistance, {units: 'kilometers'});
-                    
-                    let rewound;
-                    // アンチメリディアン（経度±180度）上の円はwinding orderが逆になるため、特別扱いする
-                    if (lon === -180 || lon === 180) {
-                        // 端の円は reverse: false で処理
-                        rewound = turf.rewind(buffered, { reverse: false });
-                    } else {
-                        // 中央の円は reverse: true で処理
-                        rewound = turf.rewind(buffered, { reverse: true });
-                    }
-                    
-                    rewound.properties = {
-                        lat: lat,
-                        lon: lon,
-                        bufferDistance: bufferDistance
-                    };
-                    
-                    features.push(rewound);
+            const circle = d3.geoCircle().radius(radiusInDegrees).precision(10);
+
+            // 緯度経度の格子を作成（緯度-80°〜80°）
+            for (let lat = -80; lat <= 80; lat += gridSpacing) {
+                for (let lon = -180; lon < 180; lon += gridSpacing) {
+                    const polygon = circle.center([lon, lat])();
+                    features.push({
+                        type: 'Feature',
+                        properties: {
+                            lat: lat,
+                            lon: lon,
+                            radius: radiusInKm
+                        },
+                        geometry: polygon
+                    });
                 }
             }
             
@@ -373,6 +357,15 @@ map.addLayer('tissot', tissotLayer);</pre>
             map.savePNG("map.png")
         });
 
+        // コードコピー機能
+        function copyCode() {
+            const code = document.getElementById('sample-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('コードをクリップボードにコピーしました！');
+            }, () => {
+                alert('コピーに失敗しました。');
+            });
+        }
     </script>
 </body>
 </html>
