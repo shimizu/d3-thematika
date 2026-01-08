@@ -25,7 +25,7 @@ export interface PointSymbolLayerOptions {
  * GeoJSONデータをシンボル要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にシンボルを配置
  */
-export class PointSymbolLayer extends BaseLayer implements IGeojsonLayer {
+export class PointSymbolLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */

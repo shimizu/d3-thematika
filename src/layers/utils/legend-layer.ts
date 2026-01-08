@@ -126,7 +126,7 @@ type ScaleType = 'quantized' | 'continuous' | 'ordinal';
 /**
  * D3スケールを受け取って地図に凡例を表示するレイヤークラス
  */
-export class LegendLayer extends BaseLayer {
+export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
   /** D3スケール */
   private scale: SupportedScale;
   /** 凡例の位置 */

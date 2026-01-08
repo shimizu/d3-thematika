@@ -135,7 +135,7 @@ interface AnnotationData {
  * GeoJSONデータをアノテーション要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にアノテーションを配置
  */
-export class PointAnnotationLayer extends BaseLayer implements IGeojsonLayer {
+export class PointAnnotationLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */

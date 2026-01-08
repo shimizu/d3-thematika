@@ -8,7 +8,7 @@ import { getCentroid } from '../../utils/gis-utils';
  * GeoJSONデータをスパイク要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にスパイクを配置
  */
-export class PointSpikeLayer extends BaseLayer implements IGeojsonLayer {
+export class PointSpikeLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */

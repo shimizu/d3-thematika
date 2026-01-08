@@ -98,7 +98,7 @@ export interface LineEdgeBundlingLayerOptions {
  * エッジバンドリング効果を適用したラインレイヤークラス
  * D3のcurveBundleとForce-directed layoutを使用して複数のラインを視覚的に整理します
  */
-export class LineEdgeBundlingLayer extends BaseLayer implements ILineConnectionLayer {
+export class LineEdgeBundlingLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements ILineConnectionLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */

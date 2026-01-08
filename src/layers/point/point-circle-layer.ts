@@ -22,7 +22,7 @@ export interface PointCircleLayerOptions {
  * GeoJSONデータをサークル要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にサークルを配置
  */
-export class PointCircleLayer extends BaseLayer implements IGeojsonLayer {
+export class PointCircleLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */

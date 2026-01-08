@@ -21,7 +21,7 @@ export interface GraticuleLayerOptions {
  * 経緯線（グラティキュール）を描画するレイヤークラス
  * D3のgeoGraticuleを使用して経緯線網を描画します
  */
-export class GraticuleLayer extends BaseLayer implements IGeojsonLayer {
+export class GraticuleLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** パス生成器 */
   private path?: GeoPath;
   /** レイヤーグループ */

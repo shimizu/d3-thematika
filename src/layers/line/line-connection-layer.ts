@@ -59,7 +59,7 @@ export interface LineConnectionLayerOptions {
  * 複数点間をラインで接続するレイヤークラス
  * LineString/MultiLineString形式のGeoJSONデータをサポート
  */
-export class LineConnectionLayer extends BaseLayer implements ILineConnectionLayer {
+export class LineConnectionLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements ILineConnectionLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */

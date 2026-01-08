@@ -6,17 +6,17 @@ import { ILayer, LayerAttr, LayerStyle } from '../../types';
  * 全レイヤーの基底となる抽象クラス
  * 共通の機能と振る舞いを定義します
  */
-export abstract class BaseLayer implements ILayer {
+export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle extends LayerStyle = LayerStyle> implements ILayer {
   /** レイヤーの一意識別子 */
   public readonly id: string;
   /** レイヤーの表示状態 */
   public visible: boolean = true;
   /** レイヤーの描画順序 */
   public zIndex: number = 0;
-  /** レイヤーのSVG属性設定（d3命名規則） */
-  protected attr: LayerAttr;
-  /** レイヤーのCSS style属性設定（d3命名規則） */
-  protected style?: LayerStyle;
+  /** レイヤーのSVG属性設定（d3命名規則に合わせてattrを使用） */
+  protected attr: TAttr;
+  /** レイヤーのCSS style属性設定（d3命名規則に合わせてstyleを使用） */
+  protected style?: TStyle;
   /** レイヤーのSVGグループ要素 */
   protected element?: SVGGElement;
 
@@ -27,7 +27,7 @@ export abstract class BaseLayer implements ILayer {
    * @param attr - レイヤーのSVG属性設定
    * @param style - レイヤーのCSS style属性設定（オプション）
    */
-  constructor(id: string, attr: LayerAttr = {}, style?: LayerStyle) {
+  constructor(id: string, attr: TAttr = {} as TAttr, style?: TStyle) {
     this.id = id;
     this.attr = {
       fill: '#cccccc',
@@ -123,7 +123,8 @@ export abstract class BaseLayer implements ILayer {
 
   /**
    * 単一要素にSVG属性を適用します
-   * @param element - 対象要素
+   * @param element - 対象要素（未使用だがシグネチャ維持）
+   * @param layerGroup - 属性を適用するレイヤーグループ
    * @protected
    */
   protected applyAttributesToElement(
@@ -131,9 +132,9 @@ export abstract class BaseLayer implements ILayer {
     layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
     Object.entries(this.attr).forEach(([property, value]) => {
-      if (value !== undefined) {
-        // 関数型・固定値に関わらず常にレイヤーグループに適用
-        const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
+      if (value !== undefined && property !== 'className') {
+        // 関数型の場合はダミーデータで評価（単一要素用）
+        const finalValue = typeof value === 'function' ? (value as Function)({} as any, 0) : value;
         layerGroup.attr(property, finalValue);
       }
     });
@@ -141,7 +142,8 @@ export abstract class BaseLayer implements ILayer {
 
   /**
    * 単一要素にCSS style属性を適用します
-   * @param element - 対象要素
+   * @param element - 対象要素（未使用）
+   * @param layerGroup - スタイルを適用するレイヤーグループ
    * @protected
    */
   protected applyStylesToElement(
@@ -151,8 +153,7 @@ export abstract class BaseLayer implements ILayer {
     if (this.style) {
       Object.entries(this.style).forEach(([property, value]) => {
         if (value !== undefined) {
-          // 関数型・固定値に関わらず常にレイヤーグループに適用
-          const finalValue = typeof value === 'function' ? value({} as any, 0) : value;
+          const finalValue = typeof value === 'function' ? (value as Function)({} as any, 0) : value;
           layerGroup.style(property, finalValue);
         }
       });
@@ -175,8 +176,8 @@ export abstract class BaseLayer implements ILayer {
 
   /**
    * 複数要素にSVG属性を適用します
-   * @param elements - 対象要素群
-   * @param layerGroup - レイヤーグループ
+   * @param elements - 対象要素群（データがバインドされている前提）
+   * @param layerGroup - レイヤーグループ（固定値の適用先）
    * @protected
    */
   protected applyAttributesToElements(
@@ -184,11 +185,10 @@ export abstract class BaseLayer implements ILayer {
     layerGroup: Selection<SVGGElement, unknown, HTMLElement, any>
   ): void {
     Object.entries(this.attr).forEach(([property, value]) => {
-      if (value !== undefined) {
-
+      if (value !== undefined && property !== 'className') {
         if (typeof value === 'function') {
           // 関数型の場合は個別の要素に適用
-          elements.attr(property, (d: any, i: number) => value(d, i));
+          elements.attr(property, (d: any, i: number) => (value as Function)(d, i));
         } else {
           // 非関数型の場合はレイヤーグループに適用
           layerGroup.attr(property, value);
@@ -212,7 +212,7 @@ export abstract class BaseLayer implements ILayer {
         if (value !== undefined) {
           if (typeof value === 'function') {
             // 関数型の場合は個別の要素に適用
-            elements.style(property, (d: any, i: number) => value(d, i));
+            elements.style(property, (d: any, i: number) => (value as Function)(d, i));
           } else {
             // 非関数型の場合はレイヤーグループに適用
             layerGroup.style(property, value);
@@ -223,7 +223,7 @@ export abstract class BaseLayer implements ILayer {
   }
 
   /**
-   * 複数要素にSVG属性とCSS style属性の両方を適用します（GeojsonLayer用）
+   * 複数要素にSVG属性とCSS style属性の両方を適用します
    * @param elements - 対象要素群
    * @param layerGroup - レイヤーグループ
    * @protected

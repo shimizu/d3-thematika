@@ -87,7 +87,7 @@ export interface LineTextLayerOptions {
  * LineString/MultiLineString上にテキストを配置するレイヤークラス
  * textPathを使用してパス沿いにテキストを配置
  */
-export class LineTextLayer extends BaseLayer implements IGeojsonLayer {
+export class LineTextLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */

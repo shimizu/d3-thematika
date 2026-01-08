@@ -21,7 +21,7 @@ export interface OutlineLayerOptions {
  * 地球の輪郭（アウトライン）を描画するレイヤークラス
  * D3のSphereジオメトリを使用して投影法の境界を描画します
  */
-export class OutlineLayer extends BaseLayer implements IGeojsonLayer {
+export class OutlineLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** パス生成器 */
   private path?: GeoPath;
   /** レイヤーグループ */

@@ -24,23 +24,23 @@ export interface ThematikaOptions {
 /**
  * レイヤーのSVG属性設定（d3命名規則に合わせてattrを使用）
  */
-export interface LayerAttr {
+export interface LayerAttr<T = any> {
   /** 塗りつぶし色 */
-  fill?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  fill?: string | ((d: T, index?: number) => string);
   /** 塗りつぶしの透明度（0-1） */
-  fillOpacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
+  fillOpacity?: number | ((d: T, index?: number) => number);
   /** 境界線の色 */
-  stroke?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  stroke?: string | ((d: T, index?: number) => string);
   /** 境界線の幅 */
-  strokeWidth?: number | ((feature: GeoJSON.Feature, index?: number) => number);
+  strokeWidth?: number | ((d: T, index?: number) => number);
   /** 境界線の破線パターン */
-  strokeDasharray?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  strokeDasharray?: string | ((d: T, index?: number) => string);
   /** 透明度（0-1） */
-  opacity?: number | ((feature: GeoJSON.Feature, index?: number) => number);
+  opacity?: number | ((d: T, index?: number) => number);
   /** SVGフィルター */
-  filter?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  filter?: string | ((d: T, index?: number) => string);
   /** クリップパス */
-  clipPath?: string | ((feature: GeoJSON.Feature, index?: number) => string);
+  clipPath?: string | ((d: T, index?: number) => string);
   /** 追加のCSSクラス名 */
   className?: string;
 }
@@ -48,8 +48,8 @@ export interface LayerAttr {
 /**
  * レイヤーのCSS style属性設定（d3命名規則に合わせてstyleを使用）
  */
-export interface LayerStyle {
-  [property: string]: string | number | ((feature: GeoJSON.Feature, index?: number) => string | number);
+export interface LayerStyle<T = any> {
+  [property: string]: string | number | ((d: T, index?: number) => string | number) | undefined;
 }
 
 

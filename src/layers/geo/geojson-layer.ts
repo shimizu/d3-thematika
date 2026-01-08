@@ -18,7 +18,7 @@ export interface GeojsonLayerOptions {
 /**
  * GeoJSONデータを描画するレイヤークラス
  */
-export class GeojsonLayer extends BaseLayer implements IGeojsonLayer {
+export class GeojsonLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** パス生成器 */

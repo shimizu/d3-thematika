@@ -24,7 +24,7 @@ export interface ImageLayerOptions {
  * Equirectangular投影法の場合は高速に描画し、
  * その他の投影法では画像を再投影して表示します
  */
-export class ImageLayer extends BaseLayer {
+export class ImageLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   private src: string;
   private bounds: [number, number, number, number];
   private projection?: GeoProjection;

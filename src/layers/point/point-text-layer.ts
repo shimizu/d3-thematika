@@ -73,7 +73,7 @@ export interface PointTextLayerOptions {
  * GeoJSONデータをテキスト要素として描画するレイヤークラス
  * ポイントならそのまま、ポリゴンやラインなら中心点にテキストを配置
  */
-export class PointTextLayer extends BaseLayer implements IGeojsonLayer {
+export class PointTextLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<GeoJSON.Feature>> implements IGeojsonLayer {
   /** GeoJSONデータ */
   private data: GeoJSON.FeatureCollection;
   /** 投影法 */
