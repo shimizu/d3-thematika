@@ -19,12 +19,18 @@ This file provides guidance to Gemini when working with code in this repository.
 - **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
 - **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
-- **各種レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, ImageLayer, LegendLayer
+- **基本レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, ImageLayer, LegendLayer
+- **ポイントレイヤー**: PointCircleLayer, PointSymbolLayer, PointSpikeLayer, PointTextLayer, PointAnnotationLayer
+- **ラインレイヤー**: LineConnectionLayer, LineEdgeBundlingLayer, LineTextLayer
 
 ### ビルド出力
 - **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間
 - **ESM** (`dist/thematika.esm.js`): ESモジュール
 - **CJS** (`dist/thematika.cjs.js`): CommonJS
+
+### ディレクトリ構成
+- **examples/**: 開発用デモページソース。開発者はここを編集します。
+- **demoPages/**: GitHub Pagesデプロイ用のビルド生成物。`npm run build:demo` で `examples/`、`docs/`、`dist/` から生成されるため、直接編集しないでください。
 
 注意: d3-geoとd3-selectionは外部依存として扱われ、UMDビルド使用時は別途読み込みが必要
 
@@ -68,14 +74,11 @@ npm run test:watch
 # カバレッジレポート付きテスト
 npm run test:coverage
 
-# デモページのデプロイ
+# デモページのビルド（demoPages/へ出力）
+npm run build:demo
+
+# デモページのデプロイ（gh-pages）
 npm run deploy
-
-# Storybook起動（http://localhost:6006）
-npm run storybook
-
-# Storybookのプロダクションビルド
-npm run build-storybook
 ```
 
 ### テスト要件
@@ -95,34 +98,6 @@ npm run build-storybook
 4. **不要な標準機能を削除**: 使用しない機能（透明度スライダー等）を削除
 
 これにより全デモページで一貫したデザインとUXを維持できます。
-
-## Storybook
-
-### 概要
-Storybook 9.0.13を使用してコンポーネントカタログとインタラクティブなドキュメントを提供しています。
-
-### 設定
-- **フレームワーク**: @storybook/html-vite
-- **ビルダー**: Vite
-- **設定ファイル**: `.storybook/main.ts`、`preview.ts`
-- **静的ファイル**: `examples/geojson`と`dist`ディレクトリを自動配信
-
-### ストーリーの作成
-新しいレイヤーのストーリーを作成する場合：
-
-1. `src/stories/layers/` にストーリーファイルを作成
-2. ファイル名は `LayerName.stories.ts` の形式
-3. 必要に応じて `src/stories/utils/story-helpers.ts` のヘルパー関数を使用
-
-### 注意事項
-- **d3インポート**: `import * as d3 from 'd3'` ではなく、個別パッケージをインポート（`d3-geo`、`d3-selection`等）
-- **アドオン**: バージョン互換性の問題により、現在アドオンは無効化されています
-- **背景色**: デモ用に見やすい背景色（#f0f8ff）を設定済み
-
-### 既存のストーリー
-- `GraticuleLayer.stories.ts`: 経緯線レイヤー（複数の投影法対応）
-- `PointCircleLayer.stories.ts`: ポイントサークルレイヤー（動的半径設定）
-- `GeojsonLayer.stories.ts`: GeoJSONレイヤー（カラースキーム、インタラクション付き）
 
 ## トークン削減戦略
 
