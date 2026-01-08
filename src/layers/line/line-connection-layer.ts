@@ -2,8 +2,9 @@ import { Selection, select as d3Select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { path as d3Path } from 'd3-path';
 import { line, curveBasis, curveCardinal, curveCatmullRom, curveLinear, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepAfter, curveStepBefore } from 'd3-shape';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer, ILineConnectionLayer, ArcControlPointType, ArcOffsetType } from '../../types';
+import { getCentroid } from '../../utils/gis-utils';
 import * as GeoJSON from 'geojson';
 
 /**

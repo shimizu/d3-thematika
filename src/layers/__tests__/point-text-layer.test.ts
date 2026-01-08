@@ -1,5 +1,5 @@
 // geoMercatorはmockProjectionに置き換え
-import { PointTextLayer } from '../point-text-layer';
+import { PointTextLayer } from '../point/point-text-layer';
 import * as GeoJSON from 'geojson';
 
 describe('PointTextLayer', () => {

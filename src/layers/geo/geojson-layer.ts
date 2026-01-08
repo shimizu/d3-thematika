@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../../types';
 
 /**
  * GeojsonLayerの初期化オプション

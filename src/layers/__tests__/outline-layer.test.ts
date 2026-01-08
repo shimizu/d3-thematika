@@ -1,4 +1,4 @@
-import { OutlineLayer } from '../outline-layer';
+import { OutlineLayer } from '../geo/outline-layer';
 import { LayerAttr } from '../../types';
 
 describe('OutlineLayer', () => {
@@ -206,7 +206,7 @@ describe('OutlineLayer', () => {
     test('動的スタイル関数が設定できる', () => {
       const dynamicLayer = new OutlineLayer({
         attr: {
-          strokeWidth: (d, i) => (i || 0) === 0 ? 2 : 1,
+          strokeWidth: (d: any, index?: number) => (index || 0) === 0 ? 2 : 1,
           opacity: () => 0.7
         }
       });

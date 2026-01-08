@@ -43,35 +43,35 @@ export type {
   TileUrlInfo,
   TileGenerationOptions
 } from './types';
-export type { ImageLayerOptions } from './layers/image-layer';
-export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/legend-layer';
-export type { PointCircleLayerOptions } from './layers/point-circle-layer';
-export type { PointSymbolLayerOptions } from './layers/point-symbol-layer';
-export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetAccessor, SubjectType, StyleValue, SubjectOptions, ConnectorOptions, NoteOptions } from './layers/point-annotation-layer';
+export type { ImageLayerOptions } from './layers/raster/image-layer';
+export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/utils/legend-layer';
+export type { PointCircleLayerOptions } from './layers/point/point-circle-layer';
+export type { PointSymbolLayerOptions } from './layers/point/point-symbol-layer';
+export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetAccessor, SubjectType, StyleValue, SubjectOptions, ConnectorOptions, NoteOptions } from './layers/point/point-annotation-layer';
 export type { PointSpikeLayerOptions } from './types';
-export type { PointTextLayerOptions } from './layers/point-text-layer';
-export type { LineConnectionLayerOptions } from './layers/line-connection-layer';
-export type { LineEdgeBundlingLayerOptions } from './layers/line-edgebundling-layer';
-export type { LineTextLayerOptions } from './layers/line-text-layer';
+export type { PointTextLayerOptions } from './layers/point/point-text-layer';
+export type { LineConnectionLayerOptions } from './layers/line/line-connection-layer';
+export type { LineEdgeBundlingLayerOptions } from './layers/line/line-edgebundling-layer';
+export type { LineTextLayerOptions } from './layers/line/line-text-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
 
 // レイヤークラス
-export { BaseLayer } from './layers/base-layer';
-export { GeojsonLayer } from './layers/geojson-layer';
-export { OutlineLayer } from './layers/outline-layer';
-export { GraticuleLayer } from './layers/graticule-layer';
-export { ImageLayer } from './layers/image-layer';
-export { LegendLayer } from './layers/legend-layer';
-export { PointCircleLayer } from './layers/point-circle-layer';
-export { PointSymbolLayer } from './layers/point-symbol-layer';
-export { PointAnnotationLayer } from './layers/point-annotation-layer';
-export { PointSpikeLayer } from './layers/point-spike-layer';
-export { PointTextLayer } from './layers/point-text-layer';
-export { LineConnectionLayer } from './layers/line-connection-layer';
-export { LineEdgeBundlingLayer } from './layers/line-edgebundling-layer';
-export { LineTextLayer } from './layers/line-text-layer';
+export { BaseLayer } from './layers/core/base-layer';
+export { GeojsonLayer } from './layers/geo/geojson-layer';
+export { OutlineLayer } from './layers/geo/outline-layer';
+export { GraticuleLayer } from './layers/geo/graticule-layer';
+export { ImageLayer } from './layers/raster/image-layer';
+export { LegendLayer } from './layers/utils/legend-layer';
+export { PointCircleLayer } from './layers/point/point-circle-layer';
+export { PointSymbolLayer } from './layers/point/point-symbol-layer';
+export { PointAnnotationLayer } from './layers/point/point-annotation-layer';
+export { PointSpikeLayer } from './layers/point/point-spike-layer';
+export { PointTextLayer } from './layers/point/point-text-layer';
+export { LineConnectionLayer } from './layers/line/line-connection-layer';
+export { LineEdgeBundlingLayer } from './layers/line/line-edgebundling-layer';
+export { LineTextLayer } from './layers/line/line-text-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';

@@ -1,4 +1,4 @@
-import { ImageLayer, ImageLayerOptions } from '../image-layer';
+import { ImageLayer, ImageLayerOptions } from '../raster/image-layer';
 import { Selection } from 'd3-selection';
 import * as d3 from 'd3-geo';
 

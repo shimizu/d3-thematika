@@ -1,4 +1,4 @@
-import { BaseLayer } from '../base-layer';
+import { BaseLayer } from '../core/base-layer';
 import { LayerAttr } from '../../types';
 import { Selection } from 'd3-selection';
 

@@ -1,4 +1,4 @@
-import { PointSymbolLayer } from '../point-symbol-layer';
+import { PointSymbolLayer } from '../point/point-symbol-layer';
 import { symbolCross, symbolCircle, symbolDiamond } from 'd3-shape';
 import { LayerAttr } from '../../types';
 

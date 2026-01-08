@@ -1,8 +1,8 @@
 import { Selection } from 'd3-selection';
 import { drag } from 'd3-drag';
 import { ScaleOrdinal, ScaleSequential, ScaleLinear, ScaleThreshold } from 'd3-scale';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, ILayer } from '../../types';
 
 /**
  * 凡例の位置設定

@@ -1,4 +1,4 @@
-import { LineEdgeBundlingLayer } from '../line-edgebundling-layer';
+import { LineEdgeBundlingLayer } from '../line/line-edgebundling-layer';
 import { geoMercator } from 'd3-geo';
 import { select } from 'd3-selection';
 import { JSDOM } from 'jsdom';

@@ -1,5 +1,5 @@
 import { geoMercator } from 'd3-geo';
-import { LineConnectionLayer } from '../line-connection-layer';
+import { LineConnectionLayer } from '../line/line-connection-layer';
 import * as GeoJSON from 'geojson';
 
 describe('LineConnectionLayer', () => {

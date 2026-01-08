@@ -1,4 +1,4 @@
-import { GeojsonLayer } from '../geojson-layer';
+import { GeojsonLayer } from '../geo/geojson-layer';
 import { LayerAttr } from '../../types';
 
 describe('GeojsonLayer', () => {
@@ -167,8 +167,8 @@ describe('GeojsonLayer', () => {
       const dynamicLayer = new GeojsonLayer({
         data: sampleGeoJSON,
         attr: {
-          fill: (d, i) => (i || 0) % 2 === 0 ? 'red' : 'blue',
-          strokeWidth: (d) => d.properties?.population > 100000 ? 2 : 1
+          fill: (d: any, index?: number) => (index || 0) % 2 === 0 ? 'red' : 'blue',
+          strokeWidth: (d: any) => d.properties?.population > 100000 ? 2 : 1
         }
       });
 

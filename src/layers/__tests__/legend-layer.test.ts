@@ -1,6 +1,6 @@
 import { scaleOrdinal, scaleLinear, scaleThreshold, scaleSequential } from 'd3-scale';
 import { interpolateYlOrRd } from 'd3-scale-chromatic';
-import { LegendLayer } from '../legend-layer';
+import { LegendLayer } from '../utils/legend-layer';
 
 describe('LegendLayer', () => {
   let container: any;

@@ -1,4 +1,4 @@
-import { LineTextLayer, LineTextLayerOptions } from '../line-text-layer';
+import { LineTextLayer, LineTextLayerOptions } from '../line/line-text-layer';
 import * as d3 from 'd3-geo';
 
 // D3のselectionのモック作成
@@ -397,9 +397,9 @@ describe('LineTextLayer', () => {
     it('フォント設定が関数で指定できる', () => {
       const options: LineTextLayerOptions = {
         data: sampleLineStringData,
-        fontFamily: (feature, index) => `font-${index}`,
-        fontSize: (feature, index) => 12 + index,
-        fontWeight: (feature, index) => index % 2 === 0 ? 'bold' : 'normal'
+        fontFamily: (feature: any, index?: number) => `font-${index}`,
+        fontSize: (feature: any, index?: number) => 12 + (index || 0),
+        fontWeight: (feature: any, index?: number) => (index || 0) % 2 === 0 ? 'bold' : 'normal'
       };
       
       layer = new LineTextLayer(options);

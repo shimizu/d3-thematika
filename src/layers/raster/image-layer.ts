@@ -1,7 +1,7 @@
 import { Selection, select } from 'd3-selection';
 import { GeoProjection, geoPath, geoEquirectangular } from 'd3-geo';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../../types';
 
 /**
  * 画像レイヤーのオプション

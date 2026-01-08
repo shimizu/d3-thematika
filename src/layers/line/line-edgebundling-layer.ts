@@ -2,8 +2,8 @@ import { Selection, select as d3Select } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { line, curveBundle } from 'd3-shape';
 import { forceSimulation, forceLink, forceManyBody } from 'd3-force';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, ILineConnectionLayer } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer, ILineConnectionLayer } from '../../types';
 import * as GeoJSON from 'geojson';
 
 /**

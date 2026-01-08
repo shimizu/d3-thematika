@@ -1,8 +1,8 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
 import { line, curveBasis, curveCardinal, curveCatmullRom, curveLinear, curveMonotoneX, curveMonotoneY, curveNatural, curveStep, curveStepAfter, curveStepBefore } from 'd3-shape';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, IGeojsonLayer, ArcControlPointType, ArcOffsetType } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer, ArcControlPointType, ArcOffsetType } from '../../types';
 import * as GeoJSON from 'geojson';
 
 /**

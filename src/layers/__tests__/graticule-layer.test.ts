@@ -1,4 +1,4 @@
-import { GraticuleLayer } from '../graticule-layer';
+import { GraticuleLayer } from '../geo/graticule-layer';
 import { LayerAttr } from '../../types';
 
 // d3-geoのモック
@@ -246,7 +246,7 @@ describe('GraticuleLayer', () => {
     test('動的スタイル関数が設定できる', () => {
       const dynamicLayer = new GraticuleLayer({
         attr: {
-          strokeWidth: (d, i) => (i || 0) === 0 ? 1 : 0.5,
+          strokeWidth: (d: any, index?: number) => (index || 0) === 0 ? 1 : 0.5,
           opacity: () => 0.6
         }
       });

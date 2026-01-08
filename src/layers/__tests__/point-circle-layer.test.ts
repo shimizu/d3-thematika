@@ -1,4 +1,4 @@
-import { PointCircleLayer } from '../point-circle-layer';
+import { PointCircleLayer } from '../point/point-circle-layer';
 import { LayerAttr } from '../../types';
 
 describe('PointCircleLayer', () => {

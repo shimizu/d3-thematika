@@ -1,5 +1,5 @@
 import { Selection, select } from 'd3-selection';
-import { ILayer, LayerAttr, LayerStyle } from '../types';
+import { ILayer, LayerAttr, LayerStyle } from '../../types';
 
 
 /**

@@ -18,10 +18,12 @@ This file provides guidance to Gemini when working with code in this repository.
 ### レイヤーベースアーキテクチャ
 - **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
-- **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
-- **基本レイヤー**: GeojsonLayer, GraticuleLayer, OutlineLayer, ImageLayer, LegendLayer
-- **ポイントレイヤー**: PointCircleLayer, PointSymbolLayer, PointSpikeLayer, PointTextLayer, PointAnnotationLayer
-- **ラインレイヤー**: LineConnectionLayer, LineEdgeBundlingLayer, LineTextLayer
+- **BaseLayer (layers/core/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
+- **Geo レイヤー (layers/geo/)**: GeojsonLayer, GraticuleLayer, OutlineLayer
+- **Point レイヤー (layers/point/)**: PointCircleLayer, PointSymbolLayer, PointSpikeLayer, PointTextLayer, PointAnnotationLayer
+- **Line レイヤー (layers/line/)**: LineConnectionLayer, LineEdgeBundlingLayer, LineTextLayer
+- **Raster レイヤー (layers/raster/)**: ImageLayer
+- **Utils レイヤー (layers/utils/)**: LegendLayer
 
 ### ビルド出力
 - **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間

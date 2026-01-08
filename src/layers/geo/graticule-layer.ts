@@ -1,7 +1,7 @@
 import { Selection } from 'd3-selection';
 import { geoPath, GeoPath, GeoProjection, geoGraticule } from 'd3-geo';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../../types';
 
 /**
  * GraticuleLayerの初期化オプション

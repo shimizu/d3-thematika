@@ -2,9 +2,9 @@ import { Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { Delaunay } from 'd3-delaunay';
 import { polygonCentroid } from 'd3-polygon';
-import { BaseLayer } from './base-layer';
-import { LayerAttr, LayerStyle, IGeojsonLayer } from '../types';
-import { getCentroid } from '../utils/gis-utils';
+import { BaseLayer } from '../core/base-layer';
+import { LayerAttr, LayerStyle, IGeojsonLayer } from '../../types';
+import { getCentroid } from '../../utils/gis-utils';
 
 /**
  * テキストデータの内部型
