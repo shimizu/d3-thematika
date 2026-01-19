@@ -189,6 +189,78 @@ function getChangeStats(originalData, fixedData) {
 }
 
 /**
+ * 座標配列から空の配列を再帰的に削除
+ * D3.jsなどでエラーになる空の座標リングなどを除去する
+ * @param {Object} geojson GeoJSONオブジェクト
+ * @returns {Object} 修正されたGeoJSON
+ */
+function removeEmptyCoordinates(geojson) {
+  if (!geojson) return null;
+
+  // FeatureCollection
+  if (geojson.type === 'FeatureCollection') {
+    const features = geojson.features
+      .map(f => removeEmptyCoordinates(f))
+      .filter(f => f !== null); // nullになったFeature（Geometryが空になったもの）を削除
+    
+    // すべてのFeatureが消えてもFeatureCollectionとしては有効（空集合）として返すか？
+    // 通常は空でもFeatureCollectionとして返す方が安全。
+    return { ...geojson, features };
+  }
+  
+  // Feature
+  if (geojson.type === 'Feature') {
+    const geometry = removeEmptyCoordinates(geojson.geometry);
+    // Geometryが空になった（null）場合は、Featureごと削除するためにnullを返す
+    if (!geometry) return null;
+    return { ...geojson, geometry };
+  }
+
+  // GeometryCollection
+  if (geojson.type === 'GeometryCollection') {
+    const geometries = geojson.geometries
+      .map(g => removeEmptyCoordinates(g))
+      .filter(g => g !== null);
+    
+    // GeometryCollectionの中身が空になってもオブジェクトとしては返す
+    return { ...geojson, geometries };
+  }
+
+  // Geometry
+  if (geojson.coordinates) {
+    const cleanCoords = (coords) => {
+      // 座標ペア（数値配列）の実体 [x, y] まできたらそのまま返す
+      // GeoJSONの座標は数値の配列
+      if (Array.isArray(coords) && coords.length >= 2 && typeof coords[0] === 'number') {
+        return coords;
+      }
+      
+      // 配列でない、または空配列の場合は null
+      if (!Array.isArray(coords) || coords.length === 0) {
+        return null;
+      }
+
+      // 再帰的に処理
+      const cleaned = coords
+        .map(c => cleanCoords(c))
+        .filter(c => c !== null);
+
+      // 子要素がすべて消えたら自身も消す
+      return cleaned.length > 0 ? cleaned : null;
+    };
+
+    const newCoords = cleanCoords(geojson.coordinates);
+
+    // 座標が空になったGeometryは削除対象
+    if (!newCoords) return null;
+
+    return { ...geojson, coordinates: newCoords };
+  }
+
+  return geojson;
+}
+
+/**
  * GeoJSONファイルを修正
  * @param {string} filePath - GeoJSONファイルパス
  * @param {Object} options - オプション
@@ -205,8 +277,22 @@ async function fixGeoJSONFile(filePath, options) {
     console.log(`修正モード: ${options.forD3 ? 'D3.js用' : 'GeoJSON仕様準拠'}`);
 
     // 元のデータを読み込み
-    const originalData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const rawData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+    // 空の座標配列を削除（D3のエラー対策）
+    console.log('データのクリーニングを実行中...');
+    const originalData = removeEmptyCoordinates(rawData);
     
+    if (!originalData) {
+      throw new Error('データが空、またはすべてのGeometryが無効でした。');
+    }
+
+    // クリーニングによる変更があったかチェック
+    const isCleaned = JSON.stringify(rawData) !== JSON.stringify(originalData);
+    if (isCleaned) {
+      console.log('✓ 空の座標配列などを削除しました。');
+    }
+
     // Turf.jsで修正
     const fixedData = rewind(originalData, { 
       reverse: options.forD3,
@@ -228,7 +314,7 @@ async function fixGeoJSONFile(filePath, options) {
       console.log(`穴 CW: ${stats.rings.holeCW.before} → ${stats.rings.holeCW.after}`);
       console.log(`穴 CCW: ${stats.rings.holeCCW.before} → ${stats.rings.holeCCW.after}`);
     } else {
-      console.log('変更の必要はありませんでした。');
+      console.log('ワインディング順序の変更はありませんでした。');
     }
 
     // Dry runの場合はここで終了
@@ -238,7 +324,7 @@ async function fixGeoJSONFile(filePath, options) {
     }
 
     // 変更がない場合は書き込みをスキップ
-    if (stats.rings.changed === 0) {
+    if (stats.rings.changed === 0 && !isCleaned) {
       console.log('\n修正完了: 変更はありませんでした。');
       return;
     }
