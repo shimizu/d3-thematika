@@ -17,7 +17,48 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### レイヤーベースアーキテクチャ
 - **Map クラス (thematika.ts)**: メインオーケストレーター。SVG作成、投影法管理、LayerManagerへの委譲
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
-- **BaseLayer (layers/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
+- **BaseLayer (layers/core/base-layer.ts)**: 全レイヤーの基底クラス。Generic型による型安全な属性管理
+
+### ソースコード構造
+
+```
+src/
+├── core/                      # コアレイヤー管理機能
+│   └── layer-manager.ts
+├── layers/                    # レイヤー実装（14種類）
+│   ├── core/
+│   │   └── base-layer.ts      # 全レイヤーの基底クラス
+│   ├── geo/                   # 地理空間レイヤー
+│   │   ├── geojson-layer.ts
+│   │   ├── graticule-layer.ts
+│   │   └── outline-layer.ts
+│   ├── point/                 # ポイント関連レイヤー
+│   │   ├── point-circle-layer.ts
+│   │   ├── point-symbol-layer.ts
+│   │   ├── point-annotation-layer.ts
+│   │   ├── point-text-layer.ts
+│   │   └── point-spike-layer.ts
+│   ├── line/                  # ライン関連レイヤー
+│   │   ├── line-connection-layer.ts
+│   │   ├── line-edgebundling-layer.ts
+│   │   └── line-text-layer.ts
+│   ├── raster/
+│   │   └── image-layer.ts
+│   └── utils/
+│       └── legend-layer.ts
+├── utils/                     # ユーティリティ（9モジュール）
+│   ├── effect-utils.ts        # SVGフィルター、ブルーム、ドロップシャドウ
+│   ├── texture-utils.ts       # テクスチャパターン
+│   ├── cog-utils.ts           # Cloud Optimized GeoTIFF
+│   ├── tile-utils.ts          # Webタイルシステム
+│   ├── gis-utils.ts           # 地理計算（turf.js使用）
+│   ├── color-palette.ts       # カラーパレット、色覚障害対応
+│   ├── hachure-utils.ts       # ハッチング効果
+│   └── test-utils.ts          # テストユーティリティ
+├── thematika.ts               # Mapクラス
+├── types.ts                   # 型定義
+└── index.ts                   # エクスポート
+```
 
 ### 実装済みレイヤータイプ
 
@@ -44,9 +85,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **カスタムフィルター**: createCustomFilter APIによるSVGフィルター定義
 - **ブルームエフェクト**: 発光効果
 - **ドロップシャドウ**: 影効果
+- **テクスチャ**: textures.jsによるパターン生成
 - **クリップ機能**: ポリゴン形状によるクリッピング
 - **COG対応**: Cloud Optimized GeoTIFFの読み込み
 - **タイル機能**: Web地図タイルシステム
+- **GIS計算**: turf.jsによる地理計算ユーティリティ
+- **カラーパレット**: 色覚障害対応のカラーパレット管理
 
 ### ビルド出力
 - **UMD** (`dist/thematika.umd.js`): ブラウザ用、グローバル`Thematika`名前空間
@@ -121,7 +165,7 @@ npm run deploy
 ## Examples ディレクトリ構造
 
 ### 概要
-examples/ディレクトリには21個のデモページが6つのカテゴリーに分類されて配置されています。
+examples/ディレクトリには32個のデモページが7つのカテゴリーに分類されて配置されています。
 
 ### カテゴリー別構成
 1. **基本レイヤー** (3例)
@@ -142,20 +186,30 @@ examples/ディレクトリには21個のデモページが6つのカテゴリ�
    - line-edgebundling-layer.html - エッジバンドリング
    - line-text-layer.html - ライン上テキスト
 
-4. **エフェクト** (3例)
+4. **エフェクト** (4例)
    - effect-bloom.html - ブルーム効果
    - effect-dropshadow.html - ドロップシャドウ
    - effect-customFilter.html - カスタムSVGフィルター
+   - effect-texture.html - テクスチャパターン
 
-5. **ユーティリティ** (5例)
+5. **ユーティリティ** (6例)
    - clip-polygon.html - ポリゴンクリップ
    - cog-load.html - Cloud Optimized GeoTIFF
    - tile-map.html - タイル地図システム
    - color-palette-showcase.html - カラーパレット展示
+   - gis-utils.html - GIS計算ユーティリティ
    - playground.html - 実験的複合デモ
 
-6. **ギャラリー** (1例)
+6. **ギャラリー** (5例)
    - gallery1.html - 古地図風デモ
+   - gallery2.html - ギャラリー2
+   - gallery3.html - ギャラリー3
+   - gallery4.html - ギャラリー4
+   - biutiful-map.html - 美しい地図デモ
+
+7. **その他** (2例)
+   - tissot-indicatrix.html - ティソの指示楕円
+   - playground.html - 実験・検証用
 
 ### 重要ファイル
 - **examples.html**: サンプル一覧ページ（ギャラリー形式）
@@ -163,9 +217,11 @@ examples/ディレクトリには21個のデモページが6つのカテゴリ�
 - **index.html**: エントリーページ
 
 ### リソースディレクトリ
-- **css/**: 共通スタイルシート
+- **css/**: 共通スタイルシート（components.css, style.css, responsive.css）
 - **js/**: 共通JavaScript（common.js）
 - **geojson/**: GeoJSONデータファイル
+- **geotiff/**: GeoTIFFファイル
+- **img/**: 画像リソース
 - **thumbnails/**: デモページのサムネイル画像
 
 ## トークン削減戦略
@@ -173,22 +229,13 @@ examples/ディレクトリには21個のデモページが6つのカテゴリ�
 Claude Code 使用時は以下の方法でトークン消費を最小限に抑える：
 
 ### ファイル読み込み最適化
-- 初回ファイル確認は `compact` モード使用
 - 必要に応じて `limit`/`offset` で部分読み込み
-- Task/Agent ツールで事前調査してピンポイント特定
-
-### コード解析最適化（serena MCP活用）
-- **serena MCPサーバー**を活用してシンボルベースで効率的にコード解析
-- `mcp__serena__find_symbol`で特定のクラス・関数をピンポイント読み込み
-- `mcp__serena__get_symbols_overview`でファイル構造を軽量に把握
-- `mcp__serena__search_for_pattern`で柔軟なパターン検索
-- `mcp__serena__list_dir`でディレクトリ構造を効率的に探索
-- **重要**: ファイル全体の`Read`は最終手段。serenaツールで必要部分のみ取得
+- Task/Exploreエージェントで事前調査してピンポイント特定
+- コードベース探索はExploreエージェントを活用
 
 ### 効率的な処理
 - 複数ファイル読み込みを並列実行
 - 独立したGitコマンドをバッチ処理
-- MultiEdit で複数箇所を一括変更
 
 ### 開発アプローチ
 - 実装前に構造とアプローチを明確化
@@ -209,7 +256,7 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
 - **重要**: HTMLファイルでのスクリプト参照は必ず `<script src="thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 21個のデモページ、20種類以上のレイヤータイプが実装済み。新機能追加時は必ず対応するexampleを作成
+- **実装状況**: 32個のデモページ、14種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するexampleを作成
 
 ### Immutableパターンの採用
 
