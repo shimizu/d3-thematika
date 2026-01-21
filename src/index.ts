@@ -7,7 +7,8 @@
  * 
  * @example
  * ```typescript
- * import { Thematika } from 'd3-thematika';
+ * import { Map, GeojsonLayer } from 'd3-thematika';
+ * import * as d3 from 'd3';
  * 
  * const map = new Map({
  *   container: '#map',
@@ -18,7 +19,7 @@
  * 
  * const layer = new GeojsonLayer({
  *   data: geoJsonData,
- *   style: { fill: '#f0f0f0', stroke: '#333' }
+ *   attr: { fill: '#f0f0f0', stroke: '#333' }
  * });
  * map.addLayer('countries', layer);
  * ```
