@@ -36,11 +36,15 @@ GeoJSONワインディング順序修正スクリプト
   --geojson    GeoJSON仕様準拠に修正（外側リング：CCW、内側リング：CW）
   --backup     修正前のファイルをバックアップ（.bakファイルを作成）
   --dry-run    実際の修正は行わず、変更内容のみ表示
+  --pretty     JSONを整形して保存（ファイルサイズが大きくなります）
   --help       このヘルプを表示
 
 例:
-  # D3用に修正（デフォルト）
+  # D3用に修正（デフォルト、ファイルサイズ最小化）
   node scripts/fix-geojson-winding.js file.geojson --d3
+
+  # 整形して保存する場合
+  node scripts/fix-geojson-winding.js file.geojson --d3 --pretty
 
   # GeoJSON仕様準拠に修正
   node scripts/fix-geojson-winding.js file.geojson --geojson
@@ -337,7 +341,8 @@ async function fixGeoJSONFile(filePath, options) {
     }
 
     // 修正したデータを書き込み
-    fs.writeFileSync(filePath, JSON.stringify(fixedData, null, 2), 'utf8');
+    const space = options.pretty ? 2 : 0;
+    fs.writeFileSync(filePath, JSON.stringify(fixedData, null, space), 'utf8');
     console.log(`\n修正完了: ${filePath}`);
 
   } catch (error) {
@@ -368,7 +373,8 @@ async function main() {
   const options = {
     forD3: args.includes('--d3') || !args.includes('--geojson'), // デフォルトはD3用
     backup: args.includes('--backup'),
-    dryRun: args.includes('--dry-run')
+    dryRun: args.includes('--dry-run'),
+    pretty: args.includes('--pretty')
   };
 
   // Turf.jsの依存関係チェック
