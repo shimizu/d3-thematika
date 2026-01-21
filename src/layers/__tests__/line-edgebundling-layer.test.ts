@@ -61,7 +61,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('constructor', () => {
-    it('should create instance with LineString data', () => {
+    test('LineStringデータでインスタンスを作成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -69,28 +69,28 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer.id).toMatch(/^line-edgebundling-/);
     });
 
-    it('should create instance with MultiLineString data', () => {
+    test('MultiLineStringデータでインスタンスを作成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testMultiLineStringData
       });
       expect(layer).toBeInstanceOf(LineEdgeBundlingLayer);
     });
 
-    it('should create instance with FeatureCollection data', () => {
+    test('FeatureCollectionデータでインスタンスを作成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testFeatureCollection
       });
       expect(layer).toBeInstanceOf(LineEdgeBundlingLayer);
     });
 
-    it('should create instance with Feature array data', () => {
+    test('Feature配列データでインスタンスを作成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: [testLineStringData, testMultiLineStringData]
       });
       expect(layer).toBeInstanceOf(LineEdgeBundlingLayer);
     });
 
-    it('should set default options', () => {
+    test('デフォルトオプションが設定される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -104,7 +104,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer['endpointSize']).toBe(6);
     });
 
-    it('should set custom options', () => {
+    test('カスタムオプションが設定される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         bundlingStrength: 0.5,
@@ -126,7 +126,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer['endpointSize']).toBe(8);
     });
 
-    it('should set attributes and styles', () => {
+    test('属性とスタイルが設定される', () => {
       const attr = { stroke: '#ff0000', strokeWidth: 2 };
       const style = { opacity: 0.7 };
       
@@ -142,7 +142,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('data validation', () => {
-    it('should throw error for invalid data type', () => {
+    test('不正なデータ型でエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: { type: 'Point' } as any
@@ -150,7 +150,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('データはFeatureCollectionである必要があります');
     });
 
-    it('should throw error for missing features', () => {
+    test('featuresが欠けている場合にエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: { type: 'FeatureCollection' } as any
@@ -158,7 +158,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('featuresが配列ではありません');
     });
 
-    it('should throw error for missing geometry', () => {
+    test('geometryが欠けている場合にエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -169,7 +169,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('フィーチャー[0]にgeometryが存在しません');
     });
 
-    it('should throw error for invalid geometry type', () => {
+    test('不正なgeometryタイプでエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -184,7 +184,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('フィーチャー[0]は\'LineString\'または\'MultiLineString\'である必要があります');
     });
 
-    it('should throw error for insufficient coordinates', () => {
+    test('座標が不足している場合にエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -202,7 +202,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('フィーチャー[0]は少なくとも2点の座標が必要です');
     });
 
-    it('should throw error for invalid coordinate format', () => {
+    test('不正な座標形式でエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -220,7 +220,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('座標[0]は[経度, 緯度]の配列である必要があります');
     });
 
-    it('should throw error for invalid longitude', () => {
+    test('不正な経度でエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -238,7 +238,7 @@ describe('LineEdgeBundlingLayer', () => {
       }).toThrow('経度は-180から180の範囲である必要があります');
     });
 
-    it('should throw error for invalid latitude', () => {
+    test('不正な緯度でエラーを投げる', () => {
       expect(() => {
         new LineEdgeBundlingLayer({
           data: {
@@ -258,7 +258,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('setProjection', () => {
-    it('should set projection and update path', () => {
+    test('投影法を設定しパスを更新できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -268,7 +268,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer['path']).toBeDefined();
     });
 
-    it('should re-render when projection changes after initial render', () => {
+    test('初回描画後に投影法が変更された場合に再描画される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -285,7 +285,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('render', () => {
-    it('should render without errors', () => {
+    test('エラーなく描画できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -294,7 +294,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(() => layer.render(container)).not.toThrow();
     });
 
-    it('should create layer group', () => {
+    test('レイヤーグループが作成される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -307,7 +307,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer.isRendered()).toBe(true);
     });
 
-    it('should render bundled lines', () => {
+    test('バンドルされたラインが描画される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -319,7 +319,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(bundledLines.empty()).toBe(false);
     });
 
-    it('should render original lines when showOriginalLines is true', () => {
+    test('showOriginalLinesがtrueの場合に元のラインが描画される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         showOriginalLines: true
@@ -332,7 +332,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(originalLines.empty()).toBe(false);
     });
 
-    it('should render control points when showControlPoints is true', () => {
+    test('showControlPointsがtrueの場合に制御点が描画される', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         showControlPoints: true
@@ -347,7 +347,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(endpoints.empty()).toBe(false);
     });
 
-    it('should not render when projection is not set', () => {
+    test('投影法が設定されていない場合は描画されない', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -362,7 +362,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(layer['bundlingData']).toBeUndefined();
     });
 
-    it('should handle empty data gracefully', () => {
+    test('空のデータを適切に処理できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: { type: 'FeatureCollection', features: [] }
       });
@@ -373,7 +373,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('generateBundlingData', () => {
-    it('should generate bundling data for LineString', () => {
+    test('LineStringのバンドリングデータを生成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -387,7 +387,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(bundlingData.paths.length).toBe(1);
     });
 
-    it('should generate bundling data for MultiLineString', () => {
+    test('MultiLineStringのバンドリングデータを生成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testMultiLineStringData
       });
@@ -401,7 +401,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(bundlingData.paths.length).toBe(2); // MultiLineStringの2本のライン
     });
 
-    it('should generate bundling data for FeatureCollection', () => {
+    test('FeatureCollectionのバンドリングデータを生成できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testFeatureCollection
       });
@@ -417,7 +417,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('calculateSegmentSteps', () => {
-    it('should calculate segment steps automatically', () => {
+    test('セグメントステップを自動計算できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         segmentSteps: 'auto'
@@ -433,7 +433,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(steps2).toBeGreaterThanOrEqual(steps1);
     });
 
-    it('should use fixed segment steps when specified', () => {
+    test('指定された固定セグメントステップを使用できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         segmentSteps: 5
@@ -443,7 +443,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(steps).toBe(5);
     });
 
-    it('should enforce minimum segment steps', () => {
+    test('最小セグメントステップを強制できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         segmentSteps: 1
@@ -455,7 +455,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('setBundlingStrength', () => {
-    it('should set bundling strength within valid range', () => {
+    test('バンドリング強度を有効な範囲内で設定できる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData
       });
@@ -472,7 +472,7 @@ describe('LineEdgeBundlingLayer', () => {
   });
 
   describe('getSimulation', () => {
-    it('should return simulation after render', () => {
+    test('描画後にシミュレーションを返すことができる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         animateForce: true
@@ -485,7 +485,7 @@ describe('LineEdgeBundlingLayer', () => {
       expect(simulation).toBeDefined();
     });
 
-    it('should return undefined when animateForce is false', () => {
+    test('animateForceがfalseの場合はundefinedを返す', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         animateForce: false
@@ -501,7 +501,7 @@ describe('LineEdgeBundlingLayer', () => {
 
 
   describe('destroy', () => {
-    it('should stop simulation and clean up', () => {
+    test('シミュレーションを停止しクリーンアップできる', () => {
       const layer = new LineEdgeBundlingLayer({
         data: testLineStringData,
         animateForce: true
