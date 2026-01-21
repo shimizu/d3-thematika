@@ -156,8 +156,6 @@ map.addLayer('world', worldLayer);</pre>
             const width = container.clientWidth;
             const height = container.clientHeight;
 
-            // 既存のSVGをクリア
-            d3.select("#map").selectAll("*").remove();
 
             // 世界地図データを読み込み
             const geojson = await d3.json('./geojson/world.geojson');
