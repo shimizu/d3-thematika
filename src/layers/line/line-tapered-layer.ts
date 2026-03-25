@@ -40,6 +40,12 @@ export interface LineTaperedLayerOptions {
   arcHeight?: number;
   /** アークの向きを反転するか（デフォルト: false） */
   flipArc?: boolean | ((d: GeoJSON.Feature, i: number) => boolean);
+  /** 開始点に矢印を表示（デフォルト: false） */
+  startArrow?: boolean;
+  /** 終了点に矢印を表示（デフォルト: false） */
+  endArrow?: boolean;
+  /** 矢印のサイズ（デフォルト: 10） */
+  arrowSize?: number;
 }
 
 /**
@@ -62,6 +68,12 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
   private arcHeight: number;
   /** アークの向きを反転するか */
   private flipArc: boolean | ((d: GeoJSON.Feature, i: number) => boolean);
+  /** 開始点に矢印を表示 */
+  private startArrow: boolean;
+  /** 終了点に矢印を表示 */
+  private endArrow: boolean;
+  /** 矢印のサイズ */
+  private arrowSize: number;
   /** 投影法 */
   private projection?: GeoProjection;
 
@@ -88,6 +100,9 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     this.endSize = options.endSize !== undefined ? options.endSize : 2;
     this.arcHeight = options.arcHeight !== undefined ? options.arcHeight : 0.3;
     this.flipArc = options.flipArc !== undefined ? options.flipArc : false;
+    this.startArrow = options.startArrow || false;
+    this.endArrow = options.endArrow || false;
+    this.arrowSize = options.arrowSize || 10;
   }
 
   /**
@@ -356,15 +371,49 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     const controlBottomX = (startBottom[0] + endBottom[0]) / 2 + nx * arcOffset;
     const controlBottomY = (startBottom[1] + endBottom[1]) / 2 + ny * arcOffset;
 
+    // 矢印の頂点を計算
+    // 終点矢印: 終点キャップの先に、接線方向にarrowSize分延長した三角形の頂点
+    const endArrowTip: [number, number] | null = this.endArrow ? [
+      endPoint[0] + (endTanX / endTanLen) * this.arrowSize,
+      endPoint[1] + (endTanY / endTanLen) * this.arrowSize
+    ] : null;
+
+    // 始点矢印: 始点キャップの先に、接線逆方向にarrowSize分延長した三角形の頂点
+    const startArrowTip: [number, number] | null = this.startArrow ? [
+      startPoint[0] - (startTanX / startTanLen) * this.arrowSize,
+      startPoint[1] - (startTanY / startTanLen) * this.arrowSize
+    ] : null;
+
     // ポリゴンパスを生成
-    // M startTop → Q controlTop endTop → L endBottom → Q controlBottom startBottom → Z
-    return [
-      `M${startTop[0]},${startTop[1]}`,
-      `Q${controlTopX},${controlTopY} ${endTop[0]},${endTop[1]}`,
-      `L${endBottom[0]},${endBottom[1]}`,
-      `Q${controlBottomX},${controlBottomY} ${startBottom[0]},${startBottom[1]}`,
-      'Z'
-    ].join('');
+    const pathParts: string[] = [];
+
+    // 始点側: 矢印ありの場合は三角形、なしの場合は通常キャップ
+    if (startArrowTip) {
+      // startBottom → startArrowTip → startTop から開始
+      pathParts.push(`M${startBottom[0]},${startBottom[1]}`);
+      pathParts.push(`L${startArrowTip[0]},${startArrowTip[1]}`);
+      pathParts.push(`L${startTop[0]},${startTop[1]}`);
+    } else {
+      pathParts.push(`M${startTop[0]},${startTop[1]}`);
+    }
+
+    // 上辺アーク: startTop → endTop
+    pathParts.push(`Q${controlTopX},${controlTopY} ${endTop[0]},${endTop[1]}`);
+
+    // 終点側: 矢印ありの場合は三角形、なしの場合は直線キャップ
+    if (endArrowTip) {
+      pathParts.push(`L${endArrowTip[0]},${endArrowTip[1]}`);
+      pathParts.push(`L${endBottom[0]},${endBottom[1]}`);
+    } else {
+      pathParts.push(`L${endBottom[0]},${endBottom[1]}`);
+    }
+
+    // 下辺アーク: endBottom → startBottom
+    pathParts.push(`Q${controlBottomX},${controlBottomY} ${startBottom[0]},${startBottom[1]}`);
+
+    pathParts.push('Z');
+
+    return pathParts.join('');
   }
 
   /**

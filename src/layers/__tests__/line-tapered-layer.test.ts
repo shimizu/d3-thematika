@@ -337,6 +337,61 @@ describe('LineTaperedLayer', () => {
     });
   });
 
+  describe('arrow', () => {
+    it('endArrow有効時に描画が正常に実行される', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeature,
+        endArrow: true,
+        arrowSize: 12,
+        attr: { fill: '#ff6b6b' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+
+    it('startArrow有効時に描画が正常に実行される', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeature,
+        startArrow: true,
+        attr: { fill: '#333' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+
+    it('両方の矢印が有効時に正常に動作する', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeatureCollection,
+        startArrow: true,
+        endArrow: true,
+        arrowSize: 8,
+        attr: { fill: '#0000ff' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+
+    it('flipArcと矢印を同時に使用できる', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeature,
+        flipArc: true,
+        endArrow: true,
+        arrowSize: 10,
+        attr: { fill: '#ff0000' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+  });
+
   describe('getData', () => {
     it('GeoJSONデータを取得できる', () => {
       const layer = new LineTaperedLayer({
