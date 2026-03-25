@@ -106,6 +106,14 @@ export interface ILineConnectionLayer extends ILayer {
 }
 
 /**
+ * LineTaperedLayerのインターフェース
+ */
+export interface ILineTaperedLayer extends ILayer {
+  /** 投影法を設定する */
+  setProjection(projection: GeoProjection): void;
+}
+
+/**
  * PointSpikeLayerの初期化オプション
  */
 export interface PointSpikeLayerOptions {

@@ -37,6 +37,7 @@ export type {
   LayerStyle,
   ILayer,
   ILineConnectionLayer,
+  ILineTaperedLayer,
   ArcControlPointType,
   ArcOffsetType,
   TileCoordinate,
@@ -53,6 +54,7 @@ export type { PointSpikeLayerOptions } from './types';
 export type { PointTextLayerOptions } from './layers/point/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line/line-connection-layer';
 export type { LineEdgeBundlingLayerOptions } from './layers/line/line-edgebundling-layer';
+export type { LineTaperedLayerOptions } from './layers/line/line-tapered-layer';
 export type { LineTextLayerOptions } from './layers/line/line-text-layer';
 
 // コア機能
@@ -71,6 +73,7 @@ export { PointAnnotationLayer } from './layers/point/point-annotation-layer';
 export { PointSpikeLayer } from './layers/point/point-spike-layer';
 export { PointTextLayer } from './layers/point/point-text-layer';
 export { LineConnectionLayer } from './layers/line/line-connection-layer';
+export { LineTaperedLayer } from './layers/line/line-tapered-layer';
 export { LineEdgeBundlingLayer } from './layers/line/line-edgebundling-layer';
 export { LineTextLayer } from './layers/line/line-text-layer';
 
