@@ -46,6 +46,8 @@ export interface LineTaperedLayerOptions {
   endArrow?: boolean;
   /** 矢印のサイズ（デフォルト: 10） */
   arrowSize?: number;
+  /** 矢印の横幅（デフォルト: 端点サイズと同じ） */
+  arrowWidth?: number;
 }
 
 /**
@@ -74,6 +76,8 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
   private endArrow: boolean;
   /** 矢印のサイズ */
   private arrowSize: number;
+  /** 矢印の横幅 */
+  private arrowWidth?: number;
   /** 投影法 */
   private projection?: GeoProjection;
 
@@ -103,6 +107,7 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     this.startArrow = options.startArrow || false;
     this.endArrow = options.endArrow || false;
     this.arrowSize = options.arrowSize || 10;
+    this.arrowWidth = options.arrowWidth;
   }
 
   /**
@@ -372,26 +377,56 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     const controlBottomY = (startBottom[1] + endBottom[1]) / 2 + ny * arcOffset;
 
     // 矢印の頂点を計算
-    // 終点矢印: 終点キャップの先に、接線方向にarrowSize分延長した三角形の頂点
-    const endArrowTip: [number, number] | null = this.endArrow ? [
-      endPoint[0] + (endTanX / endTanLen) * this.arrowSize,
-      endPoint[1] + (endTanY / endTanLen) * this.arrowSize
-    ] : null;
+    // 終点矢印
+    let endArrowTip: [number, number] | null = null;
+    let endArrowTop: [number, number] | null = null;
+    let endArrowBottom: [number, number] | null = null;
+    if (this.endArrow) {
+      endArrowTip = [
+        endPoint[0] + (endTanX / endTanLen) * this.arrowSize,
+        endPoint[1] + (endTanY / endTanLen) * this.arrowSize
+      ];
+      // arrowWidth指定時は矢印の底辺を端点サイズとは独立に設定
+      const endAW = this.arrowWidth !== undefined ? this.arrowWidth : eSize;
+      endArrowTop = [
+        endPoint[0] + endNx * endAW / 2,
+        endPoint[1] + endNy * endAW / 2
+      ];
+      endArrowBottom = [
+        endPoint[0] - endNx * endAW / 2,
+        endPoint[1] - endNy * endAW / 2
+      ];
+    }
 
-    // 始点矢印: 始点キャップの先に、接線逆方向にarrowSize分延長した三角形の頂点
-    const startArrowTip: [number, number] | null = this.startArrow ? [
-      startPoint[0] - (startTanX / startTanLen) * this.arrowSize,
-      startPoint[1] - (startTanY / startTanLen) * this.arrowSize
-    ] : null;
+    // 始点矢印
+    let startArrowTip: [number, number] | null = null;
+    let startArrowTop: [number, number] | null = null;
+    let startArrowBottom: [number, number] | null = null;
+    if (this.startArrow) {
+      startArrowTip = [
+        startPoint[0] - (startTanX / startTanLen) * this.arrowSize,
+        startPoint[1] - (startTanY / startTanLen) * this.arrowSize
+      ];
+      const startAW = this.arrowWidth !== undefined ? this.arrowWidth : sSize;
+      startArrowTop = [
+        startPoint[0] + startNx * startAW / 2,
+        startPoint[1] + startNy * startAW / 2
+      ];
+      startArrowBottom = [
+        startPoint[0] - startNx * startAW / 2,
+        startPoint[1] - startNy * startAW / 2
+      ];
+    }
 
     // ポリゴンパスを生成
     const pathParts: string[] = [];
 
-    // 始点側: 矢印ありの場合は三角形、なしの場合は通常キャップ
-    if (startArrowTip) {
-      // startBottom → startArrowTip → startTop から開始
-      pathParts.push(`M${startBottom[0]},${startBottom[1]}`);
+    // 始点側
+    if (startArrowTip && startArrowTop && startArrowBottom) {
+      pathParts.push(`M${startArrowBottom[0]},${startArrowBottom[1]}`);
       pathParts.push(`L${startArrowTip[0]},${startArrowTip[1]}`);
+      pathParts.push(`L${startArrowTop[0]},${startArrowTop[1]}`);
+      // arrowWidth != sSizeの場合、矢印底辺からテーパー幅へ接続
       pathParts.push(`L${startTop[0]},${startTop[1]}`);
     } else {
       pathParts.push(`M${startTop[0]},${startTop[1]}`);
@@ -400,9 +435,11 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     // 上辺アーク: startTop → endTop
     pathParts.push(`Q${controlTopX},${controlTopY} ${endTop[0]},${endTop[1]}`);
 
-    // 終点側: 矢印ありの場合は三角形、なしの場合は直線キャップ
-    if (endArrowTip) {
+    // 終点側
+    if (endArrowTip && endArrowTop && endArrowBottom) {
+      pathParts.push(`L${endArrowTop[0]},${endArrowTop[1]}`);
       pathParts.push(`L${endArrowTip[0]},${endArrowTip[1]}`);
+      pathParts.push(`L${endArrowBottom[0]},${endArrowBottom[1]}`);
       pathParts.push(`L${endBottom[0]},${endBottom[1]}`);
     } else {
       pathParts.push(`L${endBottom[0]},${endBottom[1]}`);
@@ -410,6 +447,11 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
 
     // 下辺アーク: endBottom → startBottom
     pathParts.push(`Q${controlBottomX},${controlBottomY} ${startBottom[0]},${startBottom[1]}`);
+
+    // 始点矢印の場合、startBottomからstartArrowBottomへ接続して閉じる
+    if (startArrowTip && startArrowBottom) {
+      pathParts.push(`L${startArrowBottom[0]},${startArrowBottom[1]}`);
+    }
 
     pathParts.push('Z');
 

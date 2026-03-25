@@ -377,6 +377,35 @@ describe('LineTaperedLayer', () => {
       expect(layer.isRendered()).toBe(true);
     });
 
+    it('arrowWidthでラインより大きい矢印を描画できる', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeature,
+        endArrow: true,
+        arrowSize: 12,
+        arrowWidth: 30,
+        endSize: 5,
+        attr: { fill: '#ff6b6b' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+
+    it('arrowWidth未指定時は端点サイズと同じ幅になる', () => {
+      const layer = new LineTaperedLayer({
+        data: testDataFeature,
+        endArrow: true,
+        startArrow: true,
+        arrowSize: 10,
+        attr: { fill: '#333' }
+      });
+      const projection = geoMercator();
+      layer.setProjection(projection);
+      layer.render(container);
+      expect(layer.isRendered()).toBe(true);
+    });
+
     it('flipArcと矢印を同時に使用できる', () => {
       const layer = new LineTaperedLayer({
         data: testDataFeature,
