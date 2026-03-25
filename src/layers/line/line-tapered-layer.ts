@@ -302,41 +302,57 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
 
     if (distance === 0) return '';
 
-    // 法線（垂直方向）の単位ベクトル
+    // 始点-終点間の直線の法線（垂直方向）単位ベクトル
     const nx = -dy / distance;
     const ny = dx / distance;
 
-    // 始点側の上下2点
-    const startTop: [number, number] = [
-      startPoint[0] + nx * sSize / 2,
-      startPoint[1] + ny * sSize / 2
-    ];
-    const startBottom: [number, number] = [
-      startPoint[0] - nx * sSize / 2,
-      startPoint[1] - ny * sSize / 2
-    ];
-
-    // 終点側の上下2点
-    const endTop: [number, number] = [
-      endPoint[0] + nx * eSize / 2,
-      endPoint[1] + ny * eSize / 2
-    ];
-    const endBottom: [number, number] = [
-      endPoint[0] - nx * eSize / 2,
-      endPoint[1] - ny * eSize / 2
-    ];
-
-    // アークの制御点を計算
-    // 中点を基準に、法線方向にアークの高さ分オフセット
-    const midX = (startPoint[0] + endPoint[0]) / 2;
-    const midY = (startPoint[1] + endPoint[1]) / 2;
+    // アークの制御点を先に計算（端点キャップの方向決定に必要）
     const arcOffset = distance * this.arcHeight * (flipped ? -1 : 1);
 
-    // 上辺の制御点（法線方向にオフセット）
+    // 中心線の制御点（始点-終点の中点を法線方向にオフセット）
+    const controlCenterX = (startPoint[0] + endPoint[0]) / 2 + nx * arcOffset;
+    const controlCenterY = (startPoint[1] + endPoint[1]) / 2 + ny * arcOffset;
+
+    // 二次ベジェ曲線の接線方向から各端点の法線を計算
+    // 始点での接線: 始点→制御点の方向
+    const startTanX = controlCenterX - startPoint[0];
+    const startTanY = controlCenterY - startPoint[1];
+    const startTanLen = Math.sqrt(startTanX * startTanX + startTanY * startTanY);
+    const startNx = startTanLen > 0 ? -startTanY / startTanLen : nx;
+    const startNy = startTanLen > 0 ? startTanX / startTanLen : ny;
+
+    // 終点での接線: 制御点→終点の方向
+    const endTanX = endPoint[0] - controlCenterX;
+    const endTanY = endPoint[1] - controlCenterY;
+    const endTanLen = Math.sqrt(endTanX * endTanX + endTanY * endTanY);
+    const endNx = endTanLen > 0 ? -endTanY / endTanLen : nx;
+    const endNy = endTanLen > 0 ? endTanX / endTanLen : ny;
+
+    // 始点側の上下2点（始点でのアーク接線に垂直）
+    const startTop: [number, number] = [
+      startPoint[0] + startNx * sSize / 2,
+      startPoint[1] + startNy * sSize / 2
+    ];
+    const startBottom: [number, number] = [
+      startPoint[0] - startNx * sSize / 2,
+      startPoint[1] - startNy * sSize / 2
+    ];
+
+    // 終点側の上下2点（終点でのアーク接線に垂直）
+    const endTop: [number, number] = [
+      endPoint[0] + endNx * eSize / 2,
+      endPoint[1] + endNy * eSize / 2
+    ];
+    const endBottom: [number, number] = [
+      endPoint[0] - endNx * eSize / 2,
+      endPoint[1] - endNy * eSize / 2
+    ];
+
+    // 上辺の制御点（始点Top・終点Topの中点を法線方向にオフセット）
     const controlTopX = (startTop[0] + endTop[0]) / 2 + nx * arcOffset;
     const controlTopY = (startTop[1] + endTop[1]) / 2 + ny * arcOffset;
 
-    // 下辺の制御点（法線方向にオフセット）
+    // 下辺の制御点（始点Bottom・終点Bottomの中点を法線方向にオフセット）
     const controlBottomX = (startBottom[0] + endBottom[0]) / 2 + nx * arcOffset;
     const controlBottomY = (startBottom[1] + endBottom[1]) / 2 + ny * arcOffset;
 
