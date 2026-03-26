@@ -25,7 +25,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 src/
 ├── core/                      # コアレイヤー管理機能
 │   └── layer-manager.ts
-├── layers/                    # レイヤー実装（14種類）
+├── layers/                    # レイヤー実装（15種類）
 │   ├── core/
 │   │   └── base-layer.ts      # 全レイヤーの基底クラス
 │   ├── geo/                   # 地理空間レイヤー
@@ -40,6 +40,7 @@ src/
 │   │   └── point-spike-layer.ts
 │   ├── line/                  # ライン関連レイヤー
 │   │   ├── line-connection-layer.ts
+│   │   ├── line-tapered-layer.ts
 │   │   ├── line-edgebundling-layer.ts
 │   │   └── line-text-layer.ts
 │   ├── raster/
@@ -78,6 +79,7 @@ src/
 
 #### ラインレイヤー
 - **LineConnectionLayer**: 直線・弧・スムージング接続
+- **LineTaperedLayer**: テーパー（太さ変化）アーク型ポリゴン接続、矢印対応
 - **LineEdgeBundlingLayer**: フォースシミュレーションによる集約
 - **LineTextLayer**: ライン上のテキスト配置
 
@@ -153,76 +155,78 @@ npm run deploy
 
 ### Examples作成時の必須手順
 
-新しいデモページ（examples/*.html）を作成する場合は、必ず以下の手順に従ってください：
+新しいデモページを作成する場合は、必ず以下の手順に従ってください：
 
 1. **テンプレートの内容を読む**: examples/template.html を参照
-2. **テンプレートをコピー**: `cp examples/template.html examples/your-layer-name.html`
-3. **テンプレートを修正**: 目的に合わせてテンプレートを修正
-4. **不要な標準機能を削除**: 使用しない機能（透明度スライダー等）を削除
+2. **テンプレートをコピー**: `cp examples/template.html examples/<カテゴリ>/your-layer-name.html`
+   - カテゴリ: basic/, point/, line/, effect/, utils/, gallery/
+3. **リソースパスを修正**: サブディレクトリ内のHTMLは `../` で参照する
+   - `./css/` → `../css/`、`./js/` → `../js/`、`./thematika.umd.js` → `../thematika.umd.js`
+   - `./geojson/` → `../geojson/`、`./img/` → `../img/`
+   - ブレッドクラム: `href="index.html"` → `href="../index.html"`
+4. **テンプレートを修正**: 目的に合わせてテンプレートを修正
+5. **不要な標準機能を削除**: 使用しない機能（透明度スライダー等）を削除
 
 これにより全デモページで一貫したデザインとUXを維持できます。
 
 ## Examples ディレクトリ構造
 
 ### 概要
-examples/ディレクトリには32個のデモページが7つのカテゴリーに分類されて配置されています。
+examples/ディレクトリには29個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
 
-### カテゴリー別構成
-1. **基本レイヤー** (3例)
-   - geojson-layer.html - GeoJSONデータの基本表示
-   - image-layer.html - 衛星画像・地形データ表示
-   - legend-layer-layer.html - 凡例の自動生成
+### ディレクトリ構成
+```
+examples/
+├── index.html            # エントリーページ
+├── examples.html         # サンプル一覧（ギャラリー形式）
+├── template.html         # 新規デモ作成用テンプレート
+├── basic/                # 基本レイヤー (3例)
+│   ├── geojson-layer.html
+│   ├── image-layer.html
+│   └── legend-layer.html
+├── point/                # ポイントレイヤー (6例)
+│   ├── circle-layer.html
+│   ├── symbol-layer.html
+│   ├── annotation-layer.html
+│   ├── text-layer.html
+│   ├── text-avoid-overlap.html
+│   └── spike.html
+├── line/                 # ラインレイヤー (4例)
+│   ├── connection-layer.html
+│   ├── tapered-layer.html
+│   ├── edgebundling-layer.html
+│   └── text-layer.html
+├── effect/               # エフェクト (4例)
+│   ├── bloom.html
+│   ├── dropshadow.html
+│   ├── texture.html
+│   └── customFilter.html
+├── utils/                # ユーティリティ (6例)
+│   ├── clip-polygon.html
+│   ├── cog-load.html
+│   ├── tile-map.html
+│   ├── color-palette-showcase.html
+│   ├── gis-utils.html
+│   └── playground.html
+├── gallery/              # ギャラリー (6例)
+│   ├── gallery1.html
+│   ├── gallery2.html
+│   ├── gallery3.html
+│   ├── gallery4.html
+│   ├── biutiful-map.html
+│   └── tissot-indicatrix.html
+├── css/                  # 共通スタイルシート
+├── js/                   # 共通JavaScript
+├── geojson/              # GeoJSONデータファイル
+├── geotiff/              # GeoTIFFファイル
+├── img/                  # 画像リソース
+└── thumbnails/           # デモページのサムネイル画像
+```
 
-2. **ポイントレイヤー** (6例)
-   - point-circle-layer.html - 円形ポイント
-   - point-symbol-layer.html - d3.symbolシンボル
-   - point-annotation-layer.html - 注釈・コールアウト
-   - point-text-layer.html - テキストラベル
-   - point-text-avoid-overlap.html - Voronoi重なり回避
-   - point-spike.html - 3Dスパイク表示
-
-3. **ラインレイヤー** (3例)
-   - line-connection-layer.html - 直線・弧接続
-   - line-edgebundling-layer.html - エッジバンドリング
-   - line-text-layer.html - ライン上テキスト
-
-4. **エフェクト** (4例)
-   - effect-bloom.html - ブルーム効果
-   - effect-dropshadow.html - ドロップシャドウ
-   - effect-customFilter.html - カスタムSVGフィルター
-   - effect-texture.html - テクスチャパターン
-
-5. **ユーティリティ** (6例)
-   - clip-polygon.html - ポリゴンクリップ
-   - cog-load.html - Cloud Optimized GeoTIFF
-   - tile-map.html - タイル地図システム
-   - color-palette-showcase.html - カラーパレット展示
-   - gis-utils.html - GIS計算ユーティリティ
-   - playground.html - 実験的複合デモ
-
-6. **ギャラリー** (5例)
-   - gallery1.html - 古地図風デモ
-   - gallery2.html - ギャラリー2
-   - gallery3.html - ギャラリー3
-   - gallery4.html - ギャラリー4
-   - biutiful-map.html - 美しい地図デモ
-
-7. **その他** (2例)
-   - tissot-indicatrix.html - ティソの指示楕円
-   - playground.html - 実験・検証用
-
-### 重要ファイル
-- **examples.html**: サンプル一覧ページ（ギャラリー形式）
-- **template.html**: 新規デモ作成用テンプレート
-- **index.html**: エントリーページ
-
-### リソースディレクトリ
-- **css/**: 共通スタイルシート（components.css, style.css, responsive.css）
-- **js/**: 共通JavaScript（common.js）
-- **geojson/**: GeoJSONデータファイル
-- **geotiff/**: GeoTIFFファイル
-- **img/**: 画像リソース
-- **thumbnails/**: デモページのサムネイル画像
+### 重要な注意点
+- サブディレクトリ内のHTMLからリソースは `../` で参照する（例: `../css/style.css`、`../thematika.umd.js`）
+- examples/直下の`index.html`、`examples.html`、`template.html`からは従来通り `./` で参照する
+- rollup serveの`contentBase: ['examples', 'dist']`により、`../thematika.umd.js`は`dist/`から配信される
 
 ## トークン削減戦略
 
@@ -254,9 +258,9 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
 - **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
-- **重要**: HTMLファイルでのスクリプト参照は必ず `<script src="thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
+- **重要**: HTMLファイルでのスクリプト参照は、examples/直下では `<script src="thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 32個のデモページ、14種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するexampleを作成
+- **実装状況**: 29個のデモページ、15種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するexampleを作成
 - **スキルファイルの更新**: ライブラリの機能変更や新機能追加時は、必ず `.agents/skills/d3-thematika/` 内のスキルファイル（SKILL.md, reference.md, examples.md）も更新すること。スキルはClaude Codeがライブラリを正しく理解するために重要
 
 ### Immutableパターンの採用
@@ -320,7 +324,7 @@ document.getElementById('markers').addEventListener('change', draw);
 
 ### 作業開始前の必須確認（この順序で必ず実行）
 1. **既存コードパターンの調査**: 類似機能の実装を必ず確認し、同じパターンを踏襲する
-2. **テンプレート確認**: examples作成時は必ず`cp examples/template.html examples/新ファイル名.html`でコピー
+2. **テンプレート確認**: examples作成時は必ず`cp examples/template.html examples/<カテゴリ>/新ファイル名.html`でコピーし、リソースパスを`../`に修正
 3. **段階的実装計画**: 大きなコードを一度に書かず、小さな単位での実装を計画
 4. **依存関係確認**: 外部ライブラリの使用方法とビルド設定への影響を確認
 
@@ -340,7 +344,7 @@ document.getElementById('markers').addEventListener('change', draw);
 ## 絶対に守るべきルール（違反は品質低下の原因）
 
 ### Examples関連
-- **必須**: examples/template.htmlを必ずコピーして修正（独自作成禁止）
+- **必須**: examples/template.htmlを必ずカテゴリ別サブディレクトリにコピーして修正（独自作成禁止）
 - **必須**: UMDビルドでは`Thematika.Map`等の名前空間経由アクセス
 - **必須**: 動作する既存exampleを参考にして同じパターンを使用
 
