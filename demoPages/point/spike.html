@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point Spike Layer - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <script src="../js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="../examples.html" class="nav-link">Examples</a>
+                <a href="../docs/" class="nav-link">Docs</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="../index.html">Home</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item">
+                    <a href="../examples.html">Examples</a>
+                </li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">Point Spike Layer</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">Point Spike Layer デモ</h2>
+            
+            <div class="info-box">
+                <h3>📊 PointSpikeLayer機能</h3>
+                <ul>
+                    <li>データ: examples/geojson/world.geojson（世界地図データ）</li>
+                    <li>レイヤー: GeojsonLayer（国境線）、PointSpikeLayer（スパイク）、OutlineLayer（投影法境界）、GraticuleLayer（経緯線）</li>
+                    <li>機能: 投影法切り替え、スパイク長さ調整、方向変更</li>
+                    <li>特徴: GeoJSONデータをスパイク形状で可視化、人口データに基づく長さ制御</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="projection-select">投影法</label>
+                    <select id="projection-select">
+                        <option value="equirectangular" selected>Equirectangular</option>
+                        <option value="mercator">Mercator</option>
+                        <option value="naturalEarth1">Natural Earth</option>
+                        <option value="orthographic">Orthographic</option>
+                        <option value="azimuthalEqualArea">Azimuthal Equal Area</option>
+                    </select>
+                </div>
+
+                <div class="control-item">
+                    <label>スパイク長さ</label>
+                    <div class="slider-control">
+                        <input type="range" id="spike-length" min="10" max="200" value="50">
+                        <span class="value-display" id="spike-length-value">50</span>
+                    </div>
+                </div>
+                
+                <div class="control-item">
+                    <label for="spike-direction">スパイク方向</label>
+                    <select id="spike-direction">
+                        <option value="up" selected>上</option>
+                        <option value="down">下</option>
+                        <option value="left">左</option>
+                        <option value="right">右</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+            
+            <div class="code-header">
+                <h3>PointSpikeLayerの使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// PointSpikeLayerの使用例
+
+const worldData = await d3.json("../geojson/world.geojson");
+const capitalsData = await d3.json("../geojson/world-capitals.geojson");
+
+const width = 800;
+const height = 600;
+
+const projection = d3.geoEquirectangular()
+    .fitExtent([[10, 60], [width-10, height-20]], worldData);
+
+const map = new Thematika.Map({
+    container: '#map',
+    width: width,
+    height: height,
+    projection: projection
+});
+
+// PointSpikeLayerインスタンスを作成
+const spikeLayer = new Thematika.PointSpikeLayer({
+    data: capitalsData,
+    length: (d) => Math.sqrt(d.properties.population || 1000000) / 500,
+    direction: 'up',
+    attr: {
+        "fill": '#ff6b6b',
+        "fill-opacity": 0.7,
+        "stroke": '#d63031',
+        "stroke-width": 1
+    }
+});
+
+// レイヤーインスタンスを地図に追加
+map.addLayer('graticule', graticuleLayer);
+map.addLayer('world', worldLayer);
+map.addLayer('outline', outlineLayer);
+map.addLayer('spikes', spikeLayer);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="../thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        
+        let map; // グローバル変数として地図インスタンスを保持
+
+        // カラーパレットの設定
+        const color = Thematika.AllPalettes.TailwindVivid.colors
+
+        // プロジェクション
+        let currentProjection = d3.geoEquirectangular();
+        
+        async function draw() {
+            const id = "#map"
+
+            // 既存のマップを削除
+            d3.select(id).selectAll('*').remove();
+
+            const width = document.querySelector(id).clientWidth ;
+            const height = document.querySelector(id).clientHeight;
+
+            // 世界地図データを読み込み（ローカルのGeoJSONを使用）
+            const worldData = await d3.json('../geojson/world.geojson');
+
+            // 投影法を地図データに合わせて設定
+            currentProjection.fitExtent([[10, 10], [width-10, height]], worldData);
+
+            // 地図を作成
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: currentProjection,
+                backgroundColor: '#ddd'
+            });
+
+            // GeojsonLayerインスタンスを作成
+            const worldLayer = new Thematika.GeojsonLayer({
+                data: worldData,                
+                attr: { 
+                    "fill": '#aaa',
+                    "stroke": '#fff',
+                    "stroke-width": 0.5,
+                    "opacity": 1
+                }
+            });
+
+            // UIの状態を取得
+            const spikeLength = parseInt(document.getElementById('spike-length').value);
+            const spikeDirection = document.getElementById('spike-direction').value;
+
+            // PointSpikeLayerインスタンスを作成
+            const spikeLayer = new Thematika.PointSpikeLayer({
+                data: worldData,
+                length: (d) => {
+                    const pop = d.properties.POP_EST || 1000000;
+                    return Math.sqrt(pop) / 1000 * spikeLength / 15;
+                },
+                direction: spikeDirection,
+                attr: {
+                    "fill": (d,i)=> color[i%2],
+                    "fill-opacity": 0.9,
+                    "stroke": (d,i)=> color[i%2],
+                    "stroke-width": 1
+                }
+            });
+
+            // OutlineLayerインスタンスを作成（クリップパス機能付き）
+            const outlineLayer = new Thematika.OutlineLayer({
+                createClipPath: true,
+                clipPathId: 'earth-outline-clip',
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#2c3e50',
+                    "stroke-width": 2,
+                    "opacity": 0.8
+                }
+            });
+
+            // GraticuleLayerインスタンスを作成
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [10, 10], // 10度間隔
+                attr: {
+                    "fill": 'none',
+                    "stroke": '#000',
+                    "stroke-width": 0.5,
+                    "stroke-dasharray": '1,2',
+                    "opacity": 0.6
+                }
+            });
+
+            // レイヤーインスタンスを地図に追加
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('world', worldLayer);
+            map.addLayer('outline', outlineLayer);
+            map.addLayer('spikes', spikeLayer);
+
+        }
+
+        // 投影法変更イベントリスナー
+        document.getElementById('projection-select').addEventListener('change', (e) => {
+            const projectionType = e.target.value;
+            
+            switch (projectionType) {
+                case 'equirectangular':
+                    currentProjection = d3.geoEquirectangular();
+                    break;
+                case 'mercator':
+                    currentProjection = d3.geoMercator();
+                    break;
+                case 'naturalEarth1':
+                    currentProjection = d3.geoNaturalEarth1();
+                    break;
+                case 'orthographic':
+                    currentProjection = d3.geoOrthographic();
+                    break;
+                case 'azimuthalEqualArea':
+                    currentProjection = d3.geoAzimuthalEqualArea();
+                    break;
+            }
+            
+            draw();
+        });
+        
+        // スパイク長さ変更イベントリスナー
+        document.getElementById('spike-length').addEventListener('input', (e) => {
+            document.getElementById('spike-length-value').textContent = e.target.value;
+            draw();
+        });
+        
+        // スパイク方向変更イベントリスナー
+        document.getElementById('spike-direction').addEventListener('change', draw);
+        
+        draw()
+
+        // SVGダウンロード機能
+        document.getElementById('download-svg').addEventListener('click', () => {
+            map.saveSVG("map.svg");
+        });
+        
+        // PNGダウンロード機能
+        document.getElementById('download-png').addEventListener('click', () => {
+            map.savePNG("map.png")
+        });
+
+    </script>
+</body>
+</html>
