@@ -14,7 +14,7 @@
  * --dry-run    実際の修正は行わず、変更内容のみ表示
  * 
  * 例:
- * node scripts/fix-geojson-winding.js examples/geojson/takasaki/bulding_single.geojson --d3 --backup
+ * node scripts/fix-geojson-winding.js site/geojson/takasaki/bulding_single.geojson --d3 --backup
  */
 
 import fs from 'fs';

@@ -5,8 +5,15 @@
  */
 
 import * as d3 from 'd3-contour';
-import * as turf from '@turf/turf';
 import { Selection, BaseType } from 'd3-selection';
+
+async function loadTurf() {
+  try {
+    return await import('@turf/turf');
+  } catch {
+    throw new Error('@turf/turfパッケージがインストールされていません。`npm install @turf/turf` を実行してください。');
+  }
+}
 
 /**
  * 等高線生成オプション
@@ -170,10 +177,11 @@ export function generateContours(
  * @param options - ハッチング生成オプション
  * @returns ハッチング線のGeoJSON FeatureCollection
  */
-export function generateHachures(
+export async function generateHachures(
   contours: GeoJSON.FeatureCollection<GeoJSON.MultiLineString | GeoJSON.LineString>,
   options: HachureOptions
-): GeoJSON.FeatureCollection<GeoJSON.LineString> {
+): Promise<GeoJSON.FeatureCollection<GeoJSON.LineString>> {
+  const turf = await loadTurf();
   const {
     spacing,
     length,

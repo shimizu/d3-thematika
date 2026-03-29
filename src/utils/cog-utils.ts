@@ -3,7 +3,7 @@
  * GeoTIFFファイルの読み込みと処理に特化したユーティリティ集
  */
 
-import { fromUrl, GeoTIFF, Pool } from 'geotiff';
+import type { GeoTIFF, Pool } from 'geotiff';
 
 /**
  * COG読み込みオプション
@@ -87,8 +87,16 @@ export async function readCOG(url: string, options: ReadCOGOptions = {}): Promis
   const onExceed = sizeLimit.onExceed ?? 'resample';
 
   try {
+    // geotiffを動的に読み込み（オプショナル依存）
+    let geotiffModule: typeof import('geotiff');
+    try {
+      geotiffModule = await import('geotiff');
+    } catch {
+      throw new Error('geotiffパッケージがインストールされていません。`npm install geotiff` を実行してください。');
+    }
+
     // GeoTIFFファイルを読み込み
-    const tiff = await fromUrl(url);
+    const tiff = await geotiffModule.fromUrl(url);
     
     // 利用可能な画像数を確認
     const imageCount = await tiff.getImageCount();

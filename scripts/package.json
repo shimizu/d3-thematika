@@ -5,8 +5,7 @@
   "description": "Utility scripts for d3-thematika development",
   "scripts": {
     "thumbnails": "node generate-thumbnails.js",
-    "thumbnails:force": "node generate-thumbnails.js --force",
-    "build-demo": "node build-demo.js"
+    "thumbnails:force": "node generate-thumbnails.js --force"
   },
   "dependencies": {
     "puppeteer": "^21.0.0"

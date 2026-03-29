@@ -295,7 +295,7 @@ function main() {
   
   if (args.length === 0) {
     console.error('使用方法: node check-geojson-winding.js <geojson-file>');
-    console.error('例: node check-geojson-winding.js examples/geojson/sample.geojson');
+    console.error('例: node check-geojson-winding.js site/geojson/sample.geojson');
     console.error('');
     console.error('このスクリプトは以下をチェックします:');
     console.error('- GeoJSON仕様（RFC7946）準拠');

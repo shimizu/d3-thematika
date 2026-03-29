@@ -164,7 +164,7 @@ ISC License - 詳細は[LICENSE](LICENSE)ファイルをご覧ください。
 ## 🔗 関連リンク
 
 - [GitHub Repository](https://github.com/shimizu/d3-thematika)
-- [Examples Gallery](https://shimizu.github.io/d3-thematika/examples/)
+- [Examples Gallery](https://shimizu.github.io/d3-thematika/site/)
 - [D3.js Documentation](https://d3js.org/)
 
 ## ⚡ ロードマップ

@@ -85,6 +85,27 @@ export interface EdgeDetectOptions {
   height?: string;
 }
 
+/** シャープン（Sharpen） */
+export interface SharpenOptions {
+  id: string;
+  amount?: number;            // シャープン強度（デフォルト: 1）
+  x?: string;
+  y?: string;
+  width?: string;
+  height?: string;
+}
+
+/** エンボス（Emboss） */
+export interface EmbossOptions {
+  id: string;
+  strength?: number;          // エンボス強度（デフォルト: 1）
+  angle?: 'topLeft' | 'top' | 'topRight' | 'left' | 'right' | 'bottomLeft' | 'bottom' | 'bottomRight';
+  x?: string;
+  y?: string;
+  width?: string;
+  height?: string;
+}
+
 /** 内側シャドウ（Inner Shadow） */
 export interface InnerShadowOptions {
   id: string;
@@ -318,6 +339,66 @@ export function createEdgeDetect(options: EdgeDetectOptions) {
       .append('feConvolveMatrix')
       .attr('order', '3')
       .attr('kernelMatrix', '-1 -1 -1 -1 8 -1 -1 -1 -1')
+      .attr('preserveAlpha', 'true');
+  };
+  (fn as any).url = () => getFilterUrl(options.id);
+  return fn;
+}
+
+/** Sharpen（シャープン：3x3アンシャープマスクカーネル） */
+export function createSharpen(options: SharpenOptions) {
+  const fn = (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
+    const filter = defs.append('filter').attr('id', options.id);
+    if (options.x) filter.attr('x', options.x);
+    if (options.y) filter.attr('y', options.y);
+    if (options.width) filter.attr('width', options.width);
+    if (options.height) filter.attr('height', options.height);
+
+    const a = options.amount ?? 1;
+    // 3x3 シャープンカーネル: center = 1 + 4a, neighbors = -a
+    const kernel = [
+       0, -a,  0,
+      -a, 1 + 4 * a, -a,
+       0, -a,  0
+    ].join(' ');
+
+    filter
+      .append('feConvolveMatrix')
+      .attr('order', '3')
+      .attr('kernelMatrix', kernel)
+      .attr('preserveAlpha', 'true');
+  };
+  (fn as any).url = () => getFilterUrl(options.id);
+  return fn;
+}
+
+/** Emboss（エンボス：方向付き3x3カーネル＋グレー化合成） */
+export function createEmboss(options: EmbossOptions) {
+  const fn = (defs: Selection<SVGDefsElement, unknown, HTMLElement, any>) => {
+    const filter = defs.append('filter').attr('id', options.id);
+    if (options.x) filter.attr('x', options.x);
+    if (options.y) filter.attr('y', options.y);
+    if (options.width) filter.attr('width', options.width);
+    if (options.height) filter.attr('height', options.height);
+
+    const s = options.strength ?? 1;
+    // 方向別エンボスカーネル
+    const kernels: Record<NonNullable<EmbossOptions['angle']>, number[]> = {
+      topLeft:     [-2*s, -s,  0, -s, 1, s,  0, s, 2*s],
+      top:         [-s, -2*s, -s,  0, 1, 0,   s, 2*s, s],
+      topRight:    [ 0, -s, -2*s,  s, 1, -s, 2*s, s, 0],
+      left:        [-2*s, -s,  0, -s, 1, s,  0, s, 2*s],
+      right:       [ 0,  s, 2*s, -s, 1, s, -2*s, -s, 0],
+      bottomLeft:  [ 0, s, 2*s, -s, 1, s, -2*s, -s, 0],
+      bottom:      [ s, 2*s, s,  0, 1, 0, -s, -2*s, -s],
+      bottomRight: [2*s, s,  0,  s, 1, -s,  0, -s, -2*s]
+    };
+    const kernel = (kernels[options.angle ?? 'topLeft']).join(' ');
+
+    filter
+      .append('feConvolveMatrix')
+      .attr('order', '3')
+      .attr('kernelMatrix', kernel)
       .attr('preserveAlpha', 'true');
   };
   (fn as any).url = () => getFilterUrl(options.id);
@@ -580,5 +661,17 @@ export const FilterPresets = {
     createNoise({ id: 'filmGrain', baseFrequency: 0.9, numOctaves: 1, opacity: 0.12 }),
 
   warmBloom: () =>
-    createBloom({ id: 'warmBloom', intensity: 5, threshold: 0.7, color: '#ffd1a3' })
+    createBloom({ id: 'warmBloom', intensity: 5, threshold: 0.7, color: '#ffd1a3' }),
+
+  sharpen: () =>
+    createSharpen({ id: 'sharpen', amount: 1 }),
+
+  strongSharpen: () =>
+    createSharpen({ id: 'strongSharpen', amount: 2 }),
+
+  emboss: () =>
+    createEmboss({ id: 'emboss', strength: 1, angle: 'topLeft' }),
+
+  softEmboss: () =>
+    createEmboss({ id: 'softEmboss', strength: 0.5, angle: 'top' })
 };

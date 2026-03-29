@@ -1,3 +1,4 @@
+import { copyFileSync } from 'fs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
@@ -34,7 +35,7 @@ export default {
         '@turf/turf': 'turf',
         'geotiff': 'GeoTIFF'
       }
-    }
+    },
   ],
   external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', 'd3-contour', '@turf/turf', 'geotiff'],
   plugins: [
@@ -47,9 +48,15 @@ export default {
       inlineSources: !production
     }),
     production && terser(),
+    {
+      name: 'copy-umd-to-site',
+      writeBundle() {
+        copyFileSync('dist/thematika.umd.js', 'site/js/thematika.umd.js');
+      }
+    },
     !production && serve({
       open: true,
-      contentBase: ['examples', 'dist'],
+      contentBase: ['dist'],
       host: 'localhost',
       port: 3000,
       headers: {
@@ -59,6 +66,6 @@ export default {
       },
       cleanUrls: false,
     }),
-    !production && livereload('examples')
+    !production && livereload('site')
   ].filter(Boolean)
 };

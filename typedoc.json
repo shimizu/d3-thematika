@@ -21,7 +21,7 @@
   "searchInComments": true,               // コメント内も検索対象に
   "navigationLinks": {
     "GitHub": "https://github.com/shimizu/d3-thematika",
-    "Examples": "https://shimizu.github.io/d3-thematika/examples/"
+    "Examples": "https://shimizu.github.io/d3-thematika/site/"
   },
   "sidebarLinks": {
     "NPM Package": "https://www.npmjs.com/package/d3-thematika",

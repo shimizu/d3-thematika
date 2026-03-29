@@ -4,7 +4,7 @@
   "type": "module",
   "main": "rollup_config.js",
   "directories": {
-    "example": "examples"
+    "example": "site"
   },
   "scripts": {
     "build": "rollup -c",
@@ -14,9 +14,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
-    "build:demo": "node scripts/build-demo.js",
-    "predeploy": "npm run build && npm run build:demo",
-    "deploy": "gh-pages -d demoPages -m 'Deploy demo pages'"
+    "deploy": "gh-pages -d site -m 'Deploy site'"
   },
   "author": "shimizu",
   "license": "ISC",
@@ -52,9 +50,6 @@
     "CHANGELOG.md"
   ],
   "dependencies": {
-    "@turf/turf": "^7.2.0",
-    "@types/d3-contour": "^3.0.6",
-    "@types/d3-drag": "^3.0.7",
     "d3-contour": "^4.0.2",
     "d3-delaunay": "^6.0.4",
     "d3-drag": "^3.0.0",
@@ -67,17 +62,27 @@
     "d3-scale-chromatic": "^3.1.0",
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
-    "geotiff": "^2.1.4-beta.0",
-    "rollup": "^4.44.2",
-    "serve": "^14.2.4",
-    "textures": "^1.2.3",
-    "typedoc": "^0.28.7"
+    "textures": "^1.2.3"
+  },
+  "peerDependencies": {
+    "@turf/turf": "^7.2.0",
+    "geotiff": "^2.1.4-beta.0"
+  },
+  "peerDependenciesMeta": {
+    "@turf/turf": {
+      "optional": true
+    },
+    "geotiff": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^12.1.4",
+    "@types/d3-contour": "^3.0.6",
     "@types/d3-delaunay": "^6.0.4",
+    "@types/d3-drag": "^3.0.7",
     "@types/d3-force": "^3.0.10",
     "@types/d3-geo": "^3.1.0",
     "@types/d3-path": "^3.1.1",
@@ -92,10 +97,13 @@
     "gh-pages": "^6.3.0",
     "jest": "^30.0.4",
     "jsdom": "^26.1.0",
+    "rollup": "^4.44.2",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^3.0.0",
+    "serve": "^14.2.4",
     "ts-jest": "^29.4.0",
     "tslib": "^2.8.1",
+    "typedoc": "^0.28.7",
     "typescript": "^5.8.3"
   }
 }

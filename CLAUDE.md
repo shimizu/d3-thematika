@@ -157,11 +157,11 @@ npm run deploy
 
 新しいデモページを作成する場合は、必ず以下の手順に従ってください：
 
-1. **テンプレートの内容を読む**: examples/template.html を参照
-2. **テンプレートをコピー**: `cp examples/template.html examples/<カテゴリ>/your-layer-name.html`
+1. **テンプレートの内容を読む**: site/template.html を参照
+2. **テンプレートをコピー**: `cp site/template.html site/<カテゴリ>/your-layer-name.html`
    - カテゴリ: basic/, point/, line/, effect/, utils/, gallery/
 3. **リソースパスを修正**: サブディレクトリ内のHTMLは `../` で参照する
-   - `./css/` → `../css/`、`./js/` → `../js/`、`./thematika.umd.js` → `../thematika.umd.js`
+   - `./css/` → `../css/`、`./js/` → `../js/`
    - `./geojson/` → `../geojson/`、`./img/` → `../img/`
    - ブレッドクラム: `href="index.html"` → `href="../index.html"`
 4. **テンプレートを修正**: 目的に合わせてテンプレートを修正
@@ -169,14 +169,14 @@ npm run deploy
 
 これにより全デモページで一貫したデザインとUXを維持できます。
 
-## Examples ディレクトリ構造
+## Site ディレクトリ構造
 
 ### 概要
-examples/ディレクトリには29個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
+site/ディレクトリには29個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
 
 ### ディレクトリ構成
 ```
-examples/
+site/
 ├── index.html            # エントリーページ
 ├── examples.html         # サンプル一覧（ギャラリー形式）
 ├── template.html         # 新規デモ作成用テンプレート
@@ -224,9 +224,9 @@ examples/
 ```
 
 ### 重要な注意点
-- サブディレクトリ内のHTMLからリソースは `../` で参照する（例: `../css/style.css`、`../thematika.umd.js`）
-- examples/直下の`index.html`、`examples.html`、`template.html`からは従来通り `./` で参照する
-- rollup serveの`contentBase: ['examples', 'dist']`により、`../thematika.umd.js`は`dist/`から配信される
+- サブディレクトリ内のHTMLからリソースは `../` で参照する（例: `../css/style.css`、`../js/thematika.umd.js`）
+- site/直下の`index.html`、`examples.html`、`template.html`からは `./` で参照する
+- `npm run build`時にUMDファイルが`site/js/thematika.umd.js`に自動コピーされる
 
 ## トークン削減戦略
 
@@ -257,10 +257,10 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
   - **代替手段**: インタラクティブな機能が必要な場合は、Map レベルまたはアプリケーション側で実装する
 - 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
-- **重要**: examples/フォルダにthematika.umd.jsをコピーしてはいけません。rollup.config.jsのserve設定でcontentBase: ['examples', 'dist']により開発サーバーが両方を配信するため、コピーは不要で重複になります。
-- **重要**: HTMLファイルでのスクリプト参照は、examples/直下では `<script src="thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../thematika.umd.js"></script>` とする。`../dist/` は絶対に付けない。
+- **重要**: `npm run build`でUMDファイルが`site/js/thematika.umd.js`に自動コピーされる。手動コピーは不要。
+- **重要**: HTMLファイルでのスクリプト参照は、site/直下では `<script src="./js/thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../js/thematika.umd.js"></script>` とする。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 29個のデモページ、15種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するexampleを作成
+- **実装状況**: 29個のデモページ、15種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
 - **スキルファイルの更新**: ライブラリの機能変更や新機能追加時は、必ず `.agents/skills/d3-thematika/` 内のスキルファイル（SKILL.md, reference.md, examples.md）も更新すること。スキルはClaude Codeがライブラリを正しく理解するために重要
 
 ### Immutableパターンの採用
@@ -293,7 +293,7 @@ const newImageLayer = new ImageLayer('id', {
 });
 ```
 
-#### examples/での実装
+#### site/での実装
 
 UIコントロールの変更時は地図全体を再描画：
 
@@ -324,7 +324,7 @@ document.getElementById('markers').addEventListener('change', draw);
 
 ### 作業開始前の必須確認（この順序で必ず実行）
 1. **既存コードパターンの調査**: 類似機能の実装を必ず確認し、同じパターンを踏襲する
-2. **テンプレート確認**: examples作成時は必ず`cp examples/template.html examples/<カテゴリ>/新ファイル名.html`でコピーし、リソースパスを`../`に修正
+2. **テンプレート確認**: デモページ作成時は必ず`cp site/template.html site/<カテゴリ>/新ファイル名.html`でコピーし、リソースパスを`../`に修正
 3. **段階的実装計画**: 大きなコードを一度に書かず、小さな単位での実装を計画
 4. **依存関係確認**: 外部ライブラリの使用方法とビルド設定への影響を確認
 
@@ -344,7 +344,7 @@ document.getElementById('markers').addEventListener('change', draw);
 ## 絶対に守るべきルール（違反は品質低下の原因）
 
 ### Examples関連
-- **必須**: examples/template.htmlを必ずカテゴリ別サブディレクトリにコピーして修正（独自作成禁止）
+- **必須**: site/template.htmlを必ずカテゴリ別サブディレクトリにコピーして修正（独自作成禁止）
 - **必須**: UMDビルドでは`Thematika.Map`等の名前空間経由アクセス
 - **必須**: 動作する既存exampleを参考にして同じパターンを使用
 
@@ -363,5 +363,5 @@ document.getElementById('markers').addEventListener('change', draw);
 
 - ファイルの変更や新規作成時は既存のコード規約に従ってください
 - コミット前に必ずビルドとテストを実行してください
-- 新機能追加時は必ず対応するexamplesページを作成してください
+- 新機能追加時は必ず対応するデモページをsite/に作成してください
 - **重要**: 上記チェックリストを省略した作業は品質低下の原因となるため禁止
