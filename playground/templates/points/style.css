@@ -1,0 +1,40 @@
+body {
+  margin: 0;
+  background: #f7f1e8;
+  min-height: 100vh;
+}
+
+.map-shell {
+  position: relative;
+  min-height: 100vh;
+}
+
+.download-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  display: flex;
+  gap: 4px;
+}
+
+.download-buttons button {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #333;
+  font: 11px/1 system-ui, sans-serif;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+
+.download-buttons button:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+#map {
+  height: 100vh;
+  background: #fffdf8;
+}

@@ -1,0 +1,5 @@
+[
+  { "id": "basic", "label": "基本地図" },
+  { "id": "points", "label": "ポイントレイヤー" },
+  { "id": "layout", "label": "レイアウト実験" }
+]
