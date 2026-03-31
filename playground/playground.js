@@ -37,21 +37,27 @@ const templates = {
 
 .download-buttons {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .download-buttons button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.55rem 0.9rem;
-  background: rgba(255, 253, 247, 0.9);
-  color: #173226;
-  font: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #333;
+  font: 11px/1 system-ui, sans-serif;
   cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+
+.download-buttons button:hover {
+  background: rgba(255, 255, 255, 0.95);
 }
 
 #map {
@@ -142,21 +148,27 @@ console.log('基本テンプレートを描画しました');`
 
 .download-buttons {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .download-buttons button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.55rem 0.9rem;
-  background: rgba(255, 253, 247, 0.9);
-  color: #1f2a24;
-  font: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.75);
+  color: #333;
+  font: 11px/1 system-ui, sans-serif;
   cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+
+.download-buttons button:hover {
+  background: rgba(255, 255, 255, 0.95);
 }
 
 #map {
@@ -260,21 +272,27 @@ console.log('ポイントテンプレートを描画しました。フィーチ�
 
 .download-buttons {
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 10px;
+  right: 10px;
   z-index: 10;
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .download-buttons button {
-  border: none;
-  border-radius: 999px;
-  padding: 0.55rem 0.9rem;
-  background: rgba(255, 248, 232, 0.9);
-  color: #173847;
-  font: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font: 11px/1 system-ui, sans-serif;
   cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+}
+
+.download-buttons button:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 #map {
