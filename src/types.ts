@@ -17,6 +17,8 @@ export interface ThematikaOptions {
   defs?: any[];
   /** 背景色 */
   backgroundColor?: string;
+  /** SVG全体の背景色（clipPathの影響を受けない） */
+  svgBackgroundColor?: string;
 
 }
 

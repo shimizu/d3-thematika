@@ -50,6 +50,15 @@ export class Map {
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
+    // SVG全体の背景rectを追加（clipPathの影響を受けない）
+    if (options.svgBackgroundColor) {
+      this.svg.append('rect')
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .attr('fill', options.svgBackgroundColor)
+        .attr('class', 'thematika-svg-background');
+    }
+
     // defsオプションが指定されている場合、テクスチャを初期化
     this.initializeDefs(options.defs);
 
