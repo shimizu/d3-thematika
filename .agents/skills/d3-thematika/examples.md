@@ -127,41 +127,6 @@ const symbolLayer = new Thematika.PointSymbolLayer({
 map.addLayer('symbols', symbolLayer);
 ```
 
-### アノテーション
-
-```javascript
-const annotationLayer = new Thematika.PointAnnotationLayer({
-  data: citiesGeojson,
-  annotationType: 'callout',
-  textAccessor: (feature) => feature.properties.name,
-  titleAccessor: (feature) => feature.properties.country,
-  offsetAccessor: (feature, index) => {
-    // 位置に応じてオフセットを調整
-    return index % 2 === 0 ? [30, -20] : [-30, 20];
-  },
-  subjectOptions: {
-    type: 'circle',
-    r: 4,
-    fill: '#e74c3c',
-    stroke: 'white',
-    strokeWidth: 1
-  },
-  connectorOptions: {
-    stroke: '#666',
-    strokeWidth: 1,
-    strokeDasharray: '3,2'
-  },
-  noteOptions: {
-    backgroundColor: 'white',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    fontSize: '11px',
-    padding: 4
-  }
-});
-map.addLayer('annotations', annotationLayer);
-```
-
 ### 3Dスパイク
 
 ```javascript

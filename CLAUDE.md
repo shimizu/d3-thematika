@@ -35,14 +35,12 @@ src/
 │   ├── point/                 # ポイント関連レイヤー
 │   │   ├── point-circle-layer.ts
 │   │   ├── point-symbol-layer.ts
-│   │   ├── point-annotation-layer.ts
-│   │   ├── point-text-layer.ts
 │   │   └── point-spike-layer.ts
 │   ├── line/                  # ライン関連レイヤー
 │   │   ├── line-connection-layer.ts
 │   │   ├── line-tapered-layer.ts
-│   │   ├── line-edgebundling-layer.ts
-│   │   └── line-text-layer.ts
+│   │   └── line-edgebundling-layer.ts
+│   ├── text/                  # テキスト関連レイヤー（実装予定）
 │   ├── raster/
 │   │   └── image-layer.ts
 │   └── utils/
@@ -71,15 +69,12 @@ src/
 #### ポイントレイヤー
 - **PointCircleLayer**: 円形ポイント、サイズ・色の動的変更
 - **PointSymbolLayer**: d3.symbolを使用したシンボル表示
-- **PointAnnotationLayer**: アノテーション（注釈）、引き出し線とテキストボックス
-- **PointTextLayer**: テキストラベル表示
 - **PointSpikeLayer**: 3Dスパイク（棒グラフ）表示
 
 #### ラインレイヤー
 - **LineConnectionLayer**: 直線・弧・スムージング接続
 - **LineTaperedLayer**: テーパー（太さ変化）アーク型ポリゴン接続、矢印対応
 - **LineEdgeBundlingLayer**: フォースシミュレーションによる集約
-- **LineTextLayer**: ライン上のテキスト配置
 
 #### エフェクト・ユーティリティ
 - **カスタムフィルター**: createCustomFilter APIによるSVGフィルター定義
@@ -155,7 +150,7 @@ npm run deploy
 ## Site ディレクトリ構造
 
 ### 概要
-site/ディレクトリには26個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
+site/ディレクトリには22個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
 
 ### ディレクトリ構成
 ```
@@ -167,18 +162,14 @@ site/
 │   ├── geojson-layer.html
 │   ├── image-layer.html
 │   └── legend-layer.html
-├── point/                # ポイントレイヤー (6例)
+├── point/                # ポイントレイヤー (3例)
 │   ├── circle-layer.html
 │   ├── symbol-layer.html
-│   ├── annotation-layer.html
-│   ├── text-layer.html
-│   ├── text-avoid-overlap.html
 │   └── spike.html
-├── line/                 # ラインレイヤー (4例)
+├── line/                 # ラインレイヤー (3例)
 │   ├── connection-layer.html
 │   ├── tapered-layer.html
-│   ├── edgebundling-layer.html
-│   └── text-layer.html
+│   └── edgebundling-layer.html
 ├── effect/               # エフェクト (4例)
 │   ├── bloom.html
 │   ├── dropshadow.html
@@ -240,7 +231,7 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - **重要**: `npm run build`でUMDファイルが`site/js/thematika.umd.js`に自動コピーされる。手動コピーは不要。
 - **重要**: HTMLファイルでのスクリプト参照は、site/直下では `<script src="./js/thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../js/thematika.umd.js"></script>` とする。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 26個のデモページ、15種類のレイヤータイプ、5種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
+- **実装状況**: 22個のデモページ、12種類のレイヤータイプ、5種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
 - **スキルファイルの更新**: ライブラリの機能変更や新機能追加時は、必ず `.agents/skills/d3-thematika/` 内のスキルファイル（SKILL.md, reference.md, examples.md）も更新すること。スキルはClaude Codeがライブラリを正しく理解するために重要
 
 ### Immutableパターンの採用

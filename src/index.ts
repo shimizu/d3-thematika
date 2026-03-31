@@ -49,13 +49,10 @@ export type { ImageLayerOptions } from './layers/raster/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/utils/legend-layer';
 export type { PointCircleLayerOptions } from './layers/point/point-circle-layer';
 export type { PointSymbolLayerOptions } from './layers/point/point-symbol-layer';
-export type { PointAnnotationLayerOptions, AnnotationType, TextAccessor, OffsetAccessor, SubjectType, StyleValue, SubjectOptions, ConnectorOptions, NoteOptions } from './layers/point/point-annotation-layer';
 export type { PointSpikeLayerOptions } from './types';
-export type { PointTextLayerOptions } from './layers/point/point-text-layer';
 export type { LineConnectionLayerOptions } from './layers/line/line-connection-layer';
 export type { LineEdgeBundlingLayerOptions } from './layers/line/line-edgebundling-layer';
 export type { LineTaperedLayerOptions } from './layers/line/line-tapered-layer';
-export type { LineTextLayerOptions } from './layers/line/line-text-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
@@ -69,13 +66,10 @@ export { ImageLayer } from './layers/raster/image-layer';
 export { LegendLayer } from './layers/utils/legend-layer';
 export { PointCircleLayer } from './layers/point/point-circle-layer';
 export { PointSymbolLayer } from './layers/point/point-symbol-layer';
-export { PointAnnotationLayer } from './layers/point/point-annotation-layer';
 export { PointSpikeLayer } from './layers/point/point-spike-layer';
-export { PointTextLayer } from './layers/point/point-text-layer';
 export { LineConnectionLayer } from './layers/line/line-connection-layer';
 export { LineTaperedLayer } from './layers/line/line-tapered-layer';
 export { LineEdgeBundlingLayer } from './layers/line/line-edgebundling-layer';
-export { LineTextLayer } from './layers/line/line-text-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';

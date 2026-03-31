@@ -42,12 +42,9 @@ map.addLayer('countries', layer);
 | ポリゴン/ライン描画 | GeojsonLayer | GeoJSONデータの基本表示 |
 | ポイント（円形） | PointCircleLayer | 円形マーカー |
 | ポイント（シンボル） | PointSymbolLayer | d3.symbol形状 |
-| ポイント（注釈） | PointAnnotationLayer | 引き出し線付きテキスト |
-| ポイント（ラベル） | PointTextLayer | テキストラベル |
 | 3Dスパイク | PointSpikeLayer | 棒グラフ風表現 |
 | 接続線 | LineConnectionLayer | 直線/弧/スムース接続 |
 | エッジバンドリング | LineEdgeBundlingLayer | フォースシミュレーション集約 |
-| ライン上テキスト | LineTextLayer | パス上テキスト配置 |
 | 画像オーバーレイ | ImageLayer | 地理座標に画像配置 |
 | 経緯線 | GraticuleLayer | グリッド線 |
 | 凡例 | LegendLayer | D3スケール連携凡例 |

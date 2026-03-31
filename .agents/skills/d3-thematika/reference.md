@@ -138,42 +138,6 @@ new Thematika.PointSymbolLayer(options: PointSymbolLayerOptions)
 
 SymbolType: `symbolCircle`, `symbolCross`, `symbolDiamond`, `symbolSquare`, `symbolStar`, `symbolTriangle`, `symbolWye`
 
-### PointAnnotationLayer
-
-アノテーション（注釈）を描画。
-
-```typescript
-new Thematika.PointAnnotationLayer(options: PointAnnotationLayerOptions)
-```
-
-| オプション | 型 | デフォルト | 説明 |
-|-----------|-----|-----------|------|
-| data | FeatureCollection \| Feature[] | 必須 | GeoJSONデータ |
-| annotationType | AnnotationType | 'callout' | アノテーション形式 |
-| textAccessor | string \| ((feature, index) => string) | | テキスト取得関数 |
-| titleAccessor | string \| ((feature, index) => string) | | タイトル取得関数 |
-| offsetAccessor | ((feature, index) => [dx, dy]) | | オフセット位置 |
-| subjectOptions | SubjectOptions | | サブジェクト設定 |
-| connectorOptions | ConnectorOptions | | コネクター設定 |
-| noteOptions | NoteOptions | | ノート設定 |
-
-AnnotationType: `'callout'`, `'label'`, `'badge'`, `'calloutElbow'`, `'calloutCurve'`, `'calloutCircle'`, `'calloutRect'`
-
-### PointTextLayer
-
-テキストラベルを描画。
-
-```typescript
-new Thematika.PointTextLayer(options: PointTextLayerOptions)
-```
-
-| オプション | 型 | 説明 |
-|-----------|-----|------|
-| data | FeatureCollection \| Feature[] | GeoJSONデータ |
-| textAccessor | string \| ((feature, index) => string) | テキスト取得関数 |
-| attr | LayerAttr | SVG属性設定 |
-| style | LayerStyle | CSSスタイル設定 |
-
 ### PointSpikeLayer
 
 3Dスパイク（棒グラフ風）を描画。
@@ -230,21 +194,6 @@ new Thematika.LineEdgeBundlingLayer(options: LineEdgeBundlingLayerOptions)
 |-----------|-----|------|
 | data | FeatureCollection \| Feature[] | LineString/MultiLineStringデータ |
 | strength | number | バンドリング強度 |
-| attr | LayerAttr | SVG属性設定 |
-| style | LayerStyle | CSSスタイル設定 |
-
-### LineTextLayer
-
-ライン上にテキストを配置。
-
-```typescript
-new Thematika.LineTextLayer(options: LineTextLayerOptions)
-```
-
-| オプション | 型 | 説明 |
-|-----------|-----|------|
-| data | FeatureCollection \| Feature[] | LineStringデータ |
-| textAccessor | string \| ((feature, index) => string) | テキスト取得関数 |
 | attr | LayerAttr | SVG属性設定 |
 | style | LayerStyle | CSSスタイル設定 |
 

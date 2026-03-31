@@ -160,13 +160,10 @@ interface LayerStyle<T = any> {
 | Utils | `LegendLayer` | D3スケール連携凡例 |
 | Point | `PointCircleLayer` | 円形ポイント |
 | Point | `PointSymbolLayer` | d3.symbol シンボル |
-| Point | `PointAnnotationLayer` | 注釈・コールアウト |
-| Point | `PointTextLayer` | テキストラベル |
 | Point | `PointSpikeLayer` | 3Dスパイク表示 |
 | Line | `LineConnectionLayer` | 直線・弧・スムージング接続 |
 | Line | `LineTaperedLayer` | テーパーアーク型ポリゴン接続 |
 | Line | `LineEdgeBundlingLayer` | エッジバンドリング |
-| Line | `LineTextLayer` | ライン上テキスト配置 |
 
 ---
 
@@ -429,125 +426,6 @@ map.addLayer('airports', symbols);
 
 ---
 
-### PointAnnotationLayer
-
-注釈（コールアウト）を表示する。サブジェクト（対象マーク）、コネクター（引き出し線）、ノート（テキストボックス）で構成。
-
-```typescript
-new PointAnnotationLayer(options: PointAnnotationLayerOptions)
-```
-
-```typescript
-interface PointAnnotationLayerOptions {
-  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  annotationType?: AnnotationType;  // 'callout' | 'label' | 'badge' | 'calloutElbow' | 'calloutCurve' | 'calloutCircle' | 'calloutRect'
-  textAccessor?: string | ((feature: GeoJSON.Feature, index: number) => string);
-  titleAccessor?: string | ((feature: GeoJSON.Feature, index: number) => string);
-  offsetAccessor?: ((feature: GeoJSON.Feature, index: number) => [number, number]);
-  subjectOptions?: SubjectOptions;
-  connectorOptions?: ConnectorOptions;
-  noteOptions?: NoteOptions;
-  attr?: LayerAttr;
-  style?: LayerStyle;
-}
-
-interface SubjectOptions {
-  type?: 'point' | 'circle' | 'rect';
-  r?: StyleValue<number>;
-  width?: StyleValue<number>;
-  height?: StyleValue<number>;
-  fill?: StyleValue<string>;
-  stroke?: StyleValue<string>;
-  strokeWidth?: StyleValue<number>;
-  strokeDasharray?: StyleValue<string>;
-}
-
-interface ConnectorOptions {
-  stroke?: StyleValue<string>;
-  strokeWidth?: StyleValue<number>;
-  strokeDasharray?: StyleValue<string>;
-}
-
-interface NoteOptions {
-  backgroundColor?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  borderRadius?: number;
-  padding?: number;
-  fontSize?: string;
-  fontFamily?: string;
-  textColor?: string;
-  wrap?: number;
-  align?: string;
-}
-
-type StyleValue<T> = T | ((feature: GeoJSON.Feature, index: number) => T);
-```
-
-**使用例:**
-```javascript
-const annotations = new Thematika.PointAnnotationLayer({
-  data: pointsOfInterest,
-  annotationType: 'callout',
-  textAccessor: (d) => d.properties.name,
-  offsetAccessor: (d) => [30, -20],
-  subjectOptions: { type: 'circle', r: 5, fill: '#e63946' },
-  connectorOptions: { stroke: '#333', strokeWidth: 1 },
-  noteOptions: { fontSize: '12px', backgroundColor: '#fff', padding: 4 }
-});
-map.addLayer('annotations', annotations);
-```
-
----
-
-### PointTextLayer
-
-テキストラベルを表示する。Voronoi図によるラベル重なり回避機能あり。
-
-```typescript
-new PointTextLayer(options: PointTextLayerOptions)
-```
-
-```typescript
-interface PointTextLayerOptions {
-  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  attr?: LayerAttr<GeoJSON.Feature>;
-  style?: LayerStyle<GeoJSON.Feature>;
-  textProperty?: string;       // テキスト取得プロパティ名（デフォルト: 'text'、次候補: 'name'）
-  dx?: number | ((feature, index) => number);   // Xオフセット
-  dy?: number | ((feature, index) => number);   // Yオフセット
-  rotate?: number | ((feature, index) => number);
-  lengthAdjust?: "spacing" | "spacingAndGlyphs";
-  alignmentBaseline?: string;  // デフォルト: "middle"
-  textAnchor?: "start" | "middle" | "end" | "inherit";  // デフォルト: "start"
-  fontFamily?: string | ((feature, index) => string);
-  fontSize?: number | string | ((feature, index) => number | string);  // デフォルト: 16
-  fontWeight?: string | ((feature, index) => string);
-  avoidOverlap?: boolean;      // Voronoi重なり回避（デフォルト: false）
-  showConnectors?: boolean;    // 接続線表示（avoidOverlap有効時、デフォルト: false）
-  connectorStyle?: LayerStyle | ((feature, index) => LayerStyle);
-  voronoiMargin?: number;      // Voronoi計算マージン（デフォルト: 20）
-}
-```
-
-**使用例:**
-```javascript
-const labels = new Thematika.PointTextLayer({
-  data: cities,
-  textProperty: 'name',
-  fontSize: 12,
-  fontWeight: 'bold',
-  dx: 8,
-  avoidOverlap: true,
-  showConnectors: true,
-  connectorStyle: { stroke: '#999', 'stroke-width': 0.5 },
-  attr: { fill: '#333' }
-});
-map.addLayer('labels', labels);
-```
-
----
-
 ### PointSpikeLayer
 
 3Dスパイク（棒グラフ風）表示。データ値に応じた長さのスパイクを各ポイントに配置する。
@@ -722,39 +600,6 @@ map.addLayer('bundling', bundling);
 ```
 
 ---
-
-### LineTextLayer
-
-ライン上にテキストを配置する。textPath要素を使用してパスに沿ったテキスト表示が可能。
-
-```typescript
-new LineTextLayer(options: LineTextLayerOptions)
-```
-
-```typescript
-interface LineTextLayerOptions {
-  data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
-  attr?: LayerAttr;
-  style?: LayerStyle;
-  textProperty?: string;         // デフォルト: 'text'（次候補: 'name'）
-  fontFamily?: string | ((feature, index) => string);
-  fontSize?: number | string | ((feature, index) => number | string);
-  fontWeight?: string | ((feature, index) => string);
-  textAnchor?: "start" | "middle" | "end" | "inherit";
-  startOffset?: string | number; // textPathのstartOffset（デフォルト: "50%"）
-  lineType?: 'straight' | 'arc' | 'smooth';
-  arcHeight?: number;
-  arcControlPoint?: ArcControlPointType;
-  arcOffset?: ArcOffsetType;
-  smoothType?: string;           // curveXxx系
-  showGuidePath?: boolean;       // ガイドパス表示（デフォルト: false）
-  guidePathStyle?: LayerAttr;
-  followPath?: boolean;          // パスに沿って配置（デフォルト: true）
-  flipText?: boolean;            // テキスト反転（デフォルト: false）
-  dx?: number | ((feature, index) => number);
-  dy?: number | ((feature, index) => number);
-}
-```
 
 ---
 

@@ -151,43 +151,10 @@ const innerLineLayer = new Thematika.LineConnectionLayer({
     }
 })
 
-// PointAnnotationLayerを作成
-const annotationLayer = new Thematika.PointAnnotationLayer({
-    data: pointData,
-    annotationType: "callout",
-    textAccessor: 'name',
-    titleAccessor: undefined,
-    offsetAccessor: (feature, index) => [30, -20],
-    subjectOptions: {
-        type: "circle",
-        r: 20,
-        width: 16,
-        height: 16,
-        fill: "none",
-        stroke: "#ffffff",
-        strokeWidth: 1.5,
-        strokeDasharray: "2,2",
-    },
-    connectorOptions: {
-        stroke: '#ffffff',
-        strokeWidth: 1
-    },
-    noteOptions: {
-        backgroundColor: "#ffffff",
-        fontSize: '12px',
-        textColor: '#000000',
-        borderColor: '#cccccc',
-        borderWidth: 1,
-        padding: 2
-    }
-});
-
-
 map.addLayer('graticuleLayer', graticuleLayer);
 map.addLayer('imageLayer', imageLayer);
 map.addLayer('bloomLineLayer', bloomLineLayer)
-map.addLayer('innerLineLayer', innerLineLayer)
-map.addLayer("anotationLayer", annotationLayer)</pre>
+map.addLayer('innerLineLayer', innerLineLayer)</pre>
             </div>
         </section>
     </div>
@@ -284,43 +251,10 @@ map.addLayer("anotationLayer", annotationLayer)</pre>
                 }
             })
 
-            // PointAnnotationLayerを作成
-            const annotationLayer = new Thematika.PointAnnotationLayer({
-                data: pointData,
-                annotationType: "callout",
-                textAccessor: 'name',
-                titleAccessor: undefined,
-                offsetAccessor: (feature, index) => [30, -20],
-                subjectOptions: {
-                    type: "circle",
-                    r: 20,
-                    width: 16,
-                    height: 16,
-                    fill: "none",
-                    stroke: "#ffffff",
-                    strokeWidth: 1.5,
-                    strokeDasharray: "2,2",
-                },
-                connectorOptions: {
-                    stroke: '#ffffff',
-                    strokeWidth: 1
-                },
-                noteOptions: {
-                    backgroundColor: "#ffffff",
-                    fontSize: '12px',
-                    textColor: '#000000',
-                    borderColor: '#cccccc',
-                    borderWidth: 1,
-                    padding: 2
-                }
-            });
-
-
             map.addLayer('graticuleLayer', graticuleLayer);
             map.addLayer('imageLayer', imageLayer);
             map.addLayer('bloomLineLayer', bloomLineLayer)
             map.addLayer('innerLineLayer', innerLineLayer)
-            map.addLayer("anotationLayer", annotationLayer)
 
         }
 

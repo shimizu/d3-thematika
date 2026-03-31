@@ -52,28 +52,9 @@ const outlineLayer = new Thematika.OutlineLayer({
   }
 });
 
-const color = Thematika.AllPalettes.TailwindVivid.colors;
-const textLayer = new Thematika.PointTextLayer({
-  data: geojson,
-  textProperty: 'NAME_JA',
-  dx: 0,
-  dy: 0,
-  rotate: 0,
-  attr: {
-    fill: (d, i) => color[i % 3],
-    stroke: (d, i) => color[i % 3],
-    'stroke-width': 1
-  },
-  fontSize: '14px',
-  fontWeight: 'bold',
-  textAnchor: 'start',
-  alignmentBaseline: 'middle'
-});
-
 map.addLayer('graticule', graticuleLayer);
 map.addLayer('outline', outlineLayer);
 map.addLayer('world', worldLayer);
-map.addLayer('cityLabels', textLayer);
 
 document.getElementById('download-svg').addEventListener('click', () => {
   map.saveSVG('map.svg');

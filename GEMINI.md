@@ -20,8 +20,8 @@ This file provides guidance to Gemini when working with code in this repository.
 - **LayerManager (core/layer-manager.ts)**: レイヤーのライフサイクル管理、z-index制御、レンダリング調整
 - **BaseLayer (layers/core/base-layer.ts)**: 全レイヤーの基底クラス。共通インターフェースと基本実装
 - **Geo レイヤー (layers/geo/)**: GeojsonLayer, GraticuleLayer, OutlineLayer
-- **Point レイヤー (layers/point/)**: PointCircleLayer, PointSymbolLayer, PointSpikeLayer, PointTextLayer, PointAnnotationLayer
-- **Line レイヤー (layers/line/)**: LineConnectionLayer, LineEdgeBundlingLayer, LineTextLayer
+- **Point レイヤー (layers/point/)**: PointCircleLayer, PointSymbolLayer, PointSpikeLayer
+- **Line レイヤー (layers/line/)**: LineConnectionLayer, LineEdgeBundlingLayer
 - **Raster レイヤー (layers/raster/)**: ImageLayer
 - **Utils レイヤー (layers/utils/)**: LegendLayer
 
