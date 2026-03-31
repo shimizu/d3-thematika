@@ -593,7 +593,7 @@ export class PointAnnotationLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, 
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .style('font-size', this.noteOptions.fontSize || '12px')
-      .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
+      .style('font-family', this.noteOptions.fontFamily || "'Roboto', 'Noto Sans JP', sans-serif")
       .style('fill', this.noteOptions.textColor || 'black')
       .html(data.text);
   }
@@ -610,7 +610,7 @@ export class PointAnnotationLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, 
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'central')
       .style('font-size', this.noteOptions.fontSize || '10px')
-      .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
+      .style('font-family', this.noteOptions.fontFamily || "'Roboto', 'Noto Sans JP', sans-serif")
       .style('font-weight', 'bold')
       .style('fill', this.noteOptions.textColor || 'white')
       .html(data.text.substring(0, 3)); // バッジは短いテキストのみ
@@ -643,7 +643,7 @@ export class PointAnnotationLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, 
       .attr('text-anchor', this.getTextAnchor(data.dx))
       .attr('dominant-baseline', this.getBaseline(data.dy))
       .style('font-size', this.noteOptions.fontSize || '12px')
-      .style('font-family', this.noteOptions.fontFamily || 'Arial, sans-serif')
+      .style('font-family', this.noteOptions.fontFamily || "'Roboto', 'Noto Sans JP', sans-serif")
       .style('fill', this.noteOptions.textColor || 'black');
 
     // タイトルとテキストの処理

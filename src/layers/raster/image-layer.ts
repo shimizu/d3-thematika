@@ -428,7 +428,7 @@ export class ImageLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle
         .attr('x', 10)
         .attr('y', 4)
         .attr('font-size', '11px')
-        .attr('font-family', 'Arial, sans-serif')
+        .attr('font-family', "'Roboto', 'Noto Sans JP', sans-serif")
         .attr('fill', colors[index] || '#9b59b6')
         .attr('font-weight', 'bold')
         .attr('class', 'bbox-marker-label')

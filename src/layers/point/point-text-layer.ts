@@ -157,7 +157,7 @@ export class PointTextLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerS
     if (typeof options.fontFamily === 'function') {
       this.fontFamilyFunction = options.fontFamily;
     } else {
-      const fontFamily = options.fontFamily || "メイリオ, Meiryo, 'ＭＳ Ｐゴシック', MS Gothic, sans-serif";
+      const fontFamily = options.fontFamily || "'Roboto', 'Noto Sans JP', sans-serif";
       this.fontFamilyFunction = () => fontFamily;
     }
     
