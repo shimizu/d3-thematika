@@ -2,6 +2,7 @@ import { select, Selection } from 'd3-selection';
 import { GeoProjection } from 'd3-geo';
 import { ThematikaOptions, LayerAttr, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
+import { WebFontPresets } from './utils/effect-utils';
 
 /**
  * 主題図描画を行うメインクラス（リファクタリング版）
@@ -57,6 +58,11 @@ export class Map {
         .attr('height', this.height)
         .attr('fill', options.svgBackgroundColor)
         .attr('class', 'thematika-svg-background');
+    }
+
+    // デフォルトWebフォントを読み込み
+    if (options.webFont !== false) {
+      this.svg.call(WebFontPresets.default());
     }
 
     // defsオプションが指定されている場合、テクスチャを初期化

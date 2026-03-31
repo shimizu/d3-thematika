@@ -583,6 +583,30 @@ export function createClipPolygon(options: ClipPolygonOptions) {
 }
 
 /* -----------------------------------------------------------------------------
+ * Webフォント
+ * ---------------------------------------------------------------------------*/
+
+/** Webフォント読み込み用の@importスタイルをSVGのdefs内に追加する */
+export function createWebFont(options: { url: string }) {
+  return (svg: Selection<SVGSVGElement, unknown, HTMLElement, any>) => {
+    let defs = svg.select<SVGDefsElement>('defs');
+    if (defs.empty()) {
+      defs = svg.append('defs');
+    }
+    defs.append('style')
+      .attr('type', 'text/css')
+      .text(`@import url('${options.url}');`);
+  };
+}
+
+export const WebFontPresets = {
+  /** Noto Sans JP + Roboto */
+  default: () => createWebFont({
+    url: 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap'
+  }),
+};
+
+/* -----------------------------------------------------------------------------
  * プリセット
  * ---------------------------------------------------------------------------*/
 

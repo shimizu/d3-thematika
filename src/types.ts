@@ -19,6 +19,8 @@ export interface ThematikaOptions {
   backgroundColor?: string;
   /** SVG全体の背景色（clipPathの影響を受けない） */
   svgBackgroundColor?: string;
+  /** デフォルトWebフォントの読み込み（デフォルト: true） */
+  webFont?: boolean;
 
 }
 
