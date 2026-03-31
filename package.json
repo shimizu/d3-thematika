@@ -10,7 +10,7 @@
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "dev": "rollup -c -w",
-    "playground": "npm run build && serve . -l 3001",
+    "playground": "npm run build && node scripts/start-playground.mjs",
     "playground:serve": "serve . -l 3001",
     "typecheck": "tsc --noEmit",
     "preview:site": "serve site",
