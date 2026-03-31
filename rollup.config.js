@@ -1,4 +1,4 @@
-import { copyFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync } from 'fs';
 import resolve from '@rollup/plugin-node-resolve';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
@@ -6,6 +6,13 @@ import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 
 const production = !process.env.ROLLUP_WATCH;
+const siteJsDir = 'site/js';
+
+function copyIfExists(source, destination) {
+  if (existsSync(source)) {
+    copyFileSync(source, destination);
+  }
+}
 
 export default {
   input: 'src/index.ts',
@@ -49,12 +56,14 @@ export default {
     {
       name: 'copy-umd-to-site',
       writeBundle() {
-        copyFileSync('dist/thematika.umd.js', 'site/js/thematika.umd.js');
+        mkdirSync(siteJsDir, { recursive: true });
+        copyFileSync('dist/thematika.umd.js', `${siteJsDir}/thematika.umd.js`);
+        copyIfExists('dist/thematika.umd.js.map', `${siteJsDir}/thematika.umd.js.map`);
       }
     },
     !production && serve({
       open: true,
-      contentBase: ['dist'],
+      contentBase: ['site'],
       host: 'localhost',
       port: 3000,
       headers: {

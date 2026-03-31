@@ -10,6 +10,11 @@
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "dev": "rollup -c -w",
+    "playground": "npm run build && serve . -l 3001",
+    "playground:serve": "serve . -l 3001",
+    "typecheck": "tsc --noEmit",
+    "preview:site": "serve site",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d site -m 'Deploy site'"
   },
   "author": "shimizu",
