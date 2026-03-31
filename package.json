@@ -77,9 +77,9 @@
     }
   },
   "devDependencies": {
-    "@rollup/plugin-node-resolve": "^16.0.1",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.1.4",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.0",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@types/d3-contour": "^3.0.6",
     "@types/d3-delaunay": "^6.0.4",
     "@types/d3-drag": "^3.0.7",
@@ -90,20 +90,20 @@
     "@types/d3-scale": "^4.0.9",
     "@types/d3-scale-chromatic": "^3.1.0",
     "@types/d3-selection": "^3.0.11",
-    "@types/d3-shape": "^3.1.7",
+    "@types/d3-shape": "^3.1.8",
     "@types/geojson": "^7946.0.16",
     "@types/jest": "^30.0.0",
-    "@types/jsdom": "^21.1.7",
+    "@types/jsdom": "^28.0.1",
     "gh-pages": "^6.3.0",
-    "jest": "^30.0.4",
-    "jsdom": "^26.1.0",
-    "rollup": "^4.44.2",
+    "jest": "^30.3.0",
+    "jsdom": "^29.0.1",
+    "rollup": "^4.60.1",
     "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^3.0.0",
-    "serve": "^14.2.4",
-    "ts-jest": "^29.4.0",
+    "serve": "^14.2.6",
+    "ts-jest": "^29.4.6",
     "tslib": "^2.8.1",
-    "typedoc": "^0.28.7",
-    "typescript": "^5.8.3"
+    "typedoc": "^0.28.18",
+    "typescript": "^6.0.2"
   }
 }
