@@ -9,7 +9,6 @@
   },
   "dependencies": {
     "geotiff": "^2.1.4-beta.0",
-    "puppeteer": "^21.0.0",
     "sharp": "^0.33.0"
   },
   "devDependencies": {},
