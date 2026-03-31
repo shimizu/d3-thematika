@@ -32,12 +32,10 @@ export default {
         'd3-force': 'd3',
         'd3-shape': 'd3',
         'd3-contour': 'd3',
-        '@turf/turf': 'turf',
-        'geotiff': 'GeoTIFF'
       }
     },
   ],
-  external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', 'd3-contour', '@turf/turf', 'geotiff'],
+  external: ['d3-geo', 'd3-selection', 'd3-force', 'd3-shape', 'd3-contour'],
   plugins: [
     resolve({
       browser: true

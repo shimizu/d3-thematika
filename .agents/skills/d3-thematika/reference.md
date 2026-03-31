@@ -444,16 +444,6 @@ Thematika.generateTileUrls(
 
 ---
 
-## COGユーティリティ
-
-Cloud Optimized GeoTIFFの読み込みをサポート。
-
-```typescript
-Thematika.loadCOG(url: string, options?: COGOptions): Promise<COGData>
-```
-
----
-
 ## テクスチャ
 
 textures.jsラッパー。

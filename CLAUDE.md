@@ -50,11 +50,9 @@ src/
 ├── utils/                     # ユーティリティ（9モジュール）
 │   ├── effect-utils.ts        # SVGフィルター、ブルーム、ドロップシャドウ
 │   ├── texture-utils.ts       # テクスチャパターン
-│   ├── cog-utils.ts           # Cloud Optimized GeoTIFF
 │   ├── tile-utils.ts          # Webタイルシステム
-│   ├── gis-utils.ts           # 地理計算（turf.js使用）
+│   ├── gis-utils.ts           # 地理計算
 │   ├── color-palette.ts       # カラーパレット、色覚障害対応
-│   ├── hachure-utils.ts       # ハッチング効果
 │   └── test-utils.ts          # テストユーティリティ
 ├── thematika.ts               # Mapクラス
 ├── types.ts                   # 型定義
@@ -89,9 +87,8 @@ src/
 - **ドロップシャドウ**: 影効果
 - **テクスチャ**: textures.jsによるパターン生成
 - **クリップ機能**: ポリゴン形状によるクリッピング
-- **COG対応**: Cloud Optimized GeoTIFFの読み込み
 - **タイル機能**: Web地図タイルシステム
-- **GIS計算**: turf.jsによる地理計算ユーティリティ
+- **GIS計算**: 地理計算ユーティリティ
 - **カラーパレット**: 色覚障害対応のカラーパレット管理
 
 ### ビルド出力
@@ -172,7 +169,7 @@ npm run deploy
 ## Site ディレクトリ構造
 
 ### 概要
-site/ディレクトリには29個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
+site/ディレクトリには28個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
 
 ### ディレクトリ構成
 ```
@@ -201,9 +198,8 @@ site/
 │   ├── dropshadow.html
 │   ├── texture.html
 │   └── customFilter.html
-├── utils/                # ユーティリティ (6例)
+├── utils/                # ユーティリティ (5例)
 │   ├── clip-polygon.html
-│   ├── cog-load.html
 │   ├── tile-map.html
 │   ├── color-palette-showcase.html
 │   ├── gis-utils.html
@@ -255,12 +251,11 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
   - **禁止**: レイヤー内でD3イベントリスナーを設定すること
   - **理由**: シンプルで一貫性のあるライブラリ設計を維持するため
   - **代替手段**: インタラクティブな機能が必要な場合は、Map レベルまたはアプリケーション側で実装する
-- 地理空間データ（GeoJSON）の計算処理はturf.jsを使用する。d3-thematikaは可視化に特化し、地理計算はturf.jsに委譲する。
 - 設計を変更したときは不要になったコードを極力削除する
 - **重要**: `npm run build`でUMDファイルが`site/js/thematika.umd.js`に自動コピーされる。手動コピーは不要。
 - **重要**: HTMLファイルでのスクリプト参照は、site/直下では `<script src="./js/thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../js/thematika.umd.js"></script>` とする。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 29個のデモページ、15種類のレイヤータイプ、9種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
+- **実装状況**: 28個のデモページ、15種類のレイヤータイプ、7種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
 - **スキルファイルの更新**: ライブラリの機能変更や新機能追加時は、必ず `.agents/skills/d3-thematika/` 内のスキルファイル（SKILL.md, reference.md, examples.md）も更新すること。スキルはClaude Codeがライブラリを正しく理解するために重要
 
 ### Immutableパターンの採用
