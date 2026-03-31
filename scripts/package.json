@@ -8,10 +8,11 @@
     "thumbnails:force": "node generate-thumbnails.js --force"
   },
   "dependencies": {
+    "@turf/rewind": "^7.3.4",
     "geotiff": "^2.1.4-beta.0",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.5",
+    "turf": "^3.0.14"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=16.0.0"
   }
