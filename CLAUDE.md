@@ -47,7 +47,7 @@ src/
 │   │   └── image-layer.ts
 │   └── utils/
 │       └── legend-layer.ts
-├── utils/                     # ユーティリティ（9モジュール）
+├── utils/                     # ユーティリティ（6モジュール）
 │   ├── effect-utils.ts        # SVGフィルター、ブルーム、ドロップシャドウ
 │   ├── texture-utils.ts       # テクスチャパターン
 │   ├── tile-utils.ts          # Webタイルシステム
@@ -129,24 +129,10 @@ npm run dev
 # プロダクションビルド
 npm run build
 
-# テスト実行
-npm test
-
-# テスト（ウォッチモード）
-npm run test:watch
-
-# カバレッジレポート付きテスト
-npm run test:coverage
-
 # デモページのデプロイ
 npm run deploy
 
 ```
-
-### テスト要件
-- Jest使用、TypeScript対応
-- カバレッジ要件: 全指標で80%以上
-- 新機能追加時は必ずユニットテストを作成
 
 ## 開発ワークフロー
 
@@ -169,7 +155,7 @@ npm run deploy
 ## Site ディレクトリ構造
 
 ### 概要
-site/ディレクトリには28個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
+site/ディレクトリには26個のデモページが6つのカテゴリー別サブディレクトリに配置されています。
 
 ### ディレクトリ構成
 ```
@@ -198,12 +184,11 @@ site/
 │   ├── dropshadow.html
 │   ├── texture.html
 │   └── customFilter.html
-├── utils/                # ユーティリティ (5例)
+├── utils/                # ユーティリティ (4例)
 │   ├── clip-polygon.html
 │   ├── tile-map.html
 │   ├── color-palette-showcase.html
-│   ├── gis-utils.html
-│   └── playground.html
+│   └── gis-utils.html
 ├── gallery/              # ギャラリー (6例)
 │   ├── gallery1.html
 │   ├── gallery2.html
@@ -255,7 +240,7 @@ Claude Code 使用時は以下の方法でトークン消費を最小限に抑�
 - **重要**: `npm run build`でUMDファイルが`site/js/thematika.umd.js`に自動コピーされる。手動コピーは不要。
 - **重要**: HTMLファイルでのスクリプト参照は、site/直下では `<script src="./js/thematika.umd.js"></script>`、サブディレクトリ内では `<script src="../js/thematika.umd.js"></script>` とする。
 - **コーディング規約**: 新しいコードを書く際は必ず既存の処理との統一感を保つこと。他の関数やパターンと同じ引数の取り方、戻り値の形式、処理の流れに従う。独自の実装パターンを作らず、既存コードの一貫性を重視する
-- **実装状況**: 28個のデモページ、15種類のレイヤータイプ、7種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
+- **実装状況**: 26個のデモページ、15種類のレイヤータイプ、5種類のユーティリティモジュールが実装済み。新機能追加時は必ず対応するデモページをsite/に作成
 - **スキルファイルの更新**: ライブラリの機能変更や新機能追加時は、必ず `.agents/skills/d3-thematika/` 内のスキルファイル（SKILL.md, reference.md, examples.md）も更新すること。スキルはClaude Codeがライブラリを正しく理解するために重要
 
 ### Immutableパターンの採用
@@ -357,6 +342,6 @@ document.getElementById('markers').addEventListener('change', draw);
 ## 注意事項
 
 - ファイルの変更や新規作成時は既存のコード規約に従ってください
-- コミット前に必ずビルドとテストを実行してください
+- コミット前に必ずビルドを実行してください
 - 新機能追加時は必ず対応するデモページをsite/に作成してください
 - **重要**: 上記チェックリストを省略した作業は品質低下の原因となるため禁止
