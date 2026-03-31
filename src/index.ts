@@ -53,6 +53,7 @@ export type { PointSpikeLayerOptions } from './types';
 export type { LineConnectionLayerOptions } from './layers/line/line-connection-layer';
 export type { LineEdgeBundlingLayerOptions } from './layers/line/line-edgebundling-layer';
 export type { LineTaperedLayerOptions } from './layers/line/line-tapered-layer';
+export type { TextLayerOptions } from './layers/text/text-layer';
 
 // コア機能
 export { LayerManager } from './core/layer-manager';
@@ -70,6 +71,7 @@ export { PointSpikeLayer } from './layers/point/point-spike-layer';
 export { LineConnectionLayer } from './layers/line/line-connection-layer';
 export { LineTaperedLayer } from './layers/line/line-tapered-layer';
 export { LineEdgeBundlingLayer } from './layers/line/line-edgebundling-layer';
+export { TextLayer } from './layers/text/text-layer';
 
 // ユーティリティ
 export * from './utils/effect-utils';
