@@ -184,3 +184,5 @@ ISC License - 詳細は[LICENSE](LICENSE)ファイルをご覧ください。
 ---
 
 **注**: このプロジェクトは個人的な実験プロジェクトとして開始されました。フィードバックや提案は[Issues](https://github.com/shimizu/d3-thematika/issues)でお待ちしています。
+
+.
