@@ -55,5 +55,5 @@ node scripts/fix-geojson-winding.js <file> --d3  # D3 用に修正
 ## サンプルとプレイグラウンド
 
 - `site/`: GitHub Pages に公開されるサンプルギャラリー。UMD ビルドを `site/js/thematika.umd.js` から読み込む。
-- `playground/`: ブラウザ上のコード実験環境。テンプレート追加は `playground/templates/<id>/` に index.html / style.css / script.js を作成し、`manifest.json` に登録する（手順は playground/README.md）。
+- `playground/`: AI 地図生成プレイグラウンド。GeoJSON をアップロードして自然言語で指示すると、AI エージェント（Claude Messages API へのブラウザ完結 client tool use ループ）が d3-thematika の描画コードを生成・自己修正し、zip でエクスポートできる。エージェント中核は `playground/js/agent/`、ツール定義は `playground/js/tools/register-tools.js`（構成の詳細は playground/README.md）。API キーは利用者が画面から入力し localStorage 保存（埋め込み禁止）。
 - `docs/`: TypeDoc の生成物。手動編集しない。

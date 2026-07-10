@@ -141,3 +141,6 @@ dist
 .DS_Store
 # docs/ からデプロイ時にコピーされる生成物（npm run docs:site）
 site/docs/
+
+# playground/ からデプロイ時にコピーされる生成物（npm run playground:site）
+site/playground/

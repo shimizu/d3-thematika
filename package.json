@@ -26,7 +26,8 @@
     "typecheck": "tsc --noEmit",
     "preview:site": "serve site",
     "docs:site": "rm -rf site/docs && cp -r docs site/docs",
-    "predeploy": "npm run build && npm run docs:site",
+    "playground:site": "rm -rf site/playground && cp -r playground site/playground",
+    "predeploy": "npm run build && npm run docs:site && npm run playground:site",
     "deploy": "gh-pages -d site -m 'Deploy site'"
   },
   "author": "shimizu",
