@@ -6,6 +6,7 @@ import {
   loadThematikaReference,
 } from "./agent/system-prompt.js";
 import { GeoDataStore } from "./data-store.js";
+import { exportProject } from "./export.js";
 import { PreviewRunner } from "./preview.js";
 import { createPlaygroundToolRegistry } from "./tools/register-tools.js";
 
@@ -493,6 +494,29 @@ document.querySelectorAll(".viewer-tab").forEach((button) => {
 el("run-preview").addEventListener("click", () => runPreview());
 el("clear-console").addEventListener("click", () => {
   consoleOutput.textContent = "";
+});
+
+// ── エクスポート ─────────────────────────────────────────────────
+
+el("export-zip").addEventListener("click", async () => {
+  try {
+    const datasets = dataStore
+      .list()
+      .filter((summary) => summary.available)
+      .map((summary) => ({
+        name: summary.name,
+        geojson: dataStore.get(summary.name),
+      }));
+
+    await exportProject({
+      code: editors.get(),
+      datasets,
+      libraryUrl: await previewRunner.resolveLibraryUrl(),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    addChatMessage("assistant", `エクスポートに失敗しました: ${message}`, "notice");
+  }
 });
 
 // ── 初期化 ───────────────────────────────────────────────────────
