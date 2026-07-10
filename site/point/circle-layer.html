@@ -131,6 +131,18 @@ const circleLayer = new Thematika.PointCircleLayer({
 });
 
 // または関数を使った動的半径設定
+// 比例記号（人口など量データ）は createProportionalScale を使う。
+// 円の面積が値に比例するため、視覚的な誇張が起きない
+const radius = Thematika.createProportionalScale(
+    geojson.features.map(f => f.properties.POP_EST),
+    { maxRadius: 25, minRadius: 2 }
+);
+const proportionalLayer = new Thematika.PointCircleLayer({
+    data: geojson,
+    r: (feature) => radius(feature.properties.POP_EST),
+    attr: { fill: '#74b9ff', opacity: 0.7 }
+});
+
 const dynamicCircleLayer = new Thematika.PointCircleLayer({
     data: geojson,
     r: (feature, index) => {
@@ -241,10 +253,13 @@ circleLayer.updateRadius((feature, index) => index % 3 + 3);</pre>
                         radiusFunction = (feature, index) => (index % 5) + baseRadius;
                         break;
                     case 'population':
-                        radiusFunction = (feature, index) => {
-                            const population = feature.properties?.POP_EST || 0;
-                            return Math.min(Math.sqrt(population / 10000000) * baseRadius + 2, 25);
-                        };
+                        // 面積が人口に比例するようにスケーリング（比例記号の正規化）
+                        const populationScale = Thematika.createProportionalScale(
+                            worldData.features.map(f => f.properties?.POP_EST || 0),
+                            { maxRadius: 25, minRadius: 2 }
+                        );
+                        radiusFunction = (feature, index) =>
+                            populationScale(feature.properties?.POP_EST || 0);
                         break;
                     default:
                         radiusFunction = baseRadius;

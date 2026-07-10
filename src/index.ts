@@ -81,6 +81,7 @@ export { TextLayer } from './layers/text/text-layer';
 
 // ユーティリティ
 export * from './utils/classification';
+export * from './utils/scale-utils';
 export * from './utils/effect-utils';
 export * from './utils/texture-utils';
 export * from './utils/test-utils';

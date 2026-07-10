@@ -989,6 +989,33 @@ const layer = new Thematika.GeojsonLayer({
 });
 ```
 
+### 比例記号スケール（createProportionalScale）
+
+比例記号（proportional symbol）用の半径スケールを生成する。円の**面積**が値に比例するよう半径を平方根でスケーリングする。半径を線形スケールにすると面積が値の2乗に比例し大きい値が視覚的に誇張されるため、量データをPointCircleLayerで表す場合は必ずこれを使う。
+
+```typescript
+createProportionalScale(
+  values: number[],
+  options?: {
+    maxRadius?: number;  // 最大半径px（デフォルト: 30）
+    minRadius?: number;  // 最小半径px（デフォルト: 1）
+    minValue?: number;   // 下限値（デフォルト: 0）
+    maxValue?: number;   // 上限値（デフォルト: valuesの最大値）
+  }
+): (value: number) => number
+```
+
+**使用パターン:**
+```javascript
+const values = geojson.features.map(f => f.properties.POP_EST);
+const radius = Thematika.createProportionalScale(values, { maxRadius: 25 });
+
+const layer = new Thematika.PointCircleLayer({
+  data: geojson,
+  r: (feature) => radius(feature.properties.POP_EST)
+});
+```
+
 ---
 
 ## GISユーティリティ
