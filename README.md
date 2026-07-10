@@ -40,63 +40,80 @@ npm install d3-thematika
 
 ### UMD版（ブラウザ）
 
+以下は1ファイルで動作する完全なサンプルです（GeoJSONのパスはご自身のデータに置き換えてください）。
+
 ```html
-<!-- D3.js CDN -->
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<!-- d3-thematika -->
-<script src="./dist/thematika.umd.js"></script>
+<!DOCTYPE html>
+<html lang="ja">
+<body>
+  <div id="map"></div>
 
-<script>
-  //geojsonデータの読み込み
-  const geojson =  await d3.json("geojson/world.geojson");
+  <!-- D3.js CDN -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- d3-thematika（npm install 後は node_modules/d3-thematika/dist/ からコピー） -->
+  <script src="./dist/thematika.umd.js"></script>
 
+  <script>
+    async function draw() {
+      const width = 800;
+      const height = 600;
 
-  // D3.jsの投影法を使用して地図の投影を設定
-  const projection = d3.geoEqualEarth()
-      .fitExtent([[0, 0], [width, height]], geojson);
+      // GeoJSONデータの読み込み
+      const geojson = await d3.json('geojson/world.geojson');
 
-        
-  const map = new Thematika.Map({
-      container: '#map',
-      width: width,
-      height: height,
-      defs: [texture, effect], 
-      projection: projection
-  });
+      // D3.jsの投影法を使用して地図の投影を設定
+      const projection = d3.geoEqualEarth()
+          .fitExtent([[0, 0], [width, height]], geojson);
 
-  // GeojsonLayerインスタンスを作成
-  const worldLayer = new Thematika.GeojsonLayer({
-      data: geojson,                
-      attr: { 
-          fill:'#f8f9fa', 
-          stroke: '#1a3d1f',
-          strokeWidth: 0.8,
-          opacity: 0.9,
-      }
-  });
+      // UMD版では Thematika 名前空間経由でアクセスする
+      // （const { Map } = Thematika のような destructuring は不可）
+      const map = new Thematika.Map({
+          container: '#map',
+          width: width,
+          height: height,
+          projection: projection
+      });
 
-  // レイヤーを追加
-  map.addLayer('world_layer', worldLayer);
+      // GeojsonLayerインスタンスを作成
+      const worldLayer = new Thematika.GeojsonLayer({
+          data: geojson,
+          attr: {
+              fill: '#f8f9fa',
+              stroke: '#1a3d1f',
+              'stroke-width': 0.8,
+              opacity: 0.9,
+          }
+      });
 
+      // レイヤーを追加
+      map.addLayer('world_layer', worldLayer);
+    }
 
-</script>
+    draw();
+  </script>
+</body>
+</html>
 ```
 
 ### ES Modules
 
 ```javascript
-import { Map, GeojsonLayer } from 'd3-thematika';
+import { Map as ThematikaMap, GeojsonLayer } from 'd3-thematika';
 import * as d3 from 'd3';
 
+const width = 800;
+const height = 600;
+
 // GeoJSONデータの読み込み
-const geojson = await d3.json("geojson/world.geojson");
+const geojson = await d3.json('geojson/world.geojson');
 
 // D3.jsの投影法を使用して地図の投影を設定
 const projection = d3.geoEqualEarth()
     .fitExtent([[0, 0], [width, height]], geojson);
 
 // 地図インスタンスを作成
-const map = new Map({
+// （Map はES組み込みのMapと衝突するため別名インポートを推奨）
+const map = new ThematikaMap({
     container: '#map',
     width: width,
     height: height,
@@ -109,7 +126,7 @@ const worldLayer = new GeojsonLayer({
     attr: {
         fill: '#f8f9fa',
         stroke: '#1a3d1f',
-        strokeWidth: 0.8,
+        'stroke-width': 0.8,
         opacity: 0.9,
     }
 });
@@ -117,6 +134,8 @@ const worldLayer = new GeojsonLayer({
 // レイヤーを追加
 map.addLayer('world_layer', worldLayer);
 ```
+
+詳細な API リファレンスは [docs/d3-thematika_llm.md](docs/d3-thematika_llm.md) を参照してください。
 
 ## 開発
 
@@ -150,7 +169,7 @@ npm run build
 
 ## 🤝 コントリビューション
 
-バグ報告、機能リクエスト、プルリクエストを歓迎します！詳細は[CONTRIBUTING.md](CONTRIBUTING.md)をご覧ください。
+バグ報告、機能リクエスト、プルリクエストを歓迎します！
 
 ### 問題を報告する
 
