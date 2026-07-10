@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地図装飾（スケールバー） - d3-thematika</title>
+    <title>地図装飾（スケールバー・タイトル） - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
@@ -49,6 +49,7 @@
                 <h3>📊 使用データ & 機能</h3>
                 <ul>
                     <li>ScaleBarLayer: 投影法から実距離を計算するスケールバー</li>
+                    <li>TitleLayer: タイトル・サブタイトル・出典表記のピクセル座標配置</li>
                     <li>配置位置・最大幅・単位（km/mi）の設定</li>
                     <li>キリの良い距離（1/2/5×10^n）への自動丸め</li>
                 </ul>
@@ -94,7 +95,24 @@ const scaleBar = new Thematika.ScaleBarLayer({
     units: 'km',                          // 'km' | 'mi'
     segments: 4                           // 交互塗りの分割数
 });
-map.addLayer('scalebar', scaleBar);</pre>
+map.addLayer('scalebar', scaleBar);
+
+// タイトルとサブタイトル（左上）
+const title = new Thematika.TitleLayer({
+    title: '日本の都道府県',
+    subtitle: '国土数値情報をもとに作成',
+    position: 'top-left'                 // キーワードまたは {top, left} px指定
+});
+map.addLayer('title', title);
+
+// 出典表記（右下に小さく）
+const credit = new Thematika.TitleLayer({
+    title: '© National Land Numerical Information',
+    position: 'bottom-right',
+    fontSize: 10,
+    color: '#64748b'
+});
+map.addLayer('credit', credit);</pre>
             </div>
         </section>
     </div>
@@ -152,8 +170,23 @@ map.addLayer('scalebar', scaleBar);</pre>
                 segments: 4
             });
 
+            const title = new Thematika.TitleLayer({
+                title: '日本の都道府県',
+                subtitle: '国土数値情報をもとに作成',
+                position: 'top-left'
+            });
+
+            const credit = new Thematika.TitleLayer({
+                title: '© National Land Numerical Information',
+                position: 'bottom-right',
+                fontSize: 10,
+                color: '#64748b'
+            });
+
             map.addLayer('japan', japanLayer);
             map.addLayer('scalebar', scaleBar);
+            map.addLayer('title', title);
+            map.addLayer('credit', credit);
         }
 
         document.getElementById('units-select').addEventListener('change', draw);

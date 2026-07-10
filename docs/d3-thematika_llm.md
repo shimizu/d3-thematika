@@ -146,7 +146,7 @@ interface LayerStyle<T = any> {
 
 ## レイヤー一覧と詳細
 
-全13種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
+全14種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
 
 ### 一覧
 
@@ -165,6 +165,7 @@ interface LayerStyle<T = any> {
 | Line | `LineEdgeBundlingLayer` | エッジバンドリング |
 | Text | `TextLayer` | テキストラベル（ポイント/ポリゴン重心配置） |
 | Utils | `ScaleBarLayer` | 縮尺（スケールバー） |
+| Utils | `TitleLayer` | タイトル・出典表記（ピクセル座標配置） |
 
 ---
 
@@ -671,6 +672,52 @@ const scaleBar = new Thematika.ScaleBarLayer({
   units: 'km'
 });
 map.addLayer('scalebar', scaleBar);
+```
+
+---
+
+### TitleLayer
+
+地図のタイトル・サブタイトル・出典表記をピクセル座標で配置する。TextLayerがGeoJSON座標を必要とするのに対し、画面座標で「左上にタイトル」「右下に出典」のような周辺要素を配置できる。
+
+```typescript
+new TitleLayer(options: TitleLayerOptions)
+```
+
+```typescript
+interface TitleLayerOptions {
+  title: string;                     // タイトル本文
+  subtitle?: string;                 // サブタイトル
+  position?: TitlePosition           // 'top-left' | 'top-center' | 'top-right' |
+    | { top?: number; bottom?: number; left?: number; right?: number };
+                                     // 'bottom-left' | 'bottom-center' | 'bottom-right'
+                                     // またはピクセル座標（デフォルト: 'top-left'）
+  margin?: number;                   // 地図端からの余白px（デフォルト: 16）
+  fontSize?: number;                 // デフォルト: 20
+  subtitleFontSize?: number;         // デフォルト: 12
+  color?: string;                    // デフォルト: '#333333'
+  haloColor?: string | null;         // ハロー色。nullでハローなし（デフォルト: '#ffffff'）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**使用例:**
+```javascript
+// タイトル
+map.addLayer('title', new Thematika.TitleLayer({
+  title: '世界の人口分布',
+  subtitle: '出典: Natural Earth (2023)',
+  position: 'top-left'
+}));
+
+// 出典表記（右下に小さく）
+map.addLayer('credit', new Thematika.TitleLayer({
+  title: '© Natural Earth',
+  position: 'bottom-right',
+  fontSize: 10,
+  color: '#666666'
+}));
 ```
 
 ---
