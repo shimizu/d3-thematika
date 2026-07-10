@@ -2,7 +2,18 @@
   "name": "d3-thematika",
   "version": "0.0.1",
   "type": "module",
-  "main": "rollup_config.js",
+  "main": "./dist/thematika.cjs",
+  "module": "./dist/thematika.esm.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/thematika.umd.js",
+  "jsdelivr": "./dist/thematika.umd.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/thematika.esm.js",
+      "require": "./dist/thematika.cjs"
+    }
+  },
   "directories": {
     "example": "site"
   },
@@ -47,8 +58,7 @@
     "dist",
     "src",
     "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
+    "LICENSE"
   ],
   "dependencies": {
     "d3-contour": "^4.0.2",

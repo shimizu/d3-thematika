@@ -18,7 +18,7 @@ export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/thematika.cjs.js',
+      file: 'dist/thematika.cjs',
       format: 'cjs',
       sourcemap: true,
       exports: 'named'
