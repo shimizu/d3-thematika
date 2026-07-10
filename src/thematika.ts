@@ -171,22 +171,26 @@ export class Map {
    * @param padding - パディング（ピクセル）
    */
   fitBounds(bounds: [number, number, number, number], padding: number = 20): void {
-    const [[x0, y0], [x1, y1]] = this.projection.invert ? [
-      this.projection([bounds[0], bounds[3]])!,
-      this.projection([bounds[2], bounds[1]])!
-    ] : [[0, 0], [this.width, this.height]];
+    const [west, south, east, north] = bounds;
 
-    const scale = Math.min(
-      (this.width - padding * 2) / Math.abs(x1 - x0),
-      (this.height - padding * 2) / Math.abs(y1 - y0)
+    // D3は外側リングが時計回り（CW）のポリゴンを期待する。
+    // CCWで渡すと「全世界」として解釈されフィットが壊れる。
+    const bboxPolygon: GeoJSON.Polygon = {
+      type: 'Polygon',
+      coordinates: [[
+        [west, south],
+        [west, north],
+        [east, north],
+        [east, south],
+        [west, south]
+      ]]
+    };
+
+    this.projection.fitExtent(
+      [[padding, padding], [this.width - padding, this.height - padding]],
+      bboxPolygon
     );
 
-    const translate: [number, number] = [
-      this.width / 2 - scale * (x0 + x1) / 2,
-      this.height / 2 - scale * (y0 + y1) / 2
-    ];
-
-    this.projection.scale(scale).translate(translate);
     this.layerManager.updateProjection(this.projection);
     this.layerManager.rerenderAllLayers();
   }
