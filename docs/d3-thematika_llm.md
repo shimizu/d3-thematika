@@ -989,6 +989,49 @@ const layer = new Thematika.GeojsonLayer({
 });
 ```
 
+### コロプレス統合ヘルパー（choropleth）
+
+分級 → 配色 → GeojsonLayer → LegendLayer の組み立てを1回の呼び出しにまとめる。
+
+```typescript
+choropleth(options: ChoroplethOptions): ChoroplethResult
+
+interface ChoroplethOptions {
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
+  value: string | ((feature: GeoJSON.Feature) => number);  // プロパティ名または関数
+  palette?: string;              // AllPalettesのパレット名（デフォルト: 'YlOrRd'）
+  colors?: string[];             // 色配列の直接指定（paletteより優先）
+  classes?: number;              // 階級数（デフォルト: 5）
+  method?: ClassificationMethod; // 分級手法（デフォルト: 'jenks'）
+  noDataColor?: string;          // 値がないフィーチャーの色（デフォルト: '#cccccc'）
+  attr?: LayerAttr;              // 追加attr（fillは分級結果で上書き）
+  style?: LayerStyle;
+  legend?: false | Partial<LegendLayerOptions>;  // falseで凡例なし
+}
+
+interface ChoroplethResult {
+  layer: GeojsonLayer;              // 塗り分け済みレイヤー
+  legend: LegendLayer | null;       // 凡例（legend: false でnull）
+  scale: (value: number) => string; // 値→色のスケール
+  classification: ClassifyResult;   // 分級結果
+  colors: string[];                 // 使用した色配列
+}
+```
+
+**使用パターン:**
+```javascript
+const { layer, legend } = Thematika.choropleth({
+  data: geojson,
+  value: 'POP_EST',
+  palette: 'Blues',
+  classes: 5,
+  method: 'jenks',
+  legend: { title: '人口', position: { top: 20, left: 20 }, labelFormat: d3.format('.2s') }
+});
+map.addLayer('choropleth', layer);
+map.addLayer('legend', legend);
+```
+
 ### 比例記号スケール（createProportionalScale）
 
 比例記号（proportional symbol）用の半径スケールを生成する。円の**面積**が値に比例するよう半径を平方根でスケーリングする。半径を線形スケールにすると面積が値の2乗に比例し大きい値が視覚的に誇張されるため、量データをPointCircleLayerで表す場合は必ずこれを使う。
@@ -1137,6 +1180,8 @@ draw();
 ```
 
 ### コロプレスマップ（階級区分図）
+
+**推奨:** 分級・配色・凡例をまとめて生成する [`choropleth()` ヘルパー](#コロプレス統合ヘルパーchoropleth) を使うと以下の手作業を1回の呼び出しに置き換えられる。手動で組む場合:
 
 ```javascript
 async function draw() {
