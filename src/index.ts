@@ -47,6 +47,7 @@ export type {
 } from './types';
 export type { ImageLayerOptions } from './layers/raster/image-layer';
 export type { LegendLayerOptions, LegendPosition, LegendData, SupportedScale, LegendSymbolType, SymbolSize, LegendBackgroundStyle } from './layers/utils/legend-layer';
+export type { ScaleBarLayerOptions, ScaleBarPosition } from './layers/utils/scalebar-layer';
 export type { PointCircleLayerOptions } from './layers/point/point-circle-layer';
 export type { PointSymbolLayerOptions } from './layers/point/point-symbol-layer';
 export type { PointSpikeLayerOptions } from './types';
@@ -65,6 +66,7 @@ export { OutlineLayer } from './layers/geo/outline-layer';
 export { GraticuleLayer } from './layers/geo/graticule-layer';
 export { ImageLayer } from './layers/raster/image-layer';
 export { LegendLayer } from './layers/utils/legend-layer';
+export { ScaleBarLayer } from './layers/utils/scalebar-layer';
 export { PointCircleLayer } from './layers/point/point-circle-layer';
 export { PointSymbolLayer } from './layers/point/point-symbol-layer';
 export { PointSpikeLayer } from './layers/point/point-spike-layer';

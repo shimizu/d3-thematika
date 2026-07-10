@@ -146,7 +146,7 @@ interface LayerStyle<T = any> {
 
 ## レイヤー一覧と詳細
 
-全12種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
+全13種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
 
 ### 一覧
 
@@ -164,6 +164,7 @@ interface LayerStyle<T = any> {
 | Line | `LineTaperedLayer` | テーパーアーク型ポリゴン接続 |
 | Line | `LineEdgeBundlingLayer` | エッジバンドリング |
 | Text | `TextLayer` | テキストラベル（ポイント/ポリゴン重心配置） |
+| Utils | `ScaleBarLayer` | 縮尺（スケールバー） |
 
 ---
 
@@ -636,6 +637,40 @@ const labels = new Thematika.TextLayer({
   }
 });
 map.addLayer('labels', labels);
+```
+
+---
+
+### ScaleBarLayer
+
+縮尺（スケールバー）をピクセル座標で配置する。配置位置での球面距離から実距離を計算し、1/2/5×10^n のキリの良い値に丸める。invert をサポートしない投影法では描画されない（警告）。
+
+```typescript
+new ScaleBarLayer(options?: ScaleBarLayerOptions)
+```
+
+```typescript
+interface ScaleBarLayerOptions {
+  position?: { top?: number; bottom?: number; left?: number; right?: number };
+                          // デフォルト: { left: 20, bottom: 20 }
+  maxWidth?: number;      // バーの最大幅px（デフォルト: 150）
+  units?: 'km' | 'mi';    // デフォルト: 'km'
+  segments?: number;      // バーの分割数（デフォルト: 4）
+  barHeight?: number;     // バーの高さpx（デフォルト: 6）
+  fontSize?: number;      // ラベルのフォントサイズ（デフォルト: 10）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**使用例:**
+```javascript
+const scaleBar = new Thematika.ScaleBarLayer({
+  position: { left: 20, bottom: 20 },
+  maxWidth: 200,
+  units: 'km'
+});
+map.addLayer('scalebar', scaleBar);
 ```
 
 ---
