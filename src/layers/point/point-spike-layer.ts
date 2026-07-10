@@ -37,7 +37,7 @@ export class PointSpikeLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Layer
     if (typeof options.length === 'function') {
       this.lengthFunction = options.length;
     } else {
-      const length = options.length || 50; // デフォルト長さは50
+      const length = options.length ?? 50; // デフォルト長さは50
       this.lengthFunction = () => length;
     }
 

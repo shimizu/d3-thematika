@@ -49,7 +49,7 @@ export class PointCircleLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     if (typeof options.r === 'function') {
       this.radiusFunction = options.r;
     } else {
-      const radius = options.r || 5; // デフォルト半径は5
+      const radius = options.r ?? 5; // デフォルト半径は5
       this.radiusFunction = () => radius;
     }
   }

@@ -111,12 +111,12 @@ export class LineConnectionLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, L
     this.validateData(this.data);
     
     this.lineType = options.lineType || 'straight';
-    this.arcHeight = options.arcHeight || 0.3;
+    this.arcHeight = options.arcHeight ?? 0.3;
     this.arcControlPoint = options.arcControlPoint || 'center';
     this.arcOffset = options.arcOffset || 'perpendicular';
     this.startArrow = options.startArrow || false;
     this.endArrow = options.endArrow || false;
-    this.arrowSize = options.arrowSize || 10;
+    this.arrowSize = options.arrowSize ?? 10;
     this.smoothType = options.smoothType || 'curveBasis';
   }
 

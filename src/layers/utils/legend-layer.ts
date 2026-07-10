@@ -180,14 +180,14 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     this.position = options.position;
     this.title = options.title;
     this.orientation = options.orientation || 'vertical';
-    this.itemSpacing = options.itemSpacing || 20;
-    this.fontSize = options.fontSize || 12;
+    this.itemSpacing = options.itemSpacing ?? 20;
+    this.fontSize = options.fontSize ?? 12;
     this.width = options.width;
     this.height = options.height;
     this.symbolType = options.symbolType || this.inferSymbolType();
     this.symbolSize = options.symbolSize || { fixed: 16 };
     this.sizeScale = options.sizeScale;
-    this.gradientSteps = options.gradientSteps || 256;
+    this.gradientSteps = options.gradientSteps ?? 256;
     this.enableDrag = options.enableDrag !== false; // デフォルトで有効
     this.showBackground = options.showBackground !== false; // デフォルトで有効
     this.overlapping = options.overlapping || false; // デフォルトで無効

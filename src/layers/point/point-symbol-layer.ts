@@ -54,7 +54,7 @@ export class PointSymbolLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     if (typeof options.size === 'function') {
       this.sizeFunction = options.size;
     } else {
-      const size = options.size || 64; // デフォルトサイズは64（8x8ピクセル相当）
+      const size = options.size ?? 64; // デフォルトサイズは64（8x8ピクセル相当）
       this.sizeFunction = () => size;
     }
     

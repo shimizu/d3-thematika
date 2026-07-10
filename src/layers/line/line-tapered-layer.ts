@@ -106,7 +106,7 @@ export class LineTaperedLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, Laye
     this.flipArc = options.flipArc !== undefined ? options.flipArc : false;
     this.startArrow = options.startArrow || false;
     this.endArrow = options.endArrow || false;
-    this.arrowSize = options.arrowSize || 10;
+    this.arrowSize = options.arrowSize ?? 10;
     this.arrowWidth = options.arrowWidth;
   }
 
