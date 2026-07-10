@@ -1,5 +1,5 @@
 import { Selection } from 'd3-selection';
-import { geoPath, GeoPath, GeoProjection } from 'd3-geo';
+import { geoPath, geoArea, GeoPath, GeoProjection } from 'd3-geo';
 import { BaseLayer } from '../core/base-layer';
 import { LayerAttr, LayerStyle, IGeojsonLayer } from '../../types';
 
@@ -38,6 +38,38 @@ export class GeojsonLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerSty
     this.data = Array.isArray(options.data)
       ? { type: 'FeatureCollection', features: options.data }
       : options.data as GeoJSON.FeatureCollection;
+
+    this.warnIfInvalidWinding();
+  }
+
+  /**
+   * ワインディング順序が逆（CCW外側リング）の疑いがあるポリゴンを検出して警告します。
+   * D3はGeoJSON仕様(RFC7946)と逆に外側リングが時計回り(CW)であることを期待するため、
+   * CCWのポリゴンは球面上で「そのポリゴンの外側全体」と解釈され、
+   * geoAreaが半球(2πステラジアン)を超える巨大な面積になる。
+   * @private
+   */
+  private warnIfInvalidWinding(): void {
+    const HALF_SPHERE = 2 * Math.PI;
+    const suspicious: (string | number)[] = [];
+
+    this.data.features.forEach((feature, i) => {
+      const type = feature.geometry?.type;
+      if (type !== 'Polygon' && type !== 'MultiPolygon') return;
+      if (geoArea(feature) > HALF_SPHERE) {
+        suspicious.push(feature.properties?.name ?? feature.id ?? i);
+      }
+    });
+
+    if (suspicious.length > 0) {
+      const shown = suspicious.slice(0, 5).join(', ');
+      const more = suspicious.length > 5 ? ` ほか${suspicious.length - 5}件` : '';
+      console.warn(
+        `[thematika] GeojsonLayer: ${suspicious.length}個のポリゴン(${shown}${more})の面積が半球を超えています。` +
+        `ワインディング順序がD3の期待(外側リング: 時計回り)と逆である可能性が高く、描画が壊れる原因になります。` +
+        `node scripts/fix-geojson-winding.js <file> --d3 などで修正してください。`
+      );
+    }
   }
 
   /**
