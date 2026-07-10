@@ -116,6 +116,8 @@ export interface LegendLayerOptions {
   backgroundStyle?: LegendBackgroundStyle;
   /** 重ね表示モード（サイズスケール時のみ有効） */
   overlapping?: boolean;
+  /** ラベルの数値フォーマット関数（例: d3.format(',.1f')） */
+  labelFormat?: (value: any) => string;
 }
 
 /**
@@ -163,6 +165,8 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
   private backgroundStyle: LegendBackgroundStyle;
   /** 重ね表示モード */
   private overlapping: boolean;
+  /** ラベルのフォーマット関数 */
+  private labelFormat: (value: any) => string;
 
   /**
    * LegendLayerを初期化します
@@ -187,6 +191,7 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     this.enableDrag = options.enableDrag !== false; // デフォルトで有効
     this.showBackground = options.showBackground !== false; // デフォルトで有効
     this.overlapping = options.overlapping || false; // デフォルトで無効
+    this.labelFormat = options.labelFormat || LegendLayer.defaultLabelFormat;
     this.backgroundStyle = {
       fill: '#ffffff',
       stroke: '#cccccc',
@@ -197,6 +202,20 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
       padding: 8,
       ...options.backgroundStyle
     };
+  }
+
+  /**
+   * デフォルトのラベルフォーマット。
+   * 浮動小数点誤差（0.30000000000000004等）を除去して文字列化する。
+   * @param value - フォーマットする値
+   * @returns フォーマット済み文字列
+   * @private
+   */
+  private static defaultLabelFormat(value: any): string {
+    if (typeof value === 'number' && isFinite(value) && !Number.isInteger(value)) {
+      return String(parseFloat(value.toPrecision(12)));
+    }
+    return String(value);
   }
 
   /**
@@ -328,7 +347,7 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     
     return {
       data: ticks,
-      labels: ticks.map((d: any) => d.toString()),
+      labels: ticks.map((d: any) => this.labelFormat(d)),
       colors: ticks.map((d: any) => scale(d))
     };
   }
@@ -348,11 +367,19 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     const legendData: LegendData = {
       data: range,
       labels: range.map((value: any) => {
-        const extent = scale.invertExtent(value);
-        if (extent[0] != null && extent[1] != null) {
-          return `${extent[0]} - ${extent[1]}`;
+        // scaleThresholdの端のrangeではinvertExtentが片側undefinedの
+        // 開区間を返すため、「〜未満」「〜以上」の形式でラベル化する
+        const [lo, hi] = scale.invertExtent(value);
+        if (lo != null && hi != null) {
+          return `${this.labelFormat(lo)} - ${this.labelFormat(hi)}`;
         }
-        return value.toString();
+        if (hi != null) {
+          return `< ${this.labelFormat(hi)}`;
+        }
+        if (lo != null) {
+          return `≥ ${this.labelFormat(lo)}`;
+        }
+        return String(value);
       }),
       colors: isNumericRange 
         ? range.map(() => '#0066cc') // 数値の場合はデフォルト色
@@ -382,7 +409,7 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     
     const legendData: LegendData = {
       data: domain,
-      labels: domain.map((d: any) => d.toString()),
+      labels: domain.map((d: any) => this.labelFormat(d)),
       colors: isNumericRange
         ? domain.map(() => '#0066cc') // 数値の場合はデフォルト色
         : domain.map((d: any) => scale(d))
@@ -415,7 +442,7 @@ export class LegendLayer extends BaseLayer<LayerAttr<any>, LayerStyle<any>> {
     
     return {
       data: domain,
-      labels: domain.map((d: any) => d.toString()),
+      labels: domain.map((d: any) => this.labelFormat(d)),
       colors: domain.map(() => {
         // カラースケールの場合は最初のドメイン値を使用、なければデフォルト色
         if (typeof colorScale === 'function') {
