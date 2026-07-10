@@ -3,6 +3,7 @@
  * GeoJSONデータの解析と計算に特化したユーティリティ集
  */
 
+import { geoCentroid } from 'd3-geo';
 import type { GeoJSON, Feature, FeatureCollection, Geometry, Position } from 'geojson';
 
 /**
@@ -103,37 +104,22 @@ export function getBbox(geojson: GeoJSON): BBox {
 }
 
 /**
- * GeoJSONから中心点を取得する（単純な平均計算）
+ * GeoJSONから中心点（経度・緯度）を取得する
+ *
+ * d3-geoのgeoCentroidによる球面上の重心計算を使用する。
+ * ポリゴンは面積加重・ラインは長さ加重のため、頂点密度の偏りに
+ * 引きずられず、ラベル配置などに適した中心点が得られる。
  * @param geojson - GeoJSONオブジェクト
- * @returns 中心点の座標
+ * @returns 中心点の座標（x: 経度, y: 緯度）
  */
 export function getCentroid(geojson: GeoJSON): Centroid {
-  const allCoords: Position[] = [];
-  
-  if (geojson.type === 'Feature') {
-    allCoords.push(...extractCoordinates(geojson.geometry));
-  } else if (geojson.type === 'FeatureCollection') {
-    geojson.features.forEach(feature => {
-      allCoords.push(...extractCoordinates(feature.geometry));
-    });
-  } else if ('coordinates' in geojson || 'geometries' in geojson) {
-    allCoords.push(...extractCoordinates(geojson as Geometry));
-  }
-  
-  if (allCoords.length === 0) {
+  const [x, y] = geoCentroid(geojson as any);
+
+  if (!isFinite(x) || !isFinite(y)) {
     return { x: 0, y: 0 };
   }
-  
-  let sumX = 0, sumY = 0;
-  for (const [x, y] of allCoords) {
-    sumX += x;
-    sumY += y;
-  }
-  
-  return {
-    x: sumX / allCoords.length,
-    y: sumY / allCoords.length
-  };
+
+  return { x, y };
 }
 
 /**

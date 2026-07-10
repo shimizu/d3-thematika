@@ -99,16 +99,25 @@ export class TextLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<
       return {
         feature,
         index,
-        x: projectedCoords ? projectedCoords[0] : 0,
-        y: projectedCoords ? projectedCoords[1] : 0,
+        projected: projectedCoords,
         text: this.textAccessor(feature, index)
       };
-    }).filter(d => d.x !== null && d.y !== null && d.text);
+    })
+      // 投影範囲外（projectionがnullを返した）のフィーチャーは描画しない
+      .filter((d): d is typeof d & { projected: [number, number] } =>
+        d.projected !== null && isFinite(d.projected[0]) && isFinite(d.projected[1]) && !!d.text
+      )
+      .map(d => ({ feature: d.feature, index: d.index, x: d.projected[0], y: d.projected[1], text: d.text }));
 
     // テキスト要素を作成
+    // paint-order: stroke により、attrでstroke/stroke-widthを指定するだけで
+    // 文字の背面に縁取り（ハロー）が描画される
     const texts = this.layerGroup
       .append('g')
       .attr('class', 'thematika-text-layer')
+      .attr('paint-order', 'stroke')
+      .attr('stroke-linejoin', 'round')
+      .attr('stroke-linecap', 'round')
       .selectAll('text')
       .data(textData)
       .enter()
@@ -140,13 +149,14 @@ export class TextLayer extends BaseLayer<LayerAttr<GeoJSON.Feature>, LayerStyle<
   ): void {
     Object.entries(this.attr).forEach(([property, value]) => {
       if (value !== undefined && property !== 'className') {
+        const attrName = BaseLayer.normalizePropertyName(property);
         if (typeof value === 'function') {
-          elements.attr(property, (d: any, i: number) => (value as Function)(d, i));
-        } else if (TextLayer.TEXT_ELEMENT_ATTRS.has(property)) {
+          elements.attr(attrName, (d: any, i: number) => (value as Function)(d, i));
+        } else if (TextLayer.TEXT_ELEMENT_ATTRS.has(attrName)) {
           // text要素固有の属性は個々の要素に適用
-          elements.attr(property, value);
+          elements.attr(attrName, value);
         } else {
-          layerGroup.attr(property, value);
+          layerGroup.attr(attrName, value);
         }
       }
     });
