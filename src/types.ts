@@ -27,6 +27,9 @@ export interface ThematikaOptions {
 
 /**
  * レイヤーのSVG属性設定（d3命名規則に合わせてattrを使用）
+ *
+ * キーは camelCase（strokeWidth）・kebab-case（'stroke-width'）のどちらでも指定可能。
+ * camelCase のキーは適用時に kebab-case のSVG属性名へ自動変換される。
  */
 export interface LayerAttr<T = any> {
   /** 塗りつぶし色 */
@@ -47,6 +50,12 @@ export interface LayerAttr<T = any> {
   clipPath?: string | ((d: T, index?: number) => string);
   /** 追加のCSSクラス名 */
   className?: string;
+  /** 上記以外の任意のSVG属性（'stroke-width' 等の kebab-case キーも許容） */
+  [property: string]:
+    | string
+    | number
+    | ((d: T, index?: number) => string | number)
+    | undefined;
 }
 
 /**

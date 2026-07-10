@@ -121,6 +121,30 @@ export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle exte
     return group;
   }
 
+  /** camelCaseのまま出力すべきSVG属性名（プレゼンテーション属性以外の例外） */
+  private static readonly CAMEL_CASE_SVG_ATTRS = new Set([
+    'viewBox',
+    'preserveAspectRatio',
+    'textLength',
+    'lengthAdjust',
+    'startOffset'
+  ]);
+
+  /**
+   * 属性名・スタイル名を実際のSVG/CSSの命名（kebab-case）に正規化します。
+   * LayerAttr の型定義は strokeWidth 等の camelCase を許容するが、
+   * SVGのプレゼンテーション属性は stroke-width 等の kebab-case のため変換が必要。
+   * @param property - 属性名
+   * @returns 正規化された属性名
+   * @protected
+   */
+  protected static normalizePropertyName(property: string): string {
+    if (BaseLayer.CAMEL_CASE_SVG_ATTRS.has(property) || property.startsWith('--')) {
+      return property;
+    }
+    return property.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+  }
+
   /**
    * 単一要素にSVG属性を適用します
    * @param element - 対象要素（未使用だがシグネチャ維持）
@@ -135,7 +159,7 @@ export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle exte
       if (value !== undefined && property !== 'className') {
         // 関数型の場合はダミーデータで評価（単一要素用）
         const finalValue = typeof value === 'function' ? (value as Function)({} as any, 0) : value;
-        layerGroup.attr(property, finalValue);
+        layerGroup.attr(BaseLayer.normalizePropertyName(property), finalValue);
       }
     });
   }
@@ -154,7 +178,7 @@ export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle exte
       Object.entries(this.style).forEach(([property, value]) => {
         if (value !== undefined) {
           const finalValue = typeof value === 'function' ? (value as Function)({} as any, 0) : value;
-          layerGroup.style(property, finalValue);
+          layerGroup.style(BaseLayer.normalizePropertyName(property), finalValue);
         }
       });
     }
@@ -186,12 +210,13 @@ export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle exte
   ): void {
     Object.entries(this.attr).forEach(([property, value]) => {
       if (value !== undefined && property !== 'className') {
+        const attrName = BaseLayer.normalizePropertyName(property);
         if (typeof value === 'function') {
           // 関数型の場合は個別の要素に適用
-          elements.attr(property, (d: any, i: number) => (value as Function)(d, i));
+          elements.attr(attrName, (d: any, i: number) => (value as Function)(d, i));
         } else {
           // 非関数型の場合はレイヤーグループに適用
-          layerGroup.attr(property, value);
+          layerGroup.attr(attrName, value);
         }
       }
     });
@@ -210,12 +235,13 @@ export abstract class BaseLayer<TAttr extends LayerAttr = LayerAttr, TStyle exte
     if (this.style) {
       Object.entries(this.style).forEach(([property, value]) => {
         if (value !== undefined) {
+          const styleName = BaseLayer.normalizePropertyName(property);
           if (typeof value === 'function') {
             // 関数型の場合は個別の要素に適用
-            elements.style(property, (d: any, i: number) => (value as Function)(d, i));
+            elements.style(styleName, (d: any, i: number) => (value as Function)(d, i));
           } else {
             // 非関数型の場合はレイヤーグループに適用
-            layerGroup.style(property, value);
+            layerGroup.style(styleName, value);
           }
         }
       });
