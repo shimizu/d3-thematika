@@ -14,9 +14,7 @@ D3.jsベースの静的主題図（thematic map）作成ライブラリ。SVGを
 8. [カラーパレット](#カラーパレット)
 9. [GISユーティリティ](#gisユーティリティ)
 10. [タイルユーティリティ](#タイルユーティリティ)
-11. [COGユーティリティ](#cogユーティリティ)
-12. [ハッチングユーティリティ](#ハッチングユーティリティ)
-13. [実用パターン集](#実用パターン集)
+11. [実用パターン集](#実用パターン集)
 
 ---
 
@@ -147,7 +145,7 @@ interface LayerStyle<T = any> {
 
 ## レイヤー一覧と詳細
 
-全13種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
+全12種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
 
 ### 一覧
 
@@ -164,6 +162,7 @@ interface LayerStyle<T = any> {
 | Line | `LineConnectionLayer` | 直線・弧・スムージング接続 |
 | Line | `LineTaperedLayer` | テーパーアーク型ポリゴン接続 |
 | Line | `LineEdgeBundlingLayer` | エッジバンドリング |
+| Text | `TextLayer` | テキストラベル（ポイント/ポリゴン重心配置） |
 
 ---
 
@@ -322,6 +321,7 @@ interface LegendLayerOptions {
   showBackground?: boolean;         // 背景ボックス表示
   backgroundStyle?: LegendBackgroundStyle;
   overlapping?: boolean;            // 重ね表示モード（サイズスケール時のみ）
+  labelFormat?: (value: any) => string;  // ラベルの数値フォーマット関数（例: d3.format(',.1f')）
 }
 
 type SupportedScale = ScaleOrdinal<any, string> | ScaleSequential<string>
@@ -601,6 +601,42 @@ map.addLayer('bundling', bundling);
 
 ---
 
+### TextLayer
+
+GeoJSONフィーチャーにテキストラベルを描画する。Pointはその座標に、ポリゴン/ラインは重心（面積/長さ加重）に配置される。投影範囲外のフィーチャーは描画されない。
+
+```typescript
+new TextLayer(options: TextLayerOptions)
+```
+
+```typescript
+interface TextLayerOptions {
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
+  attr?: LayerAttr;
+  style?: LayerStyle;
+  // テキスト内容のプロパティ名または関数（デフォルト: 'name'）
+  textProperty?: string | ((feature: GeoJSON.Feature, index: number) => string);
+}
+```
+
+`paint-order: stroke` がデフォルト設定されているため、`attr` で `stroke` / `stroke-width` を指定するだけで文字の背面に縁取り（ハロー）が描画される。
+
+**使用例:**
+```javascript
+const labels = new Thematika.TextLayer({
+  data: geojson,
+  textProperty: 'name',
+  attr: {
+    'font-size': 12,
+    'text-anchor': 'middle',
+    fill: '#333',
+    stroke: '#fff',        // ハロー（縁取り）
+    'stroke-width': 3
+  }
+});
+map.addLayer('labels', labels);
+```
+
 ---
 
 ## エフェクトユーティリティ
@@ -862,121 +898,6 @@ interface TileGenerationOptions {
   maxZoom?: number;       // デフォルト: 18
   tileSize?: number;      // デフォルト: 256
   clampToBounds?: boolean; // デフォルト: true
-}
-```
-
----
-
-## COGユーティリティ
-
-Cloud Optimized GeoTIFFの読み込み。
-
-```typescript
-async readCOG(url: string, options?: ReadCOGOptions): Promise<ReadCOGResult>
-```
-
-```typescript
-interface ReadCOGOptions {
-  resampleMethod?: 'nearest' | 'bilinear';
-  imageIndex?: number;          // デフォルト: 0
-  samples?: number[];           // デフォルト: [0, 1, 2]（RGB）
-  pool?: Pool;
-  sizeLimit?: {
-    maxWidth?: number;          // デフォルト: 512
-    maxHeight?: number;         // デフォルト: 512
-    onExceed?: 'error' | 'resample';
-  };
-  outputWidth?: number;
-  outputHeight?: number;
-  bbox?: [west, south, east, north];
-}
-
-interface ReadCOGResult {
-  dataUri: string;              // Data URI画像
-  bounds: [west, south, east, north];
-  width: number;
-  height: number;
-  originalWidth: number;
-  originalHeight: number;
-  wasResampled: boolean;
-}
-```
-
-### 使用パターン
-
-```javascript
-const result = await Thematika.readCOG('https://example.com/dem.tif', {
-  sizeLimit: { maxWidth: 512, maxHeight: 512 }
-});
-
-const imageLayer = new Thematika.ImageLayer('dem', {
-  src: result.dataUri,
-  bounds: result.bounds
-});
-map.addLayer('dem', imageLayer);
-```
-
----
-
-## ハッチングユーティリティ
-
-地形表現のための等高線とハッチング線を生成する。
-
-```typescript
-// 2次元配列データから等高線を生成
-generateContours(
-  data: number[][],
-  options: ContourOptions
-): GeoJSON.FeatureCollection
-
-// 等高線に沿ったハッチング線を生成
-generateHachures(
-  contours: GeoJSON.FeatureCollection,
-  options: HachureOptions
-): GeoJSON.FeatureCollection
-
-// SVGハッチングパターン定義を作成
-createHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-
-// クロスハッチパターン
-createCrossHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-
-// 密度ハッチパターン（値に応じて密度が変化）
-createDensityHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-```
-
-```typescript
-interface ContourOptions {
-  interval: number;
-  bounds: [[number, number], [number, number]];
-  smooth?: boolean;
-  minValue?: number;
-  maxValue?: number;
-}
-
-interface HachureOptions {
-  spacing: number;
-  length: number;
-  angle?: number;
-  density?: number;     // 0-1
-  randomness?: number;  // 0-1
-}
-
-interface HatchPatternOptions {
-  spacing?: number;
-  strokeWidth?: number;
-  stroke?: string;
-  angle?: number;
-  background?: string;
 }
 ```
 
