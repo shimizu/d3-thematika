@@ -42,6 +42,14 @@ export class LayerManager {
       throw new Error('SVG container not set. Call setContext() first.');
     }
 
+    // 同一IDのレイヤーが既に存在する場合は破棄してから置き換える
+    // （旧レイヤーのDOMが孤児として残るのを防ぐ）
+    if (this.layerInstances.has(id)) {
+      console.warn(`[thematika] LayerManager: レイヤーID "${id}" は既に存在するため、既存レイヤーを破棄して置き換えます。`);
+      this.layerInstances.get(id)!.destroy();
+      this.layerInstances.delete(id);
+    }
+
     // 投影法をレイヤーに設定（GeojsonLayerの場合）
     if (this.projection && this.isGeojsonLayer(layerInstance)) {
       layerInstance.setProjection(this.projection);
@@ -66,7 +74,20 @@ export class LayerManager {
     if (layerInstance) {
       layerInstance.destroy();
       this.layerInstances.delete(id);
+    } else {
+      this.warnUnknownLayerId('removeLayer', id);
     }
+  }
+
+  /**
+   * 存在しないレイヤーIDが指定されたときに警告を出します
+   * @param method - 呼び出し元メソッド名
+   * @param id - 指定されたレイヤーID
+   * @private
+   */
+  private warnUnknownLayerId(method: string, id: string): void {
+    const known = Array.from(this.layerInstances.keys()).join(', ') || '(なし)';
+    console.warn(`[thematika] LayerManager.${method}: レイヤーID "${id}" は存在しません。登録済みID: ${known}`);
   }
 
   /**
@@ -78,6 +99,8 @@ export class LayerManager {
     const layerInstance = this.layerInstances.get(id);
     if (layerInstance) {
       layerInstance.setVisible(visible);
+    } else {
+      this.warnUnknownLayerId('setLayerVisibility', id);
     }
   }
 
@@ -91,11 +114,13 @@ export class LayerManager {
     if (layerInstance) {
       const oldZIndex = layerInstance.zIndex;
       layerInstance.setZIndex(zIndex);
-      
+
       // zIndexが変更された場合のみ再配置
       if (oldZIndex !== zIndex) {
         this.reorderLayersOptimized();
       }
+    } else {
+      this.warnUnknownLayerId('setLayerZIndex', id);
     }
   }
 
