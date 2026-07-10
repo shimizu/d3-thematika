@@ -7,10 +7,12 @@ d3-thematika のコードを書いてすぐに結果を確認できるブラウ�
 ### 起動
 
 ```bash
-npm run dev
+npm run playground
 ```
 
-`http://localhost:3000/playground/` にアクセスします。
+ビルド後にサーバーが起動し、`http://localhost:3001/playground/` が自動で開きます。
+
+> **Note**: `npm run dev` は `site/` のみを配信するため、プレイグラウンドは表示できません。必ず `npm run playground` を使用してください。
 
 ### 画面構成
 

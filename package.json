@@ -25,7 +25,8 @@
     "playground:serve": "serve . -l 3001",
     "typecheck": "tsc --noEmit",
     "preview:site": "serve site",
-    "predeploy": "npm run build",
+    "docs:site": "rm -rf site/docs && cp -r docs site/docs",
+    "predeploy": "npm run build && npm run docs:site",
     "deploy": "gh-pages -d site -m 'Deploy site'"
   },
   "author": "shimizu",

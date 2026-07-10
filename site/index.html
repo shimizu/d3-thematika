@@ -751,14 +751,16 @@
 const geojson = await d3.json("world.geojson");
 
 // 地図のサイズと投影法の設定
+const width = 800;
+const height = 600;
 const projection = d3.geoEquirectangular()
     .fitExtent([[0, 0], [width, height]], geojson);
 
 // 基本的なセットアップ
 const map = new Thematika.Map({
     container: '#map',
-    width: 800,
-    height: 600,
+    width: width,
+    height: height,
     projection: projection
 });
 
@@ -797,7 +799,8 @@ map.addLayer('outline', outlineLayer);
                 <pre id="code-style" style="display: none;">// SVGエフェクトを使ったスタイリング
 
 // ドロップシャドウフィルターの作成
-const shadowFilter = map.createFilter('drop-shadow', {
+const shadowFilter = Thematika.createDropShadow({
+    id: 'drop-shadow',
     dx: 2,
     dy: 2,
     stdDeviation: 3,
@@ -805,17 +808,23 @@ const shadowFilter = map.createFilter('drop-shadow', {
     floodOpacity: 0.3
 });
 
-// グラデーションの作成
-const gradient = map.createGradient('country-gradient', [
-    { offset: '0%', color: '#3498db' },
-    { offset: '100%', color: '#2c3e50' }
-]);
+// 海テクスチャ（プリセット）の作成
+const oceanTexture = Thematika.TexturePresets.standardOcean();
+
+// defsに登録してMapを作成
+const map = new Thematika.Map({
+    container: '#map',
+    width: 800,
+    height: 600,
+    projection: projection,
+    defs: [shadowFilter, oceanTexture]
+});
 
 // SVGエフェクトを適用したレイヤー
 const styledLayer = new Thematika.GeojsonLayer({
     data: geojson,
     attr: {
-        fill: gradient.url(),
+        fill: oceanTexture.url(),
         stroke: '#fff',
         'stroke-width': 1,
         filter: shadowFilter.url()
