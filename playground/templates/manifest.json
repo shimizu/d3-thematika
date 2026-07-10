@@ -1,6 +1,0 @@
-[
-  { "id": "basic", "label": "基本地図" },
-  { "id": "points", "label": "ポイントレイヤー" },
-  { "id": "layout", "label": "レイアウト実験" },
-  { "id": "image-layer", "label": "画像レイヤー" }
-]

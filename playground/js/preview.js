@@ -199,9 +199,11 @@ export class PreviewRunner {
             headers: { 'Content-Type': 'application/json' }
           }));
         }
-        return Promise.resolve(new Response(
-          JSON.stringify({ error: 'データ「' + name + '」はアップロードされていません。' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
+        // d3.jsonは404レスポンスのbodyを読まず「Error: 404」しか出さないため、
+        // 原因が伝わるようrejectで明示的なメッセージを返す。
+        const known = Object.keys(dataMap).join(', ') || '(なし)';
+        return Promise.reject(new Error(
+          'データ「' + name + '」はアップロードされていません。利用可能: ' + known
         ));
       }
       return originalFetch(input, init);
