@@ -146,7 +146,7 @@ interface LayerStyle<T = any> {
 
 ## レイヤー一覧と詳細
 
-全14種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
+全15種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
 
 ### 一覧
 
@@ -166,6 +166,7 @@ interface LayerStyle<T = any> {
 | Text | `TextLayer` | テキストラベル（ポイント/ポリゴン重心配置） |
 | Utils | `ScaleBarLayer` | 縮尺（スケールバー） |
 | Utils | `TitleLayer` | タイトル・出典表記（ピクセル座標配置） |
+| Utils | `NorthArrowLayer` | 方位記号（真北方向へ自動回転） |
 
 ---
 
@@ -717,6 +718,39 @@ map.addLayer('credit', new Thematika.TitleLayer({
   position: 'bottom-right',
   fontSize: 10,
   color: '#666666'
+}));
+```
+
+---
+
+### NorthArrowLayer
+
+方位記号（ノースアロー）を描画する。デフォルトでは配置位置における真北の方向を投影法から計算して回転する（正角図法では上向き、円錐図法などでは傾く）。
+
+```typescript
+new NorthArrowLayer(options?: NorthArrowLayerOptions)
+```
+
+```typescript
+interface NorthArrowLayerOptions {
+  position?: { top?: number; bottom?: number; left?: number; right?: number };
+                            // デフォルト: { top: 20, right: 20 }
+  size?: number;            // 記号のサイズpx（デフォルト: 40）
+  color?: string;           // デフォルト: '#333333'
+  showLabel?: boolean;      // 「N」ラベル表示（デフォルト: true）
+  rotateToNorth?: boolean;  // 真北方向へ回転（デフォルト: true）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**注意:** 真北が画面上で一定でない投影法（正距方位図法の全球表示など）では、記号の意味が場所によって変わる。全球図では非表示を推奨。
+
+**使用例:**
+```javascript
+map.addLayer('north', new Thematika.NorthArrowLayer({
+  position: { top: 20, right: 20 },
+  size: 44
 }));
 ```
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地図装飾（スケールバー・タイトル） - d3-thematika</title>
+    <title>地図装飾（スケールバー・タイトル・方位記号） - d3-thematika</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
@@ -50,6 +50,7 @@
                 <ul>
                     <li>ScaleBarLayer: 投影法から実距離を計算するスケールバー</li>
                     <li>TitleLayer: タイトル・サブタイトル・出典表記のピクセル座標配置</li>
+                    <li>NorthArrowLayer: 配置位置の真北方向へ自動回転する方位記号</li>
                     <li>配置位置・最大幅・単位（km/mi）の設定</li>
                     <li>キリの良い距離（1/2/5×10^n）への自動丸め</li>
                 </ul>
@@ -112,7 +113,14 @@ const credit = new Thematika.TitleLayer({
     fontSize: 10,
     color: '#64748b'
 });
-map.addLayer('credit', credit);</pre>
+map.addLayer('credit', credit);
+
+// 方位記号（配置位置での真北方向へ自動回転）
+const northArrow = new Thematika.NorthArrowLayer({
+    position: { top: 20, right: 20 },
+    size: 44
+});
+map.addLayer('north', northArrow);</pre>
             </div>
         </section>
     </div>
@@ -183,10 +191,16 @@ map.addLayer('credit', credit);</pre>
                 color: '#64748b'
             });
 
+            const northArrow = new Thematika.NorthArrowLayer({
+                position: { top: 20, right: 20 },
+                size: 44
+            });
+
             map.addLayer('japan', japanLayer);
             map.addLayer('scalebar', scaleBar);
             map.addLayer('title', title);
             map.addLayer('credit', credit);
+            map.addLayer('north', northArrow);
         }
 
         document.getElementById('units-select').addEventListener('change', draw);
