@@ -12,9 +12,10 @@ D3.jsベースの静的主題図（thematic map）作成ライブラリ。SVGを
 6. [エフェクトユーティリティ](#エフェクトユーティリティ)
 7. [テクスチャユーティリティ](#テクスチャユーティリティ)
 8. [カラーパレット](#カラーパレット)
-9. [GISユーティリティ](#gisユーティリティ)
-10. [タイルユーティリティ](#タイルユーティリティ)
-11. [実用パターン集](#実用パターン集)
+9. [分級ユーティリティ](#分級ユーティリティ)
+10. [GISユーティリティ](#gisユーティリティ)
+11. [タイルユーティリティ](#タイルユーティリティ)
+12. [実用パターン集](#実用パターン集)
 
 ---
 
@@ -825,6 +826,50 @@ const colorScale = d3.scaleThreshold()
 const layer = new Thematika.GeojsonLayer({
   data: geojson,
   attr: { fill: (d) => colorScale(d.properties.population) }
+});
+```
+
+---
+
+## 分級ユーティリティ
+
+コロプレス図の階級区分に使用する境界値を計算する。結果は `d3.scaleThreshold` にそのまま渡せる。
+
+```typescript
+classify(
+  values: number[],              // 分級対象の数値配列（NaN/Infinityは無視）
+  classes: number,               // 階級数（2以上）
+  method?: ClassificationMethod  // デフォルト: 'jenks'
+): ClassifyResult
+
+type ClassificationMethod = 'jenks' | 'equalInterval' | 'quantile' | 'stdDev';
+
+interface ClassifyResult {
+  breaks: number[];      // 最小値・最大値を含む全境界値（classes+1個）
+  thresholds: number[];  // scaleThresholdのdomain用（classes-1個）
+  classes: number;       // 実際の階級数（同値が多いと要求より減ることがある）
+  method: ClassificationMethod;
+}
+```
+
+**手法の使い分け:**
+- `jenks`: 自然分類。データの自然なまとまりで区切る。コロプレスの定番（デフォルト）
+- `equalInterval`: 等間隔分類。値域を等分。分布が一様なデータ向け
+- `quantile`: 等量分類。各階級のデータ数が等しい。順位を強調したい場合
+- `stdDev`: 標準偏差分類。平均からの偏差。正規分布に近いデータ向け
+
+**使用パターン:**
+```javascript
+const values = geojson.features.map(f => f.properties.POP_EST);
+const { thresholds } = Thematika.classify(values, 5, 'jenks');
+
+const colorScale = d3.scaleThreshold()
+  .domain(thresholds)
+  .range(d3.schemeYlOrRd[5]);
+
+const layer = new Thematika.GeojsonLayer({
+  data: geojson,
+  attr: { fill: d => colorScale(d.properties.POP_EST) }
 });
 ```
 

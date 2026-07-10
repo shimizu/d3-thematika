@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分級ユーティリティ - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <script src="../js/common.js"></script>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="../examples.html" class="nav-link">Examples</a>
+                <a href="../docs/" class="nav-link">Docs</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">分級ユーティリティ</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">分級ユーティリティ（classify）デモ</h2>
+
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>世界各国の人口（POP_EST）によるコロプレス図</li>
+                    <li>classify() による4種類の分級手法の比較（jenks / equalInterval / quantile / stdDev）</li>
+                    <li>計算した境界値を d3.scaleThreshold にそのまま適用</li>
+                    <li>LegendLayer（labelFormat 使用）との連携</li>
+                </ul>
+            </div>
+
+            <!-- コントロールパネル -->
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label for="method-select">分級手法</label>
+                    <select id="method-select">
+                        <option value="jenks" selected>自然分類（Jenks）</option>
+                        <option value="equalInterval">等間隔分類</option>
+                        <option value="quantile">等量分類（Quantile）</option>
+                        <option value="stdDev">標準偏差分類</option>
+                    </select>
+                </div>
+                <div class="control-item">
+                    <label for="classes-select">階級数</label>
+                    <select id="classes-select">
+                        <option value="4">4</option>
+                        <option value="5" selected>5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 計算された境界値の表示 -->
+            <div class="info-box">
+                <h3>計算された境界値（thresholds）</h3>
+                <p id="thresholds-display" style="font-family: monospace;"></p>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map"></div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+
+            <div class="code-header">
+                <h3>classify() の使用例</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// 各国の人口データから分級境界を計算する
+const geojson = await d3.json('./geojson/world.geojson');
+const values = geojson.features.map(f => f.properties.POP_EST);
+
+// 自然分類（Jenks）で5階級に分級
+// method: 'jenks' | 'equalInterval' | 'quantile' | 'stdDev'
+const result = Thematika.classify(values, 5, 'jenks');
+// result.thresholds → scaleThreshold の domain 用の境界値（4個）
+// result.breaks     → 最小値・最大値を含む全境界値（6個）
+
+// D3のscaleThresholdにそのまま渡す
+const colorScale = d3.scaleThreshold()
+    .domain(result.thresholds)
+    .range(d3.schemeYlOrRd[5]);
+
+// コロプレスレイヤー
+const choroplethLayer = new Thematika.GeojsonLayer({
+    data: geojson,
+    attr: {
+        fill: d => colorScale(d.properties.POP_EST),
+        stroke: '#fff',
+        'stroke-width': 0.5
+    }
+});
+map.addLayer('choropleth', choroplethLayer);
+
+// 凡例（labelFormatで数値を整形）
+const legend = new Thematika.LegendLayer({
+    scale: colorScale,
+    position: { top: 20, left: 20 },
+    title: '人口',
+    labelFormat: d3.format('.2s')
+});
+map.addLayer('legend', legend);</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="../js/thematika.umd.js"></script>
+
+    <script>
+        // ナビゲーションバーのスクロール処理
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        let map;
+
+        async function draw() {
+            const container = document.querySelector('#map');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            d3.select('#map').selectAll('*').remove();
+
+            const method = document.getElementById('method-select').value;
+            const classes = +document.getElementById('classes-select').value;
+
+            const geojson = await d3.json('../geojson/world.geojson');
+            const values = geojson.features.map(f => f.properties.POP_EST);
+
+            // 分級境界を計算
+            const result = Thematika.classify(values, classes, method);
+
+            // 境界値を表示
+            const fmt = d3.format('.3s');
+            document.getElementById('thresholds-display').textContent =
+                `[ ${result.thresholds.map(fmt).join(' | ')} ]（実際の階級数: ${result.classes}）`;
+
+            const colorScale = d3.scaleThreshold()
+                .domain(result.thresholds)
+                .range(d3.schemeYlOrRd[result.classes] || d3.quantize(d3.interpolateYlOrRd, result.classes));
+
+            const projection = d3.geoNaturalEarth1()
+                .fitExtent([[20, 20], [width - 20, height - 20]], geojson);
+
+            map = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: projection,
+                backgroundColor: '#f8fafc'
+            });
+
+            const graticuleLayer = new Thematika.GraticuleLayer({
+                step: [20, 20],
+                attr: { stroke: '#e2e8f0', 'stroke-width': 0.5 }
+            });
+
+            const choroplethLayer = new Thematika.GeojsonLayer({
+                data: geojson,
+                attr: {
+                    fill: d => colorScale(d.properties.POP_EST),
+                    stroke: '#ffffff',
+                    'stroke-width': 0.5,
+                    opacity: 0.95
+                }
+            });
+
+            const legend = new Thematika.LegendLayer({
+                scale: colorScale,
+                position: { top: height - 180, left: 20 },
+                title: '人口（POP_EST）',
+                labelFormat: d3.format('.2s'),
+                enableDrag: false
+            });
+
+            map.addLayer('graticule', graticuleLayer);
+            map.addLayer('choropleth', choroplethLayer);
+            map.addLayer('legend', legend);
+        }
+
+        document.getElementById('method-select').addEventListener('change', draw);
+        document.getElementById('classes-select').addEventListener('change', draw);
+
+        draw();
+
+        document.getElementById('download-svg').addEventListener('click', () => map.saveSVG('classification.svg'));
+        document.getElementById('download-png').addEventListener('click', () => map.savePNG('classification.png'));
+    </script>
+</body>
+</html>
