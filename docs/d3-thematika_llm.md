@@ -1069,8 +1069,12 @@ GeoJSONデータの解析・計算ユーティリティ。
 // Bounding Box取得
 getBbox(geojson: GeoJSON): BBox  // { minX, minY, maxX, maxY }
 
-// 中心点取得（座標の単純平均）
-getCentroid(geojson: GeoJSON): Centroid  // { x, y }
+// 中心点取得（d3-geoのgeoCentroidによる面積/長さ加重の球面重心）
+getCentroid(geojson: GeoJSON): Centroid  // { x: 経度, y: 緯度 }
+
+// bboxからD3互換Polygon（外側リング時計回り）を生成。
+// fitExtentやインセット地図の範囲枠にそのまま使える
+bboxToPolygon(bounds: [west, south, east, north]): Feature
 
 // 複数GeoJSONをマージ
 merge(geojsons: GeoJSON[]): FeatureCollection
@@ -1177,6 +1181,39 @@ async function draw() {
 }
 
 draw();
+```
+
+### インセット地図（位置図）
+
+メイン地図と位置図の2つのMapを重ねて作る。位置図にはメイン地図の表示範囲を `bboxToPolygon()` で範囲枠として描く。
+
+```html
+<div id="map"><div id="inset"></div></div>
+<style>
+  #map { position: relative; }
+  #inset { position: absolute; right: 12px; bottom: 12px;
+           width: 200px; height: 150px;
+           background: #fff; border: 1px solid #94a3b8; }
+</style>
+```
+
+```javascript
+// メイン地図
+const mainMap = new Thematika.Map({ container: '#map', width, height, projection: mainProjection });
+mainMap.addLayer('area', new Thematika.GeojsonLayer({ data: target }));
+
+// インセット位置図: 全体図 + メイン範囲の枠
+const insetMap = new Thematika.Map({
+  container: '#inset', width: 200, height: 150,
+  projection: d3.geoMercator().fitExtent([[5, 5], [195, 145]], overview)
+});
+const bbox = Thematika.getBbox(target);
+const frame = Thematika.bboxToPolygon([bbox.minX, bbox.minY, bbox.maxX, bbox.maxY]);
+insetMap.addLayer('overview', new Thematika.GeojsonLayer({ data: overview }));
+insetMap.addLayer('frame', new Thematika.GeojsonLayer({
+  data: [frame],
+  attr: { fill: 'none', stroke: '#e11d48', 'stroke-width': 1.5 }
+}));
 ```
 
 ### コロプレスマップ（階級区分図）

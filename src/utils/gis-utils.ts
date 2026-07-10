@@ -123,6 +123,44 @@ export function getCentroid(geojson: GeoJSON): Centroid {
 }
 
 /**
+ * bbox（境界ボックス）からD3互換のPolygonフィーチャーを生成する。
+ *
+ * 外側リングはD3が期待する時計回り（CW）順序で生成されるため、
+ * projection.fitExtent や GeojsonLayer にそのまま渡せる
+ * （CCWだと「全世界」として解釈され描画が壊れる）。
+ * インセット地図の範囲枠やfitBoundsの内部処理に使用する。
+ *
+ * @param bounds - 境界ボックス [west, south, east, north]
+ * @returns Polygonフィーチャー
+ *
+ * @example
+ * ```javascript
+ * const frame = bboxToPolygon([122, 24, 146, 46]);
+ * const frameLayer = new GeojsonLayer({
+ *   data: [frame],
+ *   attr: { fill: 'none', stroke: '#e11d48', 'stroke-width': 1.5 }
+ * });
+ * ```
+ */
+export function bboxToPolygon(bounds: [number, number, number, number]): Feature {
+  const [west, south, east, north] = bounds;
+  return {
+    type: 'Feature',
+    properties: {},
+    geometry: {
+      type: 'Polygon',
+      coordinates: [[
+        [west, south],
+        [west, north],
+        [east, north],
+        [east, south],
+        [west, south]
+      ]]
+    }
+  };
+}
+
+/**
  * 複数のGeoJSONをマージする
  * @param geojsons - GeoJSONオブジェクトの配列
  * @returns マージされたFeatureCollection

@@ -3,6 +3,7 @@ import { GeoProjection } from 'd3-geo';
 import { ThematikaOptions, LayerAttr, ILayer } from './types';
 import { LayerManager } from './core/layer-manager';
 import { WebFontPresets } from './utils/effect-utils';
+import { bboxToPolygon } from './utils/gis-utils';
 
 /**
  * 主題図描画を行うメインクラス（リファクタリング版）
@@ -171,24 +172,12 @@ export class Map {
    * @param padding - パディング（ピクセル）
    */
   fitBounds(bounds: [number, number, number, number], padding: number = 20): void {
-    const [west, south, east, north] = bounds;
-
-    // D3は外側リングが時計回り（CW）のポリゴンを期待する。
-    // CCWで渡すと「全世界」として解釈されフィットが壊れる。
-    const bboxPolygon: GeoJSON.Polygon = {
-      type: 'Polygon',
-      coordinates: [[
-        [west, south],
-        [west, north],
-        [east, north],
-        [east, south],
-        [west, south]
-      ]]
-    };
+    // D3互換（外側リング: 時計回り）のPolygonに変換してフィットさせる
+    const bboxPolygon = bboxToPolygon(bounds);
 
     this.projection.fitExtent(
       [[padding, padding], [this.width - padding, this.height - padding]],
-      bboxPolygon
+      bboxPolygon as any
     );
 
     this.layerManager.updateProjection(this.projection);
