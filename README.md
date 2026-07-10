@@ -167,20 +167,6 @@ ISC License - 詳細は[LICENSE](LICENSE)ファイルをご覧ください。
 - [Examples Gallery](https://shimizu.github.io/d3-thematika/site/)
 - [D3.js Documentation](https://d3js.org/)
 
-## ⚡ ロードマップ
-
-### v0.1.0 (予定)
-- [ ] 基本的なレイヤータイプの安定化
-- [ ] APIドキュメントの充実
-- [ ] パフォーマンス最適化
-- [ ] より多くのサンプル追加
-
-### 将来的な機能
-- インタラクティブ機能の強化
-- アニメーションAPI
-- プラグインシステム
-- TypeScript型定義の改善
-
 ---
 
 **注**: このプロジェクトは個人的な実験プロジェクトとして開始されました。フィードバックや提案は[Issues](https://github.com/shimizu/d3-thematika/issues)でお待ちしています。
