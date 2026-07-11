@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./playground.css">
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
 </head>
 <body>
   <div class="shell">
@@ -77,10 +78,10 @@
           <div class="panel-title">
             <h2>データ</h2>
             <label class="upload-button" for="file-input">アップロード</label>
-            <input id="file-input" type="file" accept=".geojson,.json" multiple hidden>
+            <input id="file-input" type="file" accept=".geojson,.topojson,.json" multiple hidden>
           </div>
           <ul id="data-list" class="data-list"></ul>
-          <p class="drop-hint">GeoJSONファイルをここにドラッグ＆ドロップ</p>
+          <p class="drop-hint">GeoJSON / TopoJSONファイルをここにドラッグ＆ドロップ</p>
         </section>
 
         <section class="left-panel log-panel" data-left-panel="log">

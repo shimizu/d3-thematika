@@ -120,6 +120,36 @@ function removeEmptyCoordinates(geojson) {
 }
 
 /**
+ * TopoJSONのTopologyをオブジェクトごとのFeatureCollectionへ変換する。
+ * 変換本体はtopojson-clientのfeature関数を注入して使う（CDN読込のグローバル等）。
+ *
+ * @param {object} topology - type: "Topology" のTopoJSONオブジェクト
+ * @param {(topology: object, object: object) => object} featureFn - topojson.feature
+ * @returns {Array<{ name: string, collection: GeoJSON.FeatureCollection }>}
+ */
+export function topologyToFeatureCollections(topology, featureFn) {
+  if (typeof featureFn !== "function") {
+    throw new Error(
+      "topojson-clientが読み込まれていません。ページを再読み込みしてください。",
+    );
+  }
+  const objects = topology?.objects ?? {};
+  const names = Object.keys(objects);
+  if (names.length === 0) {
+    throw new Error("TopoJSONにobjectsが含まれていません。");
+  }
+
+  return names.map((name) => {
+    const result = featureFn(topology, objects[name]);
+    const collection =
+      result?.type === "FeatureCollection"
+        ? result
+        : { type: "FeatureCollection", features: [result] };
+    return { name, collection };
+  });
+}
+
+/**
  * FeatureCollectionをD3互換へ正規化する。
  * 入力は変更せず、正規化済みのコピーと変換統計を返す。
  *

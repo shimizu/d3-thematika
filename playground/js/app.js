@@ -7,6 +7,7 @@ import {
 } from "./agent/system-prompt.js";
 import { GeoDataStore } from "./data-store.js";
 import { exportProject } from "./export.js";
+import { topologyToFeatureCollections } from "./geojson-normalize.js";
 import { PreviewRunner } from "./preview.js";
 import { createPlaygroundToolRegistry } from "./tools/register-tools.js";
 
@@ -403,7 +404,29 @@ async function addFiles(files) {
   for (const file of files) {
     try {
       const text = await file.text();
-      const summary = dataStore.add(file.name, text);
+      const parsed = JSON.parse(text);
+
+      if (parsed?.type === "Topology") {
+        // TopoJSONはGeoJSONへ変換してから追加する。
+        // 複数のobjectsを持つ場合は「<ファイル名>_<オブジェクト名>」として個別に登録する。
+        const converted = topologyToFeatureCollections(
+          parsed,
+          globalThis.topojson?.feature,
+        );
+        const base = file.name.replace(/\.(topojson|json)$/i, "");
+        for (const { name, collection } of converted) {
+          const rawName = converted.length === 1 ? base : `${base}_${name}`;
+          const summary = dataStore.add(rawName, collection);
+          addChatMessage(
+            "assistant",
+            `「${summary.path}」を追加しました（TopoJSONの「${name}」から変換、${summary.featureCount} features）。`,
+            "progress",
+          );
+        }
+        continue;
+      }
+
+      const summary = dataStore.add(file.name, parsed);
       addChatMessage(
         "assistant",
         `「${summary.path}」を追加しました（${summary.featureCount} features）。`,
