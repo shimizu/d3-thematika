@@ -144,3 +144,6 @@ site/docs/
 
 # playground/ からデプロイ時にコピーされる生成物（npm run playground:site）
 site/playground/
+
+# 参考実装のプレゼン資料（40MB）はリポジトリに含めない
+reference/e-Stat-Web-AI-Agent/slide/
