@@ -59,9 +59,7 @@ import { Map, GeojsonLayer } from 'd3-thematika';
 ```
 
 ### 外部依存（UMD使用時は別途読み込み必要）
-- `d3-geo`, `d3-selection`, `d3-force`, `d3-shape`, `d3-contour`
-- `@turf/turf` → グローバル `turf`
-- `geotiff` → グローバル `GeoTIFF`
+- `d3-geo`, `d3-selection`, `d3-force`, `d3-shape`, `d3-contour`（グローバル `d3` にマップ。d3 v7 の読み込みで揃う）
 
 ---
 
@@ -82,7 +80,9 @@ interface ThematikaOptions {
   height: number;              // 地図の高さ（ピクセル）
   projection: GeoProjection;   // D3投影法オブジェクト
   defs?: any[];                // SVG定義（フィルター、テクスチャ等）のコールバック配列
-  backgroundColor?: string;    // 背景色（デフォルト: '#ffffff'）
+  backgroundColor?: string;    // 地図グループの背景色（デフォルト: '#ffffff'）
+  svgBackgroundColor?: string; // SVG全体の背景色（clipPathの影響を受けない）
+  webFont?: boolean;           // デフォルトWebフォントの読み込み（デフォルト: true）
 }
 ```
 
@@ -114,6 +114,8 @@ interface ThematikaOptions {
 
 SVG属性の設定。全プロパティは固定値またはデータに応じた関数を受け取る。
 
+キーは **camelCase（`strokeWidth`）と kebab-case（`'stroke-width'`）のどちらでも指定できる**。camelCaseのキーは適用時にkebab-caseのSVG属性名へ自動変換される（`viewBox`等の正当なcamelCase属性とCSSカスタムプロパティは除く）。インデックスシグネチャにより、下記以外の任意のSVG属性（`'font-size'`、`'stroke-linecap'`等）も指定可能。
+
 ```typescript
 interface LayerAttr<T = any> {
   fill?: string | ((d: T, index?: number) => string);
@@ -125,6 +127,9 @@ interface LayerAttr<T = any> {
   filter?: string | ((d: T, index?: number) => string);
   clipPath?: string | ((d: T, index?: number) => string);
   className?: string;
+  // 上記以外の任意のSVG属性（kebab-case文字列キーも可）
+  [property: string]: string | number
+    | ((d: T, index?: number) => string | number) | undefined;
 }
 ```
 
@@ -185,6 +190,8 @@ interface GeojsonLayerOptions {
   style?: LayerStyle<GeoJSON.Feature>;
 }
 ```
+
+**ワインディング検査:** D3はGeoJSON仕様(RFC7946)と逆のリング順序（外側リング: 時計回り）を期待する。構築時にCCW疑いのポリゴン（球面面積が半球超）を検出するとconsole.warnで警告する。該当データは `scripts/fix-geojson-winding.js --d3` で修正できる。
 
 **使用例（UMD）:**
 ```javascript
@@ -321,7 +328,7 @@ interface LegendLayerOptions {
   symbolSize?: SymbolSize;          // { min?, max?, fixed? }
   sizeScale?: ScaleLinear<number, number>;  // circleタイプ用サイズスケール
   gradientSteps?: number;           // gradientタイプ用ステップ数
-  enableDrag?: boolean;             // ドラッグ有効（デフォルト: false）
+  enableDrag?: boolean;             // ドラッグ有効（デフォルト: true。静的出力ではfalse推奨）
   showBackground?: boolean;         // 背景ボックス表示
   backgroundStyle?: LegendBackgroundStyle;
   overlapping?: boolean;            // 重ね表示モード（サイズスケール時のみ）
@@ -382,9 +389,15 @@ interface PointCircleLayerOptions {
 
 **使用例:**
 ```javascript
+// 量データは createProportionalScale（面積比例）で半径を作る
+const radius = Thematika.createProportionalScale(
+  cities.features.map(d => d.properties.population),
+  { maxRadius: 25, minRadius: 2 }
+);
+
 const circles = new Thematika.PointCircleLayer({
   data: cities,
-  r: (d) => Math.sqrt(d.properties.population) / 100,
+  r: (d) => radius(d.properties.population),
   attr: {
     fill: '#e63946',
     'fill-opacity': 0.6,
@@ -785,23 +798,52 @@ createCustomFilter(id: string, filterContent: string)
 | `createColorMatrix(options)` | 色行列変換 | `id`, `type`('saturate'\|'hueRotate'\|'luminanceToAlpha'\|'matrix'), `values` |
 | `createGlow(options)` | 外側発光 | `id`, `stdDeviation`, `color`, `opacity` |
 | `createEdgeDetect(options)` | 輪郭抽出 | `id` |
+| `createSharpen(options)` | シャープ化 | `id`, `amount` |
+| `createEmboss(options)` | エンボス | `id`, `strength`, `angle` |
 | `createInnerShadow(options)` | 内側シャドウ | `id`, `dx`, `dy`, `stdDeviation`, `color`, `opacity` |
 | `createOutline(options)` | アウトライン | `id`, `radius`, `color`, `opacity` |
 | `createNoise(options)` | フィルムグレイン/ノイズ | `id`, `baseFrequency`, `numOctaves`, `opacity` |
 | `createClipPolygon(options)` | GeoJSONクリップパス | `id`, `polygon`, `projection` |
+| `createWebFont(options)` | WebフォントのSVG埋め込み（@import） | `url` |
 
-### FilterPresets（プリセット）
+### FilterPresets（プリセット、全21種）
 
 ```typescript
-Thematika.FilterPresets.lightBlur()         // stdDeviation: 2
-Thematika.FilterPresets.strongBlur()        // stdDeviation: 8
+// ブラー
+Thematika.FilterPresets.lightBlur()          // stdDeviation: 2
+Thematika.FilterPresets.strongBlur()         // stdDeviation: 8
+// シャドウ
 Thematika.FilterPresets.standardDropShadow() // dx:2, dy:2, std:2, opacity:0.8
-Thematika.FilterPresets.softDropShadow()    // dx:2, dy:2, std:4, opacity:0.2
-Thematika.FilterPresets.standardBloom()     // intensity:4, threshold:0.8
-Thematika.FilterPresets.strongBloom()       // intensity:8, threshold:0.6, color:#fff
-Thematika.FilterPresets.grayscale()         // saturate: 0
-Thematika.FilterPresets.hueRotate60()       // hueRotate: 60
-Thematika.FilterPresets.sepia()             // セピア色行列
+Thematika.FilterPresets.softDropShadow()     // dx:2, dy:2, std:4, opacity:0.2
+Thematika.FilterPresets.softInnerShadow()    // 内側シャドウ dx:1, dy:1, std:2
+// ブルーム・グロー
+Thematika.FilterPresets.standardBloom()      // intensity:4, threshold:0.8
+Thematika.FilterPresets.strongBloom()        // intensity:8, threshold:0.6, color:#fff
+Thematika.FilterPresets.warmBloom()          // intensity:5, 暖色 #ffd1a3
+Thematika.FilterPresets.blueGlow()           // シアン発光
+Thematika.FilterPresets.neonMagenta()        // マゼンタ発光
+// 色調
+Thematika.FilterPresets.grayscale()          // saturate: 0
+Thematika.FilterPresets.hueRotate60()        // hueRotate: 60
+Thematika.FilterPresets.sepia()              // セピア色行列
+// 輪郭・質感
+Thematika.FilterPresets.edgeDetect()         // 輪郭抽出
+Thematika.FilterPresets.outlineThin()        // アウトライン radius:1
+Thematika.FilterPresets.outlineThick()       // アウトライン radius:2.5
+Thematika.FilterPresets.filmGrain()          // ノイズ opacity:0.12
+Thematika.FilterPresets.sharpen()            // シャープ amount:1
+Thematika.FilterPresets.strongSharpen()      // シャープ amount:2
+Thematika.FilterPresets.emboss()             // エンボス strength:1
+Thematika.FilterPresets.softEmboss()         // エンボス strength:0.5
+```
+
+**注意:** プリセットのフィルターIDは固定文字列（例: 'lightBlur'）。同一ページに複数の地図を置く場合はIDが衝突するため、ファクトリ関数で個別のidを指定する。
+
+### WebFontPresets
+
+```typescript
+Thematika.WebFontPresets.default()  // Noto Sans JP + Roboto を読み込む
+// Mapのコンストラクタが webFont: true（デフォルト）のとき自動適用される
 ```
 
 ### 使用パターン
@@ -849,11 +891,25 @@ textures.jsをラップしたテクスチャパターン生成。
 | `createDesertTexture(options)` | 砂漠テクスチャ | `id`, `size`, `background`, `fill` |
 | `createMountainTexture(options)` | 山岳テクスチャ | `id`, `size`, `background`, `fill` |
 
-### TexturePresets
+### TexturePresets（全10種）
 
 ```typescript
-Thematika.TexturePresets  // プリセットテクスチャ群（上記と同様の構造）
+// 海（強度3段階）
+Thematika.TexturePresets.lightOcean()
+Thematika.TexturePresets.standardOcean()
+Thematika.TexturePresets.heavyOcean()
+// 森林（密度3段階）
+Thematika.TexturePresets.sparseForest()
+Thematika.TexturePresets.standardForest()
+Thematika.TexturePresets.denseForest()
+// その他の地形・汎用
+Thematika.TexturePresets.desert()
+Thematika.TexturePresets.mountain()
+Thematika.TexturePresets.simpleDots()
+Thematika.TexturePresets.simpleLines()
 ```
+
+**注意:** プリセットのパターンIDは固定文字列。ファクトリと同じく `.url()` で `fill` に参照させる。
 
 ### 使用パターン
 
@@ -884,7 +940,7 @@ const layer = new Thematika.GeojsonLayer({
 ```typescript
 Thematika.ColorBrewerPalettes  // ColorBrewer: Set1, Set2, Set3, Blues, Greens, Oranges, YlOrRd, YlGnBu等
 Thematika.ViridisPalettes      // viridis系: Viridis, Magma, Inferno, Plasma
-Thematika.CARTOPalettes        // CARTO: Bold, Pastel等
+Thematika.CARTOPalettes        // CARTO: Prism, Safe, Vivid
 Thematika.TailwindPalettes     // Tailwind CSS系
 Thematika.AllPalettes          // 全パレットの統合
 ```
