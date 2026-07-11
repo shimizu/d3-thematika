@@ -50,24 +50,16 @@
     </form>
 
     <main class="workspace">
-      <!-- 左: データ + チャット -->
+      <!-- 左: チャット / データ / 実行ログ（タブ切替） -->
       <section class="chat-column">
-        <section class="data-panel" id="data-panel">
-          <div class="panel-title">
-            <h2>データ</h2>
-            <label class="upload-button" for="file-input">アップロード</label>
-            <input id="file-input" type="file" accept=".geojson,.json" multiple hidden>
-          </div>
-          <ul id="data-list" class="data-list"></ul>
-          <p class="drop-hint">GeoJSONファイルをここにドラッグ＆ドロップ</p>
-        </section>
+        <div class="left-tabs" role="tablist" aria-label="チャットとデータ">
+          <button class="left-tab active" data-left-panel="chat" type="button">チャット</button>
+          <button class="left-tab" data-left-panel="data" type="button">データ</button>
+          <button class="left-tab" data-left-panel="log" type="button">実行ログ</button>
+        </div>
 
-        <section class="chat-panel">
+        <section class="left-panel chat-panel active" data-left-panel="chat">
           <div id="chat-messages" class="chat-messages"></div>
-          <details class="log-panel">
-            <summary>実行ログ</summary>
-            <ul id="execution-log"></ul>
-          </details>
           <form id="chat-form" class="chat-form">
             <textarea
               id="chat-input"
@@ -79,6 +71,20 @@
               <button type="button" id="chat-abort" hidden>中断</button>
             </div>
           </form>
+        </section>
+
+        <section class="left-panel data-panel" data-left-panel="data" id="data-panel">
+          <div class="panel-title">
+            <h2>データ</h2>
+            <label class="upload-button" for="file-input">アップロード</label>
+            <input id="file-input" type="file" accept=".geojson,.json" multiple hidden>
+          </div>
+          <ul id="data-list" class="data-list"></ul>
+          <p class="drop-hint">GeoJSONファイルをここにドラッグ＆ドロップ</p>
+        </section>
+
+        <section class="left-panel log-panel" data-left-panel="log">
+          <ul id="execution-log"></ul>
         </section>
       </section>
 

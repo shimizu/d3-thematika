@@ -200,11 +200,65 @@ button.primary:hover {
   flex-direction: column;
 }
 
-.data-panel {
+.left-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0;
+  background: var(--surface);
   flex-shrink: 0;
-  border-bottom: 1px solid var(--border-subtle);
+}
+
+.left-tab {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  position: relative;
+  transition: color 0.15s;
+}
+
+.left-tab:hover {
+  color: var(--text);
+  background: transparent;
+  border: none;
+}
+
+.left-tab.active {
+  color: var(--text);
+  background: transparent;
+  border: none;
+}
+
+.left-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: var(--tab-active);
+  border-radius: 2px 2px 0 0;
+}
+
+.left-panel {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.left-panel.active {
+  display: flex;
+  flex-direction: column;
+}
+
+.data-panel {
   padding: 12px 14px;
-  max-height: 40%;
   overflow-y: auto;
 }
 
@@ -299,13 +353,6 @@ button.primary:hover {
 
 /* ── Chat panel ── */
 
-.chat-panel {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
 .chat-messages {
   flex: 1;
   min-height: 0;
@@ -363,23 +410,16 @@ button.primary:hover {
 /* ── Execution log ── */
 
 .log-panel {
-  flex-shrink: 0;
-  border-top: 1px solid var(--border-subtle);
   font-size: 0.72rem;
   color: var(--text-secondary);
-}
-
-.log-panel summary {
-  padding: 6px 14px;
-  cursor: pointer;
-  user-select: none;
 }
 
 .log-panel ul {
   list-style: none;
   margin: 0;
-  padding: 4px 14px 8px;
-  max-height: 140px;
+  padding: 10px 14px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;

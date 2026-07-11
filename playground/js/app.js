@@ -421,21 +421,26 @@ fileInput.addEventListener("change", () => {
   fileInput.value = "";
 });
 
+// ドラッグ&ドロップは左カラム全体で受け付け、ドラッグ中はデータタブへ自動切替する。
+const chatColumn = document.querySelector(".chat-column");
+
 ["dragover", "dragenter"].forEach((type) => {
-  dataPanel.addEventListener(type, (event) => {
+  chatColumn.addEventListener(type, (event) => {
+    if (![...(event.dataTransfer?.types ?? [])].includes("Files")) return;
     event.preventDefault();
+    activateLeftPanel("data");
     dataPanel.classList.add("drag-over");
   });
 });
 
 ["dragleave", "drop"].forEach((type) => {
-  dataPanel.addEventListener(type, (event) => {
+  chatColumn.addEventListener(type, (event) => {
     event.preventDefault();
     dataPanel.classList.remove("drag-over");
   });
 });
 
-dataPanel.addEventListener("drop", (event) => {
+chatColumn.addEventListener("drop", (event) => {
   const files = [...(event.dataTransfer?.files ?? [])];
   if (files.length > 0) addFiles(files);
 });
@@ -469,6 +474,19 @@ el("delete-api-key").addEventListener("click", () => {
 });
 
 // ── エディタ・プレビューの手動操作 ───────────────────────────────
+
+function activateLeftPanel(name) {
+  document.querySelectorAll(".left-tab").forEach((b) => {
+    b.classList.toggle("active", b.dataset.leftPanel === name);
+  });
+  document.querySelectorAll(".left-panel").forEach((panel) => {
+    panel.classList.toggle("active", panel.dataset.leftPanel === name);
+  });
+}
+
+document.querySelectorAll(".left-tab").forEach((button) => {
+  button.addEventListener("click", () => activateLeftPanel(button.dataset.leftPanel));
+});
 
 document.querySelectorAll(".editor-tab").forEach((button) => {
   button.addEventListener("click", () => {
