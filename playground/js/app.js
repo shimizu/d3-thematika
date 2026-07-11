@@ -15,7 +15,7 @@ const API_KEY_STORAGE = "thematika-playground.apiKey";
 const MODEL_STORAGE = "thematika-playground.model";
 const MAX_TOKENS_STORAGE = "thematika-playground.maxTokens";
 const EDITOR_STORAGE = "thematika-playground.editors";
-const DEFAULT_MODEL = "claude-sonnet-4-6";
+const DEFAULT_MODEL = "claude-opus-4-8";
 const DEFAULT_MAX_TOKENS = 16000;
 const MAX_LOG_ENTRIES = 300;
 
