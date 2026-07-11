@@ -18,7 +18,7 @@ npm run playground
 
 1. **API設定** — 画面右上の「API設定」からClaude APIキーを入力する（[platform.claude.com](https://platform.claude.com/) で取得）。キーはこのブラウザのlocalStorageにのみ保存される。共有端末では使用後に「キーを削除」すること
 2. **データ** — データタブにGeoJSON / TopoJSONファイルをアップロード（ファイル選択またはドラッグ&ドロップ）。TopoJSONはGeoJSONへ変換され、複数のobjectsを持つ場合は「ファイル名_オブジェクト名」として個別に登録される。さらにアップロード時に D3 互換へ自動変換される（ワインディング順序の反転 + 空座標の除去。`scripts/fix-geojson-winding.js --d3` と同じ変換）。プレビューもエクスポートも変換済みデータを使う
-3. **チャット** — 作りたい地図を日本語で指示する（例:「都道府県を人口で5階級のコロプレスに。タイトルと凡例付きで」）。エージェントがデータを確認し、コードを生成してプレビューで動作確認し、エラーがあれば自己修正する
+3. **チャット** — 作りたい地図を日本語で指示する（例:「都道府県を人口で5階級のコロプレスに。タイトルと凡例付きで」）。エージェントがデータを確認し、コードを生成してプレビューで動作確認し、エラーがあれば自己修正する。手元にない地域のデータは [geoBoundaries](https://www.geoboundaries.org/) から取得できる（simplified版を優先し、さらに間引き+座標丸めで軽量化して追加。出典表記が必要）
 4. **微調整** — 生成されたコードは中央のエディタ（HTML/CSS/JS）で手動編集できる。「実行」または `Ctrl+Enter` でプレビューを更新。追加の変更をチャットで指示することもできる（エージェントは手動編集後のコードを読んでから修正する）
 5. **エクスポート** — 「エクスポート」で自己完結のzipをダウンロード。解凍して `npx serve .` で配信すればプレビューと同一の地図が表示される
 
@@ -44,7 +44,9 @@ playground/
       compaction.js             #   会話履歴の縮約
       conversation-store.js     #   会話のlocalStorage永続化
       system-prompt.js          #   コード規約 + docs/d3-thematika_llm.md 連結
-    tools/register-tools.js     # ツール5種: list_data / inspect_data / get_code / update_code / render_preview
+    tools/register-tools.js     # ツール8種: list_data / inspect_data / search_features /
+                                #   get_boundary_info / fetch_boundaries / get_code / update_code / render_preview
+    tools/geoboundaries-client.js # geoBoundaries API（行政界データの取得）
     data-store.js               # アップロードGeoJSONの管理（要約+変換後検証）
     geojson-normalize.js        # D3互換への自動変換（ワインディング反転+空座標除去）
     preview.js                  # iframe実行（fetch shim・コンソール捕捉・SVG統計）

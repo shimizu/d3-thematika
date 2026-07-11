@@ -120,6 +120,143 @@ function removeEmptyCoordinates(geojson) {
 }
 
 /**
+ * Douglas-Peuckerによるポリライン間引き。tolは度単位の許容距離。
+ */
+function douglasPeucker(points, tol) {
+  if (points.length <= 2) return points;
+  const sqTol = tol * tol;
+
+  const sqSegmentDist = (p, a, b) => {
+    let x = a[0];
+    let y = a[1];
+    let dx = b[0] - x;
+    let dy = b[1] - y;
+    if (dx !== 0 || dy !== 0) {
+      const t = ((p[0] - x) * dx + (p[1] - y) * dy) / (dx * dx + dy * dy);
+      if (t > 1) {
+        x = b[0];
+        y = b[1];
+      } else if (t > 0) {
+        x += dx * t;
+        y += dy * t;
+      }
+    }
+    dx = p[0] - x;
+    dy = p[1] - y;
+    return dx * dx + dy * dy;
+  };
+
+  const keep = new Uint8Array(points.length);
+  keep[0] = 1;
+  keep[points.length - 1] = 1;
+  const stack = [[0, points.length - 1]];
+  while (stack.length > 0) {
+    const [first, last] = stack.pop();
+    let maxDist = 0;
+    let index = 0;
+    for (let i = first + 1; i < last; i++) {
+      const dist = sqSegmentDist(points[i], points[first], points[last]);
+      if (dist > maxDist) {
+        maxDist = dist;
+        index = i;
+      }
+    }
+    if (maxDist > sqTol) {
+      keep[index] = 1;
+      stack.push([first, index], [index, last]);
+    }
+  }
+  return points.filter((_, i) => keep[i]);
+}
+
+/** 座標を指定桁で丸め、連続する重複点を除去する。 */
+function roundAndDedupe(points, precision) {
+  const factor = Math.pow(10, precision);
+  const rounded = points.map(([x, y]) => [
+    Math.round(x * factor) / factor,
+    Math.round(y * factor) / factor,
+  ]);
+  const out = [rounded[0]];
+  for (let i = 1; i < rounded.length; i++) {
+    const prev = out[out.length - 1];
+    if (rounded[i][0] !== prev[0] || rounded[i][1] !== prev[1]) {
+      out.push(rounded[i]);
+    }
+  }
+  // リングの閉合を維持する（丸めで始点と終点が一致して消えた場合は閉じ直す）
+  const first = out[0];
+  const last = out[out.length - 1];
+  if (points[0][0] === points[points.length - 1][0] &&
+      points[0][1] === points[points.length - 1][1] &&
+      (first[0] !== last[0] || first[1] !== last[1])) {
+    out.push([first[0], first[1]]);
+  }
+  return out;
+}
+
+function simplifyPointArray(points, { toleranceDeg, precision }, isRing) {
+  let result = toleranceDeg > 0 ? douglasPeucker(points, toleranceDeg) : points;
+  result = roundAndDedupe(result, precision);
+  // リングは最低4点（閉合含む）が必要。潰れた場合は間引き前の丸めのみで返す
+  if (isRing && result.length < 4) {
+    result = roundAndDedupe(points, precision);
+    if (result.length < 4) return null; // 丸めでも成立しない極小リングは削除
+  }
+  return result;
+}
+
+function simplifyCoordinates(coords, options, depth, geometryType) {
+  if (!Array.isArray(coords) || coords.length === 0) return coords;
+  if (typeof coords[0] === "number") return coords; // Point座標
+
+  if (typeof coords[0][0] === "number") {
+    // 数値ペアの配列 = LineStringまたはリング
+    const isRing = geometryType === "Polygon" || geometryType === "MultiPolygon";
+    return simplifyPointArray(coords, options, isRing);
+  }
+
+  return coords
+    .map((child) => simplifyCoordinates(child, options, depth + 1, geometryType))
+    .filter((child) => child !== null && child.length > 0);
+}
+
+/**
+ * FeatureCollectionのジオメトリを軽量化する。
+ * Douglas-Peucker間引き（toleranceDeg、度単位）と座標の桁丸め（precision）を行う。
+ * 外部APIから取得した高詳細データのサイズ削減に使う。
+ *
+ * @param {GeoJSON.FeatureCollection} collection - 対象（in-placeでは変更しない）
+ * @param {{ toleranceDeg?: number, precision?: number }} options
+ * @returns {{ collection: GeoJSON.FeatureCollection, verticesBefore: number, verticesAfter: number }}
+ */
+export function simplifyCollection(collection, { toleranceDeg = 0, precision = 4 } = {}) {
+  const countVertices = (coords) => {
+    if (!Array.isArray(coords)) return 0;
+    if (typeof coords[0] === "number") return 1;
+    return coords.reduce((sum, child) => sum + countVertices(child), 0);
+  };
+
+  const copy = JSON.parse(JSON.stringify(collection));
+  let verticesBefore = 0;
+  let verticesAfter = 0;
+
+  for (const feature of copy.features ?? []) {
+    const geometry = feature?.geometry;
+    if (!geometry?.coordinates) continue;
+    verticesBefore += countVertices(geometry.coordinates);
+    geometry.coordinates = simplifyCoordinates(
+      geometry.coordinates,
+      { toleranceDeg, precision },
+      0,
+      geometry.type,
+    ) ?? [];
+    verticesAfter += countVertices(geometry.coordinates);
+  }
+
+  return { collection: copy, verticesBefore, verticesAfter };
+}
+
+/**
  * TopoJSONのTopologyをオブジェクトごとのFeatureCollectionへ変換する。
  * 変換本体はtopojson-clientのfeature関数を注入して使う（CDN読込のグローバル等）。
  *

@@ -1,4 +1,9 @@
 import { ToolRegistry } from "../agent/tool-registry.js";
+import { simplifyCollection } from "../geojson-normalize.js";
+import {
+  downloadBoundaryGeojson,
+  getBoundaryMetadata,
+} from "./geoboundaries-client.js";
 
 // LLMへ返すサンプルfeature数。全データはGeoDataStoreに保持し、プロパティの
 // サマリーだけをトークン化して送ることでコンテキストの無駄を避ける。
@@ -82,6 +87,72 @@ const SEARCH_FEATURES = {
       },
     },
     required: ["path"],
+  },
+};
+
+// fetch_boundariesのデフォルト間引き許容値（度）。国レベルの地図で
+// 画面上1px未満になる値で、共有境界のずれは視認できない。
+const DEFAULT_SIMPLIFY_TOLERANCE = 0.002;
+
+const GET_BOUNDARY_INFO = {
+  name: "get_boundary_info",
+  description:
+    "geoBoundaries APIから行政界データ（国境・州県境など）のメタデータを取得します。アップロードされていない地域の地図が必要なとき、fetch_boundariesの前に利用可能なADMレベル・データ量・ライセンスを確認するために使用してください。",
+  input_schema: {
+    type: "object",
+    properties: {
+      iso3: {
+        type: "string",
+        description: "ISO 3166-1 alpha-3の国コード（例: JPN, USA, GBR）",
+      },
+      admLevel: {
+        type: "string",
+        enum: ["ADM0", "ADM1", "ADM2", "ADM3", "ADM4", "ADM5", "ALL"],
+        description:
+          "行政界レベル。ADM0=国境、ADM1=州/都道府県、ADM2=郡/市区町村相当。省略時はALL（利用可能な全レベルの一覧）",
+      },
+    },
+    required: ["iso3"],
+  },
+};
+
+const FETCH_BOUNDARIES = {
+  name: "fetch_boundaries",
+  description:
+    "geoBoundariesから行政界GeoJSONをダウンロードしてデータとして追加します。追加されたデータは他のアップロードデータと同様に './data/<name>' で描画コードから読めます。事前にget_boundary_infoでレベルとデータ量を確認してください。取得データを使う地図には出典（geoBoundaries）の表記を必ず入れてください。",
+  input_schema: {
+    type: "object",
+    properties: {
+      iso3: {
+        type: "string",
+        description: "ISO 3166-1 alpha-3の国コード（例: JPN）",
+      },
+      admLevel: {
+        type: "string",
+        enum: ["ADM0", "ADM1", "ADM2", "ADM3", "ADM4", "ADM5"],
+        description: "行政界レベル",
+      },
+      releaseType: {
+        type: "string",
+        enum: ["gbOpen", "gbHumanitarian", "gbAuthoritative"],
+        description: "リリース種別（デフォルト: gbOpen = CC-BY 4.0）",
+      },
+      detail: {
+        type: "string",
+        enum: ["simplified", "full"],
+        description:
+          "simplified（デフォルト、軽量化済みで通常はこちら）またはfull（高詳細・数十MBになることがある）",
+      },
+      simplifyTolerance: {
+        type: "number",
+        description: `追加の間引き許容値（度）。デフォルト${DEFAULT_SIMPLIFY_TOLERANCE}（国レベルの地図で画面1px未満）。0で間引きなし、大きくするほど軽量・粗くなる`,
+      },
+      name: {
+        type: "string",
+        description: "保存名（省略時: gb_<ISO>_<ADM>）",
+      },
+    },
+    required: ["iso3", "admLevel"],
   },
 };
 
@@ -304,6 +375,87 @@ export function createPlaygroundToolRegistry({ dataStore, editors, runPreview })
         ...(matched.length > resultLimit
           ? { limitNote: `一致${matched.length}件のうち${resultLimit}件のみ返却。条件を絞るかlimitを増やすこと。` }
           : {}),
+      };
+    },
+  );
+
+  registry.register(GET_BOUNDARY_INFO, async ({ iso3, admLevel }, context) => {
+    const entries = await getBoundaryMetadata({
+      iso3,
+      admLevel: admLevel ?? "ALL",
+      signal: context?.signal,
+    });
+    return {
+      boundaries: entries.map((e) => ({
+        boundaryISO: e.boundaryISO,
+        boundaryName: e.boundaryName,
+        boundaryType: e.boundaryType,
+        year: e.boundaryYearRepresented,
+        admUnitCount: e.admUnitCount,
+        meanVertices: e.meanVertices,
+        license: e.boundaryLicense,
+        source: e.boundarySource,
+      })),
+      note: "取得はfetch_boundariesで行う。meanVerticesが大きいレベルはdetail:'simplified'（デフォルト）のまま取得すること。",
+    };
+  });
+
+  registry.register(
+    FETCH_BOUNDARIES,
+    async (
+      { iso3, admLevel, releaseType, detail, simplifyTolerance, name },
+      context,
+    ) => {
+      const [meta] = await getBoundaryMetadata({
+        iso3,
+        admLevel,
+        releaseType,
+        signal: context?.signal,
+      });
+
+      const useFull = detail === "full";
+      const url = useFull ? meta.gjDownloadURL : meta.simplifiedGeometryGeoJSON;
+      if (!url) {
+        throw new Error("ダウンロードURLがメタデータに含まれていません。");
+      }
+
+      const raw = await downloadBoundaryGeojson(url, { signal: context?.signal });
+
+      // 軽量化: Douglas-Peucker間引き + 座標4桁丸め。
+      // localStorage容量・エクスポートサイズ・描画性能を守る。
+      const tolerance = simplifyTolerance ?? DEFAULT_SIMPLIFY_TOLERANCE;
+      const { collection, verticesBefore, verticesAfter } = simplifyCollection(raw, {
+        toleranceDeg: Math.max(0, tolerance),
+        precision: 4,
+      });
+
+      const dataName = name || `gb_${meta.boundaryISO}_${meta.boundaryType}`;
+      const summary = dataStore.add(dataName, collection);
+
+      return {
+        added: {
+          path: summary.path,
+          featureCount: summary.featureCount,
+          geometryTypes: summary.geometryTypes,
+          propertyKeys: summary.propertyKeys,
+          bbox: summary.bbox,
+          sizeBytes: summary.sizeBytes,
+        },
+        source: {
+          boundaryName: meta.boundaryName,
+          boundaryType: meta.boundaryType,
+          year: meta.boundaryYearRepresented,
+          license: meta.boundaryLicense,
+          licenseSource: meta.licenseSource,
+          boundarySource: meta.boundarySource,
+        },
+        simplification: {
+          detail: useFull ? "full" : "simplified",
+          toleranceDeg: tolerance,
+          verticesBefore,
+          verticesAfter,
+        },
+        note: "inspect_dataでプロパティを確認してから使うこと。地図には出典表記（例: TitleLayerで「© geoBoundaries (" + (meta.boundarySource || "gbOpen") + ")」）を必ず入れること。",
       };
     },
   );
