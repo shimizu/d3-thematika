@@ -1,12 +1,22 @@
 import { ToolRegistry } from "../agent/tool-registry.js";
 
 // LLMへ返すサンプルfeature数。全データはGeoDataStoreに保持し、プロパティの
-// サンプルだけをトークン化して送ることでコンテキストの無駄を避ける。
+// サマリーだけをトークン化して送ることでコンテキストの無駄を避ける。
+// 座標・全レコードはどのツールからも返さない。
 const LLM_SAMPLE_ROWS = 5;
 // 文字列プロパティの distinct 値サンプル数。
 const DISTINCT_SAMPLE = 10;
 // render_preview がLLMへ返すコンソール行数の上限。
 const LLM_LOG_LINES = 30;
+// list_data が返すプロパティキー数の上限。
+const LIST_KEY_CAP = 30;
+// inspect_data が一度に統計を返すプロパティ数の上限
+// （超過分は properties パラメータで指定して取得する）。
+// runtime側のtool result上限（8000字）に収まるよう調整している。
+const INSPECT_KEY_CAP = 20;
+// search_features の返却件数の上限。
+const SEARCH_LIMIT_MAX = 50;
+const SEARCH_LIMIT_DEFAULT = 10;
 
 const LIST_DATA = {
   name: "list_data",
@@ -18,13 +28,57 @@ const LIST_DATA = {
 const INSPECT_DATA = {
   name: "inspect_data",
   description:
-    "指定したGeoJSONデータの詳細（プロパティごとの型・数値統計・値のサンプル、サンプルfeatureのプロパティ）を返します。色分けやラベルに使うプロパティを決める前に必ず確認してください。座標は返しません。",
+    "指定したGeoJSONデータのサマリー（プロパティごとの型・数値統計・値のサンプル、サンプルfeatureのプロパティ）を返します。色分けやラベルに使うプロパティを決める前に必ず確認してください。座標や全レコードは返しません。プロパティ数が多いデータは一部のみ返すため、必要なキーはpropertiesで指定してください。",
   input_schema: {
     type: "object",
     properties: {
       path: {
         type: "string",
         description: "list_dataが返したデータのパス（例: data/pref.geojson）",
+      },
+      properties: {
+        type: "array",
+        items: { type: "string" },
+        description:
+          "統計・サンプルを取得するプロパティ名の配列。省略時は先頭から一部のキーのみ返す",
+      },
+    },
+    required: ["path"],
+  },
+};
+
+const SEARCH_FEATURES = {
+  name: "search_features",
+  description:
+    "GeoJSONのfeatureをプロパティ条件で検索し、一致したfeatureのプロパティを返します（座標は返しません）。特定の地物の値を確認したいとき、値の分布から外れ値を特定したいとき、名前からコードを引きたいときに使用してください。",
+  input_schema: {
+    type: "object",
+    properties: {
+      path: {
+        type: "string",
+        description: "list_dataが返したデータのパス（例: data/pref.geojson）",
+      },
+      property: {
+        type: "string",
+        description:
+          "検索対象のプロパティ名。queryはこのプロパティに対して部分一致し、min/maxはこのプロパティの数値範囲で絞り込む。省略時はqueryを全プロパティに対して照合",
+      },
+      query: {
+        type: "string",
+        description: "部分一致で検索する文字列（大文字小文字を無視）",
+      },
+      min: { type: "number", description: "数値プロパティの下限（property必須）" },
+      max: { type: "number", description: "数値プロパティの上限（property必須）" },
+      fields: {
+        type: "array",
+        items: { type: "string" },
+        description: "結果に含めるプロパティ名。省略時は全プロパティ（キー数が多い場合は主要なもののみ）",
+      },
+      limit: {
+        type: "integer",
+        minimum: 1,
+        maximum: SEARCH_LIMIT_MAX,
+        description: `返す件数の上限（デフォルト: ${SEARCH_LIMIT_DEFAULT}）`,
       },
     },
     required: ["path"],
@@ -125,7 +179,11 @@ export function createPlaygroundToolRegistry({ dataStore, editors, runPreview })
         path: d.path,
         featureCount: d.featureCount,
         geometryTypes: d.geometryTypes,
-        propertyKeys: d.propertyKeys,
+        propertyKeyCount: d.propertyKeys.length,
+        propertyKeys: d.propertyKeys.slice(0, LIST_KEY_CAP),
+        ...(d.propertyKeys.length > LIST_KEY_CAP
+          ? { propertyKeysNote: `キーが多いため先頭${LIST_KEY_CAP}件のみ表示。全キーはinspect_dataで確認可能。` }
+          : {}),
         bbox: d.bbox,
         available: d.available,
         ...(d.rewoundRings > 0
@@ -140,12 +198,33 @@ export function createPlaygroundToolRegistry({ dataStore, editors, runPreview })
     };
   });
 
-  registry.register(INSPECT_DATA, ({ path }) => {
+  registry.register(INSPECT_DATA, ({ path, properties }) => {
     const geojson = dataStore.get(path);
     const features = geojson.features;
-    const propertyKeys = [
+    const allKeys = [
       ...new Set(features.flatMap((f) => Object.keys(f?.properties ?? {}))),
     ];
+
+    // トークン消費を抑えるため、統計・サンプルの対象キーを絞る。
+    // properties指定があればそのキーだけ、なければ先頭INSPECT_KEY_CAP件。
+    let targetKeys;
+    let keysNote;
+    if (Array.isArray(properties) && properties.length > 0) {
+      targetKeys = properties.filter((key) => allKeys.includes(key));
+      const unknown = properties.filter((key) => !allKeys.includes(key));
+      keysNote = unknown.length > 0 ? `存在しないキー: ${unknown.join(", ")}` : undefined;
+    } else {
+      targetKeys = allKeys.slice(0, INSPECT_KEY_CAP);
+      keysNote =
+        allKeys.length > INSPECT_KEY_CAP
+          ? `キーが${allKeys.length}個あるため先頭${INSPECT_KEY_CAP}件のみ集計。他のキーはpropertiesパラメータで指定して取得すること。`
+          : undefined;
+    }
+
+    const pickProps = (feature) => {
+      const props = feature?.properties ?? {};
+      return Object.fromEntries(targetKeys.map((key) => [key, props[key]]));
+    };
 
     return {
       path,
@@ -153,13 +232,81 @@ export function createPlaygroundToolRegistry({ dataStore, editors, runPreview })
       geometryTypes: [
         ...new Set(features.map((f) => f?.geometry?.type).filter(Boolean)),
       ],
-      properties: summarizeProperties(features, propertyKeys),
-      sampleFeatures: features
-        .slice(0, LLM_SAMPLE_ROWS)
-        .map((f) => f?.properties ?? {}),
-      note: "sampleFeaturesは先頭数件のプロパティのみ。全体の傾向はpropertiesの統計を使うこと。",
+      propertyKeyCount: allKeys.length,
+      allPropertyKeys: allKeys,
+      properties: summarizeProperties(features, targetKeys),
+      sampleFeatures: features.slice(0, LLM_SAMPLE_ROWS).map(pickProps),
+      ...(keysNote ? { keysNote } : {}),
+      note: "sampleFeaturesは先頭数件の対象キーのみ。全体の傾向はpropertiesの統計を、個別の地物はsearch_featuresを使うこと。",
     };
   });
+
+  registry.register(
+    SEARCH_FEATURES,
+    ({ path, property, query, min, max, fields, limit }) => {
+      const geojson = dataStore.get(path);
+      const features = geojson.features;
+      const resultLimit = Math.min(
+        Math.max(1, limit ?? SEARCH_LIMIT_DEFAULT),
+        SEARCH_LIMIT_MAX,
+      );
+
+      if (query === undefined && min === undefined && max === undefined) {
+        throw new Error("query または min / max のいずれかを指定してください。");
+      }
+      if ((min !== undefined || max !== undefined) && !property) {
+        throw new Error("min / max を使う場合は property を指定してください。");
+      }
+
+      const lowerQuery = query !== undefined ? String(query).toLowerCase() : null;
+
+      const matchesQuery = (props) => {
+        if (lowerQuery === null) return true;
+        const values = property ? [props?.[property]] : Object.values(props ?? {});
+        return values.some(
+          (v) => v != null && String(v).toLowerCase().includes(lowerQuery),
+        );
+      };
+
+      const matchesRange = (props) => {
+        if (min === undefined && max === undefined) return true;
+        const v = props?.[property];
+        if (typeof v !== "number" || !isFinite(v)) return false;
+        if (min !== undefined && v < min) return false;
+        if (max !== undefined && v > max) return false;
+        return true;
+      };
+
+      const matched = features.filter(
+        (f) => matchesQuery(f?.properties) && matchesRange(f?.properties),
+      );
+
+      // 返却プロパティを絞る: fields指定 > 全キー（多い場合は先頭LIST_KEY_CAP件）
+      const allKeys = [
+        ...new Set(matched.flatMap((f) => Object.keys(f?.properties ?? {}))),
+      ];
+      const returnKeys =
+        Array.isArray(fields) && fields.length > 0
+          ? fields
+          : allKeys.slice(0, LIST_KEY_CAP);
+
+      return {
+        path,
+        matchedCount: matched.length,
+        returned: Math.min(matched.length, resultLimit),
+        features: matched.slice(0, resultLimit).map((f) => {
+          const props = f?.properties ?? {};
+          return Object.fromEntries(returnKeys.map((key) => [key, props[key]]));
+        }),
+        ...(allKeys.length > returnKeys.length && !fields
+          ? { fieldsNote: `キーが多いため各featureは先頭${LIST_KEY_CAP}キーのみ。必要なキーはfieldsで指定すること。` }
+          : {}),
+        ...(matched.length > resultLimit
+          ? { limitNote: `一致${matched.length}件のうち${resultLimit}件のみ返却。条件を絞るかlimitを増やすこと。` }
+          : {}),
+      };
+    },
+  );
 
   registry.register(GET_CODE, () => editors.get());
 
