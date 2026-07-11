@@ -12,11 +12,10 @@ D3.jsベースの静的主題図（thematic map）作成ライブラリ。SVGを
 6. [エフェクトユーティリティ](#エフェクトユーティリティ)
 7. [テクスチャユーティリティ](#テクスチャユーティリティ)
 8. [カラーパレット](#カラーパレット)
-9. [GISユーティリティ](#gisユーティリティ)
-10. [タイルユーティリティ](#タイルユーティリティ)
-11. [COGユーティリティ](#cogユーティリティ)
-12. [ハッチングユーティリティ](#ハッチングユーティリティ)
-13. [実用パターン集](#実用パターン集)
+9. [分級ユーティリティ](#分級ユーティリティ)
+10. [GISユーティリティ](#gisユーティリティ)
+11. [タイルユーティリティ](#タイルユーティリティ)
+12. [実用パターン集](#実用パターン集)
 
 ---
 
@@ -60,9 +59,7 @@ import { Map, GeojsonLayer } from 'd3-thematika';
 ```
 
 ### 外部依存（UMD使用時は別途読み込み必要）
-- `d3-geo`, `d3-selection`, `d3-force`, `d3-shape`, `d3-contour`
-- `@turf/turf` → グローバル `turf`
-- `geotiff` → グローバル `GeoTIFF`
+- `d3-geo`, `d3-selection`, `d3-force`, `d3-shape`, `d3-contour`（グローバル `d3` にマップ。d3 v7 の読み込みで揃う）
 
 ---
 
@@ -83,7 +80,9 @@ interface ThematikaOptions {
   height: number;              // 地図の高さ（ピクセル）
   projection: GeoProjection;   // D3投影法オブジェクト
   defs?: any[];                // SVG定義（フィルター、テクスチャ等）のコールバック配列
-  backgroundColor?: string;    // 背景色（デフォルト: '#ffffff'）
+  backgroundColor?: string;    // 地図グループの背景色（デフォルト: '#ffffff'）
+  svgBackgroundColor?: string; // SVG全体の背景色（clipPathの影響を受けない）
+  webFont?: boolean;           // デフォルトWebフォントの読み込み（デフォルト: true）
 }
 ```
 
@@ -115,6 +114,8 @@ interface ThematikaOptions {
 
 SVG属性の設定。全プロパティは固定値またはデータに応じた関数を受け取る。
 
+キーは **camelCase（`strokeWidth`）と kebab-case（`'stroke-width'`）のどちらでも指定できる**。camelCaseのキーは適用時にkebab-caseのSVG属性名へ自動変換される（`viewBox`等の正当なcamelCase属性とCSSカスタムプロパティは除く）。インデックスシグネチャにより、下記以外の任意のSVG属性（`'font-size'`、`'stroke-linecap'`等）も指定可能。
+
 ```typescript
 interface LayerAttr<T = any> {
   fill?: string | ((d: T, index?: number) => string);
@@ -126,6 +127,9 @@ interface LayerAttr<T = any> {
   filter?: string | ((d: T, index?: number) => string);
   clipPath?: string | ((d: T, index?: number) => string);
   className?: string;
+  // 上記以外の任意のSVG属性（kebab-case文字列キーも可）
+  [property: string]: string | number
+    | ((d: T, index?: number) => string | number) | undefined;
 }
 ```
 
@@ -147,7 +151,7 @@ interface LayerStyle<T = any> {
 
 ## レイヤー一覧と詳細
 
-全13種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
+全15種類のレイヤーを提供。全レイヤーは `BaseLayer` を継承し、`attr` と `style` オプションで見た目を制御する。
 
 ### 一覧
 
@@ -160,12 +164,14 @@ interface LayerStyle<T = any> {
 | Utils | `LegendLayer` | D3スケール連携凡例 |
 | Point | `PointCircleLayer` | 円形ポイント |
 | Point | `PointSymbolLayer` | d3.symbol シンボル |
-| Point | `PointAnnotationLayer` | 注釈・コールアウト |
-| Point | `PointTextLayer` | テキストラベル |
 | Point | `PointSpikeLayer` | 3Dスパイク表示 |
 | Line | `LineConnectionLayer` | 直線・弧・スムージング接続 |
+| Line | `LineTaperedLayer` | テーパーアーク型ポリゴン接続 |
 | Line | `LineEdgeBundlingLayer` | エッジバンドリング |
-| Line | `LineTextLayer` | ライン上テキスト配置 |
+| Text | `TextLayer` | テキストラベル（ポイント/ポリゴン重心配置） |
+| Utils | `ScaleBarLayer` | 縮尺（スケールバー） |
+| Utils | `TitleLayer` | タイトル・出典表記（ピクセル座標配置） |
+| Utils | `NorthArrowLayer` | 方位記号（真北方向へ自動回転） |
 
 ---
 
@@ -184,6 +190,8 @@ interface GeojsonLayerOptions {
   style?: LayerStyle<GeoJSON.Feature>;
 }
 ```
+
+**ワインディング検査:** D3はGeoJSON仕様(RFC7946)と逆のリング順序（外側リング: 時計回り）を期待する。構築時にCCW疑いのポリゴン（球面面積が半球超）を検出するとconsole.warnで警告する。該当データは `scripts/fix-geojson-winding.js --d3` で修正できる。
 
 **使用例（UMD）:**
 ```javascript
@@ -320,10 +328,11 @@ interface LegendLayerOptions {
   symbolSize?: SymbolSize;          // { min?, max?, fixed? }
   sizeScale?: ScaleLinear<number, number>;  // circleタイプ用サイズスケール
   gradientSteps?: number;           // gradientタイプ用ステップ数
-  enableDrag?: boolean;             // ドラッグ有効（デフォルト: false）
+  enableDrag?: boolean;             // ドラッグ有効（デフォルト: true。静的出力ではfalse推奨）
   showBackground?: boolean;         // 背景ボックス表示
   backgroundStyle?: LegendBackgroundStyle;
   overlapping?: boolean;            // 重ね表示モード（サイズスケール時のみ）
+  labelFormat?: (value: any) => string;  // ラベルの数値フォーマット関数（例: d3.format(',.1f')）
 }
 
 type SupportedScale = ScaleOrdinal<any, string> | ScaleSequential<string>
@@ -380,9 +389,15 @@ interface PointCircleLayerOptions {
 
 **使用例:**
 ```javascript
+// 量データは createProportionalScale（面積比例）で半径を作る
+const radius = Thematika.createProportionalScale(
+  cities.features.map(d => d.properties.population),
+  { maxRadius: 25, minRadius: 2 }
+);
+
 const circles = new Thematika.PointCircleLayer({
   data: cities,
-  r: (d) => Math.sqrt(d.properties.population) / 100,
+  r: (d) => radius(d.properties.population),
   attr: {
     fill: '#e63946',
     'fill-opacity': 0.6,
@@ -424,125 +439,6 @@ const symbols = new Thematika.PointSymbolLayer({
   attr: { fill: '#ffd700', stroke: '#333' }
 });
 map.addLayer('airports', symbols);
-```
-
----
-
-### PointAnnotationLayer
-
-注釈（コールアウト）を表示する。サブジェクト（対象マーク）、コネクター（引き出し線）、ノート（テキストボックス）で構成。
-
-```typescript
-new PointAnnotationLayer(options: PointAnnotationLayerOptions)
-```
-
-```typescript
-interface PointAnnotationLayerOptions {
-  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  annotationType?: AnnotationType;  // 'callout' | 'label' | 'badge' | 'calloutElbow' | 'calloutCurve' | 'calloutCircle' | 'calloutRect'
-  textAccessor?: string | ((feature: GeoJSON.Feature, index: number) => string);
-  titleAccessor?: string | ((feature: GeoJSON.Feature, index: number) => string);
-  offsetAccessor?: ((feature: GeoJSON.Feature, index: number) => [number, number]);
-  subjectOptions?: SubjectOptions;
-  connectorOptions?: ConnectorOptions;
-  noteOptions?: NoteOptions;
-  attr?: LayerAttr;
-  style?: LayerStyle;
-}
-
-interface SubjectOptions {
-  type?: 'point' | 'circle' | 'rect';
-  r?: StyleValue<number>;
-  width?: StyleValue<number>;
-  height?: StyleValue<number>;
-  fill?: StyleValue<string>;
-  stroke?: StyleValue<string>;
-  strokeWidth?: StyleValue<number>;
-  strokeDasharray?: StyleValue<string>;
-}
-
-interface ConnectorOptions {
-  stroke?: StyleValue<string>;
-  strokeWidth?: StyleValue<number>;
-  strokeDasharray?: StyleValue<string>;
-}
-
-interface NoteOptions {
-  backgroundColor?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  borderRadius?: number;
-  padding?: number;
-  fontSize?: string;
-  fontFamily?: string;
-  textColor?: string;
-  wrap?: number;
-  align?: string;
-}
-
-type StyleValue<T> = T | ((feature: GeoJSON.Feature, index: number) => T);
-```
-
-**使用例:**
-```javascript
-const annotations = new Thematika.PointAnnotationLayer({
-  data: pointsOfInterest,
-  annotationType: 'callout',
-  textAccessor: (d) => d.properties.name,
-  offsetAccessor: (d) => [30, -20],
-  subjectOptions: { type: 'circle', r: 5, fill: '#e63946' },
-  connectorOptions: { stroke: '#333', strokeWidth: 1 },
-  noteOptions: { fontSize: '12px', backgroundColor: '#fff', padding: 4 }
-});
-map.addLayer('annotations', annotations);
-```
-
----
-
-### PointTextLayer
-
-テキストラベルを表示する。Voronoi図によるラベル重なり回避機能あり。
-
-```typescript
-new PointTextLayer(options: PointTextLayerOptions)
-```
-
-```typescript
-interface PointTextLayerOptions {
-  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
-  attr?: LayerAttr<GeoJSON.Feature>;
-  style?: LayerStyle<GeoJSON.Feature>;
-  textProperty?: string;       // テキスト取得プロパティ名（デフォルト: 'text'、次候補: 'name'）
-  dx?: number | ((feature, index) => number);   // Xオフセット
-  dy?: number | ((feature, index) => number);   // Yオフセット
-  rotate?: number | ((feature, index) => number);
-  lengthAdjust?: "spacing" | "spacingAndGlyphs";
-  alignmentBaseline?: string;  // デフォルト: "middle"
-  textAnchor?: "start" | "middle" | "end" | "inherit";  // デフォルト: "start"
-  fontFamily?: string | ((feature, index) => string);
-  fontSize?: number | string | ((feature, index) => number | string);  // デフォルト: 16
-  fontWeight?: string | ((feature, index) => string);
-  avoidOverlap?: boolean;      // Voronoi重なり回避（デフォルト: false）
-  showConnectors?: boolean;    // 接続線表示（avoidOverlap有効時、デフォルト: false）
-  connectorStyle?: LayerStyle | ((feature, index) => LayerStyle);
-  voronoiMargin?: number;      // Voronoi計算マージン（デフォルト: 20）
-}
-```
-
-**使用例:**
-```javascript
-const labels = new Thematika.PointTextLayer({
-  data: cities,
-  textProperty: 'name',
-  fontSize: 12,
-  fontWeight: 'bold',
-  dx: 8,
-  avoidOverlap: true,
-  showConnectors: true,
-  connectorStyle: { stroke: '#999', 'stroke-width': 0.5 },
-  attr: { fill: '#333' }
-});
-map.addLayer('labels', labels);
 ```
 
 ---
@@ -619,6 +515,73 @@ map.addLayer('routes', arcs);
 
 ---
 
+### LineTaperedLayer
+
+始点と終点をテーパー（太さが変化する）アーク型ポリゴンで接続する。LineStringの中間頂点は無視し、最初と最後の座標のみを使用する。fillベースの閉じたポリゴンで描画されるため、ストロークではなく塗りつぶしで色を指定する。
+
+```typescript
+new LineTaperedLayer(options: LineTaperedLayerOptions)
+```
+
+```typescript
+interface LineTaperedLayerOptions {
+  data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
+  attr?: LayerAttr<GeoJSON.Feature>;
+  style?: LayerStyle<GeoJSON.Feature>;
+  startSize?: number | ((d: GeoJSON.Feature, i: number) => number);  // デフォルト: 10
+  endSize?: number | ((d: GeoJSON.Feature, i: number) => number);    // デフォルト: 2
+  arcHeight?: number;                                                 // デフォルト: 0.3
+  flipArc?: boolean | ((d: GeoJSON.Feature, i: number) => boolean);  // デフォルト: false
+  startArrow?: boolean;                                               // デフォルト: false
+  endArrow?: boolean;                                                 // デフォルト: false
+  arrowSize?: number;                                                 // デフォルト: 10
+  arrowWidth?: number;                                                // デフォルト: 端点サイズと同じ
+}
+```
+
+**使用例:**
+
+```javascript
+// 基本的なテーパーライン（細→太）
+const tapered = new Thematika.LineTaperedLayer({
+  data: flightRoutes,
+  startSize: 1,
+  endSize: 8,
+  arcHeight: 0.3,
+  attr: { fill: '#ff6b6b', opacity: 0.6 }
+});
+map.addLayer('tapered', tapered);
+```
+
+```javascript
+// 矢印付き＋フィーチャーごとにアーク方向を切り替え
+const arrows = new Thematika.LineTaperedLayer({
+  data: tradeRoutes,
+  startSize: 2,
+  endSize: 10,
+  endArrow: true,
+  arrowSize: 20,
+  arrowWidth: 25,
+  flipArc: (d, i) => d.properties.direction === 'south',
+  attr: {
+    fill: (d, i) => colorScale(d.properties.volume),
+    opacity: 0.7
+  }
+});
+```
+
+```javascript
+// コールバックでフィーチャーごとにサイズを変える
+const dynamic = new Thematika.LineTaperedLayer({
+  data: migrationData,
+  startSize: (d, i) => d.properties.startPop / 1000,
+  endSize: (d, i) => d.properties.endPop / 1000,
+  attr: { fill: '#0077b6' }
+});
+```
+
+---
+
 ### LineEdgeBundlingLayer
 
 Force-directed simulationによるエッジバンドリング。多数のラインを視覚的に整理して表示する。
@@ -655,37 +618,153 @@ map.addLayer('bundling', bundling);
 
 ---
 
-### LineTextLayer
+### TextLayer
 
-ライン上にテキストを配置する。textPath要素を使用してパスに沿ったテキスト表示が可能。
+GeoJSONフィーチャーにテキストラベルを描画する。Pointはその座標に、ポリゴン/ラインは重心（面積/長さ加重）に配置される。投影範囲外のフィーチャーは描画されない。
 
 ```typescript
-new LineTextLayer(options: LineTextLayerOptions)
+new TextLayer(options: TextLayerOptions)
 ```
 
 ```typescript
-interface LineTextLayerOptions {
-  data: GeoJSON.Feature | GeoJSON.Feature[] | GeoJSON.FeatureCollection;
+interface TextLayerOptions {
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
   attr?: LayerAttr;
   style?: LayerStyle;
-  textProperty?: string;         // デフォルト: 'text'（次候補: 'name'）
-  fontFamily?: string | ((feature, index) => string);
-  fontSize?: number | string | ((feature, index) => number | string);
-  fontWeight?: string | ((feature, index) => string);
-  textAnchor?: "start" | "middle" | "end" | "inherit";
-  startOffset?: string | number; // textPathのstartOffset（デフォルト: "50%"）
-  lineType?: 'straight' | 'arc' | 'smooth';
-  arcHeight?: number;
-  arcControlPoint?: ArcControlPointType;
-  arcOffset?: ArcOffsetType;
-  smoothType?: string;           // curveXxx系
-  showGuidePath?: boolean;       // ガイドパス表示（デフォルト: false）
-  guidePathStyle?: LayerAttr;
-  followPath?: boolean;          // パスに沿って配置（デフォルト: true）
-  flipText?: boolean;            // テキスト反転（デフォルト: false）
-  dx?: number | ((feature, index) => number);
-  dy?: number | ((feature, index) => number);
+  // テキスト内容のプロパティ名または関数（デフォルト: 'name'）
+  textProperty?: string | ((feature: GeoJSON.Feature, index: number) => string);
 }
+```
+
+`paint-order: stroke` がデフォルト設定されているため、`attr` で `stroke` / `stroke-width` を指定するだけで文字の背面に縁取り（ハロー）が描画される。
+
+**使用例:**
+```javascript
+const labels = new Thematika.TextLayer({
+  data: geojson,
+  textProperty: 'name',
+  attr: {
+    'font-size': 12,
+    'text-anchor': 'middle',
+    fill: '#333',
+    stroke: '#fff',        // ハロー（縁取り）
+    'stroke-width': 3
+  }
+});
+map.addLayer('labels', labels);
+```
+
+---
+
+### ScaleBarLayer
+
+縮尺（スケールバー）をピクセル座標で配置する。配置位置での球面距離から実距離を計算し、1/2/5×10^n のキリの良い値に丸める。invert をサポートしない投影法では描画されない（警告）。
+
+```typescript
+new ScaleBarLayer(options?: ScaleBarLayerOptions)
+```
+
+```typescript
+interface ScaleBarLayerOptions {
+  position?: { top?: number; bottom?: number; left?: number; right?: number };
+                          // デフォルト: { left: 20, bottom: 20 }
+  maxWidth?: number;      // バーの最大幅px（デフォルト: 150）
+  units?: 'km' | 'mi';    // デフォルト: 'km'
+  segments?: number;      // バーの分割数（デフォルト: 4）
+  barHeight?: number;     // バーの高さpx（デフォルト: 6）
+  fontSize?: number;      // ラベルのフォントサイズ（デフォルト: 10）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**使用例:**
+```javascript
+const scaleBar = new Thematika.ScaleBarLayer({
+  position: { left: 20, bottom: 20 },
+  maxWidth: 200,
+  units: 'km'
+});
+map.addLayer('scalebar', scaleBar);
+```
+
+---
+
+### TitleLayer
+
+地図のタイトル・サブタイトル・出典表記をピクセル座標で配置する。TextLayerがGeoJSON座標を必要とするのに対し、画面座標で「左上にタイトル」「右下に出典」のような周辺要素を配置できる。
+
+```typescript
+new TitleLayer(options: TitleLayerOptions)
+```
+
+```typescript
+interface TitleLayerOptions {
+  title: string;                     // タイトル本文
+  subtitle?: string;                 // サブタイトル
+  position?: TitlePosition           // 'top-left' | 'top-center' | 'top-right' |
+    | { top?: number; bottom?: number; left?: number; right?: number };
+                                     // 'bottom-left' | 'bottom-center' | 'bottom-right'
+                                     // またはピクセル座標（デフォルト: 'top-left'）
+  margin?: number;                   // 地図端からの余白px（デフォルト: 16）
+  fontSize?: number;                 // デフォルト: 20
+  subtitleFontSize?: number;         // デフォルト: 12
+  color?: string;                    // デフォルト: '#333333'
+  haloColor?: string | null;         // ハロー色。nullでハローなし（デフォルト: '#ffffff'）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**使用例:**
+```javascript
+// タイトル
+map.addLayer('title', new Thematika.TitleLayer({
+  title: '世界の人口分布',
+  subtitle: '出典: Natural Earth (2023)',
+  position: 'top-left'
+}));
+
+// 出典表記（右下に小さく）
+map.addLayer('credit', new Thematika.TitleLayer({
+  title: '© Natural Earth',
+  position: 'bottom-right',
+  fontSize: 10,
+  color: '#666666'
+}));
+```
+
+---
+
+### NorthArrowLayer
+
+方位記号（ノースアロー）を描画する。デフォルトでは配置位置における真北の方向を投影法から計算して回転する（正角図法では上向き、円錐図法などでは傾く）。
+
+```typescript
+new NorthArrowLayer(options?: NorthArrowLayerOptions)
+```
+
+```typescript
+interface NorthArrowLayerOptions {
+  position?: { top?: number; bottom?: number; left?: number; right?: number };
+                            // デフォルト: { top: 20, right: 20 }
+  size?: number;            // 記号のサイズpx（デフォルト: 40）
+  color?: string;           // デフォルト: '#333333'
+  showLabel?: boolean;      // 「N」ラベル表示（デフォルト: true）
+  rotateToNorth?: boolean;  // 真北方向へ回転（デフォルト: true）
+  attr?: LayerAttr;
+  style?: LayerStyle;
+}
+```
+
+**注意:** 真北が画面上で一定でない投影法（正距方位図法の全球表示など）では、記号の意味が場所によって変わる。全球図では非表示を推奨。
+
+**使用例:**
+```javascript
+map.addLayer('north', new Thematika.NorthArrowLayer({
+  position: { top: 20, right: 20 },
+  size: 44
+}));
 ```
 
 ---
@@ -719,23 +798,52 @@ createCustomFilter(id: string, filterContent: string)
 | `createColorMatrix(options)` | 色行列変換 | `id`, `type`('saturate'\|'hueRotate'\|'luminanceToAlpha'\|'matrix'), `values` |
 | `createGlow(options)` | 外側発光 | `id`, `stdDeviation`, `color`, `opacity` |
 | `createEdgeDetect(options)` | 輪郭抽出 | `id` |
+| `createSharpen(options)` | シャープ化 | `id`, `amount` |
+| `createEmboss(options)` | エンボス | `id`, `strength`, `angle` |
 | `createInnerShadow(options)` | 内側シャドウ | `id`, `dx`, `dy`, `stdDeviation`, `color`, `opacity` |
 | `createOutline(options)` | アウトライン | `id`, `radius`, `color`, `opacity` |
 | `createNoise(options)` | フィルムグレイン/ノイズ | `id`, `baseFrequency`, `numOctaves`, `opacity` |
 | `createClipPolygon(options)` | GeoJSONクリップパス | `id`, `polygon`, `projection` |
+| `createWebFont(options)` | WebフォントのSVG埋め込み（@import） | `url` |
 
-### FilterPresets（プリセット）
+### FilterPresets（プリセット、全21種）
 
 ```typescript
-Thematika.FilterPresets.lightBlur()         // stdDeviation: 2
-Thematika.FilterPresets.strongBlur()        // stdDeviation: 8
+// ブラー
+Thematika.FilterPresets.lightBlur()          // stdDeviation: 2
+Thematika.FilterPresets.strongBlur()         // stdDeviation: 8
+// シャドウ
 Thematika.FilterPresets.standardDropShadow() // dx:2, dy:2, std:2, opacity:0.8
-Thematika.FilterPresets.softDropShadow()    // dx:2, dy:2, std:4, opacity:0.2
-Thematika.FilterPresets.standardBloom()     // intensity:4, threshold:0.8
-Thematika.FilterPresets.strongBloom()       // intensity:8, threshold:0.6, color:#fff
-Thematika.FilterPresets.grayscale()         // saturate: 0
-Thematika.FilterPresets.hueRotate60()       // hueRotate: 60
-Thematika.FilterPresets.sepia()             // セピア色行列
+Thematika.FilterPresets.softDropShadow()     // dx:2, dy:2, std:4, opacity:0.2
+Thematika.FilterPresets.softInnerShadow()    // 内側シャドウ dx:1, dy:1, std:2
+// ブルーム・グロー
+Thematika.FilterPresets.standardBloom()      // intensity:4, threshold:0.8
+Thematika.FilterPresets.strongBloom()        // intensity:8, threshold:0.6, color:#fff
+Thematika.FilterPresets.warmBloom()          // intensity:5, 暖色 #ffd1a3
+Thematika.FilterPresets.blueGlow()           // シアン発光
+Thematika.FilterPresets.neonMagenta()        // マゼンタ発光
+// 色調
+Thematika.FilterPresets.grayscale()          // saturate: 0
+Thematika.FilterPresets.hueRotate60()        // hueRotate: 60
+Thematika.FilterPresets.sepia()              // セピア色行列
+// 輪郭・質感
+Thematika.FilterPresets.edgeDetect()         // 輪郭抽出
+Thematika.FilterPresets.outlineThin()        // アウトライン radius:1
+Thematika.FilterPresets.outlineThick()       // アウトライン radius:2.5
+Thematika.FilterPresets.filmGrain()          // ノイズ opacity:0.12
+Thematika.FilterPresets.sharpen()            // シャープ amount:1
+Thematika.FilterPresets.strongSharpen()      // シャープ amount:2
+Thematika.FilterPresets.emboss()             // エンボス strength:1
+Thematika.FilterPresets.softEmboss()         // エンボス strength:0.5
+```
+
+**注意:** プリセットのフィルターIDは固定文字列（例: 'lightBlur'）。同一ページに複数の地図を置く場合はIDが衝突するため、ファクトリ関数で個別のidを指定する。
+
+### WebFontPresets
+
+```typescript
+Thematika.WebFontPresets.default()  // Noto Sans JP + Roboto を読み込む
+// Mapのコンストラクタが webFont: true（デフォルト）のとき自動適用される
 ```
 
 ### 使用パターン
@@ -783,11 +891,25 @@ textures.jsをラップしたテクスチャパターン生成。
 | `createDesertTexture(options)` | 砂漠テクスチャ | `id`, `size`, `background`, `fill` |
 | `createMountainTexture(options)` | 山岳テクスチャ | `id`, `size`, `background`, `fill` |
 
-### TexturePresets
+### TexturePresets（全10種）
 
 ```typescript
-Thematika.TexturePresets  // プリセットテクスチャ群（上記と同様の構造）
+// 海（強度3段階）
+Thematika.TexturePresets.lightOcean()
+Thematika.TexturePresets.standardOcean()
+Thematika.TexturePresets.heavyOcean()
+// 森林（密度3段階）
+Thematika.TexturePresets.sparseForest()
+Thematika.TexturePresets.standardForest()
+Thematika.TexturePresets.denseForest()
+// その他の地形・汎用
+Thematika.TexturePresets.desert()
+Thematika.TexturePresets.mountain()
+Thematika.TexturePresets.simpleDots()
+Thematika.TexturePresets.simpleLines()
 ```
+
+**注意:** プリセットのパターンIDは固定文字列。ファクトリと同じく `.url()` で `fill` に参照させる。
 
 ### 使用パターン
 
@@ -818,7 +940,7 @@ const layer = new Thematika.GeojsonLayer({
 ```typescript
 Thematika.ColorBrewerPalettes  // ColorBrewer: Set1, Set2, Set3, Blues, Greens, Oranges, YlOrRd, YlGnBu等
 Thematika.ViridisPalettes      // viridis系: Viridis, Magma, Inferno, Plasma
-Thematika.CARTOPalettes        // CARTO: Bold, Pastel等
+Thematika.CARTOPalettes        // CARTO: Prism, Safe, Vivid
 Thematika.TailwindPalettes     // Tailwind CSS系
 Thematika.AllPalettes          // 全パレットの統合
 ```
@@ -881,6 +1003,120 @@ const layer = new Thematika.GeojsonLayer({
 
 ---
 
+## 分級ユーティリティ
+
+コロプレス図の階級区分に使用する境界値を計算する。結果は `d3.scaleThreshold` にそのまま渡せる。
+
+```typescript
+classify(
+  values: number[],              // 分級対象の数値配列（NaN/Infinityは無視）
+  classes: number,               // 階級数（2以上）
+  method?: ClassificationMethod  // デフォルト: 'jenks'
+): ClassifyResult
+
+type ClassificationMethod = 'jenks' | 'equalInterval' | 'quantile' | 'stdDev';
+
+interface ClassifyResult {
+  breaks: number[];      // 最小値・最大値を含む全境界値（classes+1個）
+  thresholds: number[];  // scaleThresholdのdomain用（classes-1個）
+  classes: number;       // 実際の階級数（同値が多いと要求より減ることがある）
+  method: ClassificationMethod;
+}
+```
+
+**手法の使い分け:**
+- `jenks`: 自然分類。データの自然なまとまりで区切る。コロプレスの定番（デフォルト）
+- `equalInterval`: 等間隔分類。値域を等分。分布が一様なデータ向け
+- `quantile`: 等量分類。各階級のデータ数が等しい。順位を強調したい場合
+- `stdDev`: 標準偏差分類。平均からの偏差。正規分布に近いデータ向け
+
+**使用パターン:**
+```javascript
+const values = geojson.features.map(f => f.properties.POP_EST);
+const { thresholds } = Thematika.classify(values, 5, 'jenks');
+
+const colorScale = d3.scaleThreshold()
+  .domain(thresholds)
+  .range(d3.schemeYlOrRd[5]);
+
+const layer = new Thematika.GeojsonLayer({
+  data: geojson,
+  attr: { fill: d => colorScale(d.properties.POP_EST) }
+});
+```
+
+### コロプレス統合ヘルパー（choropleth）
+
+分級 → 配色 → GeojsonLayer → LegendLayer の組み立てを1回の呼び出しにまとめる。
+
+```typescript
+choropleth(options: ChoroplethOptions): ChoroplethResult
+
+interface ChoroplethOptions {
+  data: GeoJSON.FeatureCollection | GeoJSON.Feature[];
+  value: string | ((feature: GeoJSON.Feature) => number);  // プロパティ名または関数
+  palette?: string;              // AllPalettesのパレット名（デフォルト: 'YlOrRd'）
+  colors?: string[];             // 色配列の直接指定（paletteより優先）
+  classes?: number;              // 階級数（デフォルト: 5）
+  method?: ClassificationMethod; // 分級手法（デフォルト: 'jenks'）
+  noDataColor?: string;          // 値がないフィーチャーの色（デフォルト: '#cccccc'）
+  attr?: LayerAttr;              // 追加attr（fillは分級結果で上書き）
+  style?: LayerStyle;
+  legend?: false | Partial<LegendLayerOptions>;  // falseで凡例なし
+}
+
+interface ChoroplethResult {
+  layer: GeojsonLayer;              // 塗り分け済みレイヤー
+  legend: LegendLayer | null;       // 凡例（legend: false でnull）
+  scale: (value: number) => string; // 値→色のスケール
+  classification: ClassifyResult;   // 分級結果
+  colors: string[];                 // 使用した色配列
+}
+```
+
+**使用パターン:**
+```javascript
+const { layer, legend } = Thematika.choropleth({
+  data: geojson,
+  value: 'POP_EST',
+  palette: 'Blues',
+  classes: 5,
+  method: 'jenks',
+  legend: { title: '人口', position: { top: 20, left: 20 }, labelFormat: d3.format('.2s') }
+});
+map.addLayer('choropleth', layer);
+map.addLayer('legend', legend);
+```
+
+### 比例記号スケール（createProportionalScale）
+
+比例記号（proportional symbol）用の半径スケールを生成する。円の**面積**が値に比例するよう半径を平方根でスケーリングする。半径を線形スケールにすると面積が値の2乗に比例し大きい値が視覚的に誇張されるため、量データをPointCircleLayerで表す場合は必ずこれを使う。
+
+```typescript
+createProportionalScale(
+  values: number[],
+  options?: {
+    maxRadius?: number;  // 最大半径px（デフォルト: 30）
+    minRadius?: number;  // 最小半径px（デフォルト: 1）
+    minValue?: number;   // 下限値（デフォルト: 0）
+    maxValue?: number;   // 上限値（デフォルト: valuesの最大値）
+  }
+): (value: number) => number
+```
+
+**使用パターン:**
+```javascript
+const values = geojson.features.map(f => f.properties.POP_EST);
+const radius = Thematika.createProportionalScale(values, { maxRadius: 25 });
+
+const layer = new Thematika.PointCircleLayer({
+  data: geojson,
+  r: (feature) => radius(feature.properties.POP_EST)
+});
+```
+
+---
+
 ## GISユーティリティ
 
 GeoJSONデータの解析・計算ユーティリティ。
@@ -889,8 +1125,12 @@ GeoJSONデータの解析・計算ユーティリティ。
 // Bounding Box取得
 getBbox(geojson: GeoJSON): BBox  // { minX, minY, maxX, maxY }
 
-// 中心点取得（座標の単純平均）
-getCentroid(geojson: GeoJSON): Centroid  // { x, y }
+// 中心点取得（d3-geoのgeoCentroidによる面積/長さ加重の球面重心）
+getCentroid(geojson: GeoJSON): Centroid  // { x: 経度, y: 緯度 }
+
+// bboxからD3互換Polygon（外側リング時計回り）を生成。
+// fitExtentやインセット地図の範囲枠にそのまま使える
+bboxToPolygon(bounds: [west, south, east, north]): Feature
 
 // 複数GeoJSONをマージ
 merge(geojsons: GeoJSON[]): FeatureCollection
@@ -954,121 +1194,6 @@ interface TileGenerationOptions {
 
 ---
 
-## COGユーティリティ
-
-Cloud Optimized GeoTIFFの読み込み。
-
-```typescript
-async readCOG(url: string, options?: ReadCOGOptions): Promise<ReadCOGResult>
-```
-
-```typescript
-interface ReadCOGOptions {
-  resampleMethod?: 'nearest' | 'bilinear';
-  imageIndex?: number;          // デフォルト: 0
-  samples?: number[];           // デフォルト: [0, 1, 2]（RGB）
-  pool?: Pool;
-  sizeLimit?: {
-    maxWidth?: number;          // デフォルト: 512
-    maxHeight?: number;         // デフォルト: 512
-    onExceed?: 'error' | 'resample';
-  };
-  outputWidth?: number;
-  outputHeight?: number;
-  bbox?: [west, south, east, north];
-}
-
-interface ReadCOGResult {
-  dataUri: string;              // Data URI画像
-  bounds: [west, south, east, north];
-  width: number;
-  height: number;
-  originalWidth: number;
-  originalHeight: number;
-  wasResampled: boolean;
-}
-```
-
-### 使用パターン
-
-```javascript
-const result = await Thematika.readCOG('https://example.com/dem.tif', {
-  sizeLimit: { maxWidth: 512, maxHeight: 512 }
-});
-
-const imageLayer = new Thematika.ImageLayer('dem', {
-  src: result.dataUri,
-  bounds: result.bounds
-});
-map.addLayer('dem', imageLayer);
-```
-
----
-
-## ハッチングユーティリティ
-
-地形表現のための等高線とハッチング線を生成する。
-
-```typescript
-// 2次元配列データから等高線を生成
-generateContours(
-  data: number[][],
-  options: ContourOptions
-): GeoJSON.FeatureCollection
-
-// 等高線に沿ったハッチング線を生成
-generateHachures(
-  contours: GeoJSON.FeatureCollection,
-  options: HachureOptions
-): GeoJSON.FeatureCollection
-
-// SVGハッチングパターン定義を作成
-createHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-
-// クロスハッチパターン
-createCrossHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-
-// 密度ハッチパターン（値に応じて密度が変化）
-createDensityHatchPattern(
-  id: string,
-  options?: HatchPatternOptions
-): (defs: Selection<SVGDefsElement>) => void
-```
-
-```typescript
-interface ContourOptions {
-  interval: number;
-  bounds: [[number, number], [number, number]];
-  smooth?: boolean;
-  minValue?: number;
-  maxValue?: number;
-}
-
-interface HachureOptions {
-  spacing: number;
-  length: number;
-  angle?: number;
-  density?: number;     // 0-1
-  randomness?: number;  // 0-1
-}
-
-interface HatchPatternOptions {
-  spacing?: number;
-  strokeWidth?: number;
-  stroke?: string;
-  angle?: number;
-  background?: string;
-}
-```
-
----
-
 ## 実用パターン集
 
 ### 基本的な世界地図
@@ -1114,7 +1239,42 @@ async function draw() {
 draw();
 ```
 
+### インセット地図（位置図）
+
+メイン地図と位置図の2つのMapを重ねて作る。位置図にはメイン地図の表示範囲を `bboxToPolygon()` で範囲枠として描く。
+
+```html
+<div id="map"><div id="inset"></div></div>
+<style>
+  #map { position: relative; }
+  #inset { position: absolute; right: 12px; bottom: 12px;
+           width: 200px; height: 150px;
+           background: #fff; border: 1px solid #94a3b8; }
+</style>
+```
+
+```javascript
+// メイン地図
+const mainMap = new Thematika.Map({ container: '#map', width, height, projection: mainProjection });
+mainMap.addLayer('area', new Thematika.GeojsonLayer({ data: target }));
+
+// インセット位置図: 全体図 + メイン範囲の枠
+const insetMap = new Thematika.Map({
+  container: '#inset', width: 200, height: 150,
+  projection: d3.geoMercator().fitExtent([[5, 5], [195, 145]], overview)
+});
+const bbox = Thematika.getBbox(target);
+const frame = Thematika.bboxToPolygon([bbox.minX, bbox.minY, bbox.maxX, bbox.maxY]);
+insetMap.addLayer('overview', new Thematika.GeojsonLayer({ data: overview }));
+insetMap.addLayer('frame', new Thematika.GeojsonLayer({
+  data: [frame],
+  attr: { fill: 'none', stroke: '#e11d48', 'stroke-width': 1.5 }
+}));
+```
+
 ### コロプレスマップ（階級区分図）
+
+**推奨:** 分級・配色・凡例をまとめて生成する [`choropleth()` ヘルパー](#コロプレス統合ヘルパーchoropleth) を使うと以下の手作業を1回の呼び出しに置き換えられる。手動で組む場合:
 
 ```javascript
 async function draw() {

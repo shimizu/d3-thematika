@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>d3-thematika AI プレイグラウンド</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./playground.css">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div>
+        <h1>d3-thematika AI プレイグラウンド</h1>
+      </div>
+      <div class="toolbar">
+        <button id="run-preview" type="button" class="primary">実行</button>
+        <button id="export-zip" type="button">エクスポート</button>
+        <button id="reset-all" type="button">リセット</button>
+        <button id="toggle-settings" type="button">API設定</button>
+      </div>
+    </header>
+
+    <!-- API設定ポップオーバー -->
+    <form id="settings-popover" class="settings-popover" hidden aria-label="API設定">
+      <label for="api-key-input">Claude APIキー</label>
+      <input id="api-key-input" type="password" placeholder="sk-ant-..." autocomplete="off">
+      <p class="field-help">
+        APIキーは <a href="https://platform.claude.com/" target="_blank" rel="noopener noreferrer">platform.claude.com</a> で取得できます。
+      </p>
+
+      <label for="model-input">Claudeモデル</label>
+      <input id="model-input" type="text" autocomplete="off">
+
+      <label for="max-tokens-input">最大出力トークン (max_tokens)</label>
+      <input id="max-tokens-input" type="number" min="1">
+      <p class="field-help">コードが途中で切れる場合は大きくします（推奨16000）。</p>
+
+      <div class="settings-actions">
+        <button type="submit" class="primary">保存して閉じる</button>
+        <button type="button" id="delete-api-key">キーを削除</button>
+      </div>
+      <p class="field-help">
+        APIキーはこのブラウザのlocalStorageに保存され、リロード後も復元されます。
+        共有端末では使用後に必ず「キーを削除」してください。
+      </p>
+    </form>
+
+    <main class="workspace">
+      <!-- 左: チャット / データ / 実行ログ（タブ切替） -->
+      <section class="chat-column">
+        <div class="left-tabs" role="tablist" aria-label="チャットとデータ">
+          <button class="left-tab active" data-left-panel="chat" type="button">チャット</button>
+          <button class="left-tab" data-left-panel="data" type="button">データ</button>
+          <button class="left-tab" data-left-panel="log" type="button">実行ログ</button>
+        </div>
+
+        <section class="left-panel chat-panel active" data-left-panel="chat">
+          <div id="chat-messages" class="chat-messages"></div>
+          <form id="chat-form" class="chat-form">
+            <textarea
+              id="chat-input"
+              rows="3"
+              placeholder="例: 都道府県を人口で5階級のコロプレスに。タイトルと凡例付きで"
+            ></textarea>
+            <div class="chat-actions">
+              <button type="submit" id="chat-submit" class="primary">送信</button>
+              <button type="button" id="chat-abort" hidden>中断</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="left-panel data-panel" data-left-panel="data" id="data-panel">
+          <div class="panel-title">
+            <h2>データ</h2>
+            <label class="upload-button" for="file-input">アップロード</label>
+            <input id="file-input" type="file" accept=".geojson,.topojson,.json" multiple hidden>
+          </div>
+          <ul id="data-list" class="data-list"></ul>
+          <p class="drop-hint">GeoJSON / TopoJSONファイルをここにドラッグ＆ドロップ</p>
+        </section>
+
+        <section class="left-panel log-panel" data-left-panel="log">
+          <ul id="execution-log"></ul>
+        </section>
+      </section>
+
+      <!-- 中央: エディタ -->
+      <section class="editors">
+        <div class="editor-tabs" role="tablist" aria-label="エディタ">
+          <button class="editor-tab" data-panel="html" type="button">HTML</button>
+          <button class="editor-tab" data-panel="css" type="button">CSS</button>
+          <button class="editor-tab active" data-panel="js" type="button">JS</button>
+        </div>
+
+        <section class="editor-panel" data-panel="html">
+          <textarea id="html-editor" spellcheck="false"></textarea>
+        </section>
+
+        <section class="editor-panel" data-panel="css">
+          <textarea id="css-editor" spellcheck="false"></textarea>
+        </section>
+
+        <section class="editor-panel active" data-panel="js">
+          <textarea id="js-editor" spellcheck="false"></textarea>
+        </section>
+      </section>
+
+      <!-- 右: プレビュー / コンソール -->
+      <section class="preview-column">
+        <div class="viewer-tabs" role="tablist" aria-label="表示切替">
+          <button class="viewer-tab active" data-viewer-panel="preview" type="button">プレビュー</button>
+          <button class="viewer-tab" data-viewer-panel="console" type="button">コンソール</button>
+        </div>
+
+        <section class="viewer-panel active" data-viewer-panel="preview">
+          <iframe
+            id="preview-frame"
+            title="プレイグラウンドのプレビュー"
+            sandbox="allow-scripts allow-same-origin allow-downloads"
+          ></iframe>
+        </section>
+
+        <section class="viewer-panel console-panel" data-viewer-panel="console">
+          <div class="console-header">
+            <h2>コンソール</h2>
+            <button id="clear-console" type="button">消去</button>
+          </div>
+          <pre id="console-output"></pre>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

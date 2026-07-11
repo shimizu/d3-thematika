@@ -105,7 +105,7 @@ npm test
 
 コードの変更に合わせて以下も更新してください：
 - README.md（必要に応じて）
-- examples/（新機能の場合）
+- site/（新機能の場合）
 - TypeScript型定義
 - JSDocコメント
 
