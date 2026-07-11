@@ -364,10 +364,24 @@ function renderDataList(summaries) {
     meta.textContent = `${summary.featureCount} features / ${summary.geometryTypes.join(", ")} / ${formatBytes(summary.sizeBytes)}`;
     li.appendChild(meta);
 
+    if (summary.rewoundRings > 0 || summary.removedFeatures > 0) {
+      const info = document.createElement("div");
+      info.className = "data-item-meta";
+      const parts = [];
+      if (summary.rewoundRings > 0) {
+        parts.push(`${summary.rewoundRings}リングのワインディングをD3互換へ変換`);
+      }
+      if (summary.removedFeatures > 0) {
+        parts.push(`空座標のフィーチャー${summary.removedFeatures}件を除去`);
+      }
+      info.textContent = `✓ ${parts.join(" / ")}`;
+      li.appendChild(info);
+    }
+
     if (summary.windingSuspects > 0) {
       const warning = document.createElement("div");
       warning.className = "data-item-warning";
-      warning.textContent = `⚠ ${summary.windingSuspects}個のポリゴンがD3と逆のリング順序（CCW）の疑い。描画が壊れる場合は scripts/fix-geojson-winding.js --d3 で修正してください。`;
+      warning.textContent = `⚠ 変換後も${summary.windingSuspects}個のポリゴンが半球超の面積です。極や日付変更線をまたぐ特殊なジオメトリの可能性があり、描画が崩れる場合があります。`;
       li.appendChild(warning);
     }
 

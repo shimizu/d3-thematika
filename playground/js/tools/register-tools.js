@@ -128,9 +128,12 @@ export function createPlaygroundToolRegistry({ dataStore, editors, runPreview })
         propertyKeys: d.propertyKeys,
         bbox: d.bbox,
         available: d.available,
+        ...(d.rewoundRings > 0
+          ? { note: `アップロード時に${d.rewoundRings}リングをD3互換のワインディング順序へ自動変換済み。` }
+          : {}),
         ...(d.windingSuspects > 0
           ? {
-              warning: `${d.windingSuspects}個のポリゴンがCCW（D3と逆順序）の疑い。fitExtentや描画が壊れる場合はユーザーに scripts/fix-geojson-winding.js --d3 での修正を案内してください。`,
+              warning: `変換後も${d.windingSuspects}個のポリゴンが半球超の面積。極や日付変更線をまたぐ特殊なジオメトリの可能性があり、描画が崩れる場合はその旨をユーザーに伝えてください。`,
             }
           : {}),
       })),

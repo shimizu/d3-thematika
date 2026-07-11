@@ -28,7 +28,7 @@ export const BASE_SYSTEM_PROMPT = `あなたはd3-thematikaライブラリでス
 - 背景に \`GraticuleLayer\`（経緯線）や \`OutlineLayer\`、テクスチャ（\`Thematika.TexturePresets\`）、エフェクト（\`Thematika.FilterPresets\`、Mapのdefsに登録）を使うと表現が豊かになる。
 - 配色は \`Thematika.AllPalettes\` のパレット名（ColorBrewer/Viridis等）から選ぶ。色覚多様性に配慮する場合はcolorBlindSafeなパレットを使う。
 - ラベルは \`Thematika.TextLayer\`。attrで stroke（白）+ 'stroke-width': 3 を指定するとハロー（縁取り）になり可読性が上がる。
-- render_previewの警告にwinding（リング順序）の指摘が出たら、描画が壊れる原因になるためユーザーに修正方法を伝える。
+- アップロードされたGeoJSONはD3互換のワインディング順序（外側リングCW）へ自動変換済み。list_dataのwarningに「変換後も半球超」と出るデータだけは特殊なジオメトリの可能性があるため、描画が崩れたらその旨をユーザーに伝える。
 
 ## 応答スタイル
 

@@ -1,3 +1,5 @@
+import { normalizeToD3 } from "./geojson-normalize.js";
+
 const SUMMARY_STORAGE_KEY = "thematika-playground.data.summaries";
 const BODY_STORAGE_PREFIX = "thematika-playground.data.body.";
 
@@ -99,21 +101,31 @@ export class GeoDataStore {
 
     const name = sanitizeDataName(rawName);
 
-    // 常にFeatureCollectionへ正規化して保持する（生成コード側の分岐を減らす）。
-    const normalized = { type: "FeatureCollection", features };
+    // D3互換へ自動変換する: 空座標の除去 + ワインディング順序の反転
+    // （外側リングCW、穴CCW）。以降のプレビュー・inspect・エクスポートは
+    // すべてこの変換済みデータを使う。
+    const { collection: normalized, rewoundRings, removedFeatures } = normalizeToD3({
+      type: "FeatureCollection",
+      features,
+    });
+    if (normalized.features.length === 0) {
+      throw new Error("有効な座標を持つフィーチャーがありません。");
+    }
 
+    const normalizedFeatures = normalized.features;
     const geometryTypes = [
-      ...new Set(features.map((f) => f?.geometry?.type).filter(Boolean)),
+      ...new Set(normalizedFeatures.map((f) => f?.geometry?.type).filter(Boolean)),
     ];
     const propertyKeys = [
-      ...new Set(features.flatMap((f) => Object.keys(f?.properties ?? {}))),
+      ...new Set(normalizedFeatures.flatMap((f) => Object.keys(f?.properties ?? {}))),
     ];
 
-    // D3は外側リング時計回り（CW）を期待する。半球超の面積はCCW疑い。
+    // 変換後の検証: それでも半球超の面積が残る場合は特殊なジオメトリ
+    // （極や日付変更線をまたぐ等）の可能性があるため警告として残す。
     let windingSuspects = 0;
     if (this.#geoArea) {
       const HALF_SPHERE = 2 * Math.PI;
-      for (const feature of features) {
+      for (const feature of normalizedFeatures) {
         const type = feature?.geometry?.type;
         if (type !== "Polygon" && type !== "MultiPolygon") continue;
         try {
@@ -128,11 +140,13 @@ export class GeoDataStore {
     const summary = {
       name,
       path: `data/${name}`,
-      featureCount: features.length,
+      featureCount: normalizedFeatures.length,
       geometryTypes,
       propertyKeys,
-      bbox: computeBbox(features),
+      bbox: computeBbox(normalizedFeatures),
       windingSuspects,
+      rewoundRings,
+      removedFeatures,
       sizeBytes: body.length,
       persisted: this.#persistBody(name, body),
       addedAt: new Date().toISOString(),
