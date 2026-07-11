@@ -328,11 +328,15 @@ chatInput.addEventListener("keydown", (event) => {
 
 chatAbort.addEventListener("click", () => abortController?.abort());
 
-el("new-conversation").addEventListener("click", () => {
+// リセット: 会話・実行ログ・エディタ（HTML/CSS/JS）を初期状態に戻す。
+// アップロード済みデータとAPIキーは保持する。
+el("reset-all").addEventListener("click", () => {
   if (chatSubmit.disabled) return;
   conversationStore.clear();
   executionLog.textContent = "";
   restoreChatDisplay();
+  editors.set(DEFAULT_EDITORS);
+  runPreview().catch(() => {});
 });
 
 // ── データパネル ─────────────────────────────────────────────────
