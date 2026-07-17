@@ -101,5 +101,16 @@
     "tslib": "^2.8.1",
     "typedoc": "^0.28.18",
     "typescript": "^6.0.2"
+  },
+  "overrides": {
+    "anymatch": {
+      "picomatch": "^2.3.2"
+    },
+    "micromatch": {
+      "picomatch": "^2.3.2"
+    },
+    "readdirp": {
+      "picomatch": "^2.3.2"
+    }
   }
 }
