@@ -1,0 +1,8 @@
+{
+"type": "FeatureCollection",
+"name": "aflica_bbox",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -25.855061978662931, -38.477223517867408 ], [ -25.855061978662931, 41.479176022760491 ], [ 66.427949157811767, 41.479176022760491 ], [ 66.427949157811767, -38.477223517867408 ], [ -25.855061978662931, -38.477223517867408 ] ] ] } }
+]
+}

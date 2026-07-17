@@ -1,0 +1,1668 @@
+{
+  "type": "FeatureCollection",
+  "name": "major-airports",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ATL",
+        "name": "William B Hartsfield-Atlanta Intl",
+        "city": "Atlanta",
+        "state": "GA",
+        "country": "USA",
+        "totalFlights": 399600,
+        "outboundFlights": 201987,
+        "inboundFlights": 197613,
+        "routeCount": 67,
+        "displayName": "William B Hartsfield-Atlanta Intl (ATL)",
+        "location": "Atlanta, GA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.42694444,
+          33.64044444
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ORD",
+        "name": "Chicago O'Hare International",
+        "city": "Chicago",
+        "state": "IL",
+        "country": "USA",
+        "totalFlights": 298006,
+        "outboundFlights": 150639,
+        "inboundFlights": 147367,
+        "routeCount": 47,
+        "displayName": "Chicago O'Hare International (ORD)",
+        "location": "Chicago, IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.90446417,
+          41.979595
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "LAX",
+        "name": "Los Angeles International",
+        "city": "Los Angeles",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 260972,
+        "outboundFlights": 130471,
+        "inboundFlights": 130501,
+        "routeCount": 34,
+        "displayName": "Los Angeles International (LAX)",
+        "location": "Los Angeles, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.4080744,
+          33.94253611
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DEN",
+        "name": "Denver Intl",
+        "city": "Denver",
+        "state": "CO",
+        "country": "USA",
+        "totalFlights": 208546,
+        "outboundFlights": 104160,
+        "inboundFlights": 104386,
+        "routeCount": 34,
+        "displayName": "Denver Intl (DEN)",
+        "location": "Denver, CO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.6670019,
+          39.85840806
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PHX",
+        "name": "Phoenix Sky Harbor International",
+        "city": "Phoenix",
+        "state": "AZ",
+        "country": "USA",
+        "totalFlights": 200431,
+        "outboundFlights": 102211,
+        "inboundFlights": 98220,
+        "routeCount": 33,
+        "displayName": "Phoenix Sky Harbor International (PHX)",
+        "location": "Phoenix, AZ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -112.0080556,
+          33.43416667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "LAS",
+        "name": "McCarran International",
+        "city": "Las Vegas",
+        "state": "NV",
+        "country": "USA",
+        "totalFlights": 183303,
+        "outboundFlights": 91775,
+        "inboundFlights": 91528,
+        "routeCount": 30,
+        "displayName": "McCarran International (LAS)",
+        "location": "Las Vegas, NV"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -115.1523333,
+          36.08036111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DFW",
+        "name": "Dallas-Fort Worth International",
+        "city": "Dallas-Fort Worth",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 129890,
+        "outboundFlights": 64935,
+        "inboundFlights": 64955,
+        "routeCount": 20,
+        "displayName": "Dallas-Fort Worth International (DFW)",
+        "location": "Dallas-Fort Worth, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.0372,
+          32.89595056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "LGA",
+        "name": "LaGuardia",
+        "city": "New York",
+        "state": "NY",
+        "country": "USA",
+        "totalFlights": 123526,
+        "outboundFlights": 63821,
+        "inboundFlights": 59705,
+        "routeCount": 15,
+        "displayName": "LaGuardia (LGA)",
+        "location": "New York, NY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.87260917,
+          40.77724306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SFO",
+        "name": "San Francisco International",
+        "city": "San Francisco",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 110647,
+        "outboundFlights": 55482,
+        "inboundFlights": 55165,
+        "routeCount": 16,
+        "displayName": "San Francisco International (SFO)",
+        "location": "San Francisco, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.3748433,
+          37.61900194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "BOS",
+        "name": "Gen Edw L Logan Intl",
+        "city": "Boston",
+        "state": "MA",
+        "country": "USA",
+        "totalFlights": 109502,
+        "outboundFlights": 56723,
+        "inboundFlights": 52779,
+        "routeCount": 15,
+        "displayName": "Gen Edw L Logan Intl (BOS)",
+        "location": "Boston, MA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.00517917,
+          42.3643475
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SAN",
+        "name": "San Diego International-Lindbergh",
+        "city": "San Diego",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 104568,
+        "outboundFlights": 52459,
+        "inboundFlights": 52109,
+        "routeCount": 16,
+        "displayName": "San Diego International-Lindbergh (SAN)",
+        "location": "San Diego, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.1896567,
+          32.73355611
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SEA",
+        "name": "Seattle-Tacoma Intl",
+        "city": "Seattle",
+        "state": "WA",
+        "country": "USA",
+        "totalFlights": 98634,
+        "outboundFlights": 49315,
+        "inboundFlights": 49319,
+        "routeCount": 18,
+        "displayName": "Seattle-Tacoma Intl (SEA)",
+        "location": "Seattle, WA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.3093131,
+          47.44898194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "HNL",
+        "name": "Honolulu International",
+        "city": "Honolulu",
+        "state": "HI",
+        "country": "USA",
+        "totalFlights": 88354,
+        "outboundFlights": 44176,
+        "inboundFlights": 44178,
+        "routeCount": 10,
+        "displayName": "Honolulu International (HNL)",
+        "location": "Honolulu, HI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -157.9224072,
+          21.31869111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "JFK",
+        "name": "John F Kennedy Intl",
+        "city": "New York",
+        "state": "NY",
+        "country": "USA",
+        "totalFlights": 77823,
+        "outboundFlights": 40871,
+        "inboundFlights": 36952,
+        "routeCount": 13,
+        "displayName": "John F Kennedy Intl (JFK)",
+        "location": "New York, NY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.77892556,
+          40.63975111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "EWR",
+        "name": "Newark Intl",
+        "city": "Newark",
+        "state": "NJ",
+        "country": "USA",
+        "totalFlights": 70276,
+        "outboundFlights": 35339,
+        "inboundFlights": 34937,
+        "routeCount": 12,
+        "displayName": "Newark Intl (EWR)",
+        "location": "Newark, NJ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -74.16866056,
+          40.69249722
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DCA",
+        "name": "Ronald Reagan Washington National",
+        "city": "Arlington",
+        "state": "VA",
+        "country": "USA",
+        "totalFlights": 69435,
+        "outboundFlights": 34754,
+        "inboundFlights": 34681,
+        "routeCount": 8,
+        "displayName": "Ronald Reagan Washington National (DCA)",
+        "location": "Arlington, VA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.03772222,
+          38.85208333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MCO",
+        "name": "Orlando International",
+        "city": "Orlando",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 68085,
+        "outboundFlights": 31919,
+        "inboundFlights": 36166,
+        "routeCount": 11,
+        "displayName": "Orlando International (MCO)",
+        "location": "Orlando, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.31602778,
+          28.42888889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "OAK",
+        "name": "Metropolitan Oakland International",
+        "city": "Oakland",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 65526,
+        "outboundFlights": 32751,
+        "inboundFlights": 32775,
+        "routeCount": 12,
+        "displayName": "Metropolitan Oakland International (OAK)",
+        "location": "Oakland, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.2207167,
+          37.72129083
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "IAH",
+        "name": "George Bush Intercontinental",
+        "city": "Houston",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 58686,
+        "outboundFlights": 29187,
+        "inboundFlights": 29499,
+        "routeCount": 12,
+        "displayName": "George Bush Intercontinental (IAH)",
+        "location": "Houston, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.33972222,
+          29.98047222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PHL",
+        "name": "Philadelphia Intl",
+        "city": "Philadelphia",
+        "state": "PA",
+        "country": "USA",
+        "totalFlights": 58638,
+        "outboundFlights": 27412,
+        "inboundFlights": 31226,
+        "routeCount": 9,
+        "displayName": "Philadelphia Intl (PHL)",
+        "location": "Philadelphia, PA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.24114083,
+          39.87195278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DTW",
+        "name": "Detroit Metropolitan-Wayne County",
+        "city": "Detroit",
+        "state": "MI",
+        "country": "USA",
+        "totalFlights": 54773,
+        "outboundFlights": 27080,
+        "inboundFlights": 27693,
+        "routeCount": 10,
+        "displayName": "Detroit Metropolitan-Wayne County (DTW)",
+        "location": "Detroit, MI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -83.34883583,
+          42.21205889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SLC",
+        "name": "Salt Lake City Intl",
+        "city": "Salt Lake City",
+        "state": "UT",
+        "country": "USA",
+        "totalFlights": 53626,
+        "outboundFlights": 26988,
+        "inboundFlights": 26638,
+        "routeCount": 8,
+        "displayName": "Salt Lake City Intl (SLC)",
+        "location": "Salt Lake City, UT"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -111.9777731,
+          40.78838778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MSP",
+        "name": "Minneapolis-St Paul Intl",
+        "city": "Minneapolis",
+        "state": "MN",
+        "country": "USA",
+        "totalFlights": 50572,
+        "outboundFlights": 25558,
+        "inboundFlights": 25014,
+        "routeCount": 8,
+        "displayName": "Minneapolis-St Paul Intl (MSP)",
+        "location": "Minneapolis, MN"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.2169225,
+          44.88054694
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SJC",
+        "name": "San Jose International",
+        "city": "San Jose",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 47495,
+        "outboundFlights": 23752,
+        "inboundFlights": 23743,
+        "routeCount": 8,
+        "displayName": "San Jose International (SJC)",
+        "location": "San Jose, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.9290089,
+          37.36186194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CLT",
+        "name": "Charlotte/Douglas International",
+        "city": "Charlotte",
+        "state": "NC",
+        "country": "USA",
+        "totalFlights": 47289,
+        "outboundFlights": 23653,
+        "inboundFlights": 23636,
+        "routeCount": 8,
+        "displayName": "Charlotte/Douglas International (CLT)",
+        "location": "Charlotte, NC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.94312583,
+          35.21401111
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DAL",
+        "name": "Dallas Love",
+        "city": "Dallas",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 40684,
+        "outboundFlights": 20346,
+        "inboundFlights": 20338,
+        "routeCount": 6,
+        "displayName": "Dallas Love (DAL)",
+        "location": "Dallas, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -96.85177222,
+          32.84711389
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "FLL",
+        "name": "Fort Lauderdale-Hollywood Int'l",
+        "city": "Ft. Lauderdale",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 33589,
+        "outboundFlights": 16796,
+        "inboundFlights": 16793,
+        "routeCount": 6,
+        "displayName": "Fort Lauderdale-Hollywood Int'l (FLL)",
+        "location": "Ft. Lauderdale, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.15275,
+          26.07258333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "BWI",
+        "name": "Baltimore-Washington International",
+        "city": "Baltimore",
+        "state": "MD",
+        "country": "USA",
+        "totalFlights": 31394,
+        "outboundFlights": 15693,
+        "inboundFlights": 15701,
+        "routeCount": 6,
+        "displayName": "Baltimore-Washington International (BWI)",
+        "location": "Baltimore, MD"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.66819833,
+          39.17540167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "BUR",
+        "name": "Burbank-Glendale-Pasadena",
+        "city": "Burbank",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 30664,
+        "outboundFlights": 15336,
+        "inboundFlights": 15328,
+        "routeCount": 6,
+        "displayName": "Burbank-Glendale-Pasadena (BUR)",
+        "location": "Burbank, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -118.3584969,
+          34.20061917
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "OGG",
+        "name": "Kahului",
+        "city": "Kahului",
+        "state": "HI",
+        "country": "USA",
+        "totalFlights": 24397,
+        "outboundFlights": 12383,
+        "inboundFlights": 12014,
+        "routeCount": 2,
+        "displayName": "Kahului (OGG)",
+        "location": "Kahului, HI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -156.4304578,
+          20.89864972
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "AUS",
+        "name": "Austin-Bergstrom International",
+        "city": "Austin",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 22170,
+        "outboundFlights": 11079,
+        "inboundFlights": 11091,
+        "routeCount": 4,
+        "displayName": "Austin-Bergstrom International (AUS)",
+        "location": "Austin, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -97.66987194,
+          30.19453278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SNA",
+        "name": "John Wayne /Orange Co",
+        "city": "Santa Ana",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 21758,
+        "outboundFlights": 10878,
+        "inboundFlights": 10880,
+        "routeCount": 4,
+        "displayName": "John Wayne /Orange Co (SNA)",
+        "location": "Santa Ana, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.8682225,
+          33.67565861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "LIH",
+        "name": "Lihue",
+        "city": "Lihue",
+        "state": "HI",
+        "country": "USA",
+        "totalFlights": 21176,
+        "outboundFlights": 10407,
+        "inboundFlights": 10769,
+        "routeCount": 2,
+        "displayName": "Lihue (LIH)",
+        "location": "Lihue, HI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -159.3389581,
+          21.97598306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SAT",
+        "name": "San Antonio International",
+        "city": "San Antonio",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 20799,
+        "outboundFlights": 10412,
+        "inboundFlights": 10387,
+        "routeCount": 4,
+        "displayName": "San Antonio International (SAT)",
+        "location": "San Antonio, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -98.46977778,
+          29.53369444
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SMF",
+        "name": "Sacramento International",
+        "city": "Sacramento",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 20585,
+        "outboundFlights": 10290,
+        "inboundFlights": 10295,
+        "routeCount": 4,
+        "displayName": "Sacramento International (SMF)",
+        "location": "Sacramento, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.5907669,
+          38.69542167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "HOU",
+        "name": "William P Hobby",
+        "city": "Houston",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 19556,
+        "outboundFlights": 9766,
+        "inboundFlights": 9790,
+        "routeCount": 2,
+        "displayName": "William P Hobby (HOU)",
+        "location": "Houston, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -95.27888889,
+          29.64541861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "RDU",
+        "name": "Raleigh-Durham International",
+        "city": "Raleigh",
+        "state": "NC",
+        "country": "USA",
+        "totalFlights": 19401,
+        "outboundFlights": 5418,
+        "inboundFlights": 13983,
+        "routeCount": 4,
+        "displayName": "Raleigh-Durham International (RDU)",
+        "location": "Raleigh, NC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -78.78747222,
+          35.87763889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ABQ",
+        "name": "Albuquerque International",
+        "city": "Albuquerque",
+        "state": "NM",
+        "country": "USA",
+        "totalFlights": 19126,
+        "outboundFlights": 9583,
+        "inboundFlights": 9543,
+        "routeCount": 4,
+        "displayName": "Albuquerque International (ABQ)",
+        "location": "Albuquerque, NM"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.6091944,
+          35.04022222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "IAD",
+        "name": "Washington Dulles International",
+        "city": "Chantilly",
+        "state": "VA",
+        "country": "USA",
+        "totalFlights": 19099,
+        "outboundFlights": 9606,
+        "inboundFlights": 9493,
+        "routeCount": 4,
+        "displayName": "Washington Dulles International (IAD)",
+        "location": "Chantilly, VA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.45580972,
+          38.94453194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MSY",
+        "name": "New Orleans International",
+        "city": "New Orleans",
+        "state": "LA",
+        "country": "USA",
+        "totalFlights": 17895,
+        "outboundFlights": 8952,
+        "inboundFlights": 8943,
+        "routeCount": 4,
+        "displayName": "New Orleans International (MSY)",
+        "location": "New Orleans, LA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.25802778,
+          29.99338889
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "KOA",
+        "name": "Kona International At Keahole",
+        "city": "Kailua/Kona",
+        "state": "HI",
+        "country": "USA",
+        "totalFlights": 17783,
+        "outboundFlights": 9038,
+        "inboundFlights": 8745,
+        "routeCount": 2,
+        "displayName": "Kona International At Keahole (KOA)",
+        "location": "Kailua/Kona, HI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -156.0456314,
+          19.73876583
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ITO",
+        "name": "Hilo International",
+        "city": "Hilo",
+        "state": "HI",
+        "country": "USA",
+        "totalFlights": 15071,
+        "outboundFlights": 7386,
+        "inboundFlights": 7685,
+        "routeCount": 2,
+        "displayName": "Hilo International (ITO)",
+        "location": "Hilo, HI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -155.0484703,
+          19.72026306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "TPA",
+        "name": "Tampa International",
+        "city": "Tampa",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 14624,
+        "outboundFlights": 7313,
+        "inboundFlights": 7311,
+        "routeCount": 2,
+        "displayName": "Tampa International (TPA)",
+        "location": "Tampa, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.53325,
+          27.97547222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MCI",
+        "name": "Kansas City International",
+        "city": "Kansas City",
+        "state": "MO",
+        "country": "USA",
+        "totalFlights": 14507,
+        "outboundFlights": 5256,
+        "inboundFlights": 9251,
+        "routeCount": 3,
+        "displayName": "Kansas City International (MCI)",
+        "location": "Kansas City, MO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -94.71390556,
+          39.29760528
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PIT",
+        "name": "Pittsburgh International",
+        "city": "Pittsburgh",
+        "state": "PA",
+        "country": "USA",
+        "totalFlights": 13281,
+        "outboundFlights": 8726,
+        "inboundFlights": 4555,
+        "routeCount": 3,
+        "displayName": "Pittsburgh International (PIT)",
+        "location": "Pittsburgh, PA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.23287083,
+          40.49146583
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MIA",
+        "name": "Miami International",
+        "city": "Miami",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 13251,
+        "outboundFlights": 6623,
+        "inboundFlights": 6628,
+        "routeCount": 2,
+        "displayName": "Miami International (MIA)",
+        "location": "Miami, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.29055556,
+          25.79325
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ANC",
+        "name": "Ted Stevens Anchorage International",
+        "city": "Anchorage",
+        "state": "AK",
+        "country": "USA",
+        "totalFlights": 12513,
+        "outboundFlights": 6257,
+        "inboundFlights": 6256,
+        "routeCount": 2,
+        "displayName": "Ted Stevens Anchorage International (ANC)",
+        "location": "Anchorage, AK"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -149.9961856,
+          61.17432028
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CVG",
+        "name": "Cincinnati Northern Kentucky Intl",
+        "city": "Covington",
+        "state": "KY",
+        "country": "USA",
+        "totalFlights": 12007,
+        "outboundFlights": 6014,
+        "inboundFlights": 5993,
+        "routeCount": 2,
+        "displayName": "Cincinnati Northern Kentucky Intl (CVG)",
+        "location": "Covington, KY"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.6621725,
+          39.04614278
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "JAX",
+        "name": "Jacksonville International",
+        "city": "Jacksonville",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 11312,
+        "outboundFlights": 5656,
+        "inboundFlights": 5656,
+        "routeCount": 2,
+        "displayName": "Jacksonville International (JAX)",
+        "location": "Jacksonville, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.68786111,
+          30.49405556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ONT",
+        "name": "Ontario International",
+        "city": "Ontario",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 11255,
+        "outboundFlights": 5628,
+        "inboundFlights": 5627,
+        "routeCount": 2,
+        "displayName": "Ontario International (ONT)",
+        "location": "Ontario, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.6011944,
+          34.056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MSN",
+        "name": "Dane County Regional",
+        "city": "Madison",
+        "state": "WI",
+        "country": "USA",
+        "totalFlights": 9821,
+        "outboundFlights": 4943,
+        "inboundFlights": 4878,
+        "routeCount": 2,
+        "displayName": "Dane County Regional (MSN)",
+        "location": "Madison, WI"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.33751361,
+          43.13985778
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MEM",
+        "name": "Memphis International",
+        "city": "Memphis",
+        "state": "TN",
+        "country": "USA",
+        "totalFlights": 9736,
+        "outboundFlights": 4870,
+        "inboundFlights": 4866,
+        "routeCount": 2,
+        "displayName": "Memphis International (MEM)",
+        "location": "Memphis, TN"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -89.97666667,
+          35.04241667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CMH",
+        "name": "Port Columbus Intl",
+        "city": "Columbus",
+        "state": "OH",
+        "country": "USA",
+        "totalFlights": 9623,
+        "outboundFlights": 4959,
+        "inboundFlights": 4664,
+        "routeCount": 2,
+        "displayName": "Port Columbus Intl (CMH)",
+        "location": "Columbus, OH"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -82.89188278,
+          39.99798528
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DSM",
+        "name": "Des Moines International",
+        "city": "Des Moines",
+        "state": "IA",
+        "country": "USA",
+        "totalFlights": 9348,
+        "outboundFlights": 4525,
+        "inboundFlights": 4823,
+        "routeCount": 2,
+        "displayName": "Des Moines International (DSM)",
+        "location": "Des Moines, IA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -93.66068222,
+          41.53493306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PDX",
+        "name": "Portland Intl",
+        "city": "Portland",
+        "state": "OR",
+        "country": "USA",
+        "totalFlights": 9217,
+        "outboundFlights": 4654,
+        "inboundFlights": 4563,
+        "routeCount": 2,
+        "displayName": "Portland Intl (PDX)",
+        "location": "Portland, OR"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.5975,
+          45.58872222
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CLE",
+        "name": "Cleveland-Hopkins Intl",
+        "city": "Cleveland",
+        "state": "OH",
+        "country": "USA",
+        "totalFlights": 9136,
+        "outboundFlights": 4569,
+        "inboundFlights": 4567,
+        "routeCount": 2,
+        "displayName": "Cleveland-Hopkins Intl (CLE)",
+        "location": "Cleveland, OH"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.84939667,
+          41.41089417
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "RIC",
+        "name": "Richmond International",
+        "city": "Richmond",
+        "state": "VA",
+        "country": "USA",
+        "totalFlights": 9068,
+        "outboundFlights": 4536,
+        "inboundFlights": 4532,
+        "routeCount": 2,
+        "displayName": "Richmond International (RIC)",
+        "location": "Richmond, VA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -77.31966667,
+          37.50516667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "SBA",
+        "name": "Santa Barbara Municipal",
+        "city": "Santa Barbara",
+        "state": "CA",
+        "country": "USA",
+        "totalFlights": 9052,
+        "outboundFlights": 4498,
+        "inboundFlights": 4554,
+        "routeCount": 2,
+        "displayName": "Santa Barbara Municipal (SBA)",
+        "location": "Santa Barbara, CA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.8403733,
+          34.42621194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "RNO",
+        "name": "Reno/Tahoe International",
+        "city": "Reno",
+        "state": "NV",
+        "country": "USA",
+        "totalFlights": 9000,
+        "outboundFlights": 4508,
+        "inboundFlights": 4492,
+        "routeCount": 2,
+        "displayName": "Reno/Tahoe International (RNO)",
+        "location": "Reno, NV"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -119.7680647,
+          39.49857611
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CHS",
+        "name": "Charleston AFB/International",
+        "city": "Charleston",
+        "state": "SC",
+        "country": "USA",
+        "totalFlights": 8986,
+        "outboundFlights": 4494,
+        "inboundFlights": 4492,
+        "routeCount": 2,
+        "displayName": "Charleston AFB/International (CHS)",
+        "location": "Charleston, SC"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.04050583,
+          32.89864639
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PNS",
+        "name": "Pensacola Regional",
+        "city": "Pensacola",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 8859,
+        "outboundFlights": 4430,
+        "inboundFlights": 4429,
+        "routeCount": 2,
+        "displayName": "Pensacola Regional (PNS)",
+        "location": "Pensacola, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.18744444,
+          30.47330556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "STL",
+        "name": "Lambert-St Louis International",
+        "city": "St Louis",
+        "state": "MO",
+        "country": "USA",
+        "totalFlights": 8814,
+        "outboundFlights": 4256,
+        "inboundFlights": 4558,
+        "routeCount": 2,
+        "displayName": "Lambert-St Louis International (STL)",
+        "location": "St Louis, MO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -90.35998972,
+          38.74768694
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "DAY",
+        "name": "James M Cox Dayton Intl",
+        "city": "Dayton",
+        "state": "OH",
+        "country": "USA",
+        "totalFlights": 8741,
+        "outboundFlights": 4369,
+        "inboundFlights": 4372,
+        "routeCount": 2,
+        "displayName": "James M Cox Dayton Intl (DAY)",
+        "location": "Dayton, OH"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -84.219375,
+          39.90237583
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "GEG",
+        "name": "Spokane Intl",
+        "city": "Spokane",
+        "state": "WA",
+        "country": "USA",
+        "totalFlights": 8718,
+        "outboundFlights": 4372,
+        "inboundFlights": 4346,
+        "routeCount": 2,
+        "displayName": "Spokane Intl (GEG)",
+        "location": "Spokane, WA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -117.5338425,
+          47.61985556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "MDW",
+        "name": "Chicago Midway",
+        "city": "Chicago",
+        "state": "IL",
+        "country": "USA",
+        "totalFlights": 8663,
+        "outboundFlights": 4325,
+        "inboundFlights": 4338,
+        "routeCount": 2,
+        "displayName": "Chicago Midway (MDW)",
+        "location": "Chicago, IL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -87.75242444,
+          41.7859825
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PBI",
+        "name": "Palm Beach International",
+        "city": "West Palm Beach",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 8525,
+        "outboundFlights": 4262,
+        "inboundFlights": 4263,
+        "routeCount": 2,
+        "displayName": "Palm Beach International (PBI)",
+        "location": "West Palm Beach, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -80.09559417,
+          26.68316194
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "RSW",
+        "name": "Southwest Florida International",
+        "city": "Ft. Myers",
+        "state": "FL",
+        "country": "USA",
+        "totalFlights": 8389,
+        "outboundFlights": 4196,
+        "inboundFlights": 4193,
+        "routeCount": 2,
+        "displayName": "Southwest Florida International (RSW)",
+        "location": "Ft. Myers, FL"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -81.75516667,
+          26.53616667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "COS",
+        "name": "City of Colorado Springs Muni",
+        "city": "Colorado Springs",
+        "state": "CO",
+        "country": "USA",
+        "totalFlights": 8381,
+        "outboundFlights": 4193,
+        "inboundFlights": 4188,
+        "routeCount": 2,
+        "displayName": "City of Colorado Springs Muni (COS)",
+        "location": "Colorado Springs, CO"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -104.70025,
+          38.80580556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "TUS",
+        "name": "Tucson International",
+        "city": "Tucson",
+        "state": "AZ",
+        "country": "USA",
+        "totalFlights": 8331,
+        "outboundFlights": 4190,
+        "inboundFlights": 4141,
+        "routeCount": 2,
+        "displayName": "Tucson International (TUS)",
+        "location": "Tucson, AZ"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -110.9410278,
+          32.11608333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "PHF",
+        "name": "Newport News/Williamsburg International",
+        "city": "Newport News",
+        "state": "VA",
+        "country": "USA",
+        "totalFlights": 8315,
+        "outboundFlights": 4157,
+        "inboundFlights": 4158,
+        "routeCount": 2,
+        "displayName": "Newport News/Williamsburg International (PHF)",
+        "location": "Newport News, VA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -76.4929875,
+          37.13189556
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "ELP",
+        "name": "El Paso International",
+        "city": "El Paso",
+        "state": "TX",
+        "country": "USA",
+        "totalFlights": 4155,
+        "outboundFlights": 0,
+        "inboundFlights": 4155,
+        "routeCount": 1,
+        "displayName": "El Paso International (ELP)",
+        "location": "El Paso, TX"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -106.3778056,
+          31.80666667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "iata": "CID",
+        "name": "Eastern Iowa",
+        "city": "Cedar Rapids",
+        "state": "IA",
+        "country": "USA",
+        "totalFlights": 4154,
+        "outboundFlights": 0,
+        "inboundFlights": 4154,
+        "routeCount": 1,
+        "displayName": "Eastern Iowa (CID)",
+        "location": "Cedar Rapids, IA"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -91.71087222,
+          41.88458833
+        ]
+      }
+    }
+  ]
+}

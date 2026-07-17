@@ -1,0 +1,7212 @@
+{
+  "type": "FeatureCollection",
+  "name": "flight-routes",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "LAX",
+        "count": 13788,
+        "originName": "San Francisco International",
+        "destinationName": "Los Angeles International",
+        "route": "SFO → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SFO",
+        "count": 13390,
+        "originName": "Los Angeles International",
+        "destinationName": "San Francisco International",
+        "route": "LAX → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OGG",
+        "destination": "HNL",
+        "count": 12383,
+        "originName": "Kahului",
+        "destinationName": "Honolulu International",
+        "route": "OGG → HNL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -156.4304578,
+            20.89864972
+          ],
+          [
+            -157.9224072,
+            21.31869111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "BOS",
+        "count": 12035,
+        "originName": "LaGuardia",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "LGA → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "LGA",
+        "count": 12029,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "LaGuardia",
+        "route": "BOS → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HNL",
+        "destination": "OGG",
+        "count": 12014,
+        "originName": "Honolulu International",
+        "destinationName": "Kahului",
+        "route": "HNL → OGG"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -157.9224072,
+            21.31869111
+          ],
+          [
+            -156.4304578,
+            20.89864972
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "LAS",
+        "count": 11773,
+        "originName": "Los Angeles International",
+        "destinationName": "McCarran International",
+        "route": "LAX → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "LAX",
+        "count": 11729,
+        "originName": "McCarran International",
+        "destinationName": "Los Angeles International",
+        "route": "LAS → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SAN",
+        "count": 11257,
+        "originName": "Los Angeles International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "LAX → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "LAX",
+        "count": 11224,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "Los Angeles International",
+        "route": "SAN → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DCA",
+        "destination": "LGA",
+        "count": 11102,
+        "originName": "Ronald Reagan Washington National",
+        "destinationName": "LaGuardia",
+        "route": "DCA → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.03772222,
+            38.85208333
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "DCA",
+        "count": 11063,
+        "originName": "LaGuardia",
+        "destinationName": "Ronald Reagan Washington National",
+        "route": "LGA → DCA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -77.03772222,
+            38.85208333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "ORD",
+        "count": 10862,
+        "originName": "LaGuardia",
+        "destinationName": "Chicago O'Hare International",
+        "route": "LGA → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "LGA",
+        "count": 10770,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "LaGuardia",
+        "route": "ORD → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HNL",
+        "destination": "LIH",
+        "count": 10769,
+        "originName": "Honolulu International",
+        "destinationName": "Lihue",
+        "route": "HNL → LIH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -157.9224072,
+            21.31869111
+          ],
+          [
+            -159.3389581,
+            21.97598306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "PHX",
+        "count": 10626,
+        "originName": "McCarran International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "LAS → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "ATL",
+        "count": 10507,
+        "originName": "LaGuardia",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "LGA → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "LGA",
+        "count": 10506,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "LaGuardia",
+        "route": "ATL → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LIH",
+        "destination": "HNL",
+        "count": 10407,
+        "originName": "Lihue",
+        "destinationName": "Honolulu International",
+        "route": "LIH → HNL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -159.3389581,
+            21.97598306
+          ],
+          [
+            -157.9224072,
+            21.31869111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "LAS",
+        "count": 10337,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "McCarran International",
+        "route": "PHX → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "LAX",
+        "count": 9992,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Los Angeles International",
+        "route": "PHX → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "PHX",
+        "count": 9897,
+        "originName": "Los Angeles International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "LAX → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "ATL",
+        "count": 9849,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "DFW → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "DFW",
+        "count": 9847,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "ATL → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DAL",
+        "destination": "HOU",
+        "count": 9790,
+        "originName": "Dallas Love",
+        "destinationName": "William P Hobby",
+        "route": "DAL → HOU"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -96.85177222,
+            32.84711389
+          ],
+          [
+            -95.27888889,
+            29.64541861
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HOU",
+        "destination": "DAL",
+        "count": 9766,
+        "originName": "William P Hobby",
+        "destinationName": "Dallas Love",
+        "route": "HOU → DAL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.27888889,
+            29.64541861
+          ],
+          [
+            -96.85177222,
+            32.84711389
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "MSP",
+        "count": 9688,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Minneapolis-St Paul Intl",
+        "route": "ORD → MSP"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -93.2169225,
+            44.88054694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MCO",
+        "count": 9613,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Orlando International",
+        "route": "ATL → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCO",
+        "destination": "ATL",
+        "count": 9611,
+        "originName": "Orlando International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "MCO → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.31602778,
+            28.42888889
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSP",
+        "destination": "ORD",
+        "count": 9356,
+        "originName": "Minneapolis-St Paul Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "MSP → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.2169225,
+            44.88054694
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SLC",
+        "destination": "DEN",
+        "count": 9269,
+        "originName": "Salt Lake City Intl",
+        "destinationName": "Denver Intl",
+        "route": "SLC → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111.9777731,
+            40.78838778
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "KOA",
+        "destination": "HNL",
+        "count": 9038,
+        "originName": "Kona International At Keahole",
+        "destinationName": "Honolulu International",
+        "route": "KOA → HNL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -156.0456314,
+            19.73876583
+          ],
+          [
+            -157.9224072,
+            21.31869111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SJC",
+        "destination": "LAX",
+        "count": 8939,
+        "originName": "San Jose International",
+        "destinationName": "Los Angeles International",
+        "route": "SJC → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.9290089,
+            37.36186194
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DCA",
+        "destination": "BOS",
+        "count": 8929,
+        "originName": "Ronald Reagan Washington National",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "DCA → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.03772222,
+            38.85208333
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SJC",
+        "count": 8908,
+        "originName": "Los Angeles International",
+        "destinationName": "San Jose International",
+        "route": "LAX → SJC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -121.9290089,
+            37.36186194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "SLC",
+        "count": 8905,
+        "originName": "Denver Intl",
+        "destinationName": "Salt Lake City Intl",
+        "route": "DEN → SLC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -111.9777731,
+            40.78838778
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "DCA",
+        "count": 8899,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "Ronald Reagan Washington National",
+        "route": "BOS → DCA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -77.03772222,
+            38.85208333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "DEN",
+        "count": 8894,
+        "originName": "Los Angeles International",
+        "destinationName": "Denver Intl",
+        "route": "LAX → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "LAX",
+        "count": 8811,
+        "originName": "Denver Intl",
+        "destinationName": "Los Angeles International",
+        "route": "DEN → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HNL",
+        "destination": "KOA",
+        "count": 8745,
+        "originName": "Honolulu International",
+        "destinationName": "Kona International At Keahole",
+        "route": "HNL → KOA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -157.9224072,
+            21.31869111
+          ],
+          [
+            -156.0456314,
+            19.73876583
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "DEN",
+        "count": 8402,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Denver Intl",
+        "route": "PHX → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "PHX",
+        "count": 8391,
+        "originName": "Denver Intl",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "DEN → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "DFW",
+        "count": 8268,
+        "originName": "Denver Intl",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "DEN → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "DEN",
+        "count": 8193,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "Denver Intl",
+        "route": "DFW → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "ORD",
+        "count": 8165,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "DFW → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "DEN",
+        "count": 8165,
+        "originName": "McCarran International",
+        "destinationName": "Denver Intl",
+        "route": "LAS → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "LAS",
+        "count": 8147,
+        "originName": "Denver Intl",
+        "destinationName": "McCarran International",
+        "route": "DEN → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "DFW",
+        "count": 8093,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "ORD → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "LAX",
+        "count": 8078,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "Los Angeles International",
+        "route": "JFK → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "ATL",
+        "count": 8060,
+        "originName": "Newark Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "EWR → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "JFK",
+        "count": 8058,
+        "originName": "Los Angeles International",
+        "destinationName": "John F Kennedy Intl",
+        "route": "LAX → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "EWR",
+        "count": 8028,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Newark Intl",
+        "route": "ATL → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HNL",
+        "destination": "ITO",
+        "count": 7685,
+        "originName": "Honolulu International",
+        "destinationName": "Hilo International",
+        "route": "HNL → ITO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -157.9224072,
+            21.31869111
+          ],
+          [
+            -155.0484703,
+            19.72026306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "ORD",
+        "count": 7677,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "ATL → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "FLL",
+        "destination": "ATL",
+        "count": 7666,
+        "originName": "Fort Lauderdale-Hollywood Int'l",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "FLL → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.15275,
+            26.07258333
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "FLL",
+        "count": 7665,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Fort Lauderdale-Hollywood Int'l",
+        "route": "ATL → FLL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.15275,
+            26.07258333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "SAN",
+        "count": 7609,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "PHX → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "DTW",
+        "count": 7602,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Detroit Metropolitan-Wayne County",
+        "route": "ORD → DTW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -83.34883583,
+            42.21205889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "OAK",
+        "count": 7583,
+        "originName": "Los Angeles International",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "LAX → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "PHX",
+        "count": 7581,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "SAN → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "LAX",
+        "count": 7578,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "Los Angeles International",
+        "route": "OAK → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DTW",
+        "destination": "ORD",
+        "count": 7553,
+        "originName": "Detroit Metropolitan-Wayne County",
+        "destinationName": "Chicago O'Hare International",
+        "route": "DTW → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -83.34883583,
+            42.21205889
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "BOS",
+        "count": 7513,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "JFK → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "ORD",
+        "count": 7505,
+        "originName": "Newark Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "EWR → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "ATL",
+        "count": 7449,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "ORD → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "DCA",
+        "count": 7430,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Ronald Reagan Washington National",
+        "route": "ORD → DCA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -77.03772222,
+            38.85208333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DCA",
+        "destination": "ORD",
+        "count": 7427,
+        "originName": "Ronald Reagan Washington National",
+        "destinationName": "Chicago O'Hare International",
+        "route": "DCA → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.03772222,
+            38.85208333
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ITO",
+        "destination": "HNL",
+        "count": 7386,
+        "originName": "Hilo International",
+        "destinationName": "Honolulu International",
+        "route": "ITO → HNL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -155.0484703,
+            19.72026306
+          ],
+          [
+            -157.9224072,
+            21.31869111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "JFK",
+        "count": 7372,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "John F Kennedy Intl",
+        "route": "BOS → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "ORD",
+        "count": 7333,
+        "originName": "Los Angeles International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "LAX → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "TPA",
+        "destination": "ATL",
+        "count": 7313,
+        "originName": "Tampa International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "TPA → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -82.53325,
+            27.97547222
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "TPA",
+        "count": 7311,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Tampa International",
+        "route": "ATL → TPA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -82.53325,
+            27.97547222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DCA",
+        "destination": "ATL",
+        "count": 7296,
+        "originName": "Ronald Reagan Washington National",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "DCA → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.03772222,
+            38.85208333
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "DCA",
+        "count": 7289,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Ronald Reagan Washington National",
+        "route": "ATL → DCA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -77.03772222,
+            38.85208333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "SLC",
+        "count": 7177,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Salt Lake City Intl",
+        "route": "PHX → SLC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -111.9777731,
+            40.78838778
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "EWR",
+        "count": 7174,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Newark Intl",
+        "route": "ORD → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SLC",
+        "destination": "PHX",
+        "count": 7168,
+        "originName": "Salt Lake City Intl",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "SLC → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111.9777731,
+            40.78838778
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "BOS",
+        "count": 7133,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "ORD → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "ORD",
+        "count": 7085,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "BOS → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHL",
+        "destination": "ORD",
+        "count": 7078,
+        "originName": "Philadelphia Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "PHL → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -75.24114083,
+            39.87195278
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCO",
+        "destination": "PHL",
+        "count": 7034,
+        "originName": "Orlando International",
+        "destinationName": "Philadelphia Intl",
+        "route": "MCO → PHL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.31602778,
+            28.42888889
+          ],
+          [
+            -75.24114083,
+            39.87195278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHL",
+        "destination": "MCO",
+        "count": 7032,
+        "originName": "Philadelphia Intl",
+        "destinationName": "Orlando International",
+        "route": "PHL → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -75.24114083,
+            39.87195278
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "LAS",
+        "count": 7007,
+        "originName": "San Francisco International",
+        "destinationName": "McCarran International",
+        "route": "SFO → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "SFO",
+        "count": 6994,
+        "originName": "McCarran International",
+        "destinationName": "San Francisco International",
+        "route": "LAS → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "LAX",
+        "count": 6974,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Los Angeles International",
+        "route": "ORD → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "JFK",
+        "count": 6971,
+        "originName": "San Francisco International",
+        "destinationName": "John F Kennedy Intl",
+        "route": "SFO → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHL",
+        "destination": "ATL",
+        "count": 6918,
+        "originName": "Philadelphia Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PHL → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -75.24114083,
+            39.87195278
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PHL",
+        "count": 6915,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Philadelphia Intl",
+        "route": "ATL → PHL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -75.24114083,
+            39.87195278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SEA",
+        "count": 6876,
+        "originName": "Los Angeles International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "LAX → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "LAX",
+        "count": 6865,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Los Angeles International",
+        "route": "SEA → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "SFO",
+        "count": 6769,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "San Francisco International",
+        "route": "SAN → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "PHL",
+        "count": 6733,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Philadelphia Intl",
+        "route": "ORD → PHL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -75.24114083,
+            39.87195278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CLT",
+        "destination": "ATL",
+        "count": 6722,
+        "originName": "Charlotte/Douglas International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "CLT → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.94312583,
+            35.21401111
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "CLT",
+        "count": 6720,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Charlotte/Douglas International",
+        "route": "ATL → CLT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.94312583,
+            35.21401111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MIA",
+        "count": 6628,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Miami International",
+        "route": "ATL → MIA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.29055556,
+            25.79325
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MIA",
+        "destination": "ATL",
+        "count": 6623,
+        "originName": "Miami International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "MIA → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.29055556,
+            25.79325
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "DEN",
+        "count": 6623,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Denver Intl",
+        "route": "SEA → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "SFO",
+        "count": 6591,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "San Francisco International",
+        "route": "JFK → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "LAX",
+        "count": 6571,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "Los Angeles International",
+        "route": "DFW → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "DFW",
+        "count": 6571,
+        "originName": "Los Angeles International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "LAX → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "SEA",
+        "count": 6414,
+        "originName": "Denver Intl",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "DEN → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHL",
+        "destination": "BOS",
+        "count": 6384,
+        "originName": "Philadelphia Intl",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "PHL → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -75.24114083,
+            39.87195278
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "PHL",
+        "count": 6375,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "Philadelphia Intl",
+        "route": "BOS → PHL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -75.24114083,
+            39.87195278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "SAN",
+        "count": 6312,
+        "originName": "San Francisco International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "SFO → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ANC",
+        "destination": "SEA",
+        "count": 6257,
+        "originName": "Ted Stevens Anchorage International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "ANC → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -149.9961856,
+            61.17432028
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "ANC",
+        "count": 6256,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Ted Stevens Anchorage International",
+        "route": "SEA → ANC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -149.9961856,
+            61.17432028
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "ORD",
+        "count": 6051,
+        "originName": "Denver Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "DEN → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CVG",
+        "destination": "ORD",
+        "count": 6014,
+        "originName": "Cincinnati Northern Kentucky Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "CVG → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.6621725,
+            39.04614278
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "CLT",
+        "count": 6013,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Charlotte/Douglas International",
+        "route": "ORD → CLT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -80.94312583,
+            35.21401111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "CVG",
+        "count": 5993,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Cincinnati Northern Kentucky Intl",
+        "route": "ORD → CVG"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -84.6621725,
+            39.04614278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "BOS",
+        "count": 5990,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "ATL → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "ATL",
+        "count": 5982,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "BOS → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "BWI",
+        "count": 5978,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Baltimore-Washington International",
+        "route": "ATL → BWI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -76.66819833,
+            39.17540167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BWI",
+        "destination": "ATL",
+        "count": 5972,
+        "originName": "Baltimore-Washington International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "BWI → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -76.66819833,
+            39.17540167
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CLT",
+        "destination": "EWR",
+        "count": 5953,
+        "originName": "Charlotte/Douglas International",
+        "destinationName": "Newark Intl",
+        "route": "CLT → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.94312583,
+            35.21401111
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "CLT",
+        "count": 5945,
+        "originName": "Newark Intl",
+        "destinationName": "Charlotte/Douglas International",
+        "route": "EWR → CLT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -80.94312583,
+            35.21401111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "ATL",
+        "count": 5903,
+        "originName": "Denver Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "DEN → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "LAS",
+        "count": 5902,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "McCarran International",
+        "route": "SAN → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "SAN",
+        "count": 5895,
+        "originName": "McCarran International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "LAS → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "SAN",
+        "count": 5851,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "OAK → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "OAK",
+        "count": 5831,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "SAN → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "DEN",
+        "count": 5773,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Denver Intl",
+        "route": "ORD → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "ORD",
+        "count": 5746,
+        "originName": "San Francisco International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "SFO → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "DEN",
+        "count": 5726,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Denver Intl",
+        "route": "ATL → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SMF",
+        "destination": "LAX",
+        "count": 5717,
+        "originName": "Sacramento International",
+        "destinationName": "Los Angeles International",
+        "route": "SMF → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.5907669,
+            38.69542167
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SMF",
+        "count": 5692,
+        "originName": "Los Angeles International",
+        "destinationName": "Sacramento International",
+        "route": "LAX → SMF"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -121.5907669,
+            38.69542167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "JAX",
+        "count": 5656,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Jacksonville International",
+        "route": "ATL → JAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -81.68786111,
+            30.49405556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JAX",
+        "destination": "ATL",
+        "count": 5656,
+        "originName": "Jacksonville International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "JAX → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.68786111,
+            30.49405556
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "ORD",
+        "count": 5651,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "Chicago O'Hare International",
+        "route": "IAH → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CLT",
+        "destination": "ORD",
+        "count": 5639,
+        "originName": "Charlotte/Douglas International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "CLT → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.94312583,
+            35.21401111
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ONT",
+        "destination": "PHX",
+        "count": 5628,
+        "originName": "Ontario International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "ONT → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.6011944,
+            34.056
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "ONT",
+        "count": 5627,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Ontario International",
+        "route": "PHX → ONT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -117.6011944,
+            34.056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "DTW",
+        "count": 5612,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Detroit Metropolitan-Wayne County",
+        "route": "ATL → DTW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -83.34883583,
+            42.21205889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DTW",
+        "destination": "ATL",
+        "count": 5612,
+        "originName": "Detroit Metropolitan-Wayne County",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "DTW → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -83.34883583,
+            42.21205889
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "SFO",
+        "count": 5604,
+        "originName": "Denver Intl",
+        "destinationName": "San Francisco International",
+        "route": "DEN → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DAL",
+        "destination": "AUS",
+        "count": 5583,
+        "originName": "Dallas Love",
+        "destinationName": "Austin-Bergstrom International",
+        "route": "DAL → AUS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -96.85177222,
+            32.84711389
+          ],
+          [
+            -97.66987194,
+            30.19453278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "AUS",
+        "destination": "DAL",
+        "count": 5573,
+        "originName": "Austin-Bergstrom International",
+        "destinationName": "Dallas Love",
+        "route": "AUS → DAL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.66987194,
+            30.19453278
+          ],
+          [
+            -96.85177222,
+            32.84711389
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "DFW",
+        "count": 5539,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "IAH → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "IAH",
+        "count": 5526,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "George Bush Intercontinental",
+        "route": "DFW → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "SFO",
+        "count": 5524,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "San Francisco International",
+        "route": "ORD → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "AUS",
+        "count": 5508,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "Austin-Bergstrom International",
+        "route": "DFW → AUS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -97.66987194,
+            30.19453278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "AUS",
+        "destination": "DFW",
+        "count": 5506,
+        "originName": "Austin-Bergstrom International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "AUS → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.66987194,
+            30.19453278
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "SNA",
+        "count": 5497,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "John Wayne /Orange Co",
+        "route": "PHX → SNA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -117.8682225,
+            33.67565861
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SNA",
+        "destination": "PHX",
+        "count": 5477,
+        "originName": "John Wayne /Orange Co",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "SNA → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.8682225,
+            33.67565861
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "IAH",
+        "count": 5463,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "George Bush Intercontinental",
+        "route": "ORD → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSP",
+        "destination": "DTW",
+        "count": 5459,
+        "originName": "Minneapolis-St Paul Intl",
+        "destinationName": "Detroit Metropolitan-Wayne County",
+        "route": "MSP → DTW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.2169225,
+            44.88054694
+          ],
+          [
+            -83.34883583,
+            42.21205889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BUR",
+        "destination": "OAK",
+        "count": 5423,
+        "originName": "Burbank-Glendale-Pasadena",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "BUR → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.3584969,
+            34.20061917
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "BUR",
+        "count": 5420,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "Burbank-Glendale-Pasadena",
+        "route": "OAK → BUR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -118.3584969,
+            34.20061917
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "RDU",
+        "destination": "ATL",
+        "count": 5418,
+        "originName": "Raleigh-Durham International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "RDU → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -78.78747222,
+            35.87763889
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "SAT",
+        "count": 5414,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "San Antonio International",
+        "route": "DFW → SAT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -98.46977778,
+            29.53369444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "SEA",
+        "count": 5414,
+        "originName": "San Francisco International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "SFO → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAT",
+        "destination": "DFW",
+        "count": 5413,
+        "originName": "San Antonio International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "SAT → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -98.46977778,
+            29.53369444
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "RDU",
+        "count": 5411,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Raleigh-Durham International",
+        "route": "ATL → RDU"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -78.78747222,
+            35.87763889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "SFO",
+        "count": 5409,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "San Francisco International",
+        "route": "SEA → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "LAX",
+        "count": 5406,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Los Angeles International",
+        "route": "ATL → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "ATL",
+        "count": 5402,
+        "originName": "Los Angeles International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "LAX → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SNA",
+        "destination": "SJC",
+        "count": 5401,
+        "originName": "John Wayne /Orange Co",
+        "destinationName": "San Jose International",
+        "route": "SNA → SJC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.8682225,
+            33.67565861
+          ],
+          [
+            -121.9290089,
+            37.36186194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "PHX",
+        "count": 5388,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "DFW → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "DFW",
+        "count": 5387,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "PHX → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SJC",
+        "destination": "SNA",
+        "count": 5383,
+        "originName": "San Jose International",
+        "destinationName": "John Wayne /Orange Co",
+        "route": "SJC → SNA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.9290089,
+            37.36186194
+          ],
+          [
+            -117.8682225,
+            33.67565861
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "SLC",
+        "count": 5378,
+        "originName": "McCarran International",
+        "destinationName": "Salt Lake City Intl",
+        "route": "LAS → SLC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -111.9777731,
+            40.78838778
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSP",
+        "destination": "DEN",
+        "count": 5374,
+        "originName": "Minneapolis-St Paul Intl",
+        "destinationName": "Denver Intl",
+        "route": "MSP → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.2169225,
+            44.88054694
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "DEN",
+        "count": 5374,
+        "originName": "San Francisco International",
+        "destinationName": "Denver Intl",
+        "route": "SFO → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "MCO",
+        "count": 5373,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "Orlando International",
+        "route": "JFK → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SLC",
+        "destination": "LAS",
+        "count": 5373,
+        "originName": "Salt Lake City Intl",
+        "destinationName": "McCarran International",
+        "route": "SLC → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111.9777731,
+            40.78838778
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "DFW",
+        "count": 5372,
+        "originName": "LaGuardia",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "LGA → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCO",
+        "destination": "JFK",
+        "count": 5371,
+        "originName": "Orlando International",
+        "destinationName": "John F Kennedy Intl",
+        "route": "MCO → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.31602778,
+            28.42888889
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSP",
+        "destination": "ATL",
+        "count": 5369,
+        "originName": "Minneapolis-St Paul Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "MSP → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.2169225,
+            44.88054694
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MSP",
+        "count": 5368,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Minneapolis-St Paul Intl",
+        "route": "ATL → MSP"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -93.2169225,
+            44.88054694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "LGA",
+        "count": 5365,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "LaGuardia",
+        "route": "DFW → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAD",
+        "destination": "ATL",
+        "count": 5362,
+        "originName": "Washington Dulles International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "IAD → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.45580972,
+            38.94453194
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "SAN",
+        "count": 5358,
+        "originName": "Denver Intl",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "DEN → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CLT",
+        "destination": "LGA",
+        "count": 5339,
+        "originName": "Charlotte/Douglas International",
+        "destinationName": "LaGuardia",
+        "route": "CLT → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.94312583,
+            35.21401111
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "IAD",
+        "count": 5309,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Washington Dulles International",
+        "route": "ATL → IAD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -77.45580972,
+            38.94453194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "SJC",
+        "count": 5286,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "San Jose International",
+        "route": "SAN → SJC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -121.9290089,
+            37.36186194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "IAH",
+        "count": 5268,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "George Bush Intercontinental",
+        "route": "ATL → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ABQ",
+        "destination": "PHX",
+        "count": 5265,
+        "originName": "Albuquerque International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "ABQ → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -106.6091944,
+            35.04022222
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "DEN",
+        "count": 5263,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "Denver Intl",
+        "route": "SAN → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "LAS",
+        "count": 5257,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "McCarran International",
+        "route": "ORD → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCI",
+        "destination": "DEN",
+        "count": 5256,
+        "originName": "Kansas City International",
+        "destinationName": "Denver Intl",
+        "route": "MCI → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -94.71390556,
+            39.29760528
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SJC",
+        "destination": "SAN",
+        "count": 5254,
+        "originName": "San Jose International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "SJC → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.9290089,
+            37.36186194
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "ORD",
+        "count": 5235,
+        "originName": "McCarran International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "LAS → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "ABQ",
+        "count": 5234,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Albuquerque International",
+        "route": "PHX → ABQ"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -106.6091944,
+            35.04022222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SLC",
+        "count": 5178,
+        "originName": "Los Angeles International",
+        "destinationName": "Salt Lake City Intl",
+        "route": "LAX → SLC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -111.9777731,
+            40.78838778
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SLC",
+        "destination": "LAX",
+        "count": 5178,
+        "originName": "Salt Lake City Intl",
+        "destinationName": "Los Angeles International",
+        "route": "SLC → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -111.9777731,
+            40.78838778
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BUR",
+        "destination": "LAS",
+        "count": 5162,
+        "originName": "Burbank-Glendale-Pasadena",
+        "destinationName": "McCarran International",
+        "route": "BUR → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.3584969,
+            34.20061917
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "BUR",
+        "count": 5154,
+        "originName": "McCarran International",
+        "destinationName": "Burbank-Glendale-Pasadena",
+        "route": "LAS → BUR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -118.3584969,
+            34.20061917
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "ORD",
+        "count": 5130,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "PHX → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "PHX",
+        "count": 5124,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "ORD → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "MCI",
+        "count": 5111,
+        "originName": "Denver Intl",
+        "destinationName": "Kansas City International",
+        "route": "DEN → MCI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -94.71390556,
+            39.29760528
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "OAK",
+        "count": 5095,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "SEA → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "SEA",
+        "count": 5072,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "PHX → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "SEA",
+        "count": 5065,
+        "originName": "McCarran International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "LAS → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "PHX",
+        "count": 5062,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "SEA → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "LAS",
+        "count": 5051,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "McCarran International",
+        "route": "SEA → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "SEA",
+        "count": 5047,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "OAK → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "MSP",
+        "count": 5011,
+        "originName": "Denver Intl",
+        "destinationName": "Minneapolis-St Paul Intl",
+        "route": "DEN → MSP"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -93.2169225,
+            44.88054694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAT",
+        "destination": "DAL",
+        "count": 4999,
+        "originName": "San Antonio International",
+        "destinationName": "Dallas Love",
+        "route": "SAT → DAL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -98.46977778,
+            29.53369444
+          ],
+          [
+            -96.85177222,
+            32.84711389
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "ATL",
+        "count": 4989,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "IAH → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "MCO",
+        "count": 4978,
+        "originName": "Newark Intl",
+        "destinationName": "Orlando International",
+        "route": "EWR → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCO",
+        "destination": "EWR",
+        "count": 4977,
+        "originName": "Orlando International",
+        "destinationName": "Newark Intl",
+        "route": "MCO → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.31602778,
+            28.42888889
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DAL",
+        "destination": "SAT",
+        "count": 4973,
+        "originName": "Dallas Love",
+        "destinationName": "San Antonio International",
+        "route": "DAL → SAT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -96.85177222,
+            32.84711389
+          ],
+          [
+            -98.46977778,
+            29.53369444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "HNL",
+        "count": 4964,
+        "originName": "Los Angeles International",
+        "destinationName": "Honolulu International",
+        "route": "LAX → HNL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -157.9224072,
+            21.31869111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "HNL",
+        "destination": "LAX",
+        "count": 4963,
+        "originName": "Honolulu International",
+        "destinationName": "Los Angeles International",
+        "route": "HNL → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -157.9224072,
+            21.31869111
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CMH",
+        "destination": "ORD",
+        "count": 4959,
+        "originName": "Port Columbus Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "CMH → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -82.89188278,
+            39.99798528
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "DFW",
+        "count": 4959,
+        "originName": "McCarran International",
+        "destinationName": "Dallas-Fort Worth International",
+        "route": "LAS → DFW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -97.0372,
+            32.89595056
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "CLT",
+        "count": 4958,
+        "originName": "LaGuardia",
+        "destinationName": "Charlotte/Douglas International",
+        "route": "LGA → CLT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -80.94312583,
+            35.21401111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DFW",
+        "destination": "LAS",
+        "count": 4956,
+        "originName": "Dallas-Fort Worth International",
+        "destinationName": "McCarran International",
+        "route": "DFW → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -97.0372,
+            32.89595056
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DTW",
+        "destination": "MSP",
+        "count": 4947,
+        "originName": "Detroit Metropolitan-Wayne County",
+        "destinationName": "Minneapolis-St Paul Intl",
+        "route": "DTW → MSP"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -83.34883583,
+            42.21205889
+          ],
+          [
+            -93.2169225,
+            44.88054694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSN",
+        "destination": "ORD",
+        "count": 4943,
+        "originName": "Dane County Regional",
+        "destinationName": "Chicago O'Hare International",
+        "route": "MSN → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -89.33751361,
+            43.13985778
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BWI",
+        "destination": "MCO",
+        "count": 4926,
+        "originName": "Baltimore-Washington International",
+        "destinationName": "Orlando International",
+        "route": "BWI → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -76.66819833,
+            39.17540167
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MCO",
+        "destination": "BWI",
+        "count": 4926,
+        "originName": "Orlando International",
+        "destinationName": "Baltimore-Washington International",
+        "route": "MCO → BWI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.31602778,
+            28.42888889
+          ],
+          [
+            -76.66819833,
+            39.17540167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "SFO",
+        "count": 4884,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "San Francisco International",
+        "route": "PHX → SFO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -122.3748433,
+            37.61900194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "MSN",
+        "count": 4878,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Dane County Regional",
+        "route": "ORD → MSN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -89.33751361,
+            43.13985778
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MEM",
+        "destination": "ATL",
+        "count": 4870,
+        "originName": "Memphis International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "MEM → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -89.97666667,
+            35.04241667
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SFO",
+        "destination": "PHX",
+        "count": 4870,
+        "originName": "San Francisco International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "SFO → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3748433,
+            37.61900194
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MEM",
+        "count": 4866,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Memphis International",
+        "route": "ATL → MEM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -89.97666667,
+            35.04241667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "DSM",
+        "count": 4823,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Des Moines International",
+        "route": "ORD → DSM"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -93.66068222,
+            41.53493306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "SEA",
+        "count": 4802,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "ORD → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "BWI",
+        "count": 4797,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "Baltimore-Washington International",
+        "route": "BOS → BWI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -76.66819833,
+            39.17540167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BWI",
+        "destination": "BOS",
+        "count": 4795,
+        "originName": "Baltimore-Washington International",
+        "destinationName": "Gen Edw L Logan Intl",
+        "route": "BWI → BOS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -76.66819833,
+            39.17540167
+          ],
+          [
+            -71.00517917,
+            42.3643475
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "IAH",
+        "count": 4788,
+        "originName": "Denver Intl",
+        "destinationName": "George Bush Intercontinental",
+        "route": "DEN → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "LAS",
+        "count": 4766,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "McCarran International",
+        "route": "ATL → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "ATL",
+        "count": 4761,
+        "originName": "McCarran International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "LAS → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "BUR",
+        "count": 4754,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Burbank-Glendale-Pasadena",
+        "route": "PHX → BUR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -118.3584969,
+            34.20061917
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BUR",
+        "destination": "PHX",
+        "count": 4751,
+        "originName": "Burbank-Glendale-Pasadena",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "BUR → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.3584969,
+            34.20061917
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "FLL",
+        "destination": "JFK",
+        "count": 4699,
+        "originName": "Fort Lauderdale-Hollywood Int'l",
+        "destinationName": "John F Kennedy Intl",
+        "route": "FLL → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.15275,
+            26.07258333
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "FLL",
+        "count": 4696,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "Fort Lauderdale-Hollywood Int'l",
+        "route": "JFK → FLL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -80.15275,
+            26.07258333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MSY",
+        "count": 4695,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "New Orleans International",
+        "route": "ATL → MSY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -90.25802778,
+            29.99338889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSY",
+        "destination": "ATL",
+        "count": 4695,
+        "originName": "New Orleans International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "MSY → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -90.25802778,
+            29.99338889
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "OAK",
+        "count": 4693,
+        "originName": "McCarran International",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "LAS → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "CMH",
+        "count": 4664,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Port Columbus Intl",
+        "route": "ORD → CMH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -82.89188278,
+            39.99798528
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PDX",
+        "destination": "DEN",
+        "count": 4654,
+        "originName": "Portland Intl",
+        "destinationName": "Denver Intl",
+        "route": "PDX → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.5975,
+            45.58872222
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "LAS",
+        "count": 4642,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "McCarran International",
+        "route": "OAK → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "ORD",
+        "count": 4608,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "SEA → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "ATL",
+        "count": 4607,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PHX → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PHX",
+        "count": 4603,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "ATL → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SAN",
+        "destination": "SMF",
+        "count": 4603,
+        "originName": "San Diego International-Lindbergh",
+        "destinationName": "Sacramento International",
+        "route": "SAN → SMF"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.1896567,
+            32.73355611
+          ],
+          [
+            -121.5907669,
+            38.69542167
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "DTW",
+        "count": 4601,
+        "originName": "LaGuardia",
+        "destinationName": "Detroit Metropolitan-Wayne County",
+        "route": "LGA → DTW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -83.34883583,
+            42.21205889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DTW",
+        "destination": "LGA",
+        "count": 4594,
+        "originName": "Detroit Metropolitan-Wayne County",
+        "destinationName": "LaGuardia",
+        "route": "DTW → LGA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -83.34883583,
+            42.21205889
+          ],
+          [
+            -73.87260917,
+            40.77724306
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "DEN",
+        "count": 4584,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "Denver Intl",
+        "route": "IAH → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SMF",
+        "destination": "SAN",
+        "count": 4573,
+        "originName": "Sacramento International",
+        "destinationName": "San Diego International-Lindbergh",
+        "route": "SMF → SAN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.5907669,
+            38.69542167
+          ],
+          [
+            -117.1896567,
+            32.73355611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CLE",
+        "destination": "ORD",
+        "count": 4569,
+        "originName": "Cleveland-Hopkins Intl",
+        "destinationName": "Chicago O'Hare International",
+        "route": "CLE → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.84939667,
+            41.41089417
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "CLE",
+        "count": 4567,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Cleveland-Hopkins Intl",
+        "route": "ORD → CLE"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -81.84939667,
+            41.41089417
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "PDX",
+        "count": 4563,
+        "originName": "Denver Intl",
+        "destinationName": "Portland Intl",
+        "route": "DEN → PDX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -122.5975,
+            45.58872222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "STL",
+        "count": 4558,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Lambert-St Louis International",
+        "route": "ORD → STL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -90.35998972,
+            38.74768694
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PIT",
+        "destination": "ATL",
+        "count": 4557,
+        "originName": "Pittsburgh International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PIT → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.23287083,
+            40.49146583
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PIT",
+        "count": 4555,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Pittsburgh International",
+        "route": "ATL → PIT"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.23287083,
+            40.49146583
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "SBA",
+        "count": 4554,
+        "originName": "Los Angeles International",
+        "destinationName": "Santa Barbara Municipal",
+        "route": "LAX → SBA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -119.8403733,
+            34.42621194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "RIC",
+        "destination": "ATL",
+        "count": 4536,
+        "originName": "Richmond International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "RIC → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.31966667,
+            37.50516667
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "RIC",
+        "count": 4532,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Richmond International",
+        "route": "ATL → RIC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -77.31966667,
+            37.50516667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DSM",
+        "destination": "ORD",
+        "count": 4525,
+        "originName": "Des Moines International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "DSM → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -93.66068222,
+            41.53493306
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "RNO",
+        "destination": "LAS",
+        "count": 4508,
+        "originName": "Reno/Tahoe International",
+        "destinationName": "McCarran International",
+        "route": "RNO → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -119.7680647,
+            39.49857611
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SBA",
+        "destination": "LAX",
+        "count": 4498,
+        "originName": "Santa Barbara Municipal",
+        "destinationName": "Los Angeles International",
+        "route": "SBA → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -119.8403733,
+            34.42621194
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "CHS",
+        "destination": "ATL",
+        "count": 4494,
+        "originName": "Charleston AFB/International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "CHS → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.04050583,
+            32.89864639
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "CHS",
+        "count": 4492,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Charleston AFB/International",
+        "route": "ATL → CHS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.04050583,
+            32.89864639
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "RNO",
+        "count": 4492,
+        "originName": "McCarran International",
+        "destinationName": "Reno/Tahoe International",
+        "route": "LAS → RNO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -119.7680647,
+            39.49857611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "JFK",
+        "count": 4481,
+        "originName": "McCarran International",
+        "destinationName": "John F Kennedy Intl",
+        "route": "LAS → JFK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -73.77892556,
+            40.63975111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "LAS",
+        "count": 4471,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "McCarran International",
+        "route": "JFK → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "FLL",
+        "count": 4432,
+        "originName": "Newark Intl",
+        "destinationName": "Fort Lauderdale-Hollywood Int'l",
+        "route": "EWR → FLL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -80.15275,
+            26.07258333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "FLL",
+        "destination": "EWR",
+        "count": 4431,
+        "originName": "Fort Lauderdale-Hollywood Int'l",
+        "destinationName": "Newark Intl",
+        "route": "FLL → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.15275,
+            26.07258333
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PNS",
+        "destination": "ATL",
+        "count": 4430,
+        "originName": "Pensacola Regional",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PNS → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.18744444,
+            30.47330556
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PNS",
+        "count": 4429,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Pensacola Regional",
+        "route": "ATL → PNS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -87.18744444,
+            30.47330556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LGA",
+        "destination": "RDU",
+        "count": 4423,
+        "originName": "LaGuardia",
+        "destinationName": "Raleigh-Durham International",
+        "route": "LGA → RDU"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.87260917,
+            40.77724306
+          ],
+          [
+            -78.78747222,
+            35.87763889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "EWR",
+        "destination": "DTW",
+        "count": 4419,
+        "originName": "Newark Intl",
+        "destinationName": "Detroit Metropolitan-Wayne County",
+        "route": "EWR → DTW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -74.16866056,
+            40.69249722
+          ],
+          [
+            -83.34883583,
+            42.21205889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DTW",
+        "destination": "EWR",
+        "count": 4374,
+        "originName": "Detroit Metropolitan-Wayne County",
+        "destinationName": "Newark Intl",
+        "route": "DTW → EWR"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -83.34883583,
+            42.21205889
+          ],
+          [
+            -74.16866056,
+            40.69249722
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "DAY",
+        "count": 4372,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "James M Cox Dayton Intl",
+        "route": "ATL → DAY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -84.219375,
+            39.90237583
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "GEG",
+        "destination": "SEA",
+        "count": 4372,
+        "originName": "Spokane Intl",
+        "destinationName": "Seattle-Tacoma Intl",
+        "route": "GEG → SEA"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -117.5338425,
+            47.61985556
+          ],
+          [
+            -122.3093131,
+            47.44898194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DAY",
+        "destination": "ATL",
+        "count": 4369,
+        "originName": "James M Cox Dayton Intl",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "DAY → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.219375,
+            39.90237583
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SEA",
+        "destination": "GEG",
+        "count": 4346,
+        "originName": "Seattle-Tacoma Intl",
+        "destinationName": "Spokane Intl",
+        "route": "SEA → GEG"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.3093131,
+            47.44898194
+          ],
+          [
+            -117.5338425,
+            47.61985556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "MDW",
+        "count": 4338,
+        "originName": "Denver Intl",
+        "destinationName": "Chicago Midway",
+        "route": "DEN → MDW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -87.75242444,
+            41.7859825
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MDW",
+        "destination": "DEN",
+        "count": 4325,
+        "originName": "Chicago Midway",
+        "destinationName": "Denver Intl",
+        "route": "MDW → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.75242444,
+            41.7859825
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ABQ",
+        "destination": "DEN",
+        "count": 4318,
+        "originName": "Albuquerque International",
+        "destinationName": "Denver Intl",
+        "route": "ABQ → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -106.6091944,
+            35.04022222
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "ABQ",
+        "count": 4309,
+        "originName": "Denver Intl",
+        "destinationName": "Albuquerque International",
+        "route": "DEN → ABQ"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -106.6091944,
+            35.04022222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PBI",
+        "count": 4263,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Palm Beach International",
+        "route": "ATL → PBI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -80.09559417,
+            26.68316194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PBI",
+        "destination": "ATL",
+        "count": 4262,
+        "originName": "Palm Beach International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PBI → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.09559417,
+            26.68316194
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "MSY",
+        "destination": "IAH",
+        "count": 4257,
+        "originName": "New Orleans International",
+        "destinationName": "George Bush Intercontinental",
+        "route": "MSY → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -90.25802778,
+            29.99338889
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "STL",
+        "destination": "ORD",
+        "count": 4256,
+        "originName": "Lambert-St Louis International",
+        "destinationName": "Chicago O'Hare International",
+        "route": "STL → ORD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -90.35998972,
+            38.74768694
+          ],
+          [
+            -87.90446417,
+            41.979595
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "MSY",
+        "count": 4248,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "New Orleans International",
+        "route": "IAH → MSY"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -90.25802778,
+            29.99338889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAD",
+        "destination": "MCO",
+        "count": 4244,
+        "originName": "Washington Dulles International",
+        "destinationName": "Orlando International",
+        "route": "IAD → MCO"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -77.45580972,
+            38.94453194
+          ],
+          [
+            -81.31602778,
+            28.42888889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "OAK",
+        "destination": "PHX",
+        "count": 4213,
+        "originName": "Metropolitan Oakland International",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "OAK → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.2207167,
+            37.72129083
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "IAH",
+        "count": 4197,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "George Bush Intercontinental",
+        "route": "PHX → IAH"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -95.33972222,
+            29.98047222
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "RSW",
+        "destination": "ATL",
+        "count": 4196,
+        "originName": "Southwest Florida International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "RSW → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -81.75516667,
+            26.53616667
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "RSW",
+        "count": 4193,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Southwest Florida International",
+        "route": "ATL → RSW"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -81.75516667,
+            26.53616667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "COS",
+        "destination": "DEN",
+        "count": 4193,
+        "originName": "City of Colorado Springs Muni",
+        "destinationName": "Denver Intl",
+        "route": "COS → DEN"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.70025,
+            38.80580556
+          ],
+          [
+            -104.6670019,
+            39.85840806
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "TUS",
+        "destination": "LAX",
+        "count": 4190,
+        "originName": "Tucson International",
+        "destinationName": "Los Angeles International",
+        "route": "TUS → LAX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -110.9410278,
+            32.11608333
+          ],
+          [
+            -118.4080744,
+            33.94253611
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "DEN",
+        "destination": "COS",
+        "count": 4188,
+        "originName": "Denver Intl",
+        "destinationName": "City of Colorado Springs Muni",
+        "route": "DEN → COS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -104.6670019,
+            39.85840806
+          ],
+          [
+            -104.70025,
+            38.80580556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "BOS",
+        "destination": "IAD",
+        "count": 4184,
+        "originName": "Gen Edw L Logan Intl",
+        "destinationName": "Washington Dulles International",
+        "route": "BOS → IAD"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -71.00517917,
+            42.3643475
+          ],
+          [
+            -77.45580972,
+            38.94453194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "IAH",
+        "destination": "PHX",
+        "count": 4176,
+        "originName": "George Bush Intercontinental",
+        "destinationName": "Phoenix Sky Harbor International",
+        "route": "IAH → PHX"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -95.33972222,
+            29.98047222
+          ],
+          [
+            -112.0080556,
+            33.43416667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "SJC",
+        "destination": "LAS",
+        "count": 4176,
+        "originName": "San Jose International",
+        "destinationName": "McCarran International",
+        "route": "SJC → LAS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -121.9290089,
+            37.36186194
+          ],
+          [
+            -115.1523333,
+            36.08036111
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PIT",
+        "destination": "PHL",
+        "count": 4169,
+        "originName": "Pittsburgh International",
+        "destinationName": "Philadelphia Intl",
+        "route": "PIT → PHL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -80.23287083,
+            40.49146583
+          ],
+          [
+            -75.24114083,
+            39.87195278
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "PHF",
+        "count": 4158,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Newport News/Williamsburg International",
+        "route": "ATL → PHF"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -76.4929875,
+            37.13189556
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHF",
+        "destination": "ATL",
+        "count": 4157,
+        "originName": "Newport News/Williamsburg International",
+        "destinationName": "William B Hartsfield-Atlanta Intl",
+        "route": "PHF → ATL"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -76.4929875,
+            37.13189556
+          ],
+          [
+            -84.42694444,
+            33.64044444
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "ELP",
+        "count": 4155,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "El Paso International",
+        "route": "PHX → ELP"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -106.3778056,
+            31.80666667
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ORD",
+        "destination": "CID",
+        "count": 4154,
+        "originName": "Chicago O'Hare International",
+        "destinationName": "Eastern Iowa",
+        "route": "ORD → CID"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -87.90446417,
+            41.979595
+          ],
+          [
+            -91.71087222,
+            41.88458833
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "PHX",
+        "destination": "OAK",
+        "count": 4150,
+        "originName": "Phoenix Sky Harbor International",
+        "destinationName": "Metropolitan Oakland International",
+        "route": "PHX → OAK"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -112.0080556,
+            33.43416667
+          ],
+          [
+            -122.2207167,
+            37.72129083
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "JFK",
+        "destination": "RDU",
+        "count": 4149,
+        "originName": "John F Kennedy Intl",
+        "destinationName": "Raleigh-Durham International",
+        "route": "JFK → RDU"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -73.77892556,
+            40.63975111
+          ],
+          [
+            -78.78747222,
+            35.87763889
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAS",
+        "destination": "SJC",
+        "count": 4148,
+        "originName": "McCarran International",
+        "destinationName": "San Jose International",
+        "route": "LAS → SJC"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -115.1523333,
+            36.08036111
+          ],
+          [
+            -121.9290089,
+            37.36186194
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "LAX",
+        "destination": "TUS",
+        "count": 4141,
+        "originName": "Los Angeles International",
+        "destinationName": "Tucson International",
+        "route": "LAX → TUS"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -118.4080744,
+            33.94253611
+          ],
+          [
+            -110.9410278,
+            32.11608333
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "origin": "ATL",
+        "destination": "MCI",
+        "count": 4140,
+        "originName": "William B Hartsfield-Atlanta Intl",
+        "destinationName": "Kansas City International",
+        "route": "ATL → MCI"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -84.42694444,
+            33.64044444
+          ],
+          [
+            -94.71390556,
+            39.29760528
+          ]
+        ]
+      }
+    }
+  ]
+}

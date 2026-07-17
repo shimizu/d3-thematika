@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>インセット地図 - d3-thematika</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/responsive.css">
+    <script src="../js/common.js"></script>
+    <style>
+        /* インセット地図の配置: メイン地図の右下に重ねる */
+        #map { position: relative; }
+        #inset {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            width: 200px;
+            height: 150px;
+            background: #ffffff;
+            border: 1px solid #94a3b8;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-brand">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2L2 7V12C2 16.97 5.54 21.5 12 23C18.46 21.5 22 16.97 22 12V7L12 2M12 20.47C6.57 19.28 4 15.53 4 12V8.27L12 4.61L20 8.27V12C20 15.53 17.43 19.28 12 20.47Z"/>
+                </svg>
+                d3-thematika
+            </a>
+            <div class="nav-links">
+                <a href="../examples.html" class="nav-link">Examples</a>
+                <a href="../docs/" class="nav-link">Docs</a>
+                <a href="https://github.com/shimizu/d3-thematika" class="nav-link">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="main-container">
+        <!-- ブレッドクラム -->
+        <nav class="breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item"><a href="../index.html">Home</a></li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item"><a href="../examples.html">Examples</a></li>
+                <li class="breadcrumb-item breadcrumb-separator">></li>
+                <li class="breadcrumb-item breadcrumb-current">インセット地図</li>
+            </ol>
+        </nav>
+
+        <section>
+            <h2 class="section-title">インセット地図（位置図）デモ</h2>
+
+            <div class="info-box">
+                <h3>📊 使用データ & 機能</h3>
+                <ul>
+                    <li>メイン地図（群馬県）とインセット位置図（日本全体）の2つのMapを組み合わせ</li>
+                    <li>bboxToPolygon() でメイン地図の表示範囲をD3互換Polygonに変換し、位置図に範囲枠として描画</li>
+                    <li>getBbox() によるメインデータの境界ボックス取得</li>
+                </ul>
+            </div>
+
+            <!-- マップ表示エリア -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <h3>地図表示</h3>
+                    <div class="download-buttons">
+                        <button id="download-svg" class="download-button">SVG</button>
+                        <button id="download-png" class="download-button">PNG</button>
+                    </div>
+                </div>
+                <div id="map">
+                    <div id="inset"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- コードサンプル -->
+        <section class="code-section">
+            <h2 class="section-title">実装サンプル</h2>
+
+            <div class="code-header">
+                <h3>インセット地図の作り方</h3>
+                <button class="copy-button" onclick="copyCode()">コードをコピー</button>
+            </div>
+            <div class="code-block">
+                <pre id="sample-code">// インセット地図は「メイン地図」と「位置図」の2つのMapで作る。
+// HTML側で位置図のdivをメイン地図の上に重ねておく:
+//   &lt;div id="map"&gt;&lt;div id="inset"&gt;&lt;/div&gt;&lt;/div&gt;
+//   #inset { position: absolute; right: 12px; bottom: 12px; ... }
+
+// 1. メイン地図（群馬県）
+const gunma = await d3.json('./geojson/japan/gunma.geojson');
+const mainProjection = d3.geoMercator()
+    .fitExtent([[20, 20], [width - 20, height - 20]], gunma);
+
+const mainMap = new Thematika.Map({
+    container: '#map', width, height,
+    projection: mainProjection
+});
+mainMap.addLayer('gunma', new Thematika.GeojsonLayer({
+    data: gunma,
+    attr: { fill: '#a8d5ba', stroke: '#5b8a72', 'stroke-width': 0.5 }
+}));
+
+// 2. インセット位置図（日本全体 + メイン地図の範囲枠）
+const japan = await d3.json('./geojson/japan/pref.geojson');
+const insetProjection = d3.geoMercator()
+    .fitExtent([[5, 5], [195, 145]], japan);
+
+const insetMap = new Thematika.Map({
+    container: '#inset', width: 200, height: 150,
+    projection: insetProjection
+});
+
+// メインデータのbboxをD3互換Polygon（外側リング時計回り）に変換
+const bbox = Thematika.getBbox(gunma);
+const frame = Thematika.bboxToPolygon([bbox.minX, bbox.minY, bbox.maxX, bbox.maxY]);
+
+insetMap.addLayer('japan', new Thematika.GeojsonLayer({
+    data: japan,
+    attr: { fill: '#e2e8f0', stroke: '#94a3b8', 'stroke-width': 0.3 }
+}));
+insetMap.addLayer('frame', new Thematika.GeojsonLayer({
+    data: [frame],
+    attr: { fill: 'none', stroke: '#e11d48', 'stroke-width': 1.5 }
+}));</pre>
+            </div>
+        </section>
+    </div>
+
+    <!-- UMD版のライブラリを使用 -->
+    <script src="../js/thematika.umd.js"></script>
+
+    <script>
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        let mainMap;
+
+        async function draw() {
+            const container = document.querySelector('#map');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            // インセットのdivは残してSVGだけ再作成する
+            d3.select('#map').selectAll('svg').remove();
+            d3.select('#inset').selectAll('svg').remove();
+
+            const [gunma, japan] = await Promise.all([
+                d3.json('../geojson/japan/gunma.geojson'),
+                d3.json('../geojson/japan/pref.geojson')
+            ]);
+
+            // 1. メイン地図（群馬県）
+            const mainProjection = d3.geoMercator()
+                .fitExtent([[20, 20], [width - 20, height - 20]], gunma);
+
+            mainMap = new Thematika.Map({
+                container: '#map',
+                width: width,
+                height: height,
+                projection: mainProjection,
+                backgroundColor: '#eff6ff'
+            });
+
+            mainMap.addLayer('gunma', new Thematika.GeojsonLayer({
+                data: gunma,
+                attr: { fill: '#a8d5ba', stroke: '#5b8a72', 'stroke-width': 0.5 }
+            }));
+            mainMap.addLayer('title', new Thematika.TitleLayer({
+                title: '群馬県',
+                position: 'top-left'
+            }));
+
+            // 2. インセット位置図（日本全体 + 範囲枠）
+            const insetW = 200, insetH = 150;
+            const insetProjection = d3.geoMercator()
+                .fitExtent([[5, 5], [insetW - 5, insetH - 5]], japan);
+
+            const insetMap = new Thematika.Map({
+                container: '#inset',
+                width: insetW,
+                height: insetH,
+                projection: insetProjection,
+                backgroundColor: '#f8fafc'
+            });
+
+            const bbox = Thematika.getBbox(gunma);
+            const frame = Thematika.bboxToPolygon([bbox.minX, bbox.minY, bbox.maxX, bbox.maxY]);
+
+            insetMap.addLayer('japan', new Thematika.GeojsonLayer({
+                data: japan,
+                attr: { fill: '#e2e8f0', stroke: '#94a3b8', 'stroke-width': 0.3 }
+            }));
+            insetMap.addLayer('frame', new Thematika.GeojsonLayer({
+                data: [frame],
+                attr: { fill: 'none', stroke: '#e11d48', 'stroke-width': 1.5 }
+            }));
+        }
+
+        draw();
+
+        document.getElementById('download-svg').addEventListener('click', () => mainMap.saveSVG('inset-map.svg'));
+        document.getElementById('download-png').addEventListener('click', () => mainMap.savePNG('inset-map.png'));
+    </script>
+</body>
+</html>
