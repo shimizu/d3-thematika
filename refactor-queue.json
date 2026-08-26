@@ -1,0 +1,16 @@
+[
+  {
+    "id": "point-render-common",
+    "goal": "src/layers/point/ の PointCircle / PointSymbol / PointSpike で重複している「フィーチャー→重心→投影座標」変換と class 属性の組み立てを、point 配下の共通ヘルパー（例: src/layers/point/point-common.ts）に抽出して3レイヤーから利用する",
+    "allowed": "src/layers/point/*.ts",
+    "forbid": "各レイヤークラスのコンストラクタ引数・公開メソッド・生成されるSVG構造とクラス名（thematika-point-circle-layer / thematika-point-symbol-layer / thematika-point-spike-layer とその子要素）、src/index.ts の export 一覧",
+    "budget": 3
+  },
+  {
+    "id": "effect-filter-factory",
+    "goal": "src/utils/effect-utils.ts の create* 系フィルターファクトリ（13関数）に散在する定型処理（filter要素の生成と x/y/width/height の適用、戻り値関数への .url() 付与）を内部ヘルパーに集約して重複をなくす",
+    "allowed": "src/utils/effect-utils.ts",
+    "forbid": "エクスポートされている create* 関数・FilterPresets・WebFontPresets・getFilterUrl・chainFilters の名前とシグネチャ、戻り値が呼び出し可能かつ .url() を持つこと、生成される filter 要素のXML構造",
+    "budget": 3
+  }
+]

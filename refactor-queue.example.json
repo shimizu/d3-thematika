@@ -1,0 +1,15 @@
+[
+  {
+    "id": "scale-util",
+    "goal": "src/util/scale.js の d3 スケール生成を1つのファクトリ関数に統一する",
+    "allowed": "src/util/scale.js",
+    "forbid": "createScale / createAxis の引数と戻り値",
+    "budget": 2
+  },
+  {
+    "id": "layer-props",
+    "goal": "src/layers/*.js の deck.gl レイヤ props 組み立てを common.js に共通化する",
+    "allowed": "src/layers/*.js src/layers/common.js",
+    "budget": 3
+  }
+]
